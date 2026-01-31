@@ -43,7 +43,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                         </h2>
                         <p className="text-slate-500">Handpicked luxury properties that represent the best of what MakeMyStay has to offer</p>
                     </div>
-                    <Link to="/properties" className="hidden sm:flex items-center text-sm font-bold text-slate-900 hover:text-emerald-600 transition-colors">
+                    <Link to="/properties" className="hidden sm:flex items-center text-sm font-bold text-slate-900 hover:text-brand-red transition-colors">
                         View All Properties <ArrowRight className="ml-2 w-4 h-4" />
                     </Link>
                 </div>
@@ -53,35 +53,34 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                         filteredProperties.map((prop) => {
                             return (
                                 <Link to={`/property/${prop.id}`} key={prop.id} className="block group">
-                                    <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                                    <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 border-l-4 border-l-brand-red shadow-sm hover:shadow-[0_10px_40px_rgba(217,32,39,0.1)] hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                         <div className="relative h-64 overflow-hidden">
                                             <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+                                            <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                                                 {prop.tag}
                                             </div>
-                                            {/* Removed hardcoded Rent/Sale badge as requested */}
                                         </div>
 
                                         <div className="p-6 flex-1 flex flex-col">
                                             <div className="flex items-center text-xs text-slate-500 mb-2">
-                                                <MapPin className="w-3 h-3 mr-1" /> {prop.location}
+                                                <MapPin className="w-3 h-3 mr-1 text-brand-red" /> {prop.location}
                                             </div>
-                                            <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">{prop.title}</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-brand-red transition-colors">{prop.title}</h3>
 
                                             <div className="flex items-center space-x-4 text-xs text-slate-500 my-4 py-4 border-t border-b border-slate-100">
                                                 <div className="flex items-center">
-                                                    <Bed className="w-4 h-4 mr-1 text-slate-400" /> {prop.beds} Beds
+                                                    <Bed className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.beds} Beds
                                                 </div>
                                                 <div className="flex items-center">
-                                                    <Bath className="w-4 h-4 mr-1 text-slate-400" /> {prop.baths} Baths
+                                                    <Bath className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.baths} Baths
                                                 </div>
                                                 <div className="flex items-center">
-                                                    <Hash className="w-4 h-4 mr-1 text-slate-400" /> {prop.sqft} sqft
+                                                    <Hash className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.sqft} sqft
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center justify-between mt-auto">
-                                                <div className="text-xl font-bold text-slate-900">{prop.price}</div>
+                                                <div className="text-xl font-bold text-brand-red">{prop.price}</div>
                                                 <div className="text-xs font-medium text-slate-400 uppercase">{prop.type}</div>
                                             </div>
                                         </div>

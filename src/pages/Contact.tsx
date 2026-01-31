@@ -76,7 +76,7 @@ export default function Contact() {
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Call Us</h3>
                                 <p className="text-slate-500 mb-4">Mon-Fri from 8am to 5pm.</p>
-                                <a href="tel:+919876543210" className="text-lg font-semibold text-emerald-600 hover:text-emerald-700 block">+91 98765 43210</a>
+                                <a href="tel:+919876543210" className="text-lg font-semibold text-emerald-600 hover:text-emerald-700 block"> +91 81500 99911</a>
                             </div>
 
                             <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
@@ -95,8 +95,8 @@ export default function Contact() {
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Visit Us</h3>
                                 <p className="text-slate-500 mb-4">Come say hello at our office.</p>
                                 <p className="text-lg font-semibold text-slate-900">
-                                    123 Tech Park, Koramangala<br />
-                                    Bangalore, India 560034
+                                    1142, 6th Main Rd, 7th Sector, <br />
+                                    HSR Layout, Bengaluru, Karnataka 560102
                                 </p>
                             </div>
                         </div>
@@ -151,7 +151,7 @@ export default function Contact() {
                                                 onChange={handleChange}
                                                 required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                                                placeholder="+91 98765 43210"
+                                                placeholder=" +91 81500 99911"
                                             />
                                         </div>
                                     </div>

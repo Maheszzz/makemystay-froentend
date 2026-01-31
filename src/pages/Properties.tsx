@@ -37,7 +37,7 @@ export default function Properties() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-12">
-                        <Link to="/" className="inline-flex items-center text-sm text-slate-500 hover:text-emerald-600 mb-4 transition-colors">
+                        <Link to="/" className="inline-flex items-center text-sm text-slate-500 hover:text-brand-red mb-4 transition-colors">
                             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
                         </Link>
                         <h1 className="text-4xl font-bold text-slate-900 mb-4">All Properties</h1>
@@ -53,25 +53,28 @@ export default function Properties() {
                                 placeholder="Search by title or location..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-transparent"
                             />
                         </div>
                         <div className="flex gap-2">
                             <Button
                                 variant={category === 'all' ? 'primary' : 'outline'}
                                 onClick={() => setCategory('all')}
+                                className={category === 'all' ? 'bg-brand-red text-white' : ''}
                             >
                                 All
                             </Button>
                             <Button
                                 variant={category === 'buy' ? 'primary' : 'outline'}
                                 onClick={() => setCategory('buy')}
+                                className={category === 'buy' ? 'bg-brand-red text-white' : ''}
                             >
                                 For Sale
                             </Button>
                             <Button
                                 variant={category === 'rent' ? 'primary' : 'outline'}
                                 onClick={() => setCategory('rent')}
+                                className={category === 'rent' ? 'bg-brand-red text-white' : ''}
                             >
                                 For Rent
                             </Button>
@@ -112,37 +115,37 @@ export default function Properties() {
                             {filteredProperties.length > 0 ? (
                                 filteredProperties.map((prop) => (
                                     <Link to={`/property/${prop.id}`} key={prop.id} className="block group">
-                                        <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                                        <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 border-l-4 border-l-brand-red shadow-sm hover:shadow-[0_10px_40px_rgba(217,32,39,0.1)] hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
                                             <div className="relative h-64 overflow-hidden">
                                                 <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                <div className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
+                                                <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
                                                     {prop.tag}
                                                 </div>
-                                                <div className="absolute top-4 right-4 bg-slate-900/70 text-white text-xs font-medium px-2 py-1 rounded-lg uppercase">
+                                                <div className="absolute top-4 right-4 bg-brand-charcoal/90 text-white text-xs font-medium px-2 py-1 rounded-lg uppercase">
                                                     {prop.category === 'buy' ? 'Sale' : 'Rent'}
                                                 </div>
                                             </div>
 
                                             <div className="p-6 flex-1 flex flex-col">
                                                 <div className="flex items-center text-xs text-slate-500 mb-2">
-                                                    <MapPin className="w-3 h-3 mr-1" /> {prop.location}
+                                                    <MapPin className="w-3 h-3 mr-1 text-brand-red" /> {prop.location}
                                                 </div>
-                                                <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-emerald-700 transition-colors">{prop.title}</h3>
+                                                <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-brand-red transition-colors">{prop.title}</h3>
 
                                                 <div className="flex items-center space-x-4 text-xs text-slate-500 my-4 py-4 border-t border-b border-slate-100">
                                                     <div className="flex items-center">
-                                                        <Bed className="w-4 h-4 mr-1 text-slate-400" /> {prop.beds} Beds
+                                                        <Bed className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.beds} Beds
                                                     </div>
                                                     <div className="flex items-center">
-                                                        <Bath className="w-4 h-4 mr-1 text-slate-400" /> {prop.baths} Baths
+                                                        <Bath className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.baths} Baths
                                                     </div>
                                                     <div className="flex items-center">
-                                                        <Hash className="w-4 h-4 mr-1 text-slate-400" /> {prop.sqft} sqft
+                                                        <Hash className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.sqft} sqft
                                                     </div>
                                                 </div>
 
                                                 <div className="flex items-center justify-between mt-auto">
-                                                    <div className="text-xl font-bold text-slate-900">{prop.price}</div>
+                                                    <div className="text-xl font-bold text-brand-red">{prop.price}</div>
                                                     <div className="text-xs font-medium text-slate-400 uppercase">{prop.type}</div>
                                                 </div>
                                             </div>

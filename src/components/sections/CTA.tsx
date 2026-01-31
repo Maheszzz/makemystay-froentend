@@ -6,23 +6,32 @@ export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
 
     return (
-        <section className="py-24 bg-gradient-to-br from-emerald-600 to-teal-700 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-            <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Transform Your Rental Business?</h2>
-                <p className="text-xl text-emerald-50 mb-10 max-w-2xl mx-auto">Join 50+ operators who have already automated their growth and reclaimed their profits.</p>
+        <section className="py-20 bg-gradient-to-br from-brand-red via-brand-red to-red-700 text-white relative overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none"></div>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Subtle Accent */}
+            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                <h2 className="text-3xl md:text-5xl font-bold mb-6 font-heading">
+                    Ready to Transform Your Rental Business?
+                </h2>
+                <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+                    Join 50+ operators who have already automated their growth and reclaimed their profits.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <Link
                         to="/contact-us?type=demo"
-                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-emerald-700 font-bold rounded-2xl shadow-xl hover:scale-105 hover:shadow-2xl transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-red font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                     >
                         <Calendar className="w-5 h-5" />
                         Schedule Demo
                     </Link>
                     <button
                         onClick={() => setShowContactCard(true)}
-                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-2xl hover:bg-white/10 hover:scale-105 transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-transparent border-2 border-white/90 text-white font-bold rounded-xl hover:bg-white hover:text-brand-red transition-all duration-300"
                     >
                         <Phone className="w-5 h-5" />
                         Contact Sales
@@ -35,7 +44,7 @@ export function CTA() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
                         {/* Header */}
-                        <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-8 text-center relative">
+                        <div className="bg-gradient-to-br from-brand-red to-[#B91C1C] p-8 text-center relative">
                             <button
                                 onClick={() => setShowContactCard(false)}
                                 className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -43,32 +52,32 @@ export function CTA() {
                                 <X className="w-5 h-5 text-white" />
                             </button>
                             <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                                <span className="text-2xl font-bold text-emerald-600">MS</span>
+                                <span className="text-2xl font-bold text-brand-red">MS</span>
                             </div>
                             <h3 className="text-2xl font-bold text-white">MakeMyStay Sales</h3>
-                            <p className="text-emerald-100 mt-1">We're here to help you grow</p>
+                            <p className="text-white/90 mt-1">We're here to help you grow</p>
                         </div>
 
                         {/* Contact Details */}
                         <div className="p-6 space-y-4">
                             <a
                                 href="tel:+919876543210"
-                                className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 border border-slate-100 transition-colors group"
+                                className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-brand-gray hover:border-brand-red/20 border border-slate-100 transition-colors group"
                             >
-                                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Phone className="w-5 h-5 text-emerald-600" />
+                                <div className="w-12 h-12 rounded-full bg-brand-red/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Phone className="w-5 h-5 text-brand-red" />
                                 </div>
                                 <div>
                                     <div className="text-sm text-slate-500">Call us</div>
-                                    <div className="font-bold text-slate-900">+91 98765 43210</div>
+                                    <div className="font-bold text-slate-900"> +91 81500 99911</div>
                                 </div>
                             </a>
 
                             <a
                                 href="mailto:sales@makemystay.ai"
-                                className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 border border-slate-100 transition-colors group"
+                                className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-brand-gray hover:border-brand-red/20 border border-slate-100 transition-colors group"
                             >
-                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
                                     <Mail className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>

@@ -1,40 +1,55 @@
 @import "tailwindcss";
 
 @theme {
-    --color-brand-teal: #00D4AA;
-    --color-brand-navy: #1A1D2E;
-    --color-brand-dark: #0f111a;
-    --color-accent-purple: #667eea;
-    --color-accent-coral: #f5576c;
+    --color-brand-red: #D92027;
+    --color-brand-charcoal: #2C2C2C;
+    --color-brand-gray: #F5F5F5;
+
+    /* Legacy/Accent Refactoring */
+    --color-brand-navy: var(--color-brand-charcoal);
+    --color-accent-purple: var(--color-brand-red);
+    /* Simplify accent palette */
+    --color-accent-coral: #D92027;
 
     /* Semantic mapping */
-    --color-primary: var(--color-brand-teal);
-    --color-secondary: var(--color-brand-navy);
-    --color-background: #F8FAFC;
+    --color-primary: var(--color-brand-red);
+    --color-secondary: var(--color-brand-charcoal);
+    --color-background: #FFFFFF;
 
-    --font-heading: 'Playfair Display', serif;
-    --font-sans: 'Outfit', sans-serif;
+    --font-heading: 'Montserrat', sans-serif;
+    --font-sans: 'Inter', sans-serif;
 
-    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-    --shadow-glow: 0 0 20px rgba(0, 212, 170, 0.3);
-    --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0 0 20px rgba(217, 32, 39, 0.2);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 @layer utilities {
+    .bg-diagonal-grid {
+        background-color: transparent;
+        background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+            linear-gradient(225deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+            linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+            linear-gradient(315deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%);
+        background-position: 10px 0, 10px 0, 0 0, 0 0;
+        background-size: 20px 20px;
+        background-repeat: repeat;
+    }
+
     .glass-panel {
-        @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-glass;
+        @apply bg-white border border-slate-100 shadow-card;
     }
 
     .glass-panel-dark {
-        @apply bg-[#1A1D2E]/80 backdrop-blur-md border border-white/10 shadow-glass;
+        @apply bg-brand-charcoal border border-white/10 shadow-glass;
     }
 
     .text-gradient {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-teal to-accent-purple;
+        @apply text-brand-red;
     }
 
     .text-gradient-coral {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-coral;
+        @apply text-brand-red;
     }
 }
 

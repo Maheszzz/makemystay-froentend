@@ -10,24 +10,52 @@ interface HeroProps {
 
 export function Hero({ category, setCategory, searchQuery, setSearchQuery }: HeroProps) {
     return (
-        <section id="home" className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden bg-white">
-            {/* Background Gradients */}
-            <div className="absolute top-0 right-0 -z-10 w-1/2 h-full bg-gradient-to-b from-emerald-50/50 to-transparent blur-3xl opacity-50" />
-            <div className="absolute bottom-0 left-0 -z-10 w-1/3 h-1/2 bg-gradient-to-t from-teal-50/50 to-transparent blur-3xl opacity-50" />
+        <section id="home" className="relative min-h-[90vh] bg-gradient-to-br from-brand-red to-[#B91C1C] overflow-hidden flex items-center pt-32 pb-20 lg:pt-40 lg:pb-32">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-diagonal-grid opacity-20 pointer-events-none z-0"></div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Floating Geometric Accents */}
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
                 <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                    <div className="animate-in fade-in slide-in-from-bottom-10 duration-700">
-                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-medium mb-6 border border-emerald-100">
-                            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>AI-Powered Revenue Engine</span>
+                    <div className="animate-in fade-in slide-in-from-bottom-10 duration-700 flex flex-col items-start space-y-8">
+                        {/* Premium Badge with Gold Accent */}
+                        <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/15 backdrop-blur-xl border border-white/30 shadow-lg">
+                            <span className="relative flex h-2.5 w-2.5">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-300 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-300"></span>
+                            </span>
+                            <span className="text-white text-sm font-semibold tracking-wider uppercase">AI-Powered Real Estate Platform</span>
                         </div>
-                        <h1 className="text-4xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
-                            Find Your Dream <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">Property</span>
-                        </h1>
-                        <p className="text-lg text-slate-600 mb-8 max-w-lg leading-relaxed">
-                            Intelligence meets intuition in real estate. Discover properties that match your vision with our AI-powered search.
-                        </p>
+
+                        {/* Luxury Typography - Extra Large & Refined */}
+                        <div className="space-y-3">
+                            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-white leading-[0.95] tracking-tighter">
+                                <span className="block">Find Your</span>
+                                <span className="block">Dream</span>
+                            </h1>
+                            <div className="relative inline-block">
+                                <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold italic text-white leading-none tracking-tight relative z-10">
+                                    Property Today.
+                                </h2>
+                                {/* Elegant underline accent */}
+                                <div className="absolute -bottom-2 left-0 w-2/3 h-1 bg-gradient-to-r from-yellow-300 via-white to-transparent rounded-full"></div>
+                            </div>
+                        </div>
+
+                        {/* Refined Description with Premium Styling */}
+                        <div className="max-w-xl space-y-1 pt-2">
+                            <p className="text-xl text-white/95 leading-relaxed font-light tracking-wide">
+                                Experience the future of property search with our
+                                <span className="font-normal"> AI-native engine.</span>
+                            </p>
+                            <p className="text-xl text-white font-semibold tracking-wide flex items-center gap-2">
+                                <span className="inline-block w-8 h-0.5 bg-yellow-300 rounded-full"></span>
+                                Zero commissions, 100% transparency.
+                            </p>
+                        </div>
 
                         <div className="mb-10">
                             <SmartSearchBar
@@ -41,16 +69,16 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                         <div className="flex flex-col sm:flex-row gap-4 mb-8">
                             <div className="grid grid-cols-3 gap-8">
                                 <div className="text-center sm:text-left">
-                                    <div className="text-2xl font-bold text-slate-900">12k+</div>
-                                    <div className="text-xs text-slate-500">Properties Listed</div>
+                                    <div className="text-2xl font-bold text-white">1k+</div>
+                                    <div className="text-xs text-white/70">Properties Listed</div>
                                 </div>
                                 <div className="text-center sm:text-left">
-                                    <div className="text-2xl font-bold text-slate-900">8k+</div>
-                                    <div className="text-xs text-slate-500">Happy Clients</div>
+                                    <div className="text-2xl font-bold text-white">2k+</div>
+                                    <div className="text-xs text-white/70">Happy Clients</div>
                                 </div>
                                 <div className="text-center sm:text-left">
-                                    <div className="text-2xl font-bold text-slate-900">500+</div>
-                                    <div className="text-xs text-slate-500">Expert Agents</div>
+                                    <div className="text-2xl font-bold text-white">50+</div>
+                                    <div className="text-xs text-white/70">Expert Agents</div>
                                 </div>
                             </div>
                         </div>
@@ -58,17 +86,16 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
 
                     <div className="relative animate-in fade-in slide-in-from-right-10 duration-1000 delay-200 hidden lg:block h-full min-h-[500px]">
                         {/* Visual Placeholder - Matching the House Image idea */}
-                        <div className="absolute inset-0 bg-slate-100 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
+                        <div className="absolute inset-0 bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white/10">
                             <img
                                 src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1000"
                                 alt="Luxury Home"
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover opacity-90"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/10 to-teal-900/10 mix-blend-overlay"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-brand-charcoal/20 to-black/40 mix-blend-overlay"></div>
                         </div>
 
-                        {/* Decorative blob */}
-                        <div className="absolute -z-10 top-1/2 right-1/2 w-96 h-96 bg-emerald-200 rounded-full blur-[100px] opacity-30"></div>
+
                     </div>
                 </div>
             </div>

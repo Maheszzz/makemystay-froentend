@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Building2, X, Menu } from 'lucide-react';
+import { X, Menu } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -59,16 +59,14 @@ export function Navbar() {
     };
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-brand-navy/95 backdrop-blur-md shadow-glass py-4' : 'bg-brand-navy/80 backdrop-blur-sm py-6'
+        <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-4 border-b border-brand-gray' : 'bg-transparent py-6'
             }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
                     <div className="flex items-center space-x-2">
-                        <div className="p-2 bg-gradient-to-br from-brand-teal to-accent-purple rounded-lg shadow-glow">
-                            <Building2 className="w-6 h-6 text-white" />
-                        </div>
-                        <Link to="/" className="text-2xl font-bold tracking-tight text-white font-heading">
-                            MakeMyStay<span className="text-brand-teal">.ai</span>
+                        <img src="/src/assets/logo.jpg" alt="MakeMyStay Logo" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
+                        <Link to="/" className={`text-2xl font-bold tracking-tight font-heading transition-colors ${isScrolled ? 'text-brand-charcoal' : 'text-white'}`}>
+                            MakeMyStay<span className="text-brand-red">.ai</span>
                         </Link>
                     </div>
 
@@ -78,7 +76,7 @@ export function Navbar() {
                                 key={item}
                                 href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                 onClick={(e) => handleNavClick(item, e)}
-                                className="text-sm font-medium text-slate-300 hover:text-brand-teal transition-colors cursor-pointer"
+                                className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}
                             >
                                 {item}
                             </a>
@@ -104,7 +102,7 @@ export function Navbar() {
                                 key={item}
                                 href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                 onClick={(e) => handleNavClick(item, e)}
-                                className="text-base font-medium text-slate-300 py-2 hover:text-brand-teal cursor-pointer"
+                                className="text-base font-medium text-slate-300 py-2 hover:text-brand-red cursor-pointer"
                             >
                                 {item}
                             </a>

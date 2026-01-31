@@ -9,7 +9,7 @@ export function Button({ children, variant = 'primary', className = '', icon: Ic
     const baseStyles = "px-6 py-3 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2";
 
     const variants = {
-        primary: "bg-gradient-to-r from-brand-teal to-[#00bda0] text-brand-navy font-semibold shadow-glow hover:shadow-[0_0_25px_rgba(0,212,170,0.5)] active:scale-95",
+        primary: "bg-gradient-to-r from-brand-red to-orange-500 text-white font-semibold shadow-glow hover:shadow-[0_0_25px_rgba(220,38,38,0.5)] active:scale-95",
         secondary: "bg-white text-slate-900 hover:bg-slate-50 border border-slate-200 shadow-sm",
         outline: "border-2 border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600",
         ghost: "text-slate-600 hover:bg-slate-100",

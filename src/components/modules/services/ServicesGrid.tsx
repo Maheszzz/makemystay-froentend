@@ -6,13 +6,13 @@ const services = [
         title: "Property Management",
         desc: "End-to-end management for premium assets",
         icon: Building2,
-        color: "text-blue-400"
+        color: "text-brand-red"
     },
     {
         title: "Revenue Optimization",
         desc: "AI-driven pricing to maximize yields",
         icon: Wallet,
-        color: "text-brand-teal"
+        color: "text-brand-red"
     },
     {
         title: "Tenant Acquisition",
@@ -40,7 +40,7 @@ export function ServicesGrid() {
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
                     {/* Gradient Border Effect */}
-                    <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-brand-teal to-accent-purple transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-brand-red to-accent-purple transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
 
                     <div className="relative z-10 flex flex-col h-full justify-between">
                         <div>
@@ -54,7 +54,7 @@ export function ServicesGrid() {
                         </div>
 
                         <div className="pt-6 mt-4 border-t border-slate-100 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="flex items-center text-sm font-bold text-brand-teal cursor-pointer">
+                            <span className="flex items-center text-sm font-bold text-brand-red cursor-pointer">
                                 Learn More <ArrowRight className="w-4 h-4 ml-1" />
                             </span>
                         </div>
