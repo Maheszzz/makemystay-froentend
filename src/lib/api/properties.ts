@@ -7,7 +7,7 @@ import type {
     PaginationParams
 } from '@/types/api';
 
-const REALTY_PATH = '/api/v1/realty/properties';
+const REALTY_PATH = '/realty/properties';
 
 /**
  * Maps the backend RealtyProperty to the frontend Property interface

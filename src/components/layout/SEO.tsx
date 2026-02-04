@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 interface SEOProps {
     title: string;
@@ -6,10 +6,24 @@ interface SEOProps {
 }
 
 export function SEO({ title, description }: SEOProps) {
-    return (
-        <Helmet>
-            <title>{title} | MakeMyStay.ai</title>
-            <meta name="description" content={description} />
-        </Helmet>
-    );
+    useEffect(() => {
+        // Set document title
+        document.title = `${title} | MakeMyStay.ai`;
+
+        // Set or update meta description
+        let metaDescription = document.querySelector('meta[name="description"]');
+        if (!metaDescription) {
+            metaDescription = document.createElement('meta');
+            metaDescription.setAttribute('name', 'description');
+            document.head.appendChild(metaDescription);
+        }
+        metaDescription.setAttribute('content', description);
+
+        // Cleanup function to reset title when component unmounts (optional)
+        return () => {
+            document.title = 'MakeMyStay.ai';
+        };
+    }, [title, description]);
+
+    return null;
 }

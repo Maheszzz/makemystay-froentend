@@ -6,8 +6,8 @@ import type {
     PaginationParams
 } from '@/types/api';
 
-const BASE_PATH = '/api/v1/contacts';
-const REALTY_CONTACT_PATH = '/api/v1/realty/contacts';
+const BASE_PATH = '/contacts';
+const REALTY_CONTACT_PATH = '/realty/contacts';
 
 // Interface for contact form submission (realty endpoint)
 export interface ContactFormSubmission {
