@@ -1,11 +1,16 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop';
+import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
 
 const Home = lazy(() => import('./pages/Home'));
 const Contact = lazy(() => import('./pages/Contact'));
 const PropertyDetails = lazy(() => import('./pages/PropertyDetails'));
 const Properties = lazy(() => import('./pages/Properties'));
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 
 function App() {
     return (
@@ -24,8 +29,13 @@ function App() {
                     <Route path="/contact-us" element={<Contact />} />
                     <Route path="/properties" element={<Properties />} />
                     <Route path="/property/:id" element={<PropertyDetails />} />
+                    <Route path="/services/:serviceId" element={<ServiceDetail />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/refund-policy" element={<RefundPolicy />} />
                 </Routes>
             </Suspense>
+            <MobileBottomCTA />
         </Router>
     );
 }

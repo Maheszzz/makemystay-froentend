@@ -53,6 +53,7 @@ export interface Property {
     reviews?: number;
     created_at?: string;
     updated_at?: string;
+    postedDate?: string;
 
     // Original Realty fields preserved for reference
     map_link?: string;

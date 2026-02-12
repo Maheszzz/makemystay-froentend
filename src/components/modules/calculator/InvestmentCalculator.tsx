@@ -1,27 +1,37 @@
 "use client";
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
+
 
 export function InvestmentCalculator() {
-    const [price, setPrice] = useState(500000);
-    const [downPayment, setDownPayment] = useState(20);
-    const [rate, setRate] = useState(6.5);
-    const [term, setTerm] = useState(30);
+    const [price, setPrice] = useState<string | number>(500000);
+    const [downPayment, setDownPayment] = useState<string | number>(20);
+    const [rate, setRate] = useState<string | number>(6.5);
+    const [term, setTerm] = useState<string | number>(30);
 
     const calculatePayment = () => {
-        const principal = price * (1 - downPayment / 100);
-        const monthlyRate = rate / 100 / 12;
-        const months = term * 12;
+        const numPrice = Number(price);
+        const numDownPayment = Number(downPayment);
+        const numRate = Number(rate);
+        const numTerm = Number(term);
 
-        if (rate === 0) return principal / months;
+        const principal = numPrice * (1 - numDownPayment / 100);
+        const monthlyRate = numRate / 100 / 12;
+        const months = numTerm * 12;
+
+        if (months === 0) return 0;
+        if (numRate === 0) return principal / months;
 
         return (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
     };
 
     const monthlyPayment = calculatePayment();
-    const totalPayment = monthlyPayment * term * 12;
-    const totalInterest = totalPayment - (price * (1 - downPayment / 100));
+    const numPrice = Number(price);
+    const numDownPayment = Number(downPayment);
+    const numTerm = Number(term);
+
+    const totalPayment = monthlyPayment * numTerm * 12;
+    const totalInterest = totalPayment - (numPrice * (1 - numDownPayment / 100));
 
     return (
         <section className="py-20 bg-white">
@@ -49,7 +59,7 @@ export function InvestmentCalculator() {
                                     <input
                                         type="number"
                                         value={price}
-                                        onChange={(e) => setPrice(Number(e.target.value))}
+                                        onChange={(e) => setPrice(e.target.value)}
                                         className="w-full pl-8 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-colors"
                                     />
                                 </div>
@@ -60,14 +70,14 @@ export function InvestmentCalculator() {
                                 <input
                                     type="number"
                                     value={downPayment}
-                                    onChange={(e) => setDownPayment(Number(e.target.value))}
+                                    onChange={(e) => setDownPayment(e.target.value)}
                                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-colors mb-2"
                                 />
                                 <input
                                     type="range"
                                     min="0"
                                     max="100"
-                                    value={downPayment}
+                                    value={downPayment === '' ? 0 : downPayment}
                                     onChange={(e) => setDownPayment(Number(e.target.value))}
                                     className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                                 />
@@ -78,22 +88,19 @@ export function InvestmentCalculator() {
                                 <input
                                     type="number"
                                     value={rate}
-                                    onChange={(e) => setRate(Number(e.target.value))}
+                                    onChange={(e) => setRate(e.target.value)}
                                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-colors"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">Loan Term (Years)</label>
-                                <select
+                                <input
+                                    type="number"
                                     value={term}
-                                    onChange={(e) => setTerm(Number(e.target.value))}
-                                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-colors appearance-none"
-                                >
-                                    <option value="15">15 Years</option>
-                                    <option value="20">20 Years</option>
-                                    <option value="30">30 Years</option>
-                                </select>
+                                    onChange={(e) => setTerm(e.target.value)}
+                                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-emerald-500 outline-none transition-colors"
+                                />
                             </div>
                         </div>
                     </div>

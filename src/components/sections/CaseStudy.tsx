@@ -3,7 +3,7 @@ import { caseStudyStats } from '@/data/content';
 
 export function CaseStudy() {
     return (
-        <section id="case-study" className="py-24 bg-brand-charcoal relative overflow-hidden isolate">
+        <section id="case-study" className="py-14 md:py-24 bg-brand-charcoal relative overflow-hidden isolate">
             {/* Background Effects */}
             <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none z-0"></div>
 
@@ -11,7 +11,7 @@ export function CaseStudy() {
                 <div className="flex flex-col md:flex-row gap-16 items-start">
                     <div className="md:w-1/2">
                         <div className="inline-block px-4 py-1.5 rounded-full bg-brand-red/10 text-brand-red border border-brand-red/20 text-xs font-bold uppercase tracking-wider mb-6">Real Results</div>
-                        <h2 className="text-4xl font-bold text-white mb-6">Case Study: <span className="text-brand-red">UrbanNest PG</span></h2>
+                        <h2 className="text-4xl font-bold text-white mb-6">Case Study: <span className="text-brand-red">Astro Living</span></h2>
                         <div className="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 backdrop-blur-sm">
                             <div className="flex flex-wrap gap-4 text-sm text-slate-300">
                                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-brand-red" /> Bangalore</span>
@@ -25,12 +25,15 @@ export function CaseStudy() {
                         </p>
                         <div className="flex items-center space-x-4">
                             <div className="w-12 h-12 bg-slate-700 rounded-full overflow-hidden border border-white/10">
-                                {/* Placeholder avatar */}
-                                <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800"></div>
+                                <img
+                                    src="https://api.dicebear.com/7.x/notionists/svg?seed=TejaReddy&backgroundColor=1e293b"
+                                    alt="Teja Reddy"
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                             <div>
-                                <div className="font-bold text-white">Rajesh Kumar</div>
-                                <div className="text-sm text-slate-500">Owner, UrbanNest PG</div>
+                                <div className="font-bold text-white">Teja Reddy</div>
+                                <div className="text-sm text-slate-500">Owner, Astro Living</div>
                             </div>
                         </div>
                     </div>

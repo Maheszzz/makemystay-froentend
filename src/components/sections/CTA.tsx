@@ -6,7 +6,7 @@ export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
 
     return (
-        <section className="py-20 bg-gradient-to-br from-brand-red via-brand-red to-red-700 text-white relative overflow-hidden">
+        <section className="py-14 md:py-20 bg-gradient-to-br from-brand-red via-brand-red to-red-700 text-white relative overflow-hidden">
             {/* Background Pattern */}
             <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none"></div>
 
@@ -14,14 +14,14 @@ export function CTA() {
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
 
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 font-heading">
+                <h2 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 font-heading">
                     Ready to Transform Your Rental Business?
                 </h2>
                 <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
                     Join 50+ operators who have already automated their growth and reclaimed their profits.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-stretch sm:items-center">
                     <Link
                         to="/contact-us?type=demo"
                         className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-red font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"

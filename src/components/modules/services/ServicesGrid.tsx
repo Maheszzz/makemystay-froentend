@@ -1,26 +1,31 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Wallet, Users, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const services = [
     {
+        id: 'property-management',
         title: "Property Management",
         desc: "End-to-end management for premium assets",
         icon: Building2,
         color: "text-brand-red"
     },
     {
+        id: 'revenue-optimization',
         title: "Revenue Optimization",
         desc: "AI-driven pricing to maximize yields",
         icon: Wallet,
         color: "text-brand-red"
     },
     {
+        id: 'tenant-acquisition',
         title: "Tenant Acquisition",
         desc: "Automated leasing and background checks",
         icon: Users,
         color: "text-accent-purple"
     },
     {
+        id: 'market-intelligence',
         title: "Market Intelligence",
         desc: "Real-time data on rental trends",
         icon: BarChart3,
@@ -54,9 +59,9 @@ export function ServicesGrid() {
                         </div>
 
                         <div className="pt-6 mt-4 border-t border-slate-100 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                            <span className="flex items-center text-sm font-bold text-brand-red cursor-pointer">
+                            <Link to={`/services/${service.id}`} className="flex items-center text-sm font-bold text-brand-red cursor-pointer">
                                 Learn More <ArrowRight className="w-4 h-4 ml-1" />
-                            </span>
+                            </Link>
                         </div>
                     </div>
                 </motion.div>

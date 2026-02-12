@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Bed, Bath, Hash, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { Button } from '@/components/ui/Button';
 import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -34,9 +35,9 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     }
 
     return (
-        <section className="py-20 bg-slate-50">
+        <section className="py-12 md:py-20 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-end mb-12">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-12 gap-4">
                     <div>
                         <h2 className="text-3xl font-bold text-slate-900 mb-2">
                             {category === 'buy' ? 'Featured Properties for Sale' : 'Latest Rental Listings'}
@@ -48,44 +49,11 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                     </Link>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
                     {filteredProperties.length > 0 ? (
                         filteredProperties.map((prop) => {
                             return (
-                                <Link to={`/property/${prop.id}`} key={prop.id} className="block group">
-                                    <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 border-l-4 border-l-brand-red shadow-sm hover:shadow-[0_10px_40px_rgba(217,32,39,0.1)] hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
-                                        <div className="relative h-64 overflow-hidden">
-                                            <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                                                {prop.tag}
-                                            </div>
-                                        </div>
-
-                                        <div className="p-6 flex-1 flex flex-col">
-                                            <div className="flex items-center text-xs text-slate-500 mb-2">
-                                                <MapPin className="w-3 h-3 mr-1 text-brand-red" /> {prop.location}
-                                            </div>
-                                            <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-brand-red transition-colors">{prop.title}</h3>
-
-                                            <div className="flex items-center space-x-4 text-xs text-slate-500 my-4 py-4 border-t border-b border-slate-100">
-                                                <div className="flex items-center">
-                                                    <Bed className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.beds} Beds
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <Bath className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.baths} Baths
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <Hash className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.sqft} sqft
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center justify-between mt-auto">
-                                                <div className="text-xl font-bold text-brand-red">{prop.price}</div>
-                                                <div className="text-xs font-medium text-slate-400 uppercase">{prop.type}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
+                                <PropertyCard key={prop.id} property={prop} />
                             );
                         })
                     ) : (

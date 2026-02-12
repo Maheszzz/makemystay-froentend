@@ -20,6 +20,7 @@ export interface Property {
     features: string[];
     rating: number;
     reviews: number;
+    postedDate?: string;
 }
 
 export const properties: Property[] = [
@@ -43,7 +44,8 @@ export const properties: Property[] = [
         description: "Experience the pinnacle of luxury living in this breathtaking penthouse on Sunset Boulevard. Featuring panoramic views of the city skyline, this residence offers an unmatched blend of sophistication and comfort. The open-concept living area is bathed in natural light, seamlessly flowing into a state-of-the-art kitchen equipped with top-tier appliances.",
         features: ["Panoramic City Views", "Private Infinity Pool", "Smart Home Automation", "24/7 Concierge", "Private Elevator Access", "Chef's Kitchen", "Home Theater", "Wine Cellar"],
         rating: 4.9,
-        reviews: 128
+        reviews: 128,
+        postedDate: "2024-01-15"
     },
     {
         id: "lakefront-estate",
@@ -64,7 +66,8 @@ export const properties: Property[] = [
         description: "A stunning lakefront estate offering serene views and unparalleled privacy. This magnificent property features expansive living spaces, a private dock, and beautifully landscaped gardens. Perfect for those seeking a tranquil retreat without compromising on luxury.",
         features: ["Private Lake Access", "Boat Dock", "Heated Floors", "Gourmet Kitchen", "Guest House", "Landscaped Gardens", "Security System", "3-Car Garage"],
         rating: 4.8,
-        reviews: 95
+        reviews: 95,
+        postedDate: "2024-02-01"
     },
     {
         id: "downtown-luxury-condo",
@@ -85,7 +88,8 @@ export const properties: Property[] = [
         description: "Located in the heart of Miami's vibrant downtown, this luxury condo offers the ultimate urban lifestyle. Floor-to-ceiling windows showcase breathtaking ocean and city views. The building features world-class amenities including a rooftop pool and fitness center.",
         features: ["Ocean Views", "Rooftop Pool", "Fitness Center", "Concierge Service", "Valet Parking", "Pet Friendly", "In-Unit Laundry", "Balcony"],
         rating: 4.7,
-        reviews: 82
+        reviews: 82,
+        postedDate: "2024-02-10"
     },
     {
         id: "coastal-villa",
@@ -106,7 +110,8 @@ export const properties: Property[] = [
         description: "This stunning coastal villa offers the perfect blend of indoor-outdoor living with direct beach access. Mediterranean-inspired architecture meets modern luxury with open floor plans, a chef's kitchen, and resort-style amenities.",
         features: ["Beach Access", "Infinity Pool", "Outdoor Kitchen", "Fire Pit", "Mediterranean Design", "Master Suite", "Ocean Views", "Smart Home"],
         rating: 4.9,
-        reviews: 156
+        reviews: 156,
+        postedDate: "2023-12-20"
     },
     {
         id: "modern-city-apartment",
@@ -127,7 +132,8 @@ export const properties: Property[] = [
         description: "Experience the best of New York City living in this stylish modern apartment. Located in a prime neighborhood with easy access to transit, dining, and entertainment. Features high-end finishes and stunning city views.",
         features: ["City Views", "Doorman", "Gym Access", "Rooftop Deck", "In-Unit Laundry", "Central AC", "Hardwood Floors", "Walk-in Closet"],
         rating: 4.6,
-        reviews: 67
+        reviews: 67,
+        postedDate: "2024-02-05"
     },
     {
         id: "suburban-family-home",
@@ -148,7 +154,8 @@ export const properties: Property[] = [
         description: "A beautiful family home in one of Austin's most sought-after neighborhoods. This spacious property features an open floor plan, modern kitchen, and a large backyard perfect for entertaining. Close to excellent schools and parks.",
         features: ["Large Backyard", "2-Car Garage", "Updated Kitchen", "Near Schools", "Community Pool", "Pet Friendly", "Central Heat/AC", "Storage Space"],
         rating: 4.7,
-        reviews: 43
+        reviews: 43,
+        postedDate: "2024-01-28"
     },
     {
         id: "beachfront-condo",
@@ -169,7 +176,8 @@ export const properties: Property[] = [
         description: "Wake up to stunning ocean views in this beautiful beachfront condo. Direct beach access and resort-style amenities make this the perfect tropical getaway. Fully furnished with premium finishes throughout.",
         features: ["Direct Beach Access", "Ocean Views", "Pool & Spa", "Furnished", "Balcony", "Fitness Center", "Covered Parking", "24/7 Security"],
         rating: 4.8,
-        reviews: 91
+        reviews: 91,
+        postedDate: "2024-02-08"
     },
     {
         id: "luxury-loft",
@@ -190,7 +198,8 @@ export const properties: Property[] = [
         description: "A stunning industrial loft in Chicago's trendy River North neighborhood. Features soaring ceilings, exposed brick, and designer finishes. Walking distance to the best restaurants, galleries, and nightlife.",
         features: ["Exposed Brick", "High Ceilings", "Open Floor Plan", "Designer Kitchen", "Walk-in Shower", "Secured Entry", "Bike Storage", "Near Transit"],
         rating: 4.5,
-        reviews: 54
+        reviews: 54,
+        postedDate: "2024-01-10"
     }
 ];
 

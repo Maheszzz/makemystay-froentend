@@ -64,7 +64,7 @@ export default function PropertyDetails() {
 
             <main className="pb-20">
                 {/* Hero Gallery */}
-                <div className="h-[60vh] md:h-[70vh] relative group overflow-hidden">
+                <div className="h-[50vh] md:h-[70vh] relative group overflow-hidden">
                     <img
                         src={heroImage}
                         alt={property.title}
@@ -96,12 +96,12 @@ export default function PropertyDetails() {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Quick Stats Bar */}
-                        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 flex items-center justify-between">
+                        <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div className="flex items-center space-x-4">
                                 <div className="flex -space-x-3">
                                     {[1, 2, 3].map(i => (
@@ -146,54 +146,31 @@ export default function PropertyDetails() {
                     {/* Booking Widget (Sticky) */}
                     <div className="relative">
                         <div className="sticky top-24 space-y-6">
-                            <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 p-8 border border-slate-100 overflow-hidden relative">
+                            <div className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 p-5 md:p-8 border border-slate-100 overflow-hidden relative">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full blur-3xl -mr-16 -mt-16 opacity-50"></div>
 
-                                <div className="flex justify-between items-start mb-6 relative z-10">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 relative z-10 gap-3">
                                     <div>
                                         <span className="text-sm text-slate-500 font-medium">Price</span>
                                         <div className="text-3xl font-bold text-slate-900">{property.price}</div>
                                     </div>
-                                    <div className="flex items-center bg-slate-50 px-3 py-1 rounded-lg">
-                                        <Star className="w-4 h-4 text-emerald-500 fill-current mr-1" />
-                                        <span className="font-bold text-slate-900">{property.rating || 4.5}</span>
-                                        <span className="text-slate-400 mx-1">·</span>
-                                        <span className="text-slate-500 text-sm underline">{property.reviews || 0} reviews</span>
+                                    <div className="flex flex-nowrap items-center gap-1 bg-slate-50 px-3 py-2 rounded-lg">
+                                        <Star className="w-4 h-4 text-emerald-500 fill-current shrink-0" />
+                                        <span className="font-bold text-slate-900 leading-none whitespace-nowrap">{property.rating || 4.5}</span>
+                                        <span className="text-slate-400 leading-none">·</span>
+                                        <span className="text-slate-500 text-sm underline leading-none whitespace-nowrap">{property.reviews || 0} reviews</span>
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 mb-8">
-                                    <div className="border border-slate-200 rounded-2xl overflow-hidden">
-                                        <div className="flex border-b border-slate-200">
-                                            <div className="w-1/2 p-4 border-r border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                                                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Check-in</div>
-                                                <div className="font-medium text-slate-900">Add date</div>
-                                            </div>
-                                            <div className="w-1/2 p-4 hover:bg-slate-50 cursor-pointer transition-colors">
-                                                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Check-out</div>
-                                                <div className="font-medium text-slate-900">Add date</div>
-                                            </div>
-                                        </div>
-                                        <div className="p-4 hover:bg-slate-50 cursor-pointer transition-colors">
-                                            <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">Guests</div>
-                                            <div className="font-medium text-slate-900">1 Guest</div>
-                                        </div>
+                                <div className="space-y-6 mb-8">
+                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="text-sm font-medium text-slate-500">Posted on</div>
+                                        <div className="font-bold text-slate-900">{property.postedDate || new Date().toLocaleDateString()}</div>
                                     </div>
 
-                                    <Button className="w-full py-6 text-lg rounded-xl shadow-lg shadow-emerald-600/20">Check Availability</Button>
-
-                                    <div className="text-center text-xs text-slate-400">You won't be charged yet</div>
-                                </div>
-
-                                <div className="space-y-3 pt-6 border-t border-slate-100 text-sm">
-                                    <div className="flex justify-between text-slate-600">
-                                        <span className="underline">Estimate EMI</span>
-                                        <span>₹20L / month</span>
-                                    </div>
-                                    <div className="flex justify-between text-slate-600">
-                                        <span className="underline">Service fee</span>
-                                        <span>₹1L</span>
-                                    </div>
+                                    <Button className="w-full py-4 text-lg font-bold rounded-xl shadow-lg shadow-emerald-600/20 bg-brand-red hover:bg-brand-red/90 transition-all transform hover:scale-[1.02]">
+                                        Pay Now
+                                    </Button>
                                 </div>
                             </div>
 
