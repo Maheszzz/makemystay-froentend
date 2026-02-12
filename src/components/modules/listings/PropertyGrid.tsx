@@ -13,14 +13,97 @@ interface PropertyGridProps {
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const { properties, loading, error } = useProperties();
 
-    const filteredProperties = properties.filter(prop => {
+    // Fallback data in case of API error - Mirrors actual DB content
+    const FALLBACK_PROPERTIES: any[] = [
+        {
+            id: 1,
+            title: 'Kings & Queens Coliving',
+            location: 'Kundlahalli',
+            price: '₹11,999/mo',
+            type: 'Colive PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'New one',
+            features: ['fully furnished', 'Colive PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 14,
+            title: 'Flock 9 Coliving',
+            location: 'Thubarahalli',
+            price: '₹12,999/mo',
+            type: 'PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', 'PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 15,
+            title: 'Arcade Inn Coliving',
+            location: 'Marathahalli',
+            price: '₹15,999/mo',
+            type: 'PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', 'PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 16,
+            title: 'Urban living',
+            location: 'Kadubeesnahalli',
+            price: '₹24,999/mo',
+            type: '1BHK',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', '1BHK'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        }
+    ];
+
+    // Use fallback properties if there's an error
+    const displayProperties = error ? FALLBACK_PROPERTIES : properties;
+
+    const filteredProperties = displayProperties.filter(prop => {
         const matchesCategory = prop.category === category;
         const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             prop.location.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     }).slice(0, 4); // Limit to 4 for the home page
 
-    if (loading) {
+    if (loading && !error) {
         return (
             <section className="py-20 bg-slate-50">
                 <div className="flex justify-center">
@@ -28,10 +111,6 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                 </div>
             </section>
         );
-    }
-
-    if (error) {
-        return null; // Gracefully hide if error on home page
     }
 
     return (

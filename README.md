@@ -1,74 +1,98 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div align="center">
+  <img src="https://img.shields.io/badge/MakeMyStay-realty-red?style=for-the-badge&logo=homeassistant" alt="MakeMyStay Logo" width="80" height="auto" />
+  <h1>MakeMyStay.ai</h1>
+  <p>The first AI-native revenue engine for co-living and rental operators. Automate growth today.</p>
 
-Currently, two official plugins are available:
+  <p>
+    <a href="https://react.dev/">
+      <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+    </a>
+    <a href="https://vitejs.dev/">
+      <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
+    </a>
+    <a href="https://tailwindcss.com/">
+      <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+    </a>
+    <a href="https://www.typescriptlang.org/">
+      <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+    </a>
+  </p>
+</div>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Modern & Responsive Design**: Built with React 19 and TailwindCSS for a seamless experience across all devices.
+- **Dynamic Property Listings**: Browse and search properties with real-time filtering options.
+- **AI-Powered Insights**: Leveraging AI to optimize revenue and management for property operators.
+- **Service Showcases**: Detailed pages for Property Management, Revenue Optimization, Tenant Acquisition, and Market Intelligence.
+- **Contact Integration**: Integrated contact forms and direct links to sales and support teams.
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [TailwindCSS v4](https://tailwindcss.com/)
+- **Routing**: [React Router v7](https://reactrouter.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **HTTP Client**: [Axios](https://axios-http.com/)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📦 Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd make-my-stay
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+   The application will run at `http://localhost:5173`.
+
+4. **Build for production**
+   ```bash
+   npm build
+   ```
+
+## 📂 Project Structure
+
+```bash
+make-my-stay/
+├── public/          # Static assets (images, logos, etc.)
+├── src/
+│   ├── components/  # Reusable UI components (Layouts, Modules, Sections, UI)
+│   ├── hooks/       # Custom React hooks (useProperties, useContacts)
+│   ├── lib/         # Utility functions and API clients
+│   ├── pages/       # Application pages and route definitions
+│   ├── types/       # TypeScript type definitions and interfaces
+│   ├── App.tsx      # Main application component with routing
+│   └── main.tsx     # Entry point
+├── dist/            # Production build output
+└── vite.config.ts   # Vite configuration
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔧 Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file in the root directory to configure your environment:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```env
+VITE_API_URL=http://localhost:8000/api/v1
 ```
-# make-my-stay
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is proprietary software. All rights reserved. © 2026 MakeMyStay.ai

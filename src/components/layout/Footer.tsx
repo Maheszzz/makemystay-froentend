@@ -14,9 +14,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
                     <div className="col-span-1 text-center md:text-left">
                         <div className="flex items-center space-x-3 mb-6">
-                            <div className="w-10 h-10 bg-gradient-to-br from-brand-red to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-red/20">
-                                <span className="text-white font-bold text-xl">M</span>
-                            </div>
+                            <img src="/logo-m.png" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
                             <span className="text-2xl font-bold text-white tracking-tight font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>
@@ -68,7 +66,7 @@ export function Footer() {
                             </li>
                             <li className="flex items-center group">
                                 <Mail size={18} className="mr-3 text-brand-red group-hover:scale-110 transition-transform" />
-                                <a href="mailto:hello@makemystay.ai" className="text-slate-400 group-hover:text-white transition-colors">hello@makemystay.ai</a>
+                                <a href="mailto:connect@makemystay.ai" className="text-slate-400 group-hover:text-white transition-colors">connect@makemystay.ai</a>
                             </li>
                             <li className="flex items-center group">
                                 <Phone size={18} className="mr-3 text-brand-red group-hover:scale-110 transition-transform" />

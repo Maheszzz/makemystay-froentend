@@ -16,7 +16,7 @@ export default function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Get values from URL or default
-    const category = (searchParams.get('category') as 'buy' | 'rent') || 'buy';
+    const category = (searchParams.get('category') as 'buy' | 'rent') || 'rent';
     const searchQuery = searchParams.get('q') || '';
 
     // Wrapped setters to update URL

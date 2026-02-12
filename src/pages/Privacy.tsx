@@ -67,7 +67,7 @@ export default function Privacy() {
                             <li>Correction of information</li>
                             <li>Deletion requests (subject to legal obligations)</li>
                         </ul>
-                        <p>Requests may be sent to: <strong><a href="mailto:hello@makemystay.ai" className="text-brand-red hover:underline">hello@makemystay.ai</a></strong></p>
+                        <p>Requests may be sent to: <strong><a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a></strong></p>
 
                         <h2 className="text-2xl font-bold text-slate-900 mb-4 mt-8">7. Changes to Policy</h2>
                         <p>We may update this Privacy Policy from time to time. Updated versions will be posted on this page.</p>
@@ -76,7 +76,7 @@ export default function Privacy() {
                         <p>
                             MakeMyStay Realty<br />
                             Bengaluru, Karnataka, India<br />
-                            Email: <a href="mailto:hello@makemystay.ai" className="text-brand-red hover:underline">hello@makemystay.ai</a>
+                            Email: <a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a>
                         </p>
                     </div>
                 </div>

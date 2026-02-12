@@ -70,7 +70,7 @@ export default function RefundPolicy() {
                         <p>
                             MakeMyStay Realty<br />
                             Bengaluru, Karnataka, India<br />
-                            Email: <a href="mailto:hello@makemystay.ai" className="text-brand-red hover:underline">hello@makemystay.ai</a>
+                            Email: <a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a>
                         </p>
                     </div>
                 </div>

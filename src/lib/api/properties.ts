@@ -13,22 +13,19 @@ const REALTY_PATH = '/realty/properties';
  * Maps the backend RealtyProperty to the frontend Property interface
  */
 function mapRealtyToProperty(item: RealtyProperty): Property {
-    // Determine price display
+    // Determine price display — prefer starting_price from backend
     let priceDisplay = 'Price on Request';
-    if (item.listing_type === 'rent') {
+    if (item.starting_price) {
+        priceDisplay = `₹${item.starting_price.toLocaleString('en-IN')}`;
+    } else if (item.listing_type === 'rent') {
         if (item.property_type === 'PG') {
-            const prices = [];
-            if (item.single_price) prices.push(`₹${item.single_price}/mo (1 Share)`);
-            if (item.double_price) prices.push(`₹${item.double_price}/mo (2 Share)`);
-            if (item.triple_price) prices.push(`₹${item.triple_price}/mo (3 Share)`);
-
-            priceDisplay = prices.length > 0 ? `Starts ₹${Math.min(item.single_price || Infinity, item.double_price || Infinity, item.triple_price || Infinity)}/mo` : 'Price on Request';
+            const minPrice = Math.min(item.single_price || Infinity, item.double_price || Infinity, item.triple_price || Infinity);
+            priceDisplay = minPrice < Infinity ? `₹${minPrice.toLocaleString('en-IN')}` : 'Price on Request';
         } else if (item.private_price) {
-            priceDisplay = `₹${item.private_price}/mo`;
+            priceDisplay = `₹${item.private_price.toLocaleString('en-IN')}`;
         }
     } else if (item.listing_type === 'buy') {
         if (item.private_price) {
-            // Heuristic: if > 100000 assume it's total price, else it might be formatted differently
             priceDisplay = `₹${(item.private_price / 10000000).toFixed(2)} Cr`;
         }
     }
@@ -36,11 +33,11 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     // Determine default image based on type if none exists
     // Using some Unsplash placeholders
     const defaultImages: Record<string, string> = {
-        'PG': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-        '1RK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
-        '1BHK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
-        '2BHK': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-        'Villa': 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1000'
+        // 'PG': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+        // '1RK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
+        // '1BHK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
+        // '2BHK': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+        // 'Villa': 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1000'
     };
 
     // Heuristics for beds/baths based on type
@@ -54,6 +51,10 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     const rawListingType = (item.listing_type || 'rent').toLowerCase();
     const category = (rawListingType === 'sale' || rawListingType === 'buy') ? 'buy' : 'rent';
 
+    // Extract images from DB response
+    const dbImages = item.images?.sort((a, b) => a.sort_order - b.sort_order).map(img => img.image_url) || [];
+    const primaryImage = item.images?.find(img => img.is_primary)?.image_url || dbImages[0];
+
     return {
         id: item.id || Math.random().toString(), // Fallback ID
         title: item.property_name || 'Untitled Property',
@@ -63,8 +64,8 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         beds: beds,
         baths: baths,
         sqft: "On Request",
-        image: defaultImages[item.property_type] || defaultImages['PG'],
-        images: [],
+        image: primaryImage || defaultImages[item.property_type] || defaultImages['PG'],
+        images: dbImages,
         tag: item.is_available ? 'Available' : 'Sold Out',
         category: category,
         description: item.description || `A beautiful ${item.furnishing?.replace('_', ' ') || ''} ${item.property_type} property in ${item.location}.`,

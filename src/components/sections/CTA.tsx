@@ -74,7 +74,7 @@ export function CTA() {
                             </a>
 
                             <a
-                                href="mailto:sales@makemystay.ai"
+                                href="mailto:connect@makemystay.ai"
                                 className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-brand-gray hover:border-brand-red/20 border border-slate-100 transition-colors group"
                             >
                                 <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -82,7 +82,7 @@ export function CTA() {
                                 </div>
                                 <div>
                                     <div className="text-sm text-slate-500">Email us</div>
-                                    <div className="font-bold text-slate-900">sales@makemystay.ai</div>
+                                    <div className="font-bold text-slate-900">connect@makemystay.ai</div>
                                 </div>
                             </a>
 

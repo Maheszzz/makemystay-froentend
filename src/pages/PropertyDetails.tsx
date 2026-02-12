@@ -3,7 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { MapPin, Bed, Bath, Hash, Check, Star, Share2, Heart, ArrowLeft } from 'lucide-react';
+import { MapPin, Check, Star, Share2, Heart, ArrowLeft } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useProperty } from '@/hooks';
 
@@ -86,12 +86,8 @@ export default function PropertyDetails() {
                                 <span className="bg-emerald-600 text-white px-3 py-1 rounded-full text-xs uppercase tracking-wider font-bold">{property.tag}</span>
                                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-1" /> {property.location}</span>
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 tracking-tight shadow-md">{property.title}</h1>
-                            <div className="flex items-center text-white/90 space-x-6">
-                                <div className="flex items-center"><Bed className="w-5 h-5 mr-2" /> {property.beds} Beds</div>
-                                <div className="flex items-center"><Bath className="w-5 h-5 mr-2" /> {property.baths} Baths</div>
-                                <div className="flex items-center"><Hash className="w-5 h-5 mr-2" /> {property.sqft} sqft</div>
-                            </div>
+
+
                         </div>
                     </div>
                 </div>
@@ -152,7 +148,10 @@ export default function PropertyDetails() {
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 relative z-10 gap-3">
                                     <div>
                                         <span className="text-sm text-slate-500 font-medium">Price</span>
-                                        <div className="text-3xl font-bold text-slate-900">{property.price}</div>
+                                        <div className="text-3xl font-bold text-slate-900">
+                                            {property.price}
+                                            {property.category === 'rent' && <span className="text-base font-medium text-slate-400">/mo</span>}
+                                        </div>
                                     </div>
                                     <div className="flex flex-nowrap items-center gap-1 bg-slate-50 px-3 py-2 rounded-lg">
                                         <Star className="w-4 h-4 text-emerald-500 fill-current shrink-0" />
@@ -180,7 +179,7 @@ export default function PropertyDetails() {
                                     <div className="text-slate-400 text-sm">Get expert advice instantly</div>
                                 </div>
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform">
-                                    <Hash className="w-5 h-5" />
+                                    <ArrowLeft className="w-5 h-5 rotate-180" />
                                 </div>
                             </Link>
                         </div>

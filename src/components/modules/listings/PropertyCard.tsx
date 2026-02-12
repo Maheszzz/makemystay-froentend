@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Bed, Bath, Hash, ArrowRight, Heart } from 'lucide-react';
+import { MapPin, ArrowRight, Heart } from 'lucide-react';
 import type { Property } from '@/types/api';
 
 interface PropertyCardProps {
@@ -60,36 +60,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         {property.title}
                     </h3>
 
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-3 gap-3 md:gap-4 py-4 md:py-5 border-t border-b border-slate-100 mb-4 md:mb-5">
-                        <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-md text-brand-charcoal group-hover:bg-brand-red/5 group-hover:text-brand-red transition-colors duration-300">
-                                <Bed className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-sm font-bold text-slate-900">{property.beds}</span>
-                                <span className="text-[10px] text-slate-400 uppercase tracking-wide">Beds</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center gap-1.5 px-2 border-l border-r border-slate-50">
-                            <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-md text-brand-charcoal group-hover:bg-brand-red/5 group-hover:text-brand-red transition-colors duration-300">
-                                <Bath className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-sm font-bold text-slate-900">{property.baths}</span>
-                                <span className="text-[10px] text-slate-400 uppercase tracking-wide">Baths</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-8 h-8 flex items-center justify-center bg-slate-50 rounded-md text-brand-charcoal group-hover:bg-brand-red/5 group-hover:text-brand-red transition-colors duration-300">
-                                <Hash className="w-4 h-4" />
-                            </div>
-                            <div className="flex flex-col items-center text-center">
-                                <span className="text-xs font-bold text-slate-900 truncate w-full px-1">{property.sqft?.replace(' sqft', '') || 'On Request'}</span>
-                                <span className="text-[10px] text-slate-400 uppercase tracking-wide">sqft</span>
-                            </div>
-                        </div>
-                    </div>
+
+
 
                     {/* Price Section */}
                     <div className="flex items-end justify-between mt-auto">
@@ -98,7 +70,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                 Starts {property.category === 'rent' ? '' : 'From'}
                             </span>
                             <div className="flex items-baseline gap-1">
-                                <span className="font-cormorant text-2xl font-bold text-brand-red">
+                                <span className="text-2xl font-bold text-brand-red">
                                     {formattedPrice}
                                 </span>
                                 {property.category === 'rent' && (
@@ -112,9 +84,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         </div>
                     </div>
 
-                    <div className="absolute bottom-4 right-4 text-[10px] font-bold text-slate-300 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                        {property.type || 'PG'}
-                    </div>
+
+
                 </div>
             </div>
         </Link>
