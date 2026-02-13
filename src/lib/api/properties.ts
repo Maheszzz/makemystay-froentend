@@ -69,7 +69,7 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         tag: item.is_available ? 'Available' : 'Sold Out',
         category: category,
         description: item.description || `A beautiful ${item.furnishing?.replace('_', ' ') || ''} ${item.property_type} property in ${item.location}.`,
-        features: [item.furnishing?.replace('_', ' ') || '', item.property_type],
+        features: (item.features && item.features.length > 0) ? item.features : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
         rating: 4.5,
         reviews: 0,
         map_link: item.map_link,

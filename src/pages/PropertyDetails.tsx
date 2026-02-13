@@ -119,7 +119,25 @@ export default function PropertyDetails() {
                         {/* Description */}
                         <div className="bg-white rounded-3xl p-8 border border-slate-100">
                             <h3 className="text-2xl font-bold text-slate-900 mb-4">About this home</h3>
-                            <p className="text-slate-600 leading-relaxed text-lg">{property.description}</p>
+
+                            <div className="text-slate-600 leading-relaxed text-lg space-y-4">
+                                {property.description.split('\n').map((line, i) => {
+                                    if (!line.trim()) return <br key={i} className="hidden" />; // Handle empty lines
+
+                                    // Check for bold syntax **text**
+                                    const parts = line.split(/(\*\*.*?\*\*)/g);
+                                    return (
+                                        <p key={i}>
+                                            {parts.map((part, j) => {
+                                                if (part.startsWith('**') && part.endsWith('**')) {
+                                                    return <strong key={j} className="text-slate-900">{part.slice(2, -2)}</strong>;
+                                                }
+                                                return part;
+                                            })}
+                                        </p>
+                                    );
+                                })}
+                            </div>
 
                             {property.features && property.features.length > 0 && (
                                 <div className="mt-8 pt-8 border-t border-slate-100">
