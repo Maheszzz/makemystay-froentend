@@ -75,7 +75,8 @@ export default function Contact() {
                                     <Phone className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Call Us</h3>
-                                <p className="text-slate-500 mb-4">Mon-Fri from 8am to 5pm.</p>
+                               <p className="text-slate-500 mb-4">Available 24/7 (Mon–Sun)</p>
+
                                 <a href="tel:+919876543210" className="text-lg font-semibold text-emerald-600 hover:text-emerald-700 block"> +91 81500 99911</a>
                             </div>
 

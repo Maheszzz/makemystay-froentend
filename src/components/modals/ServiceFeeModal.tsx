@@ -27,21 +27,21 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
 
         if (type === 'PG' || type === 'COLIVE PG') {
             fees = [
-                { id: 'sharing', label: 'Sharing', amount: 1500, description: 'Standard service fee for sharing occupancy.' },
-                { id: 'private', label: 'Private', amount: 2500, description: 'Premium service fee for private occupancy.' }
+                { id: 'sharing', label: 'Sharing', amount: 1500, description: 'Standard booking fee for sharing occupancy.' },
+                { id: 'private', label: 'Private', amount: 2500, description: 'Premium booking fee for private occupancy.' }
             ];
         } else if (type === '1BHK') {
             fees = [
-                { id: 'fixed_1bhk', label: 'Service Fee', amount: 4000, description: 'Standard service fee for 1BHK.' }
+                { id: 'fixed_1bhk', label: 'Booking Fee', amount: 4000, description: 'Standard booking fee for 1BHK.' }
             ];
         } else if (type === '2BHK') {
             fees = [
-                { id: 'fixed_2bhk', label: 'Service Fee', amount: 6000, description: 'Standard service fee for 2BHK.' }
+                { id: 'fixed_2bhk', label: 'Booking Fee', amount: 6000, description: 'Standard booking fee for 2BHK.' }
             ];
         } else {
             // Default fallback or for other types like 3BHK if needed
             fees = [
-                { id: 'standard', label: 'Service Fee', amount: 5000, description: 'Standard booking service fee.' }
+                { id: 'standard', label: 'Booking Fee', amount: 5000, description: 'Standard booking fee.' }
             ];
         }
 
@@ -70,7 +70,7 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
                 {/* Header */}
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                     <div>
-                        <h3 className="text-xl font-bold text-slate-900">Service Fees</h3>
+                        <h3 className="text-xl font-bold text-slate-900">Booking Fee</h3>
                         <p className="text-sm text-slate-500 mt-1">Please select an option to continue</p>
                     </div>
                     <button
