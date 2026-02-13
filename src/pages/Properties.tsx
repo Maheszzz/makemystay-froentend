@@ -7,7 +7,8 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties } from '@/hooks';
 import { properties as fallbackProperties } from '@/data/properties';
-import { MapPin, Bed, Bath, Hash, Search, ArrowLeft } from 'lucide-react';
+import { Search, ArrowLeft } from 'lucide-react';
+import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 
 export default function Properties() {
     const [category, setCategory] = useState<'all' | 'buy' | 'rent'>('all');
@@ -114,43 +115,7 @@ export default function Properties() {
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {filteredProperties.length > 0 ? (
                                 filteredProperties.map((prop) => (
-                                    <Link to={`/property/${prop.id}`} key={prop.id} className="block group">
-                                        <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 border-l-4 border-l-brand-red shadow-sm hover:shadow-[0_10px_40px_rgba(217,32,39,0.1)] hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
-                                            <div className="relative h-64 overflow-hidden">
-                                                <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                                                    {prop.tag}
-                                                </div>
-                                                <div className="absolute top-4 right-4 bg-brand-charcoal/90 text-white text-xs font-medium px-2 py-1 rounded-lg uppercase">
-                                                    {prop.category === 'buy' ? 'Sale' : 'Rent'}
-                                                </div>
-                                            </div>
-
-                                            <div className="p-6 flex-1 flex flex-col">
-                                                <div className="flex items-center text-xs text-slate-500 mb-2">
-                                                    <MapPin className="w-3 h-3 mr-1 text-brand-red" /> {prop.location}
-                                                </div>
-                                                <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-brand-red transition-colors">{prop.title}</h3>
-
-                                                <div className="flex items-center space-x-4 text-xs text-slate-500 my-4 py-4 border-t border-b border-slate-100">
-                                                    <div className="flex items-center">
-                                                        <Bed className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.beds} Beds
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <Bath className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.baths} Baths
-                                                    </div>
-                                                    <div className="flex items-center">
-                                                        <Hash className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.sqft} sqft
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center justify-between mt-auto">
-                                                    <div className="text-xl font-bold text-brand-red">{prop.price}</div>
-                                                    <div className="text-xs font-medium text-slate-400 uppercase">{prop.type}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
+                                    <PropertyCard key={prop.id} property={prop} />
                                 ))
                             ) : (
                                 <div className="col-span-full text-center py-12">

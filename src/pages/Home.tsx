@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Hero } from '@/components/sections/Hero';
@@ -13,8 +13,30 @@ import { CTA } from '@/components/sections/CTA';
 import { CaseStudy } from '@/components/sections/CaseStudy';
 
 export default function Home() {
-    const [category, setCategory] = useState<'buy' | 'rent'>('buy');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // Get values from URL or default
+    const category = (searchParams.get('category') as 'buy' | 'rent') || 'rent';
+    const searchQuery = searchParams.get('q') || '';
+
+    // Wrapped setters to update URL
+    const setCategory = (newCategory: 'buy' | 'rent') => {
+        setSearchParams(prev => {
+            prev.set('category', newCategory);
+            return prev;
+        }, { replace: true });
+    };
+
+    const setSearchQuery = (newQuery: string) => {
+        setSearchParams(prev => {
+            if (newQuery) {
+                prev.set('q', newQuery);
+            } else {
+                prev.delete('q');
+            }
+            return prev;
+        }, { replace: true });
+    };
 
     return (
         <>
@@ -29,6 +51,9 @@ export default function Home() {
                     />
                 </section>
 
+                {/* Property Listings */}
+                <PropertyGrid category={category} searchQuery={searchQuery} />
+
                 {/* Services / What We Offer */}
                 <section id="services" className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">
@@ -37,9 +62,6 @@ export default function Home() {
                     </div>
                     <ServicesGrid />
                 </section>
-
-                {/* Property Listings */}
-                <PropertyGrid category={category} searchQuery={searchQuery} />
 
                 {/* Investment Calculator */}
                 <InvestmentCalculator />

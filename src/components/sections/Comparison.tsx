@@ -13,7 +13,7 @@ export function Comparison() {
     };
 
     return (
-        <section id="market" className="py-24 bg-slate-50 relative overflow-hidden">
+        <section id="market" className="py-14 md:py-24 bg-slate-50 relative overflow-hidden">
             {/* Subtle background decoration */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px]"></div>
 
@@ -28,7 +28,9 @@ export function Comparison() {
                     </p>
                 </div>
 
-                <div className="overflow-x-auto pb-4">
+                <div className="overflow-x-auto pb-4 relative">
+                    {/* Scroll indicator for mobile */}
+                    <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10 md:hidden"></div>
                     <div className="min-w-[800px] w-full bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
                         {/* Dark Header Section */}
                         <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-8 py-6">

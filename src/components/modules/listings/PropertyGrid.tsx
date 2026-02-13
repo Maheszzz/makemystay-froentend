@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Bed, Bath, Hash, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { Button } from '@/components/ui/Button';
 import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -12,14 +13,97 @@ interface PropertyGridProps {
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const { properties, loading, error } = useProperties();
 
-    const filteredProperties = properties.filter(prop => {
+    // Fallback data in case of API error - Mirrors actual DB content
+    const FALLBACK_PROPERTIES: any[] = [
+        {
+            id: 1,
+            title: 'Kings & Queens Coliving',
+            location: 'Kundlahalli',
+            price: '₹11,999/mo',
+            type: 'Colive PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'New one',
+            features: ['fully furnished', 'Colive PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 14,
+            title: 'Flock 9 Coliving',
+            location: 'Thubarahalli',
+            price: '₹12,999/mo',
+            type: 'PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', 'PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 15,
+            title: 'Arcade Inn Coliving',
+            location: 'Marathahalli',
+            price: '₹15,999/mo',
+            type: 'PG',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', 'PG'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        },
+        {
+            id: 16,
+            title: 'Urban living',
+            location: 'Kadubeesnahalli',
+            price: '₹24,999/mo',
+            type: '1BHK',
+            beds: 1,
+            baths: 1,
+            sqft: 'On Request',
+            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
+            images: [],
+            tag: 'Available',
+            category: 'rent',
+            description: 'Added via bulk script - 04/02/2026',
+            features: ['', '1BHK'],
+            rating: 4.5,
+            reviews: 0,
+            is_available: true
+        }
+    ];
+
+    // Use fallback properties if there's an error
+    const displayProperties = error ? FALLBACK_PROPERTIES : properties;
+
+    const filteredProperties = displayProperties.filter(prop => {
         const matchesCategory = prop.category === category;
         const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             prop.location.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCategory && matchesSearch;
     }).slice(0, 4); // Limit to 4 for the home page
 
-    if (loading) {
+    if (loading && !error) {
         return (
             <section className="py-20 bg-slate-50">
                 <div className="flex justify-center">
@@ -29,14 +113,10 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
         );
     }
 
-    if (error) {
-        return null; // Gracefully hide if error on home page
-    }
-
     return (
-        <section className="py-20 bg-slate-50">
+        <section className="py-12 md:py-20 bg-slate-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-end mb-12">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-12 gap-4">
                     <div>
                         <h2 className="text-3xl font-bold text-slate-900 mb-2">
                             {category === 'buy' ? 'Featured Properties for Sale' : 'Latest Rental Listings'}
@@ -48,44 +128,11 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                     </Link>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
                     {filteredProperties.length > 0 ? (
                         filteredProperties.map((prop) => {
                             return (
-                                <Link to={`/property/${prop.id}`} key={prop.id} className="block group">
-                                    <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 border-l-4 border-l-brand-red shadow-sm hover:shadow-[0_10px_40px_rgba(217,32,39,0.1)] hover:-translate-y-1 transition-all duration-300 h-full flex flex-col">
-                                        <div className="relative h-64 overflow-hidden">
-                                            <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            <div className="absolute top-4 left-4 bg-brand-red text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wide">
-                                                {prop.tag}
-                                            </div>
-                                        </div>
-
-                                        <div className="p-6 flex-1 flex flex-col">
-                                            <div className="flex items-center text-xs text-slate-500 mb-2">
-                                                <MapPin className="w-3 h-3 mr-1 text-brand-red" /> {prop.location}
-                                            </div>
-                                            <h3 className="text-lg font-bold text-slate-900 mb-1 truncate group-hover:text-brand-red transition-colors">{prop.title}</h3>
-
-                                            <div className="flex items-center space-x-4 text-xs text-slate-500 my-4 py-4 border-t border-b border-slate-100">
-                                                <div className="flex items-center">
-                                                    <Bed className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.beds} Beds
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <Bath className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.baths} Baths
-                                                </div>
-                                                <div className="flex items-center">
-                                                    <Hash className="w-4 h-4 mr-1 text-brand-charcoal" /> {prop.sqft} sqft
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center justify-between mt-auto">
-                                                <div className="text-xl font-bold text-brand-red">{prop.price}</div>
-                                                <div className="text-xs font-medium text-slate-400 uppercase">{prop.type}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
+                                <PropertyCard key={prop.id} property={prop} />
                             );
                         })
                     ) : (

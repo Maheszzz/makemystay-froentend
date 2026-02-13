@@ -27,11 +27,21 @@ export interface RealtyProperty {
     single_price?: number;
     double_price?: number;
     triple_price?: number;
+    starting_price?: number;
     listing_type: 'buy' | 'rent';
     is_available: boolean;
     description?: string; // Optional in DB response??
     features?: string[];
-    images?: string[];
+    images?: PropertyImage[];
+}
+
+export interface PropertyImage {
+    id: number;
+    property_id: number;
+    image_url: string;
+    is_primary: boolean;
+    sort_order: number;
+    created_at: string;
 }
 
 export interface Property {
@@ -53,6 +63,7 @@ export interface Property {
     reviews?: number;
     created_at?: string;
     updated_at?: string;
+    postedDate?: string;
 
     // Original Realty fields preserved for reference
     map_link?: string;
