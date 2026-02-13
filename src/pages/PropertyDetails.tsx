@@ -7,10 +7,14 @@ import { MapPin, Check, Star, Share2, Heart, ArrowLeft } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useProperty } from '@/hooks';
 
+import { ServiceFeeModal } from '@/components/modals/ServiceFeeModal';
+import { useState } from 'react';
+
 export default function PropertyDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { property, loading, error, refetch } = useProperty(id || '');
+    const [isServiceFeeModalOpen, setIsServiceFeeModalOpen] = useState(false);
 
     const handleBack = () => {
         if (window.history.length > 2) {
@@ -18,6 +22,16 @@ export default function PropertyDetails() {
         } else {
             navigate('/properties');
         }
+    };
+
+    const handlePayNow = () => {
+        setIsServiceFeeModalOpen(true);
+    };
+
+    const handleServiceFeeProceed = (selectedOption: any) => {
+        setIsServiceFeeModalOpen(false);
+        console.log("Selected Fee:", selectedOption);
+        alert(`Proceeding with ${selectedOption.label} Plan (₹${selectedOption.amount})`);
     };
 
     if (loading) {
@@ -121,7 +135,7 @@ export default function PropertyDetails() {
                             <h3 className="text-2xl font-bold text-slate-900 mb-4">About this home</h3>
 
                             <div className="text-slate-600 leading-relaxed text-lg space-y-4">
-                                {property.description.split('\n').map((line, i) => {
+                                {(property.description || '').split('\n').map((line, i) => {
                                     if (!line.trim()) return <br key={i} className="hidden" />; // Handle empty lines
 
                                     // Check for bold syntax **text**
@@ -139,7 +153,7 @@ export default function PropertyDetails() {
                                 })}
                             </div>
 
-                            {property.features && property.features.length > 0 && (
+                            {Array.isArray(property.features) && property.features.length > 0 && (
                                 <div className="mt-8 pt-8 border-t border-slate-100">
                                     <h4 className="text-lg font-bold text-slate-900 mb-6">What this place offers</h4>
                                     <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
@@ -185,7 +199,10 @@ export default function PropertyDetails() {
                                         <div className="font-bold text-slate-900">{property.postedDate || new Date().toLocaleDateString()}</div>
                                     </div>
 
-                                    <Button className="w-full py-4 text-lg font-bold rounded-xl shadow-lg shadow-emerald-600/20 bg-brand-red hover:bg-brand-red/90 transition-all transform hover:scale-[1.02]">
+                                    <Button
+                                        onClick={handlePayNow}
+                                        className="w-full py-4 text-lg font-bold rounded-xl shadow-lg shadow-emerald-600/20 bg-brand-red hover:bg-brand-red/90 transition-all transform hover:scale-[1.02]"
+                                    >
                                         Pay Now
                                     </Button>
                                 </div>
@@ -205,6 +222,13 @@ export default function PropertyDetails() {
                 </div>
             </main>
             <Footer />
+
+            <ServiceFeeModal
+                isOpen={isServiceFeeModalOpen}
+                onClose={() => setIsServiceFeeModalOpen(false)}
+                onProceed={handleServiceFeeProceed}
+                propertyType={property.type}
+            />
         </div>
     );
 }
