@@ -55,6 +55,8 @@ export function Navbar() {
             return;
         }
 
+
+
         if (location.pathname === '/') {
             e.preventDefault();
             const element = document.getElementById(sectionId);
@@ -88,7 +90,11 @@ export function Navbar() {
                             {navigationLinks.map((item) => (
                                 <a
                                     key={item}
-                                    href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
+                                    href={
+                                        item === 'Home' ? '/' :
+                                            item === 'Home' ? '/' :
+                                                `/#${item.toLowerCase().replace(' ', '-')}`
+                                    }
                                     onClick={(e) => handleNavClick(item, e)}
                                     className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
                                 >
@@ -96,7 +102,7 @@ export function Navbar() {
                                 </a>
                             ))}
                             <Link to="/contact-us">
-                                <Button variant="primary" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
+                                <Button variant="gold" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
                             </Link>
                         </div>
 
@@ -152,7 +158,11 @@ export function Navbar() {
                             {navigationLinks.map((item, idx) => (
                                 <a
                                     key={item}
-                                    href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
+                                    href={
+                                        item === 'Home' ? '/' :
+                                            item === 'Home' ? '/' :
+                                                `/#${item.toLowerCase().replace(' ', '-')}`
+                                    }
                                     onClick={(e) => handleNavClick(item, e)}
                                     className="flex items-center justify-between py-4 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5 transition-colors group"
                                     style={{ animationDelay: `${idx * 50}ms` }}
@@ -167,7 +177,7 @@ export function Navbar() {
                     {/* Menu Footer */}
                     <div className="p-6 border-t border-white/10 space-y-4">
                         <Link to="/contact-us" onClick={() => setIsMenuOpen(false)}>
-                            <Button variant="primary" className="w-full py-3.5 text-base shadow-glow">
+                            <Button variant="gold" className="w-full py-3.5 text-base shadow-glow">
                                 Contact Us
                             </Button>
                         </Link>

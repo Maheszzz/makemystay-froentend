@@ -12,6 +12,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 
+
 function App() {
     return (
         <Router>
@@ -33,6 +34,7 @@ function App() {
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/refund-policy" element={<RefundPolicy />} />
+
                 </Routes>
             </Suspense>
             <MobileBottomCTA />

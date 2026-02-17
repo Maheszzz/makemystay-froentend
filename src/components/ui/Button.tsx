@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'dark';
+    variant?: 'primary' | 'secondary' | 'outline' | 'dark' | 'gold';
     icon?: typeof ArrowRight;
 }
 
@@ -14,7 +14,8 @@ export function Button({ children, variant = 'primary', className = '', icon: Ic
         outline: "border-2 border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600",
         ghost: "text-slate-600 hover:bg-slate-100",
         dark: "bg-brand-navy text-white hover:bg-brand-dark shadow-glass border border-white/10",
-        link: "text-emerald-600 hover:underline p-0 h-auto"
+        link: "text-emerald-600 hover:underline p-0 h-auto",
+        gold: "bg-brand-gold text-white hover:bg-yellow-600 shadow-glow hover:shadow-[0_0_20px_rgba(197,160,33,0.5)]"
     };
 
     return (

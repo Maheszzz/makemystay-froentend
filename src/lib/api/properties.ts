@@ -55,6 +55,17 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     const dbImages = item.images?.sort((a, b) => a.sort_order - b.sort_order).map(img => img.image_url) || [];
     const primaryImage = item.images?.find(img => img.is_primary)?.image_url || dbImages[0];
 
+    // Determine sharing options
+    const sharingOptions: string[] = [];
+    if (item.single_price) sharingOptions.push('Single');
+    if (item.double_price) sharingOptions.push('Double');
+    if (item.triple_price) sharingOptions.push('Triple');
+
+    // Fallback if no specific prices but type is PG
+    if (sharingOptions.length === 0 && item.property_type === 'PG') {
+        sharingOptions.push('Shared');
+    }
+
     return {
         id: item.id || Math.random().toString(), // Fallback ID
         title: item.property_name || 'Untitled Property',
@@ -63,15 +74,34 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         type: item.property_type || 'Apartment',
         beds: beds,
         baths: baths,
-        sqft: "On Request",
+        sqft: item.area_sqft ? `${item.area_sqft} sqft` : "On Request",
+        parking: item.parking,
+        lift: item.lift,
+        area: item.area_sqft,
+        wifi: true, // Mocking these as they are new feature requests
+        housekeeping: true,
+        power_backup: true,
+        gym: (item.features && item.features.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK',
+        lounge: (item.features && item.features.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa',
+        cctv: true,
+        washing_machine: (item.features && item.features.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG',
+        geyser: true,
         image: primaryImage || defaultImages[item.property_type] || defaultImages['PG'],
+        modern_kitchen: (item.features && item.features.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa',
+        balcony: (item.features && item.features.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa',
+        attached_bathroom: true, // Standard for most listed properties
         images: dbImages,
         tag: item.is_available ? 'Available' : 'Sold Out',
         category: category,
-        description: item.description || `A beautiful ${item.furnishing?.replace('_', ' ') || ''} ${item.property_type} property in ${item.location}.`,
+        description: item.description || `A premium ${item.property_type} property in ${item.location}.`,
+        sharing: sharingOptions,
+        food: item.property_type === 'PG' || item.features?.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
         features: (item.features && item.features.length > 0) ? item.features : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
-        rating: 4.5,
-        reviews: 0,
+        rating: item.average_rating || 0,
+        reviews: item.review_count || 0,
+        average_rating: item.average_rating,
+        review_count: item.review_count,
+        reviews_list: item.reviews,
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,
@@ -137,6 +167,18 @@ export const propertyApi = {
     delete: async (id: number | string): Promise<void> => {
         await api.delete(`${REALTY_PATH}/${id}`);
     },
+
+    /**
+     * Get search suggestions based on a query
+     * @param query - The search string
+     * @returns Array of strings
+     */
+    getSuggestions: async (query: string): Promise<string[]> => {
+        if (!query || query.length < 1) return [];
+        return await api.get<string[]>(`${REALTY_PATH}/suggestions`, {
+            params: { q: query }
+        });
+    }
 };
 
 export default propertyApi;

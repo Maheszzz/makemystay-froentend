@@ -11,15 +11,15 @@ export default function ServiceDetail() {
             title: "Property Management",
             icon: Building2,
             tagline: "Premium Asset Oversight",
-            description: "Managing a property involves more than just collecting rent—it requires consistent oversight, tenant coordination, and regular maintenance to preserve value and ensure a smooth living experience.",
-            fullDescription: "Our property management service handles everything from tenant onboarding and documentation to maintenance scheduling and issue resolution. With structured processes and transparent reporting, property owners can stay informed while enjoying a hassle-free ownership experience.",
+            description: "End-to-end management for premium assets, including maintenance and tenant coordination.",
+            fullDescription: "We handle everything from onboarding to issue resolution with transparent reporting, ensuring a hassle-free experience for owners.",
             image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=1200",
             features: [
-                "Tenant onboarding and documentation",
-                "Maintenance scheduling and coordination",
-                "Issue resolution and support",
-                "Transparent reporting and updates",
-                "Property value preservation",
+                "Tenant onboarding & documentation",
+                "Maintenance coordination",
+                "Issue resolution support",
+                "Transparent reporting",
+                "Value preservation",
                 "Professional oversight"
             ]
         },
@@ -27,48 +27,48 @@ export default function ServiceDetail() {
             title: "Revenue Optimization",
             icon: Wallet,
             tagline: "Maximize Your Returns",
-            description: "Maximizing rental income requires understanding market demand, pricing trends, and occupancy patterns. Our revenue optimization approach uses data insights and market analysis to recommend competitive pricing strategies.",
-            fullDescription: "By aligning pricing with real-time market conditions and property performance, we help property owners achieve sustainable and optimized revenue growth that improves occupancy rates and long-term returns.",
+            description: "Data-driven pricing strategies to optimize rental income and occupancy rates.",
+            fullDescription: "Using real-time market insights, we align pricing with demand to deliver sustainable revenue growth.",
             image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
             features: [
                 "Market demand analysis",
                 "Dynamic pricing strategies",
-                "Occupancy pattern insights",
-                "Competitive market positioning",
-                "Revenue performance tracking",
-                "Long-term return optimization"
+                "Occupancy insights",
+                "Competitive positioning",
+                "Performance tracking",
+                "Return optimization"
             ]
         },
         'tenant-acquisition': {
             title: "Tenant Acquisition",
             icon: Users,
             tagline: "Quality Tenant Matching",
-            description: "Finding reliable tenants can be time-consuming and uncertain without the right process in place. Our tenant acquisition service simplifies this by connecting properties with qualified prospects.",
-            fullDescription: "Through conducting verification checks and streamlining onboarding procedures, this structured approach reduces vacancy time, improves tenant quality, and ensures a smoother leasing experience for both owners and residents.",
+            description: "Connecting properties with qualified prospects through a streamlined verification process.",
+            fullDescription: "Our structured approach reduces vacancy time and ensures high tenant quality for a smoother leasing experience.",
             image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=1200",
             features: [
                 "Qualified prospect matching",
-                "Background verification checks",
-                "Streamlined onboarding process",
+                "Background verification",
+                "Streamlined onboarding",
                 "Reduced vacancy periods",
-                "Quality tenant screening",
-                "Professional leasing support"
+                "Tenant screening",
+                "Leasing support"
             ]
         },
         'market-intelligence': {
             title: "Market Intelligence",
             icon: BarChart3,
             tagline: "Data-Driven Decisions",
-            description: "Real estate decisions are strongest when supported by accurate and timely data. Our market intelligence tools provide insights into rental trends, pricing benchmarks, and demand patterns.",
-            fullDescription: "These insights help property owners and investors make informed decisions across different locations and property types, plan effectively, and adapt strategies based on evolving market conditions.",
+            description: "Real-time insights into rental trends, pricing benchmarks, and demand patterns.",
+            fullDescription: "Make informed investment decisions across different locations with our comprehensive market analytics.",
             image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
             features: [
                 "Rental trend analysis",
                 "Pricing benchmarks",
                 "Demand pattern insights",
                 "Location-based data",
-                "Property type comparisons",
-                "Strategic planning support"
+                "Type comparisons",
+                "Strategic support"
             ]
         }
     };
@@ -95,7 +95,7 @@ export default function ServiceDetail() {
             <Navbar />
 
             {/* Hero Section */}
-            <section className="relative min-h-screen overflow-hidden flex items-center">
+            <section className="relative min-h-[70vh] overflow-hidden flex items-center">
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <img
@@ -108,11 +108,11 @@ export default function ServiceDetail() {
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                     {/* Back Button */}
                     <Link
                         to="/#services"
-                        className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-12 transition-colors group"
+                        className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8 transition-colors group"
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span className="text-sm tracking-wider uppercase">Back to Services</span>
@@ -136,11 +136,11 @@ export default function ServiceDetail() {
                                 {service.title}
                             </h1>
 
-                            <p className="text-xl text-white/80 leading-relaxed mb-8">
+                            <p className="text-xl text-white/80 leading-relaxed mb-6">
                                 {service.description}
                             </p>
 
-                            <p className="text-lg text-white/70 leading-relaxed mb-12">
+                            <p className="text-lg text-white/70 leading-relaxed mb-10">
                                 {service.fullDescription}
                             </p>
 
@@ -176,9 +176,9 @@ export default function ServiceDetail() {
             </section>
 
             {/* Features Section */}
-            <section className="relative py-32 bg-gradient-to-b from-black to-brand-charcoal">
+            <section className="relative py-20 bg-gradient-to-b from-black to-brand-charcoal">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-20">
+                    <div className="text-center mb-12">
                         <h2
                             className="text-5xl md:text-6xl font-medium text-white mb-6"
                             style={{ fontFamily: "'Playfair Display', serif" }}
@@ -208,7 +208,7 @@ export default function ServiceDetail() {
             </section>
 
             {/* CTA Section */}
-            <section className="relative py-32 bg-gradient-to-br from-brand-charcoal to-black overflow-hidden">
+            <section className="relative py-20 bg-gradient-to-br from-brand-charcoal to-black overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 opacity-5 bg-diagonal-grid"></div>
 

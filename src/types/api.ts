@@ -33,6 +33,21 @@ export interface RealtyProperty {
     description?: string; // Optional in DB response??
     features?: string[];
     images?: PropertyImage[];
+    parking?: boolean;
+    lift?: boolean;
+    area_sqft?: number;
+    reviews?: Review[];
+    average_rating?: number;
+    review_count?: number;
+}
+
+export interface Review {
+    id: number;
+    property_id: number;
+    rating: number;
+    user_name: string;
+    comment?: string;
+    created_at: string;
 }
 
 export interface PropertyImage {
@@ -53,7 +68,23 @@ export interface Property {
     beds: number;
     baths: number;
     sqft: string;
+    parking?: boolean;
+    lift?: boolean;
+    area?: number;
+    wifi?: boolean;
+    housekeeping?: boolean;
+    power_backup?: boolean;
+    gym?: boolean;
+    lounge?: boolean;
+    cctv?: boolean;
+    washing_machine?: boolean;
+    geyser?: boolean;
     image: string;
+    modern_kitchen?: boolean;
+    balcony?: boolean;
+    attached_bathroom?: boolean;
+    pool?: boolean;
+    smart_home?: boolean;
     images?: string[];
     tag?: string;
     category: 'buy' | 'rent';
@@ -61,9 +92,15 @@ export interface Property {
     features?: string[];
     rating?: number;
     reviews?: number;
+    average_rating?: number;
+    review_count?: number;
+    reviews_list?: Review[];
     created_at?: string;
     updated_at?: string;
     postedDate?: string;
+
+    sharing?: string[];
+    food?: boolean;
 
     // Original Realty fields preserved for reference
     map_link?: string;
@@ -101,6 +138,7 @@ export interface PaginationParams {
     location?: string;
     property_type?: string;
     listing_type?: string;
+    search?: string;
 }
 
 export interface ContactCreateRequest {
@@ -128,3 +166,5 @@ export interface PropertyCreateRequest {
 export interface PropertyUpdateRequest {
     [key: string]: any;
 }
+
+

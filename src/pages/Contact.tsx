@@ -75,9 +75,9 @@ export default function Contact() {
                                     <Phone className="w-6 h-6" />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Call Us</h3>
-                               <p className="text-slate-500 mb-4">Available 24/7 (Mon–Sun)</p>
+                                <p className="text-slate-500 mb-4">Available 24/7 (Mon–Sun)</p>
 
-                                <a href="tel:+919876543210" className="text-lg font-semibold text-emerald-600 hover:text-emerald-700 block"> +91 81500 99911</a>
+                                <a href="tel:+919844594800" className="text-lg font-semibold text-emerald-600 hover:text-emerald-700 block"> +91 98445 94800</a>
                             </div>
 
                             <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
@@ -140,7 +140,7 @@ export default function Contact() {
                                                 onChange={handleChange}
                                                 required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                                                placeholder="John Doe"
+                                                placeholder="Enter your name"
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -152,7 +152,7 @@ export default function Contact() {
                                                 onChange={handleChange}
                                                 required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                                                placeholder=" +91 81500 99911"
+                                                placeholder="Enter your mobile number"
                                             />
                                         </div>
                                     </div>

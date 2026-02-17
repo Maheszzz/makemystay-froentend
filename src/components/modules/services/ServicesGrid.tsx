@@ -6,28 +6,28 @@ const services = [
     {
         id: 'property-management',
         title: "Property Management",
-        desc: "End-to-end management for premium assets",
+        desc: "End-to-end management for assets",
         icon: Building2,
         color: "text-brand-red"
     },
     {
         id: 'revenue-optimization',
         title: "Revenue Optimization",
-        desc: "AI-driven pricing to maximize yields",
+        desc: "AI-driven pricing tools",
         icon: Wallet,
         color: "text-brand-red"
     },
     {
         id: 'tenant-acquisition',
         title: "Tenant Acquisition",
-        desc: "Automated leasing and background checks",
+        desc: "Automated leasing & checks",
         icon: Users,
         color: "text-accent-purple"
     },
     {
         id: 'market-intelligence',
         title: "Market Intelligence",
-        desc: "Real-time data on rental trends",
+        desc: "Real-time rental data",
         icon: BarChart3,
         color: "text-accent-coral"
     }
@@ -39,8 +39,8 @@ export function ServicesGrid() {
             {services.map((service, index) => (
                 <motion.div
                     key={index}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="relative group bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="relative group bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 overflow-hidden"
                 >
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 

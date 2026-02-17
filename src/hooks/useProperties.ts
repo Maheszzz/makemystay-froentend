@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { propertyApi } from '@/lib/api';
-import type { Property, ApiError } from '@/types/api';
+import type { Property, ApiError, PaginationParams } from '@/types/api';
 
 interface UsePropertiesResult {
     properties: Property[];
@@ -11,18 +11,19 @@ interface UsePropertiesResult {
 
 /**
  * Custom hook to fetch all properties from the API
+ * @param params - Optional pagination and filter parameters
  * @returns Properties data, loading state, error state, and refetch function
  */
-export function useProperties(): UsePropertiesResult {
+export function useProperties(params?: PaginationParams): UsePropertiesResult {
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<ApiError | null>(null);
 
-    const fetchProperties = async () => {
+    const fetchProperties = useCallback(async () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await propertyApi.getAll();
+            const data = await propertyApi.getAll(params);
             setProperties(data);
         } catch (err) {
             setError(err as ApiError);
@@ -30,11 +31,11 @@ export function useProperties(): UsePropertiesResult {
         } finally {
             setLoading(false);
         }
-    };
+    }, [params]);
 
     useEffect(() => {
         fetchProperties();
-    }, []);
+    }, [fetchProperties]);
 
     return {
         properties,

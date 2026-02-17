@@ -3,25 +3,7 @@
  * This data is used as a fallback when the API is unavailable
  */
 
-export interface Property {
-    id: string;
-    title: string;
-    location: string;
-    price: string;
-    type: string;
-    beds: number;
-    baths: number;
-    sqft: string;
-    image: string;
-    images: string[];
-    tag: string;
-    category: 'buy' | 'rent';
-    description: string;
-    features: string[];
-    rating: number;
-    reviews: number;
-    postedDate?: string;
-}
+import { Property } from '@/types/api';
 
 export const properties: Property[] = [
     {
@@ -45,7 +27,12 @@ export const properties: Property[] = [
         features: ["Panoramic City Views", "Private Infinity Pool", "Smart Home Automation", "24/7 Concierge", "Private Elevator Access", "Chef's Kitchen", "Home Theater", "Wine Cellar"],
         rating: 4.9,
         reviews: 128,
-        postedDate: "2024-01-15"
+        postedDate: "2024-01-15",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        power_backup: true,
+        smart_home: true // Assuming smart_home might be a field later or just ignored for now if not in type
     },
     {
         id: "lakefront-estate",
@@ -67,7 +54,11 @@ export const properties: Property[] = [
         features: ["Private Lake Access", "Boat Dock", "Heated Floors", "Gourmet Kitchen", "Guest House", "Landscaped Gardens", "Security System", "3-Car Garage"],
         rating: 4.8,
         reviews: 95,
-        postedDate: "2024-02-01"
+        postedDate: "2024-02-01",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        power_backup: true
     },
     {
         id: "downtown-luxury-condo",
@@ -89,7 +80,13 @@ export const properties: Property[] = [
         features: ["Ocean Views", "Rooftop Pool", "Fitness Center", "Concierge Service", "Valet Parking", "Pet Friendly", "In-Unit Laundry", "Balcony"],
         rating: 4.7,
         reviews: 82,
-        postedDate: "2024-02-10"
+        postedDate: "2024-02-10",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        power_backup: true,
+        gym: true,
+        pool: true
     },
     {
         id: "coastal-villa",
@@ -111,7 +108,12 @@ export const properties: Property[] = [
         features: ["Beach Access", "Infinity Pool", "Outdoor Kitchen", "Fire Pit", "Mediterranean Design", "Master Suite", "Ocean Views", "Smart Home"],
         rating: 4.9,
         reviews: 156,
-        postedDate: "2023-12-20"
+        postedDate: "2023-12-20",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        power_backup: true,
+        pool: true
     },
     {
         id: "modern-city-apartment",
@@ -133,7 +135,12 @@ export const properties: Property[] = [
         features: ["City Views", "Doorman", "Gym Access", "Rooftop Deck", "In-Unit Laundry", "Central AC", "Hardwood Floors", "Walk-in Closet"],
         rating: 4.6,
         reviews: 67,
-        postedDate: "2024-02-05"
+        postedDate: "2024-02-05",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        gym: true,
+        lounge: true
     },
     {
         id: "suburban-family-home",
@@ -155,7 +162,11 @@ export const properties: Property[] = [
         features: ["Large Backyard", "2-Car Garage", "Updated Kitchen", "Near Schools", "Community Pool", "Pet Friendly", "Central Heat/AC", "Storage Space"],
         rating: 4.7,
         reviews: 43,
-        postedDate: "2024-01-28"
+        postedDate: "2024-01-28",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        power_backup: true
     },
     {
         id: "beachfront-condo",
@@ -177,7 +188,12 @@ export const properties: Property[] = [
         features: ["Direct Beach Access", "Ocean Views", "Pool & Spa", "Furnished", "Balcony", "Fitness Center", "Covered Parking", "24/7 Security"],
         rating: 4.8,
         reviews: 91,
-        postedDate: "2024-02-08"
+        postedDate: "2024-02-08",
+        modern_kitchen: true,
+        balcony: true,
+        attached_bathroom: true,
+        gym: true,
+        pool: true
     },
     {
         id: "luxury-loft",
@@ -199,10 +215,13 @@ export const properties: Property[] = [
         features: ["Exposed Brick", "High Ceilings", "Open Floor Plan", "Designer Kitchen", "Walk-in Shower", "Secured Entry", "Bike Storage", "Near Transit"],
         rating: 4.5,
         reviews: 54,
-        postedDate: "2024-01-10"
+        postedDate: "2024-01-10",
+        modern_kitchen: true,
+        attached_bathroom: true,
+        gym: true
     }
 ];
 
 export function getPropertyBySlug(slug: string): Property | undefined {
-    return properties.find(p => p.id === slug);
+    return properties.find(p => String(p.id) === String(slug));
 }

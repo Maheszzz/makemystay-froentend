@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
@@ -11,13 +12,21 @@ interface PropertyGridProps {
 }
 
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
-    const { properties, loading, error } = useProperties();
+    const params = useMemo(() => ({
+        listing_type: category,
+        search: searchQuery,
+        limit: 12
+    }), [category, searchQuery]);
+
+    const { properties, loading, error } = useProperties(params);
 
     // Fallback data in case of API error - Mirrors actual DB content
     const FALLBACK_PROPERTIES: any[] = [
         {
             id: 1,
             title: 'Kings & Queens Coliving',
+            sharing: ['Single', 'Double', 'Triple'],
+            food: true,
             location: 'Kundlahalli',
             price: '₹11,999/mo',
             type: 'Colive PG',
@@ -37,6 +46,8 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
         {
             id: 14,
             title: 'Flock 9 Coliving',
+            sharing: ['Single', 'Double', 'Triple'],
+            food: true,
             location: 'Thubarahalli',
             price: '₹12,999/mo',
             type: 'PG',
@@ -56,6 +67,8 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
         {
             id: 15,
             title: 'Arcade Inn Coliving',
+            sharing: ['Single', 'Double'],
+            food: true,
             location: 'Marathahalli',
             price: '₹15,999/mo',
             type: 'PG',
@@ -96,12 +109,15 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     // Use fallback properties if there's an error
     const displayProperties = error ? FALLBACK_PROPERTIES : properties;
 
-    const filteredProperties = displayProperties.filter(prop => {
-        const matchesCategory = prop.category === category;
-        const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            prop.location.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
-    }).slice(0, 4); // Limit to 4 for the home page
+    // Filter fallback data client-side if error, otherwise use API results directly
+    const filteredProperties = error
+        ? displayProperties.filter(prop => {
+            const matchesCategory = prop.category === category;
+            const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                prop.location.toLowerCase().includes(searchQuery.toLowerCase());
+            return matchesCategory && matchesSearch;
+        }).slice(0, 4)
+        : displayProperties.slice(0, 4); // Limit to 4 for the home page
 
     if (loading && !error) {
         return (

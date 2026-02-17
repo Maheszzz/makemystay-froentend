@@ -3,11 +3,12 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { MapPin, Check, Star, Share2, Heart, ArrowLeft } from 'lucide-react';
+import { MapPin, Check, Star, Heart, ArrowLeft, Share2 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useProperty } from '@/hooks';
 
 import { ServiceFeeModal } from '@/components/modals/ServiceFeeModal';
+import { ReviewSection } from '@/components/property/ReviewSection';
 import { useState } from 'react';
 
 export default function PropertyDetails() {
@@ -15,6 +16,35 @@ export default function PropertyDetails() {
     const navigate = useNavigate();
     const { property, loading, error, refetch } = useProperty(id || '');
     const [isServiceFeeModalOpen, setIsServiceFeeModalOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = async () => {
+        if (!property) return;
+
+        const productionUrl = `https://makemystay.ai/property/${id}`;
+        const shareData = {
+            title: property.title,
+            text: `Check out this property: ${property.title} in ${property.location}`,
+            url: productionUrl,
+        };
+
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(productionUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (err) {
+                console.error('Error copying to clipboard:', err);
+                alert('Failed to copy link to clipboard.');
+            }
+        }
+    };
 
     const handleBack = () => {
         if (window.history.length > 2) {
@@ -33,6 +63,7 @@ export default function PropertyDetails() {
         console.log("Selected Fee:", selectedOption);
         alert(`Proceeding with ${selectedOption.label} Plan (₹${selectedOption.amount})`);
     };
+
 
     if (loading) {
         return (
@@ -113,20 +144,21 @@ export default function PropertyDetails() {
                         {/* Quick Stats Bar */}
                         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div className="flex items-center space-x-4">
-                                <div className="flex -space-x-3">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-200" style={{ backgroundImage: `url(https://randomuser.me/api/portraits/men/${i + 20}.jpg)`, backgroundSize: 'cover' }}></div>
-                                    ))}
-                                    <div className="w-10 h-10 rounded-full border-2 border-white bg-slate-900 text-white flex items-center justify-center text-xs font-bold">+24</div>
-                                </div>
                                 <div className="text-sm">
                                     <div className="font-bold text-slate-900">Highly Rated</div>
                                     <div className="text-slate-500">Popular among families</div>
                                 </div>
                             </div>
-                            <div className="flex space-x-3">
-                                <button className="p-3 rounded-full border border-slate-200 hover:bg-slate-50 transition-colors text-slate-600"><Share2 className="w-5 h-5" /></button>
-                                <button className="p-3 rounded-full border border-slate-200 hover:bg-red-50 hover:text-red-500 transition-colors text-slate-600"><Heart className="w-5 h-5" /></button>
+                            <div className="flex space-x-3 items-center">
+                                {copied && <span className="text-emerald-600 text-sm font-medium animate-fade-in">Link copied!</span>}
+                                <button
+                                    onClick={handleShare}
+                                    className="p-3 rounded-full border border-slate-200 hover:bg-slate-100 transition-colors text-slate-600 cursor-pointer"
+                                    title="Share property"
+                                >
+                                    <Share2 className="w-5 h-5" />
+                                </button>
+                                <button className="p-3 rounded-full border border-slate-200 hover:bg-red-50 hover:text-red-500 transition-colors text-slate-600 cursor-pointer"><Heart className="w-5 h-5" /></button>
                             </div>
                         </div>
 
@@ -169,6 +201,15 @@ export default function PropertyDetails() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Reviews Section */}
+                        <div className="bg-white rounded-3xl p-8 border border-slate-100 mt-8">
+                            <ReviewSection
+                                propertyId={property.id}
+                                initialReviews={property.reviews_list || []}
+                                onReviewAdded={refetch}
+                            />
+                        </div>
                     </div>
 
                     {/* Booking Widget (Sticky) */}
@@ -187,7 +228,7 @@ export default function PropertyDetails() {
                                     </div>
                                     <div className="flex flex-nowrap items-center gap-1 bg-slate-50 px-3 py-2 rounded-lg">
                                         <Star className="w-4 h-4 text-emerald-500 fill-current shrink-0" />
-                                        <span className="font-bold text-slate-900 leading-none whitespace-nowrap">{property.rating || 4.5}</span>
+                                        <span className="font-bold text-slate-900 leading-none whitespace-nowrap">{(property.rating ?? 0) > 0 ? (property.rating ?? 0).toFixed(1) : 'N/A'}</span>
                                         <span className="text-slate-400 leading-none">·</span>
                                         <span className="text-slate-500 text-sm underline leading-none whitespace-nowrap">{property.reviews || 0} reviews</span>
                                     </div>

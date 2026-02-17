@@ -61,7 +61,7 @@ export function CTA() {
                         {/* Contact Details */}
                         <div className="p-6 space-y-4">
                             <a
-                                href="tel:+919876543210"
+                                href="tel:+919844594800"
                                 className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-brand-gray hover:border-brand-red/20 border border-slate-100 transition-colors group"
                             >
                                 <div className="w-12 h-12 rounded-full bg-brand-red/10 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -69,7 +69,7 @@ export function CTA() {
                                 </div>
                                 <div>
                                     <div className="text-sm text-slate-500">Call us</div>
-                                    <div className="font-bold text-slate-900"> +91 81500 99911</div>
+                                    <div className="font-bold text-slate-900"> +91 81500 9911</div>
                                 </div>
                             </a>
 
@@ -87,7 +87,7 @@ export function CTA() {
                             </a>
 
                             <a
-                                href="https://wa.me/919876543210?text=Hi, I'm interested in MakeMyStay"
+                                href="https://wa.me/919844594800?text=Hi, I'm interested in MakeMyStay"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-green-50 hover:border-green-200 border border-slate-100 transition-colors group"
