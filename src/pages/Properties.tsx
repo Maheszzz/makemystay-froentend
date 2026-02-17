@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties } from '@/hooks';
-import { properties as fallbackProperties } from '@/data/properties';
 import { Search, ArrowLeft, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -27,8 +26,7 @@ export default function Properties() {
     // Fetch properties from API with server-side filters
     const { properties: apiProperties, loading, error, refetch } = useProperties(params);
 
-    // Use API data if available, fallback to mock data on error
-    const properties = error ? fallbackProperties : apiProperties;
+    const properties = apiProperties;
 
     // Get unique locations for filter
     const locations = useMemo(() => {
@@ -37,37 +35,20 @@ export default function Properties() {
     }, [properties]);
 
     // Client-side filtering as a secondary layer (for location and BHK which might not be in API yet)
-    // Or if error, fallback to full client-side filtering
     const filteredProperties = useMemo(() => {
-        if (!error && apiProperties.length > 0) {
-            // If we have API results, only apply filters that AREN'T handled by server yet
-            return apiProperties.filter(prop => {
-                const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
-                const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
-                return matchesLocation && matchesBHK;
-            });
-        }
-
-        // Fallback or No API results (apply all filters)
+        // Only apply filters that AREN'T handled by server yet
         return properties.filter(prop => {
-            const matchesCategory = category === 'all' || prop.category === category;
-            const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                prop.location.toLowerCase().includes(searchQuery.toLowerCase());
-
             const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
-
-            const matchesType = typeFilter === 'all' || prop.type === typeFilter;
             const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
-
-            return matchesCategory && matchesSearch && matchesLocation && matchesType && matchesBHK;
+            return matchesLocation && matchesBHK;
         });
-    }, [apiProperties, properties, category, searchQuery, locationFilter, typeFilter, bhkFilter, error]);
+    }, [properties, locationFilter, bhkFilter]);
 
     return (
-        <div className="bg-slate-50 min-h-screen font-sans">
+        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
             <Navbar />
 
-            <main className="pt-32 pb-20">
+            <main className="pt-32 pb-20 flex-grow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-12">
@@ -201,17 +182,13 @@ export default function Properties() {
                                 detail={error.detail}
                                 onRetry={refetch}
                             />
-                            <p className="text-sm text-slate-500 text-center mt-4">
-                                Showing fallback data. The backend might not be running.
-                            </p>
                         </div>
                     )}
 
                     {/* Results count */}
-                    {!loading && (
+                    {!loading && !error && (
                         <p className="text-slate-500 mb-6">
                             {filteredProperties.length} properties found
-                            {error && <span className="text-orange-600 ml-2">(using fallback data)</span>}
                         </p>
                     )}
 

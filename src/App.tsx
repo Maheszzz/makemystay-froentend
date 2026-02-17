@@ -11,6 +11,7 @@ const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
+const QuickPay = lazy(() => import('./pages/QuickPay'));
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/privacy" element={<Privacy />} />
                     <Route path="/refund-policy" element={<RefundPolicy />} />
+                    <Route path="/quick-pay" element={<QuickPay />} />
 
                 </Routes>
             </Suspense>

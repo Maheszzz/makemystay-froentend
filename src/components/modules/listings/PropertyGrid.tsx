@@ -11,6 +11,8 @@ interface PropertyGridProps {
     searchQuery: string;
 }
 
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo(() => ({
         listing_type: category,
@@ -21,109 +23,31 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const { properties, loading, error } = useProperties(params);
 
     // Fallback data in case of API error - Mirrors actual DB content
-    const FALLBACK_PROPERTIES: any[] = [
-        {
-            id: 1,
-            title: 'Kings & Queens Coliving',
-            sharing: ['Single', 'Double', 'Triple'],
-            food: true,
-            location: 'Kundlahalli',
-            price: '₹11,999/mo',
-            type: 'Colive PG',
-            beds: 1,
-            baths: 1,
-            sqft: 'On Request',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-            images: [],
-            tag: 'Available',
-            category: 'rent',
-            description: 'New one',
-            features: ['fully furnished', 'Colive PG'],
-            rating: 4.5,
-            reviews: 0,
-            is_available: true
-        },
-        {
-            id: 14,
-            title: 'Flock 9 Coliving',
-            sharing: ['Single', 'Double', 'Triple'],
-            food: true,
-            location: 'Thubarahalli',
-            price: '₹12,999/mo',
-            type: 'PG',
-            beds: 1,
-            baths: 1,
-            sqft: 'On Request',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-            images: [],
-            tag: 'Available',
-            category: 'rent',
-            description: 'Added via bulk script - 04/02/2026',
-            features: ['', 'PG'],
-            rating: 4.5,
-            reviews: 0,
-            is_available: true
-        },
-        {
-            id: 15,
-            title: 'Arcade Inn Coliving',
-            sharing: ['Single', 'Double'],
-            food: true,
-            location: 'Marathahalli',
-            price: '₹15,999/mo',
-            type: 'PG',
-            beds: 1,
-            baths: 1,
-            sqft: 'On Request',
-            image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-            images: [],
-            tag: 'Available',
-            category: 'rent',
-            description: 'Added via bulk script - 04/02/2026',
-            features: ['', 'PG'],
-            rating: 4.5,
-            reviews: 0,
-            is_available: true
-        },
-        {
-            id: 16,
-            title: 'Urban living',
-            location: 'Kadubeesnahalli',
-            price: '₹24,999/mo',
-            type: '1BHK',
-            beds: 1,
-            baths: 1,
-            sqft: 'On Request',
-            image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
-            images: [],
-            tag: 'Available',
-            category: 'rent',
-            description: 'Added via bulk script - 04/02/2026',
-            features: ['', '1BHK'],
-            rating: 4.5,
-            reviews: 0,
-            is_available: true
-        }
-    ];
 
-    // Use fallback properties if there's an error
-    const displayProperties = error ? FALLBACK_PROPERTIES : properties;
 
-    // Filter fallback data client-side if error, otherwise use API results directly
-    const filteredProperties = error
-        ? displayProperties.filter(prop => {
-            const matchesCategory = prop.category === category;
-            const matchesSearch = prop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                prop.location.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearch;
-        }).slice(0, 4)
-        : displayProperties.slice(0, 4); // Limit to 4 for the home page
+    // Limit to 4 for the home page
+    const filteredProperties = properties.slice(0, 4);
 
-    if (loading && !error) {
+    if (loading) {
         return (
             <section className="py-20 bg-slate-50">
                 <div className="flex justify-center">
                     <LoadingSpinner message="Loading latest listings..." />
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className="py-20 bg-slate-50">
+                <div className="max-w-7xl mx-auto px-4 flex justify-center">
+                    <div className="max-w-md w-full bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <ErrorMessage
+                            message="Failed to load properties"
+                            detail={error.message}
+                        />
+                    </div>
                 </div>
             </section>
         );

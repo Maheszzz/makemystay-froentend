@@ -89,7 +89,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     <div className="mb-4">
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900 line-clamp-1 group-hover:text-brand-red transition-colors">
+                                <h3 className="text-lg font-bold text-slate-900 group-hover:text-brand-red transition-colors leading-tight">
                                     {property.title}
                                 </h3>
                                 <div className="flex items-center text-slate-500 text-xs mt-1">
