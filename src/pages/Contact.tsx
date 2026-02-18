@@ -10,8 +10,8 @@ export default function Contact() {
         name: '',
         phone: '',
         email: '',
-        location: 'Everywhere',
-        property_type: 'Any Type',
+        location: '',
+        property_type: '',
         message: ''
     });
     const [loading, setLoading] = useState(false);
@@ -31,18 +31,22 @@ export default function Contact() {
         setError(null);
         setSuccess(false);
 
+        if (formData.phone.length < 10) {
+            setError('Phone number must be at least 10 digits');
+            setLoading(false);
+            return;
+        }
+
         try {
-            // Submit to backend API — filter out "Everywhere" and "Any Type" defaults if needed
+            // Submit to backend API
             const submissionData = {
-                ...formData,
-                location: formData.location === 'Everywhere' ? undefined : formData.location,
-                property_type: formData.property_type === 'Any Type' ? undefined : formData.property_type
+                ...formData
             };
             await contactApi.submitContactForm(submissionData);
 
             // Success!
             setSuccess(true);
-            setFormData({ name: '', phone: '', email: '', location: 'Everywhere', property_type: 'Any Type', message: '' });
+            setFormData({ name: '', phone: '', email: '', location: '', property_type: '', message: '' });
 
             // Hide success message after 5 seconds
             setTimeout(() => setSuccess(false), 5000);
@@ -184,9 +188,10 @@ export default function Contact() {
                                                 id="location"
                                                 value={formData.location}
                                                 onChange={handleChange}
+                                                required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
                                             >
-                                                <option value="Everywhere">Everywhere</option>
+                                                <option value="" disabled>Select Location</option>
                                                 <option value="Aecs layout">Aecslayout</option>
                                                 <option value="Bellandur">Bellandur</option>
                                                 <option value="Bommasandra">Bommasandra</option>
@@ -215,9 +220,10 @@ export default function Contact() {
                                                 id="property_type"
                                                 value={formData.property_type}
                                                 onChange={handleChange}
+                                                required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
                                             >
-                                                <option value="Any Type">Any Type</option>
+                                                <option value="" disabled>Select Property Type</option>
                                                 <option value="PG">PG</option>
                                                 <option value="1RK">1RK</option>
                                                 <option value="1BHK">1BHK</option>
