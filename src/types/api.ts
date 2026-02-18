@@ -7,6 +7,8 @@ export interface Contact {
     email: string;
     phone: string;
     message?: string;
+    location?: string;
+    property_type?: string;
     status?: 'new' | 'contacted' | 'closed';
     created_at?: string;
     updated_at?: string;
@@ -146,6 +148,8 @@ export interface ContactCreateRequest {
     email: string;
     phone: string;
     message?: string;
+    location?: string;
+    property_type?: string;
 }
 
 export interface ContactUpdateRequest {

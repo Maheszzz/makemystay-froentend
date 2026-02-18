@@ -10,13 +10,15 @@ export default function Contact() {
         name: '',
         phone: '',
         email: '',
+        location: 'Everywhere',
+        property_type: 'Any Type',
         message: ''
     });
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({
             ...formData,
             [e.target.id]: e.target.value
@@ -30,12 +32,17 @@ export default function Contact() {
         setSuccess(false);
 
         try {
-            // Submit to backend API
-            await contactApi.submitContactForm(formData);
+            // Submit to backend API — filter out "Everywhere" and "Any Type" defaults if needed
+            const submissionData = {
+                ...formData,
+                location: formData.location === 'Everywhere' ? undefined : formData.location,
+                property_type: formData.property_type === 'Any Type' ? undefined : formData.property_type
+            };
+            await contactApi.submitContactForm(submissionData);
 
             // Success!
             setSuccess(true);
-            setFormData({ name: '', phone: '', email: '', message: '' });
+            setFormData({ name: '', phone: '', email: '', location: 'Everywhere', property_type: 'Any Type', message: '' });
 
             // Hide success message after 5 seconds
             setTimeout(() => setSuccess(false), 5000);
@@ -168,6 +175,58 @@ export default function Contact() {
                                             className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none"
                                             placeholder="john@example.com"
                                         />
+                                    </div>
+
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label htmlFor="location" className="text-sm font-semibold text-slate-700">Location</label>
+                                            <select
+                                                id="location"
+                                                value={formData.location}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
+                                            >
+                                                <option value="Everywhere">Everywhere</option>
+                                                <option value="Aecs layout">Aecslayout</option>
+                                                <option value="Bellandur">Bellandur</option>
+                                                <option value="Bommasandra">Bommasandra</option>
+                                                <option value="Brookfield">Brookfield</option>
+                                                <option value="BTM">BTM</option>
+                                                <option value="Doddanekkundi">Doddanekkundi</option>
+                                                <option value="Hsr layout">Hsr layout</option>
+                                                <option value="Indiranagar">Indiranagar</option>
+                                                <option value="Kadubeesanahalli">Kadubeesanahalli</option>
+                                                <option value="Kadubeesnahalli">Kadubeesnahalli</option>
+                                                <option value="Koramangala">Koramangala</option>
+                                                <option value="Kundalahalli">Kundalahalli</option>
+                                                <option value="kundanahalli">kundanahalli</option>
+                                                <option value="Kundlahalli">Kundlahalli</option>
+                                                <option value="Mahadevapura">Mahadevapura</option>
+                                                <option value="Marathahalli">Marathahalli</option>
+                                                <option value="Munnekollal">Munnekollal</option>
+                                                <option value="Sarjapur">Sarjapur</option>
+                                                <option value="Thubarahalli">Thubarahalli</option>
+                                                <option value="Whitefield">Whitefield</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="property_type" className="text-sm font-semibold text-slate-700">Property Type</label>
+                                            <select
+                                                id="property_type"
+                                                value={formData.property_type}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
+                                            >
+                                                <option value="Any Type">Any Type</option>
+                                                <option value="PG">PG</option>
+                                                <option value="1RK">1RK</option>
+                                                <option value="1BHK">1BHK</option>
+                                                <option value="2BHK">2BHK</option>
+                                                <option value="3BHK">3BHK</option>
+                                                <option value="4BHK">4BHK</option>
+                                                <option value="Villa">Villa</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">

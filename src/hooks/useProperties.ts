@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { propertyApi } from '@/lib/api';
 import type { Property, ApiError, PaginationParams } from '@/types/api';
 
@@ -6,7 +6,7 @@ interface UsePropertiesResult {
     properties: Property[];
     loading: boolean;
     error: ApiError | null;
-    refetch: () => Promise<void>;
+    refetch: () => void;
 }
 
 /**
@@ -18,30 +18,43 @@ export function useProperties(params?: PaginationParams): UsePropertiesResult {
     const [properties, setProperties] = useState<Property[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<ApiError | null>(null);
-
-    const fetchProperties = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await propertyApi.getAll(params);
-            setProperties(data);
-        } catch (err) {
-            setError(err as ApiError);
-            console.error('Error fetching properties:', err);
-        } finally {
-            setLoading(false);
-        }
-    }, [params]);
+    const [refreshSignal, setRefreshSignal] = useState<number>(0);
 
     useEffect(() => {
-        fetchProperties();
-    }, [fetchProperties]);
+        let isCurrent = true;
+
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await propertyApi.getAll(params);
+                if (isCurrent) {
+                    setProperties(data);
+                }
+            } catch (err) {
+                if (isCurrent) {
+                    setError(err as ApiError);
+                    console.error('Error fetching properties:', err);
+                }
+            } finally {
+                if (isCurrent) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+
+        return () => {
+            isCurrent = false;
+        };
+    }, [params, refreshSignal]);
 
     return {
         properties,
         loading,
         error,
-        refetch: fetchProperties,
+        refetch: () => setRefreshSignal(s => s + 1),
     };
 }
 

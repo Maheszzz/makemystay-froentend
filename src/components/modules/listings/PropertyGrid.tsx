@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
-import { Button } from '@/components/ui/Button';
 import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
@@ -63,9 +62,6 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                         </h2>
                         <p className="text-slate-500">Handpicked luxury properties that represent the best of what MakeMyStay has to offer</p>
                     </div>
-                    <Link to="/properties" className="hidden sm:flex items-center text-sm font-bold text-slate-900 hover:text-brand-red transition-colors">
-                        View All Properties <ArrowRight className="ml-2 w-4 h-4" />
-                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
@@ -83,9 +79,10 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                     )}
                 </div>
 
-                <div className="mt-8 sm:hidden flex justify-center">
-                    <Link to="/properties">
-                        <Button variant="outline">View All Properties</Button>
+                <div className="mt-12 flex justify-center">
+                    <Link to="/properties" className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
+                        View All Properties
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </div>

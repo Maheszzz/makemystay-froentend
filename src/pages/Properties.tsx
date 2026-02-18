@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -13,15 +13,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Properties() {
     const [category, setCategory] = useState<'all' | 'buy' | 'rent'>('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+    // Debounce search query
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
     const [locationFilter, setLocationFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
     const [bhkFilter, setBhkFilter] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
     const params = useMemo(() => ({
         listing_type: category === 'all' ? undefined : category,
-        search: searchQuery,
+        search: debouncedSearchQuery,
         property_type: typeFilter === 'all' ? undefined : typeFilter
-    }), [category, searchQuery, typeFilter]);
+    }), [category, debouncedSearchQuery, typeFilter]);
 
     // Fetch properties from API with server-side filters
     const { properties: apiProperties, loading, error, refetch } = useProperties(params);
@@ -169,13 +180,13 @@ export default function Properties() {
                     </div>
 
                     {/* API Status Messages */}
-                    {loading && (
+                    {(loading || searchQuery !== debouncedSearchQuery) && (
                         <div className="py-12">
-                            <LoadingSpinner size={40} message="Loading properties from database..." />
+                            <LoadingSpinner size={40} message={searchQuery !== debouncedSearchQuery ? "Waiting for you to finish typing..." : "Loading properties from database..."} />
                         </div>
                     )}
 
-                    {error && (
+                    {error && searchQuery === debouncedSearchQuery && (
                         <div className="mb-8">
                             <ErrorMessage
                                 message={error.message}
