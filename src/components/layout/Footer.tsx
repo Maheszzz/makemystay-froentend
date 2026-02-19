@@ -14,7 +14,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
                     <div className="col-span-1 text-center md:text-left">
                         <div className="flex items-center space-x-3 mb-6">
-                            <img src="/logo-m.png" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
+                            <img src="/logo-a.png" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
                             <span className="text-2xl font-bold text-white tracking-tight font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>

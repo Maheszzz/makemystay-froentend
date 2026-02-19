@@ -242,7 +242,7 @@ export default function QuickPay() {
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
-                                        placeholder="John Doe"
+                                        placeholder="Enter your name"
                                         required
                                     />
                                 </div>
@@ -255,7 +255,7 @@ export default function QuickPay() {
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
                                         className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
-                                        placeholder="9876543210"
+                                        placeholder="Enter your phone number"
                                         required
                                     />
                                 </div>

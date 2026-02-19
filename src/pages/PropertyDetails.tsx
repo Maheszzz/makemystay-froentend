@@ -211,12 +211,21 @@ export default function PropertyDetails() {
 
             <main className="pb-20 flex-grow">
                 {/* Hero Gallery */}
-                <div className="h-[50vh] md:h-[70vh] relative group overflow-hidden">
-                    <img
-                        src={heroImage}
-                        alt={property.title}
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
+                <div className="h-[50vh] md:h-[70vh] relative group overflow-hidden bg-slate-200">
+                    {heroImage ? (
+                        <img
+                            src={heroImage}
+                            alt={property.title}
+                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                            <div className="text-center text-slate-400">
+                                <div className="text-6xl mb-2">🏠</div>
+                                <p className="text-sm font-medium">No image available</p>
+                            </div>
+                        </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
                     {/* Back Button */}

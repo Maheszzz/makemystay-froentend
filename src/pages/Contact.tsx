@@ -177,7 +177,7 @@ export default function Contact() {
                                             onChange={handleChange}
                                             required
                                             className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white transition-all outline-none"
-                                            placeholder="john@example.com"
+                                            placeholder="Enter your email"
                                         />
                                     </div>
 

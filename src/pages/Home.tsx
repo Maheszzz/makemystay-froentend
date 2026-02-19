@@ -73,6 +73,11 @@ export default function Home() {
                 <CaseStudy />
                 <CTA />
             </main>
+
+            <div className="flex justify-center py-10 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
+                <img src="/logo-full.svg" alt="MakeMyStay" className="h-8" />
+            </div>
+
             <Footer />
         </>
     );

@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
+import bgVideo from '@/assets/bgimage.mp4';
 
 
 interface HeroProps {
@@ -9,19 +11,32 @@ interface HeroProps {
 }
 
 export function Hero({ category, setCategory, searchQuery, setSearchQuery }: HeroProps) {
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    useEffect(() => {
+        if (videoRef.current) {
+            videoRef.current.playbackRate = 0.5; // Slower speed for luxury feel
+        }
+    }, []);
     return (
         <section id="home" className="relative min-h-[85vh] md:min-h-screen overflow-hidden flex items-center justify-center">
             {/* Full-width Background Image */}
+            {/* Full-width Background Video */}
             <div className="absolute inset-0 z-0">
-                <img
-                    src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1920"
-                    alt="Luxury Home"
+                <video
+                    ref={videoRef}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
                     className="w-full h-full object-cover"
-                    loading="eager"
-                />
-                {/* Dark Overlay */}
-                <div className="absolute inset-0 bg-black/60"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/70"></div>
+                    poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1920"
+                >
+                    <source src={bgVideo} type="video/mp4" />
+                </video>
+                {/* Dark Overlay - Adjusted for video visibility */}
+                <div className="absolute inset-0 bg-black/50"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60"></div>
             </div>
 
             {/* Content Container */}

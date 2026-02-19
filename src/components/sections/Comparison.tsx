@@ -15,7 +15,7 @@ export function Comparison() {
     return (
         <section id="market" className="py-14 md:py-24 bg-slate-50 relative overflow-hidden">
             {/* Subtle background decoration */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px]"></div>
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px] pointer-events-none"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-16">
@@ -28,14 +28,46 @@ export function Comparison() {
                     </p>
                 </div>
 
-                <div className="overflow-x-auto pb-4 relative">
-                    {/* Scroll indicator for mobile */}
-                    <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10 md:hidden"></div>
-                    <div className="min-w-[800px] w-full bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden">
+                {/* Mobile View: Cards */}
+                <div className="md:hidden space-y-6">
+                    {comparisonData.map((row, idx) => (
+                        <div key={idx} className="bg-white rounded-2xl p-6 shadow-card border border-slate-100">
+                            <h3 className="text-lg font-bold text-slate-900 mb-4">{row.label}</h3>
+
+                            {/* MakeMyStay - Hero */}
+                            <div className="flex items-center justify-between mb-6 bg-red-50 p-4 rounded-xl border border-red-100">
+                                <span className="font-bold text-brand-red">MakeMyStay</span>
+                                <div className="text-xl font-bold text-brand-red flex items-center gap-2">
+                                    {getValueIcon(row.m)} {row.m}
+                                </div>
+                            </div>
+
+                            {/* Others - Grid */}
+                            <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="text-center p-3 bg-slate-50 rounded-lg">
+                                    <div className="text-slate-500 mb-1 font-medium">Brokers</div>
+                                    <div className="font-semibold text-slate-700">{row.b}</div>
+                                </div>
+                                <div className="text-center p-3 bg-slate-50 rounded-lg">
+                                    <div className="text-slate-500 mb-1 font-medium">Portals</div>
+                                    <div className="font-semibold text-slate-700">{row.l}</div>
+                                </div>
+                                <div className="text-center p-3 bg-slate-50 rounded-lg">
+                                    <div className="text-slate-500 mb-1 font-medium">CRM</div>
+                                    <div className="font-semibold text-slate-700">{row.c}</div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Desktop View: Table */}
+                <div className="hidden md:block overflow-x-auto pb-4 relative">
+                    <div className="min-w-[800px] w-full bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-slate-100">
                         {/* Dark Header Section */}
-                        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-8 py-6">
+                        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-6">
                             <div className="grid grid-cols-5 gap-4 items-center">
-                                <div className="text-lg font-bold text-white">Feature</div>
+                                <div className="text-lg font-bold text-white pl-8">Feature</div>
                                 <div className="text-center">
                                     <div className="text-sm font-medium text-slate-300">Brokers</div>
                                 </div>
@@ -45,8 +77,8 @@ export function Comparison() {
                                 <div className="text-center">
                                     <div className="text-sm font-medium text-slate-300">Generic CRM</div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="px-5 py-2 bg-brand-red rounded-full inline-block">
+                                <div className="text-center pr-8">
+                                    <div className="px-5 py-2 bg-brand-red rounded-full inline-block shadow-glow">
                                         <span className="text-white font-bold text-sm">MakeMyStay.ai</span>
                                     </div>
                                 </div>
@@ -54,33 +86,35 @@ export function Comparison() {
                         </div>
 
                         {/* White Table Body */}
-                        <div className="p-8">
+                        <div className="py-4">
                             {comparisonData.map((row, idx) => (
                                 <div
                                     key={idx}
-                                    className={`grid grid-cols-5 gap-4 py-5 items-center ${idx !== comparisonData.length - 1 ? 'border-b border-slate-200' : ''}`}
+                                    className={`grid grid-cols-5 gap-4 py-5 items-center hover:bg-slate-50 transition-colors ${idx !== comparisonData.length - 1 ? 'border-b border-slate-100' : ''}`}
                                 >
-                                    <div className="font-semibold text-slate-900">{row.label}</div>
+                                    <div className="font-semibold text-slate-900 pl-8">{row.label}</div>
                                     <div className="text-center">
-                                        <span className="text-red-500 text-sm flex items-center justify-center gap-2 font-medium">
+                                        <span className="text-slate-500 text-sm flex items-center justify-center gap-2 font-medium">
                                             {getValueIcon(row.b)}
                                             {row.b}
                                         </span>
                                     </div>
                                     <div className="text-center">
-                                        <span className="text-orange-500 text-sm flex items-center justify-center gap-2 font-medium">
+                                        <span className="text-slate-500 text-sm flex items-center justify-center gap-2 font-medium">
                                             {getValueIcon(row.l)}
                                             {row.l}
                                         </span>
                                     </div>
                                     <div className="text-center">
-                                        <span className="text-blue-500 text-sm flex items-center justify-center gap-2 font-medium">
+                                        <span className="text-slate-500 text-sm flex items-center justify-center gap-2 font-medium">
                                             {getValueIcon(row.c)}
                                             {row.c}
                                         </span>
                                     </div>
-                                    <div className="text-center">
-                                        <span className="inline-flex items-center gap-2 text-brand-red font-bold bg-red-50 py-2 px-4 rounded-full text-sm">
+                                    <div className="text-center pr-8 relative">
+                                        {/* Highlight background for the winner */}
+                                        <div className="absolute inset-y-[-20px] inset-x-2 bg-red-50/50 -z-10 rounded-lg hidden group-hover:block"></div>
+                                        <span className="inline-flex items-center gap-2 text-brand-red font-bold bg-red-50 py-2 px-4 rounded-full text-sm border border-red-100">
                                             {getValueIcon(row.m)}
                                             {row.m}
                                         </span>
