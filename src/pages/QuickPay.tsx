@@ -133,11 +133,11 @@ export default function QuickPay() {
         <div className="min-h-screen flex flex-col bg-white">
             <Navbar />
 
-            <main className="flex-grow flex items-center justify-center p-4 md:p-8 pt-24 md:pt-28">
-                <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-5 min-h-[650px]">
+            <main className="flex-grow flex items-center justify-center p-4 md:p-8 pt-20 md:pt-28">
+                <div className="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden grid md:grid-cols-5">
 
                     {/* Left Panel - Visual Side */}
-                    <div className="md:col-span-2 bg-gradient-to-br from-brand-charcoal via-slate-900 to-black relative p-8 md:p-12 flex flex-col justify-between overflow-hidden">
+                    <div className="hidden md:flex md:col-span-2 bg-gradient-to-br from-brand-charcoal via-slate-900 to-black relative p-8 md:p-12 flex-col justify-between overflow-hidden">
                         {/* Abstract Background Shapes */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
@@ -194,7 +194,7 @@ export default function QuickPay() {
                     </div>
 
                     {/* Right Panel - Form */}
-                    <div className="md:col-span-3 p-8 md:p-12 bg-white flex flex-col justify-center">
+                    <div className="md:col-span-3 p-6 md:p-12 bg-white flex flex-col justify-center">
                         <div className="mb-8">
                             <div className="flex items-center justify-between mb-4">
                                 <h1 className="text-3xl md:text-4xl font-bold text-slate-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>

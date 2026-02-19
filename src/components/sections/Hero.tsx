@@ -40,12 +40,12 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-20 md:pt-0 flex flex-col items-center text-center">
+            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 md:pt-0 flex flex-col items-center text-center">
 
                 {/* 1. Eyebrow Tagline — Elegant & Spaced */}
                 <div className="mb-6 md:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
                     <span
-                        className="text-[10px] md:text-xs text-white/90 tracking-[0.8em] uppercase font-medium flex items-center gap-6 before:h-[1px] before:w-12 before:bg-white/30 after:h-[1px] after:w-12 after:bg-white/30"
+                        className="text-[10px] md:text-xs text-white/90 tracking-[0.4em] md:tracking-[0.8em] uppercase font-medium flex items-center gap-3 md:gap-6 before:h-[1px] before:w-6 md:before:w-12 before:bg-white/30 after:h-[1px] after:w-6 md:after:w-12 after:bg-white/30"
                         style={{ fontFamily: "'Playfair Display', serif" }}
                     >
                         Professional • Trusted • Seamless
@@ -75,7 +75,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
 
                 {/* 4. Description — Refined Balance */}
                 <div className="max-w-2xl mx-auto mb-12 md:mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-                    <p className="text-sm md:text-lg text-white/90 leading-relaxed font-light tracking-widest px-8">
+                    <p className="text-sm md:text-lg text-white/90 leading-relaxed font-light tracking-wide md:tracking-widest px-2 sm:px-8">
                         Affordable, flexible, and secure stays meticulously curated for
                         <span className="text-white font-normal mx-2 border-b border-brand-gold/50 pb-0.5">students</span> &
                         <span className="text-white font-normal mx-2 border-b border-brand-gold/50 pb-0.5">professionals</span>.

@@ -57,8 +57,8 @@ export default function Home() {
                 {/* Services / What We Offer */}
                 <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">
-                        <h2 className="text-3xl font-bold text-slate-900">Our Services</h2>
-                        <p className="text-slate-500 mt-2">Comprehensive solutions for every real estate need</p>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Our Services</h2>
+                        <p className="text-slate-500 mt-2 text-sm sm:text-base">Comprehensive solutions for every real estate need</p>
                     </div>
                     <ServicesGrid />
                 </section>
@@ -73,10 +73,6 @@ export default function Home() {
                 <CaseStudy />
                 <CTA />
             </main>
-
-            <div className="flex justify-center py-10 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
-                <img src="/logo-full.svg" alt="MakeMyStay" className="h-8" />
-            </div>
 
             <Footer />
         </>

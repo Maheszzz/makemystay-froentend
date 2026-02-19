@@ -13,7 +13,7 @@ export function Footer() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
                     <div className="col-span-1 text-center md:text-left">
-                        <div className="flex items-center space-x-3 mb-6">
+                        <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
                             <img src="/logo-a.png" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
                             <span className="text-2xl font-bold text-white tracking-tight font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
@@ -40,8 +40,8 @@ export function Footer() {
                         </div>
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-bold text-lg mb-8 font-heading">Quick Links</h4>
+                    <div className="text-center md:text-left">
+                        <h4 className="text-white font-bold text-lg mb-6 font-heading">Quick Links</h4>
                         <ul className="space-y-4 text-sm font-medium">
                             {navigationLinks.map((item) => (
                                 <li key={item}>
@@ -57,8 +57,8 @@ export function Footer() {
 
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-bold text-lg mb-8 font-heading">Contact</h4>
+                    <div className="text-center md:text-left">
+                        <h4 className="text-white font-bold text-lg mb-6 font-heading">Contact</h4>
                         <ul className="space-y-4 text-sm font-medium">
                             <li className="flex items-start group">
                                 <MapPin size={18} className="mr-3 mt-0.5 text-brand-red group-hover:scale-110 transition-transform" />
@@ -76,9 +76,9 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-                    <p>&copy; 2026 MakeMyStay.ai. All rights reserved.</p>
-                    <div className="flex space-x-8 mt-4 md:mt-0 font-medium">
+                <div className="border-t border-white/5 pt-8 flex flex-col gap-3 md:flex-row justify-between items-center text-sm text-slate-500">
+                    <p className="text-center md:text-left">&copy; 2026 MakeMyStay.ai. All rights reserved.</p>
+                    <div className="flex flex-wrap justify-center gap-4 md:gap-8 font-medium">
                         <Link to="/privacy" className="hover:text-brand-red transition-colors">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-brand-red transition-colors">Terms & Conditions</Link>
                         <Link to="/refund-policy" className="hover:text-brand-red transition-colors">Refund & Cancellation policy</Link>

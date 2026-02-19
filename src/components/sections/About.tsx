@@ -5,8 +5,8 @@ export function About() {
         <section id="about-us" className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-slate-900 mb-4">About MakeMyStay</h2>
+                <div className="text-center mb-12 md:mb-16">
+                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-4">About MakeMyStay</h2>
                     <div className="w-20 h-1.5 bg-brand-red mx-auto rounded-full mb-6"></div>
                     <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
                         MakeMyStay.ai is a technology-driven real estate platform built to make property discovery simple, transparent, and intelligent.
@@ -14,8 +14,8 @@ export function About() {
                 </div>
 
                 {/* Introduction */}
-                <div className="max-w-4xl mx-auto mb-20 text-center">
-                    <p className="text-slate-700 text-lg leading-relaxed mb-4">
+                <div className="max-w-4xl mx-auto mb-16 md:mb-20 text-center">
+                    <p className="text-slate-700 text-base md:text-lg leading-relaxed mb-4">
                         Finding the right place to stay shouldn't be complicated. Whether you're searching for a rental home, a PG, or an investment opportunity, MakeMyStay helps you explore verified properties, compare options, and make confident decisions—all in one place.
                     </p>
                     <p className="text-xl font-semibold text-brand-red">
@@ -25,7 +25,7 @@ export function About() {
 
                 {/* Our Story */}
                 <div className="mb-20 bg-slate-50 rounded-2xl p-8 md:p-12">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-6">Our Story</h3>
+                    <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Our Story</h3>
                     <p className="text-slate-700 leading-relaxed mb-4">
                         MakeMyStay was founded in <strong>2026</strong> in <strong>Bengaluru</strong> with a vision to modernize the way people search for homes.
                     </p>
@@ -143,9 +143,9 @@ export function About() {
 
                 {/* Our Commitment */}
                 <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-10 md:p-16 text-center text-white">
-                    <Heart className="w-16 h-16 mx-auto mb-6 text-brand-red" />
-                    <h3 className="text-3xl font-bold mb-6">Our Commitment</h3>
-                    <p className="text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-4">
+                    <Heart className="w-12 md:w-16 h-12 md:h-16 mx-auto mb-6 text-brand-red" />
+                    <h3 className="text-2xl sm:text-3xl font-bold mb-6">Our Commitment</h3>
+                    <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-4">
                         At MakeMyStay, we believe a home is more than a space—it's where life happens.
                     </p>
                     <p className="text-lg text-white/80 leading-relaxed max-w-3xl mx-auto">
