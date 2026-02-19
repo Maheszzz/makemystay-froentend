@@ -60,16 +60,16 @@ export function Footer() {
                     <div className="text-center md:text-left">
                         <h4 className="text-white font-bold text-lg mb-6 font-heading">Contact</h4>
                         <ul className="space-y-4 text-sm font-medium">
-                            <li className="flex items-start group">
-                                <MapPin size={18} className="mr-3 mt-0.5 text-brand-red group-hover:scale-110 transition-transform" />
-                                <span className="text-slate-400 group-hover:text-white transition-colors">HSR Layout, Sector 4<br />Bangalore, India 560102</span>
+                            <li className="flex items-start justify-center md:justify-start group">
+                                <MapPin size={18} className="mr-3 mt-0.5 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
+                                <span className="text-slate-400 group-hover:text-white transition-colors text-left">HSR Layout, Sector 4<br />Bangalore, India 560102</span>
                             </li>
-                            <li className="flex items-center group">
-                                <Mail size={18} className="mr-3 text-brand-red group-hover:scale-110 transition-transform" />
+                            <li className="flex items-center justify-center md:justify-start group">
+                                <Mail size={18} className="mr-3 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
                                 <a href="mailto:connect@makemystay.ai" className="text-slate-400 group-hover:text-white transition-colors">connect@makemystay.ai</a>
                             </li>
-                            <li className="flex items-center group">
-                                <Phone size={18} className="mr-3 text-brand-red group-hover:scale-110 transition-transform" />
+                            <li className="flex items-center justify-center md:justify-start group">
+                                <Phone size={18} className="mr-3 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
                                 <a href="tel:+918150099911" className="text-slate-400 group-hover:text-white transition-colors">+91 81500 99911</a>
                             </li>
                         </ul>

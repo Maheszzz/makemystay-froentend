@@ -11,15 +11,25 @@ import { paymentApi } from '@/lib/api';
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { ReviewSection } from '@/components/property/ReviewSection';
 import { useState } from 'react';
+import { useWishlist } from '@/context/WishlistContext';
 
 
 export default function PropertyDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { property, loading, error, refetch } = useProperty(id || '');
+    const { isWishlisted, toggleWishlist } = useWishlist();
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+
+    const wishlisted = property ? isWishlisted(String(property.id)) : false;
+
+    const handleWishlistToggle = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (property) toggleWishlist(property);
+    };
 
     const handleShare = async () => {
         if (!property) return;
@@ -269,7 +279,16 @@ export default function PropertyDetails() {
                                 >
                                     <Share2 className="w-5 h-5" />
                                 </button>
-                                <button className="p-3 rounded-full border border-slate-200 hover:bg-red-50 hover:text-red-500 transition-colors text-slate-600 cursor-pointer"><Heart className="w-5 h-5" /></button>
+                                <button
+                                    onClick={handleWishlistToggle}
+                                    className={`p-3 rounded-full border transition-colors cursor-pointer ${wishlisted
+                                            ? 'border-brand-red bg-red-50 text-brand-red'
+                                            : 'border-slate-200 hover:bg-red-50 hover:text-brand-red text-slate-600'
+                                        }`}
+                                    title={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                                >
+                                    <Heart className={`w-5 h-5 transition-colors ${wishlisted ? 'fill-brand-red' : ''}`} />
+                                </button>
                             </div>
                         </div>
 

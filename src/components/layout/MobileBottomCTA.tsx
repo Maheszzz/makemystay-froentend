@@ -17,7 +17,7 @@ export function MobileBottomCTA() {
 
                     {/* WhatsApp Button */}
                     <a
-                        href="https://wa.me/99844594800?text=Hi,%20I'm%20interested%20in%20MakeMyStay"
+                        href="https://wa.me/919844594800?text=Hi,%20I'm%20interested%20in%20MakeMyStay"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex flex-col items-center justify-center py-3 gap-1 text-green-600 hover:text-green-700 active:bg-green-50 transition-colors"
