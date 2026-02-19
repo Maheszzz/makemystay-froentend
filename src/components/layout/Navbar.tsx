@@ -80,8 +80,8 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
-                            <img src="/logo.jpg" alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover shadow-sm" />
-                            <Link to="/" className={`text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors ${showScrolledStyle ? 'text-brand-charcoal' : 'text-white'}`}>
+                            <img src="/logo.jpg" alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover shadow-md bg-white" />
+                            <Link to="/" className={`text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors ${showScrolledStyle ? 'text-brand-charcoal' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'}`}>
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
                         </div>

@@ -58,7 +58,7 @@ export function ServicesGrid() {
                             </p>
                         </div>
 
-                        <div className="pt-6 mt-4 border-t border-slate-100 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                        <div className="pt-6 mt-4 border-t border-slate-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0 transition-all duration-300">
                             <Link to={`/services/${service.id}`} className="flex items-center text-sm font-bold text-brand-red cursor-pointer">
                                 Learn More <ArrowRight className="w-4 h-4 ml-1" />
                             </Link>
