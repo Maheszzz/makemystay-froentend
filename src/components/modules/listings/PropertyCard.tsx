@@ -74,9 +74,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     {/* Wishlist Button */}
                     <button
                         onClick={handleHeartClick}
-                        className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110"
+                        className="absolute top-3 right-3 z-10 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center transition-all hover:scale-110 active:scale-95 touch-manipulation"
+                        aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
                     >
-                        <Heart className={`w-4 h-4 transition-colors ${wishlisted ? 'fill-brand-red text-brand-red' : 'text-slate-500'}`} />
+                        <Heart className={`w-5 h-5 transition-colors ${wishlisted ? 'fill-brand-red text-brand-red' : 'text-slate-500'}`} />
                     </button>
 
                     {/* Category Badge */}
@@ -91,8 +92,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     {/* Price on image (bottom left) */}
                     <div className="absolute bottom-3 left-3 z-10">
                         <div className="flex items-baseline gap-1">
-                            <span className="text-white text-xl font-bold drop-shadow-sm">{property.price}</span>
-                            {property.category === 'rent' && <span className="text-white/80 text-xs font-medium">/mo</span>}
+                            <span className="text-white text-lg md:text-xl font-bold drop-shadow-sm">{property.price}</span>
+                            {property.category === 'rent' && <span className="text-white/90 text-[10px] md:text-xs font-medium">/mo</span>}
                         </div>
                     </div>
                 </div>

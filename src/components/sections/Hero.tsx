@@ -31,6 +31,8 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     playsInline
                     className="w-full h-full object-cover"
                     poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1920"
+                    width="1920"
+                    height="1080"
                 >
                     <source src={bgVideo} type="video/mp4" />
                 </video>

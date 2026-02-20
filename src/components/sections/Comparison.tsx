@@ -31,30 +31,30 @@ export function Comparison() {
                 {/* Mobile View: Cards */}
                 <div className="md:hidden space-y-6">
                     {comparisonData.map((row, idx) => (
-                        <div key={idx} className="bg-white rounded-2xl p-6 shadow-card border border-slate-100">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4">{row.label}</h3>
+                        <div key={idx} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                            <h3 className="text-lg font-bold text-slate-900 mb-4 px-1">{row.label}</h3>
 
-                            {/* MakeMyStay - Hero */}
-                            <div className="flex items-center justify-between mb-6 bg-red-50 p-4 rounded-xl border border-red-100">
-                                <span className="font-bold text-brand-red">MakeMyStay</span>
-                                <div className="text-xl font-bold text-brand-red flex items-center gap-2">
+                            {/* MakeMyStay - Highlighted Row */}
+                            <div className="flex items-center justify-between mb-4 bg-red-50 p-4 rounded-xl border border-red-100">
+                                <span className="font-bold text-brand-red text-sm">MakeMyStay</span>
+                                <div className="text-lg font-bold text-brand-red flex items-center gap-2">
                                     {getValueIcon(row.m)} {row.m}
                                 </div>
                             </div>
 
-                            {/* Others - Grid */}
-                            <div className="grid grid-cols-3 gap-2 text-xs">
-                                <div className="text-center p-3 bg-slate-50 rounded-lg">
-                                    <div className="text-slate-500 mb-1 font-medium">Brokers</div>
-                                    <div className="font-semibold text-slate-700">{row.b}</div>
+                            {/* Others - Vertical List for readability */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                                    <span className="text-slate-500 text-xs font-medium">Brokers</span>
+                                    <span className="font-semibold text-slate-700 text-sm">{row.b}</span>
                                 </div>
-                                <div className="text-center p-3 bg-slate-50 rounded-lg">
-                                    <div className="text-slate-500 mb-1 font-medium">Portals</div>
-                                    <div className="font-semibold text-slate-700">{row.l}</div>
+                                <div className="flex justify-between items-center p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                                    <span className="text-slate-500 text-xs font-medium">Portals</span>
+                                    <span className="font-semibold text-slate-700 text-sm">{row.l}</span>
                                 </div>
-                                <div className="text-center p-3 bg-slate-50 rounded-lg">
-                                    <div className="text-slate-500 mb-1 font-medium">CRM</div>
-                                    <div className="font-semibold text-slate-700">{row.c}</div>
+                                <div className="flex justify-between items-center p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+                                    <span className="text-slate-500 text-xs font-medium">CRM</span>
+                                    <span className="font-semibold text-slate-700 text-sm">{row.c}</span>
                                 </div>
                             </div>
                         </div>

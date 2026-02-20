@@ -88,6 +88,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                 <MapPin className="absolute left-3 md:left-4 w-5 h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300" />
                 <input
                     type="text"
+                    aria-label="Search properties"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery?.(e.target.value)}
                     onFocus={() => {
@@ -96,7 +97,9 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                     placeholder="Search by property name, location, or project..."
                     className="w-full pl-10 md:pl-12 pr-14 md:pr-16 py-3 md:py-4 bg-white/5 border border-white/10 focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 rounded-full text-white placeholder:text-white/50 outline-none transition-all text-sm group-hover:border-brand-gold/30"
                 />
-                <button className="absolute right-2 w-10 h-10 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                <button
+                    aria-label="Search"
+                    className="absolute right-2 w-10 h-10 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                     <Search className="w-4 h-4 md:w-5 md:h-5 text-white" />
                 </button>
             </div>
