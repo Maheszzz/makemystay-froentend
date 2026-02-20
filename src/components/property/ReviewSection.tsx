@@ -54,9 +54,9 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
 
     return (
         <div className="space-y-12">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h3 className="text-2xl font-bold text-slate-900 border-l-4 border-brand-red pl-4">Reviews & Ratings</h3>
-                <div className="flex items-center space-x-2 bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
+                <div className="self-start md:self-auto flex items-center space-x-2 bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
                     <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
                     <span className="font-bold text-slate-900">
                         {reviews.length > 0
@@ -89,8 +89,8 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                                 >
                                     <Star
                                         className={`w-8 h-8 ${(hoverRating || rating) >= star
-                                                ? 'text-amber-400 fill-amber-400'
-                                                : 'text-slate-300'
+                                            ? 'text-amber-400 fill-amber-400'
+                                            : 'text-slate-300'
                                             }`}
                                     />
                                 </button>

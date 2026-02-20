@@ -111,6 +111,7 @@ export function Navbar() {
 
                         {/* Mobile Hamburger */}
                         <button
+                            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${showScrolledStyle ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
                                 }`}
@@ -148,6 +149,7 @@ export function Navbar() {
                             </span>
                         </div>
                         <button
+                            aria-label="Close menu"
                             onClick={() => setIsMenuOpen(false)}
                             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
                         >
