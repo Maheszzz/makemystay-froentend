@@ -51,6 +51,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     <img
                         src={images[0] ?? ''}
                         alt={property.title}
+                        loading="lazy"
+                        width="400"
+                        height="300"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 

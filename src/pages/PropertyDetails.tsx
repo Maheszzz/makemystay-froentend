@@ -220,7 +220,7 @@ export default function PropertyDetails() {
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
             <Navbar />
 
-            <main className="pb-20 flex-grow">
+            <main id="main-content" className="pb-20 flex-grow">
                 {/* Hero Gallery */}
                 <div className="h-[50vh] md:h-[70vh] relative group overflow-hidden bg-slate-200">
                     {heroImage ? (

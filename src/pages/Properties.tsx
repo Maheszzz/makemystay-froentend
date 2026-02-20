@@ -61,7 +61,7 @@ export default function Properties() {
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
             <Navbar />
 
-            <main className="pt-32 pb-20 flex-grow">
+            <main id="main-content" className="pt-32 pb-20 flex-grow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-12">

@@ -41,7 +41,7 @@ export default function Home() {
     return (
         <>
             <Navbar />
-            <main className="min-h-screen bg-white">
+            <main id="main-content" className="min-h-screen bg-white">
                 <section id="home">
                     <Hero
                         category={category}
