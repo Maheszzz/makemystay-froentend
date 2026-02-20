@@ -12,6 +12,7 @@ import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFe
 import { ReviewSection } from '@/components/property/ReviewSection';
 import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
+import { amenityIconMap } from '@/lib/amenityIcons';
 
 
 export default function PropertyDetails() {
@@ -282,8 +283,8 @@ export default function PropertyDetails() {
                                 <button
                                     onClick={handleWishlistToggle}
                                     className={`p-3 rounded-full border transition-colors cursor-pointer ${wishlisted
-                                            ? 'border-brand-red bg-red-50 text-brand-red'
-                                            : 'border-slate-200 hover:bg-red-50 hover:text-brand-red text-slate-600'
+                                        ? 'border-brand-red bg-red-50 text-brand-red'
+                                        : 'border-slate-200 hover:bg-red-50 hover:text-brand-red text-slate-600'
                                         }`}
                                     title={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                                 >
@@ -321,9 +322,9 @@ export default function PropertyDetails() {
                                 })()}
                             </div>
 
-                            <div className="mt-8 pt-8 border-t border-slate-100">
-                                <h4 className="text-lg font-bold text-slate-900 mb-6">What this place offers</h4>
-                                <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                            <div className="mt-6 pt-6 border-t border-slate-100">
+                                <h4 className="text-base font-bold text-slate-900 mb-3">What this place offers</h4>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                     {(() => {
                                         // Standardize amenities for PGs if features are sparse or user wants consistency
                                         let displayFeatures = property.features || [];
@@ -341,14 +342,17 @@ export default function PropertyDetails() {
                                             displayFeatures = Array.from(uniqueFeatures);
                                         }
 
-                                        return displayFeatures.map((feature, idx) => (
-                                            <div key={idx} className="flex items-center text-slate-600 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                                                <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mr-4 shrink-0">
-                                                    <Check className="w-5 h-5" />
+                                        return displayFeatures.map((feature, idx) => {
+                                            const icon = amenityIconMap[feature.toLowerCase()] ?? <Check className="w-4 h-4" />;
+                                            return (
+                                                <div key={idx} className="flex items-center gap-2 text-slate-600 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">
+                                                    <div className="w-7 h-7 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        {icon}
+                                                    </div>
+                                                    <span className="text-xs font-medium leading-tight">{feature}</span>
                                                 </div>
-                                                <span className="font-medium">{feature}</span>
-                                            </div>
-                                        ));
+                                            );
+                                        });
                                     })()}
                                 </div>
                             </div>

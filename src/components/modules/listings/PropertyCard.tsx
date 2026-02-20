@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
 import {
-    MapPin, Heart, Bed, Bath, Users, Utensils,
-    Wifi, Sparkles, Zap, Dumbbell,
-    Coffee, ShieldCheck, Waves, Thermometer, Wind
+    MapPin, Heart, Bed, Bath, Users, Utensils
 } from 'lucide-react';
+import { amenityIconMap } from '@/lib/amenityIcons';
 import type { Property } from '@/types/api';
 import { useWishlist } from '@/context/WishlistContext';
 
@@ -42,19 +41,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
     if (property.cctv) amenities.push('Security');
     if (property.geyser) amenities.push('Geyser');
 
-    const amenityIcons: Record<string, React.ReactNode> = {
-        'WiFi': <Wifi className="w-3 h-3" />,
-        'Backup': <Zap className="w-3 h-3" />,
-        'Service': <Sparkles className="w-3 h-3" />,
-        'Lounge': <Coffee className="w-3 h-3" />,
-        'Kitchen': <Utensils className="w-3 h-3" />,
-        'Balcony': <Wind className="w-3 h-3" />,
-        'Att. Bath': <Bath className="w-3 h-3" />,
-        'Gym': <Dumbbell className="w-3 h-3" />,
-        'Pool': <Waves className="w-3 h-3" />,
-        'Security': <ShieldCheck className="w-3 h-3" />,
-        'Geyser': <Thermometer className="w-3 h-3" />,
-    };
 
     return (
         <Link to={`/property/${property.id}`} className="block group">
@@ -148,12 +134,15 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     {/* Amenity Pills */}
                     {amenities.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                            {amenities.slice(0, 5).map((amenity) => (
-                                <span key={amenity} className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-50 border border-slate-100 rounded-full px-2.5 py-1">
-                                    {amenityIcons[amenity]}
-                                    {amenity}
-                                </span>
-                            ))}
+                            {amenities.slice(0, 5).map((amenity) => {
+                                const icon = amenityIconMap[amenity.toLowerCase()];
+                                return (
+                                    <span key={amenity} className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-slate-50 border border-slate-100 rounded-full px-2.5 py-1">
+                                        {icon && <span className="[&>svg]:w-3 [&>svg]:h-3">{icon}</span>}
+                                        {amenity}
+                                    </span>
+                                );
+                            })}
                             {amenities.length > 5 && (
                                 <span className="inline-flex items-center text-[10px] font-medium text-brand-red bg-brand-red/5 border border-brand-red/10 rounded-full px-2.5 py-1">
                                     +{amenities.length - 5} more
