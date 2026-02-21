@@ -55,9 +55,14 @@ export default function Properties() {
             const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
             const isBuyOrRentCategory = category === 'buy' || category === 'rent';
             const hidePlotIfBuyRent = isBuyOrRentCategory ? prop.type?.toLowerCase() !== 'plot' : true;
-            // Native API handles PG property type filter already, but as backup for client:
+
+            // If the category is strictly 'PG', only show PG:
             const hideOthersIfPg = category === 'pg' ? prop.type === 'PG' : true;
-            return matchesLocation && matchesBHK && hidePlotIfBuyRent && hideOthersIfPg;
+
+            // If the category is strictly 'rent', hide PGs:
+            const hidePgIfRent = category === 'rent' ? prop.type !== 'PG' : true;
+
+            return matchesLocation && matchesBHK && hidePlotIfBuyRent && hideOthersIfPg && hidePgIfRent;
         });
     }, [properties, locationFilter, bhkFilter, category]);
 
@@ -184,7 +189,7 @@ export default function Properties() {
                                                     className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red/20 bg-slate-50/50 text-sm font-medium appearance-none"
                                                 >
                                                     <option value="all">Any Type</option>
-                                                    <option value="PG">Paying Guest (PG)</option>
+                                                    {category !== 'rent' && <option value="PG">Paying Guest (PG)</option>}
                                                     <option value="1RK">1 RK</option>
                                                     <option value="1BHK">1 BHK</option>
                                                     <option value="2BHK">2 BHK</option>

@@ -112,7 +112,7 @@ export function WhatsAppWidget() {
             <button
                 onClick={() => setIsOpen(prev => !prev)}
                 aria-label="Chat with us on WhatsApp"
-                className="fixed z-[999] flex items-center gap-0 rounded-full shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden"
+                className="fixed z-[999] hidden md:flex items-center gap-0 rounded-full shadow-xl cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 group overflow-hidden"
                 style={{
                     bottom: '24px',
                     right: '24px',
