@@ -17,10 +17,13 @@ const QuickPay = lazy(() => import('./pages/QuickPay'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 
 
+import { SkipLink } from './components/a11y/SkipLink';
+
 function App() {
     return (
         <Router>
             <WishlistProvider>
+                <SkipLink />
                 <ScrollToTop />
                 <Suspense fallback={
                     <div className="h-screen w-full bg-slate-50 flex items-center justify-center">

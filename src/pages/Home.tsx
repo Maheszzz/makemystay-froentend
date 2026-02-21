@@ -16,11 +16,11 @@ export default function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Get values from URL or default
-    const category = (searchParams.get('category') as 'buy' | 'rent') || 'rent';
+    const category = (searchParams.get('category') as 'buy' | 'rent' | 'plot') || 'rent';
     const searchQuery = searchParams.get('q') || '';
 
     // Wrapped setters to update URL
-    const setCategory = (newCategory: 'buy' | 'rent') => {
+    const setCategory = (newCategory: 'buy' | 'rent' | 'plot' | 'all') => {
         setSearchParams(prev => {
             prev.set('category', newCategory);
             return prev;
@@ -41,7 +41,7 @@ export default function Home() {
     return (
         <>
             <Navbar />
-            <main className="min-h-screen bg-white">
+            <main id="main-content" className="min-h-screen bg-white">
                 <section id="home">
                     <Hero
                         category={category}

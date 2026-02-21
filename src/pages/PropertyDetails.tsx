@@ -220,7 +220,7 @@ export default function PropertyDetails() {
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
             <Navbar />
 
-            <main className="pb-20 flex-grow">
+            <main id="main-content" className="pb-20 flex-grow">
                 {/* Hero Gallery */}
                 <div className="h-[50vh] md:h-[70vh] relative group overflow-hidden bg-slate-200">
                     {heroImage ? (
@@ -340,6 +340,36 @@ export default function PropertyDetails() {
                                             // Merge unique amenities
                                             const uniqueFeatures = new Set([...displayFeatures, ...standardAmenities]);
                                             displayFeatures = Array.from(uniqueFeatures);
+                                        }
+
+                                        // Deduplicate: when a more-specific label is present, drop the generic one.
+                                        // Format: [generic (drop this), specific (keep this)]
+                                        const duplicatePairs: [string, string][] = [
+                                            ['ro water', 'ro water purifier'],
+                                            ['wifi', 'high-speed wifi'],
+                                            ['wifi', 'wi-fi'],
+                                            ['security', '24/7 security'],
+                                            ['security', 'cctv security'],
+                                            ['housekeeping', 'daily housekeeping'],
+                                            ['housekeeping', 'professional housekeeping'],
+                                            ['tv', 'smart tv'],
+                                            ['parking', 'bike parking'],
+                                            ['parking', 'car parking'],
+                                            ['kitchen', 'common kitchen'],
+                                            ['kitchen', 'shared kitchen'],
+                                            ['kitchen', 'modern kitchen'],
+                                            ['kitchen', 'fully equipped kitchen'],
+                                            ['water purifier', 'ro water purifier'],
+                                        ];
+                                        const lowerSet = new Set(displayFeatures.map(f => f.toLowerCase()));
+                                        const toRemove = new Set<string>();
+                                        for (const [generic, specific] of duplicatePairs) {
+                                            if (lowerSet.has(generic) && lowerSet.has(specific)) {
+                                                toRemove.add(generic);
+                                            }
+                                        }
+                                        if (toRemove.size > 0) {
+                                            displayFeatures = displayFeatures.filter(f => !toRemove.has(f.toLowerCase()));
                                         }
 
                                         return displayFeatures.map((feature, idx) => {

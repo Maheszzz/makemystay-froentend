@@ -40,8 +40,8 @@ const SLIDE_INTERVAL = 4500;
 const FADE_DURATION = 1500;
 
 interface HeroProps {
-    category: 'buy' | 'rent';
-    setCategory: (category: 'buy' | 'rent') => void;
+    category: 'buy' | 'rent' | 'plot' | 'all';
+    setCategory: (category: 'buy' | 'rent' | 'plot' | 'all') => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
 }

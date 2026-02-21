@@ -6,7 +6,7 @@ import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface PropertyGridProps {
-    category: 'buy' | 'rent';
+    category: 'buy' | 'rent' | 'plot' | 'all';
     searchQuery: string;
 }
 
@@ -14,7 +14,8 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo(() => ({
-        listing_type: category,
+        listing_type: category === 'buy' || category === 'rent' ? category : undefined,
+        property_type: category === 'plot' ? 'Plot' : undefined,
         search: searchQuery,
         limit: 12
     }), [category, searchQuery]);
@@ -24,8 +25,13 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     // Fallback data in case of API error - Mirrors actual DB content
 
 
-    // Limit to 4 for the home page
-    const filteredProperties = properties.slice(0, 4);
+    // Filter out plots from buy/rent categories and limit to 4 for the home page
+    const filteredProperties = properties.filter(prop => {
+        if (category === 'buy' || category === 'rent') {
+            return prop.type?.toLowerCase() !== 'plot';
+        }
+        return true;
+    }).slice(0, 4);
 
     if (loading) {
         return (
@@ -58,7 +64,10 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-12 gap-4">
                     <div>
                         <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                            {category === 'buy' ? 'Featured Properties for Sale' : 'Latest Rental Listings'}
+                            {category === 'buy' ? 'Featured Properties for Sale'
+                                : category === 'plot' ? 'Premium Plots & Lands'
+                                    : category === 'all' ? 'All Verified Properties'
+                                        : 'Latest Rental Listings'}
                         </h2>
                         <p className="text-slate-500">Handpicked luxury properties that represent the best of what MakeMyStay has to offer</p>
                     </div>
