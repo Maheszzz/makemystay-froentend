@@ -28,7 +28,10 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     // Filter out plots from buy/rent categories and limit to 4 for the home page
     const filteredProperties = properties.filter(prop => {
         if (category === 'buy' || category === 'rent') {
-            return prop.type?.toLowerCase() !== 'plot';
+            const isNotPlot = prop.type?.toLowerCase() !== 'plot';
+            // Explicitly filter out PG if we are requesting Rent category items
+            const hidePgIfRent = category === 'rent' ? prop.type !== 'PG' : true;
+            return isNotPlot && hidePgIfRent;
         }
         return true;
     }).slice(0, 4);
