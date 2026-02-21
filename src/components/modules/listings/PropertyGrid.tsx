@@ -6,7 +6,7 @@ import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface PropertyGridProps {
-    category: 'buy' | 'rent' | 'plot' | 'all';
+    category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
     searchQuery: string;
 }
 
@@ -15,7 +15,7 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo(() => ({
         listing_type: category === 'buy' || category === 'rent' ? category : undefined,
-        property_type: category === 'plot' ? 'Plot' : undefined,
+        property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : undefined,
         search: searchQuery,
         limit: 12
     }), [category, searchQuery]);

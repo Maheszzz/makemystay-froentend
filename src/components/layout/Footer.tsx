@@ -1,7 +1,7 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { navigationLinks } from '@/data/content';
-
+import logoImage from '@/assets/MakeMysStaylogo.svg';
 
 export function Footer() {
     return (
@@ -14,7 +14,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
                     <div className="col-span-1 text-center md:text-left">
                         <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
-                            <img src="/logo-a.png" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
+                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-cover" />
                             <span className="text-2xl font-bold text-white tracking-tight font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>
@@ -71,7 +71,7 @@ export function Footer() {
                             <li className="flex items-center justify-center md:justify-start group">
                                 <Phone size={18} className="mr-3 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
                                 <a href="tel:+918150099911" className="text-slate-400 group-hover:text-white transition-colors">+91 81500 99911</a>
-                            </li> 
+                            </li>
                         </ul>
                     </div>
                 </div>

@@ -2,17 +2,16 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties } from '@/hooks';
-import { Search, ArrowLeft, SlidersHorizontal, X, ChevronDown, Heart, Trash2, MapPin } from 'lucide-react';
+import { Search, ArrowLeft, Filter, X, ChevronDown, Heart, Trash2, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 
 export default function Properties() {
-    const [category, setCategory] = useState<'all' | 'buy' | 'rent' | 'plot'>('all');
+    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
     const { wishlist, clearWishlist, toggleWishlist } = useWishlist();
@@ -32,9 +31,9 @@ export default function Properties() {
     const [showFilters, setShowFilters] = useState(false);
     const params = useMemo(() => {
         return {
-            listing_type: category === 'all' || category === 'plot' ? undefined : category,
+            listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
             search: debouncedSearchQuery,
-            property_type: category === 'plot' ? 'Plot' : (typeFilter === 'all' ? undefined : typeFilter)
+            property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter)
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 
@@ -49,7 +48,6 @@ export default function Properties() {
         return ['all', ...Array.from(new Set(locs))];
     }, [properties]);
 
-    // Client-side filtering as a secondary layer (for location and BHK which might not be in API yet)
     const filteredProperties = useMemo(() => {
         // Only apply filters that AREN'T handled by server yet
         return properties.filter(prop => {
@@ -57,7 +55,9 @@ export default function Properties() {
             const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
             const isBuyOrRentCategory = category === 'buy' || category === 'rent';
             const hidePlotIfBuyRent = isBuyOrRentCategory ? prop.type?.toLowerCase() !== 'plot' : true;
-            return matchesLocation && matchesBHK && hidePlotIfBuyRent;
+            // Native API handles PG property type filter already, but as backup for client:
+            const hideOthersIfPg = category === 'pg' ? prop.type === 'PG' : true;
+            return matchesLocation && matchesBHK && hidePlotIfBuyRent && hideOthersIfPg;
         });
     }, [properties, locationFilter, bhkFilter, category]);
 
@@ -99,16 +99,22 @@ export default function Properties() {
                                         All
                                     </button>
                                     <button
-                                        onClick={() => setCategory('buy')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        onClick={() => setCategory('pg')}
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
-                                        Buy
+                                        PG
                                     </button>
                                     <button
                                         onClick={() => setCategory('rent')}
                                         className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         Rent
+                                    </button>
+                                    <button
+                                        onClick={() => setCategory('buy')}
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Buy
                                     </button>
                                     <button
                                         onClick={() => setCategory('plot')}
@@ -130,14 +136,14 @@ export default function Properties() {
                                     >
                                         Reset
                                     </button>
-                                    <Button
-                                        variant="outline"
+                                    <button
                                         onClick={() => setShowFilters(!showFilters)}
-                                        className={`h-9 w-9 p-0 rounded-xl flex items-center justify-center border-slate-200 transition-all shadow-sm ${showFilters ? 'bg-brand-charcoal text-white border-brand-charcoal' : 'bg-white hover:border-brand-red hover:text-brand-red'}`}
+                                        className={`h-9 md:h-10 px-3 md:px-4 rounded-xl flex items-center justify-center gap-2 border border-slate-200 transition-all shadow-sm ${showFilters ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 hover:border-emerald-600 hover:text-emerald-600'}`}
                                         aria-label="Toggle Filters"
                                     >
-                                        {showFilters ? <X className="w-4 h-4" /> : <SlidersHorizontal className="w-4 h-4" />}
-                                    </Button>
+                                        {showFilters ? <X className="w-4 h-4" /> : <Filter className="w-4 h-4" />}
+                                        <span className="hidden sm:inline font-bold text-xs md:text-sm">Filter</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

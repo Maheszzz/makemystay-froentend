@@ -1,10 +1,10 @@
 "use client";
 
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, X } from 'lucide-react';
 
 export interface SmartSearchBarProps {
-    category?: 'buy' | 'rent' | 'plot' | 'all';
-    setCategory?: (category: 'buy' | 'rent' | 'plot' | 'all') => void;
+    category?: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
+    setCategory?: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
 }
@@ -17,14 +17,15 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
     const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const suggestionRef = useRef<HTMLDivElement>(null);
+    const [inputValue, setInputValue] = useState('');
 
     // Dynamic suggestions with debounce
     useEffect(() => {
         const fetchSuggestions = async () => {
-            if (searchQuery && searchQuery.trim().length >= 1) {
+            if (inputValue && inputValue.trim().length >= 1) {
                 try {
                     setIsLoadingSuggestions(true);
-                    const results = await propertyApi.getSuggestions(searchQuery);
+                    const results = await propertyApi.getSuggestions(inputValue);
                     setFilteredSuggestions(results);
                     setShowSuggestions(results.length > 0);
                 } catch (error) {
@@ -45,7 +46,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timeoutId);
-    }, [searchQuery]);
+    }, [inputValue]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -58,7 +59,11 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
     }, []);
 
     const handleSelectSuggestion = (suggestion: string) => {
-        setSearchQuery?.(suggestion);
+        const parts = (searchQuery || '').split(',').filter(Boolean);
+        if (!parts.includes(suggestion.trim())) {
+            setSearchQuery?.([...parts, suggestion].join(','));
+        }
+        setInputValue('');
         setShowSuggestions(false);
     };
 
@@ -67,13 +72,14 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
             {/* BUY / RENT / PLOT Toggle */}
             <div className="flex gap-1 mb-3 md:mb-4 bg-white/5 rounded-full p-1 w-fit mx-auto border border-white/10">
                 {[
-                    { id: 'buy', label: 'BUY' },
+                    { id: 'pg', label: 'PG' },
                     { id: 'rent', label: 'RENT' },
+                    { id: 'buy', label: 'BUY' },
                     { id: 'plot', label: 'PLOT' }
                 ].map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot')}
+                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot' | 'pg')}
                         className={`py-2 px-6 md:px-8 rounded-full text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] ${category === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
@@ -84,24 +90,85 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                 ))}
             </div>
 
-            {/* Search Input */}
-            <div className="relative flex items-center group">
-                <MapPin className="absolute left-3 md:left-4 w-5 h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300" />
-                <input
-                    type="text"
-                    aria-label="Search properties"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery?.(e.target.value)}
-                    onFocus={() => {
-                        if (searchQuery && searchQuery.length > 0) setShowSuggestions(true);
-                    }}
-                    placeholder="Search by property name, location, or project..."
-                    className="w-full pl-10 md:pl-12 pr-14 md:pr-16 py-2 md:py-3 bg-white/5 border border-white/10 focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 rounded-full text-white placeholder:text-white/50 outline-none transition-all text-sm group-hover:border-brand-gold/30"
-                />
+            {/* Search Input Area */}
+            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full group focus-within:ring-2 focus-within:ring-brand-gold/50 focus-within:border-brand-gold/50 transition-all min-h-[48px] md:min-h-[52px] pl-10 md:pl-12 pr-24 md:pr-28 py-1.5 md:py-2">
+                <MapPin className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300 pointer-events-none" />
+
+                <div className="flex flex-wrap items-center gap-2 w-full">
+                    {/* Selected Locations (Chips) */}
+                    {(searchQuery || '').split(',').filter(Boolean).map((loc, idx) => (
+                        <div key={idx} className="flex items-center gap-1 bg-white/10 text-white text-[11px] md:text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full">
+                            <span className="truncate max-w-[120px] md:max-w-xs">{loc}</span>
+                            <button
+                                onClick={() => {
+                                    const newLocations = (searchQuery || '').split(',').filter(Boolean).filter((_, i) => i !== idx);
+                                    setSearchQuery?.(newLocations.join(','));
+                                }}
+                                className="hover:text-brand-gold transition-colors"
+                            >
+                                <X className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                            </button>
+                        </div>
+                    ))}
+
+                    <input
+                        type="text"
+                        aria-label="Search properties"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onFocus={() => {
+                            if (inputValue && inputValue.length > 0) setShowSuggestions(true);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Backspace' && !inputValue && searchQuery) {
+                                const newLocations = searchQuery.split(',').filter(Boolean).slice(0, -1);
+                                setSearchQuery?.(newLocations.join(','));
+                            }
+                            if (e.key === 'Enter') {
+                                if (inputValue.trim()) {
+                                    const parts = (searchQuery || '').split(',').filter(Boolean);
+                                    if (!parts.includes(inputValue.trim())) {
+                                        setSearchQuery?.([...parts, inputValue.trim()].join(','));
+                                    }
+                                    setInputValue('');
+                                    setShowSuggestions(false);
+                                }
+                            }
+                        }}
+                        placeholder={(searchQuery || '').trim() ? "" : "Search multiple locations..."}
+                        className="flex-1 bg-transparent text-white placeholder:text-white/50 outline-none text-sm min-w-[80px] py-1"
+                    />
+                </div>
+
+                {(searchQuery || inputValue) && (
+                    <button
+                        onClick={() => {
+                            setSearchQuery?.('');
+                            setInputValue('');
+                            setShowSuggestions(false);
+                            setFilteredSuggestions([]);
+                        }}
+                        className="absolute right-14 md:right-16 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                        aria-label="Clear all"
+                    >
+                        <X className="w-4 h-4 md:w-5 md:h-5" />
+                    </button>
+                )}
+
                 <button
                     aria-label="Search"
-                    className="absolute right-2 w-10 h-10 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                    <Search className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                    onClick={() => {
+                        if (inputValue.trim()) {
+                            const parts = (searchQuery || '').split(',').filter(Boolean);
+                            if (!parts.includes(inputValue.trim())) {
+                                setSearchQuery?.([...parts, inputValue.trim()].join(','));
+                            }
+                            setInputValue('');
+                            setShowSuggestions(false);
+                        }
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                    <Search className="w-4 h-4 md:w-5 md:h-5 text-white pointer-events-none" />
                 </button>
             </div>
 

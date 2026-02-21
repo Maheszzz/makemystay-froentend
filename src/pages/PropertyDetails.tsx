@@ -3,7 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { MapPin, Check, Star, Heart, ArrowLeft, Share2 } from 'lucide-react';
+import { Check, Star, Heart, ArrowLeft, Share2 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useProperty } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -251,7 +251,6 @@ export default function PropertyDetails() {
                         <div className="animate-fade-in-up">
                             <div className="flex items-center space-x-2 text-white/90 mb-2 font-medium">
                                 <span className="bg-emerald-600 text-white px-3 py-1 rounded-full text-xs uppercase tracking-wider font-bold">{property.tag}</span>
-                                <span className="flex items-center"><MapPin className="w-4 h-4 mr-1" /> {property.location}</span>
                             </div>
 
 
@@ -266,9 +265,9 @@ export default function PropertyDetails() {
                         {/* Quick Stats Bar */}
                         <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div className="flex items-center space-x-4">
-                                <div className="text-sm">
-                                    <div className="font-bold text-slate-900">Highly Rated</div>
-                                    <div className="text-slate-500">Popular among families</div>
+                                <div>
+                                    <h1 className="text-xl md:text-2xl font-bold text-slate-900">{property.title}</h1>
+                                    <div className="text-slate-500 text-sm md:text-base mt-1">{property.type} • {property.location}</div>
                                 </div>
                             </div>
                             <div className="flex space-x-3 items-center">

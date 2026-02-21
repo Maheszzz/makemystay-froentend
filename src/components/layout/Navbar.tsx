@@ -5,7 +5,7 @@ import { X, Menu, Phone, ArrowRight } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
+import logoImage from '@/assets/MakeMysStaylogo.svg';
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -80,7 +80,7 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
-                            <img src="/logo.jpg" alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover shadow-md bg-white" />
+                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 rounded-lg object-cover shadow-md bg-white" />
                             <Link to="/" className={`text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors ${showScrolledStyle ? 'text-brand-charcoal' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'}`}>
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
@@ -143,7 +143,7 @@ export function Navbar() {
                     {/* Menu Header */}
                     <div className="flex items-center justify-between p-6 border-b border-white/10">
                         <div className="flex items-center space-x-2">
-                            <img src="/logo.jpg" alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg object-cover" />
+                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg object-cover" />
                             <span className="text-lg font-bold text-white font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>

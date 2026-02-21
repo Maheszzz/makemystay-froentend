@@ -40,8 +40,8 @@ const SLIDE_INTERVAL = 4500;
 const FADE_DURATION = 1500;
 
 interface HeroProps {
-    category: 'buy' | 'rent' | 'plot' | 'all';
-    setCategory: (category: 'buy' | 'rent' | 'plot' | 'all') => void;
+    category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
+    setCategory: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
 }
@@ -74,8 +74,8 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
     return (
         <section
             id="home"
-            className="relative w-full overflow-hidden"
-            style={{ height: '100dvh', minHeight: '600px' }}
+            className="relative w-full"
+            style={{ height: '100dvh', minHeight: '600px', zIndex: 20 }}
         >
             {/* ── Background Image Layers (crossfade) ── */}
             {slides.map((s, idx) => (
@@ -120,7 +120,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
             {/* ── Single centered column: fading text + static search bar ── */}
             <div
                 className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-8"
-                style={{ zIndex: 10, paddingTop: '72px' }}
+                style={{ zIndex: 30, paddingTop: '72px' }}
             >
                 {/* --- Fading text block --- */}
                 <div
