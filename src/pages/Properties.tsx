@@ -32,7 +32,7 @@ export default function Properties() {
     const params = useMemo(() => {
         return {
             listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
-            search: debouncedSearchQuery,
+            search: debouncedSearchQuery.trim() || undefined,
             property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter)
         };
     }, [category, debouncedSearchQuery, typeFilter]);
@@ -189,7 +189,7 @@ export default function Properties() {
                                                     className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red/20 bg-slate-50/50 text-sm font-medium appearance-none"
                                                 >
                                                     <option value="all">Any Type</option>
-                                                    {category !== 'rent' && <option value="PG">Paying Guest (PG)</option>}
+                                                    {category !== 'rent' && category !== 'all' && <option value="PG">Paying Guest (PG)</option>}
                                                     <option value="1RK">1 RK</option>
                                                     <option value="1BHK">1 BHK</option>
                                                     <option value="2BHK">2 BHK</option>

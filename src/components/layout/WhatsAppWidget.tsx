@@ -20,7 +20,7 @@ export function WhatsAppWidget() {
         <>
             {/* ── Popupcard ── */}
             <div
-                className="fixed z-[999]"
+                className="fixed z-[999] hidden md:block"
                 style={{
                     bottom: '90px',
                     right: '24px',
