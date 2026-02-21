@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 
 export default function Properties() {
-    const [category, setCategory] = useState<'all' | 'buy' | 'rent'>('all');
+    const [category, setCategory] = useState<'all' | 'buy' | 'rent' | 'plot'>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
     const { wishlist, clearWishlist, toggleWishlist } = useWishlist();
@@ -30,11 +30,13 @@ export default function Properties() {
     const [typeFilter, setTypeFilter] = useState('all');
     const [bhkFilter, setBhkFilter] = useState('all');
     const [showFilters, setShowFilters] = useState(false);
-    const params = useMemo(() => ({
-        listing_type: category === 'all' ? undefined : category,
-        search: debouncedSearchQuery,
-        property_type: typeFilter === 'all' ? undefined : typeFilter
-    }), [category, debouncedSearchQuery, typeFilter]);
+    const params = useMemo(() => {
+        return {
+            listing_type: category === 'all' || category === 'plot' ? undefined : category,
+            search: debouncedSearchQuery,
+            property_type: category === 'plot' ? 'Plot' : (typeFilter === 'all' ? undefined : typeFilter)
+        };
+    }, [category, debouncedSearchQuery, typeFilter]);
 
     // Fetch properties from API with server-side filters
     const { properties: apiProperties, loading, error, refetch } = useProperties(params);
@@ -53,9 +55,11 @@ export default function Properties() {
         return properties.filter(prop => {
             const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
             const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
-            return matchesLocation && matchesBHK;
+            const isBuyOrRentCategory = category === 'buy' || category === 'rent';
+            const hidePlotIfBuyRent = isBuyOrRentCategory ? prop.type?.toLowerCase() !== 'plot' : true;
+            return matchesLocation && matchesBHK && hidePlotIfBuyRent;
         });
-    }, [properties, locationFilter, bhkFilter]);
+    }, [properties, locationFilter, bhkFilter, category]);
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
@@ -105,6 +109,12 @@ export default function Properties() {
                                         className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         Rent
+                                    </button>
+                                    <button
+                                        onClick={() => setCategory('plot')}
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'plot' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Plot
                                     </button>
                                 </div>
 

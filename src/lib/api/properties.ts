@@ -46,6 +46,9 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     if (item.property_type === '2BHK') { beds = 2; baths = 2; }
     if (item.property_type === '3BHK') { beds = 3; baths = 3; }
     if (item.property_type === 'Villa') { beds = 4; baths = 4; }
+    if (item.property_type?.toLowerCase() === 'plot') { beds = 0; baths = 0; }
+
+    const isPlot = item.property_type?.toLowerCase() === 'plot';
 
     // Safely map listing_type (handle missing or case mismatch)
     const rawListingType = (item.listing_type || 'rent').toLowerCase();
@@ -78,18 +81,18 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         parking: item.parking,
         lift: item.lift,
         area: item.area_sqft,
-        wifi: true, // Mocking these as they are new feature requests
-        housekeeping: true,
-        power_backup: true,
-        gym: (item.features && item.features.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK',
-        lounge: (item.features && item.features.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa',
+        wifi: !isPlot, // Mocking these as they are new feature requests
+        housekeeping: !isPlot,
+        power_backup: !isPlot,
+        gym: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK'),
+        lounge: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa'),
         cctv: true,
-        washing_machine: (item.features && item.features.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG',
-        geyser: true,
+        washing_machine: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG'),
+        geyser: !isPlot,
         image: primaryImage || defaultImages[item.property_type] || defaultImages['PG'],
-        modern_kitchen: (item.features && item.features.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa',
-        balcony: (item.features && item.features.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa',
-        attached_bathroom: true, // Standard for most listed properties
+        modern_kitchen: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
+        balcony: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
+        attached_bathroom: !isPlot, // Standard for most listed properties
         images: dbImages,
         tag: item.is_available ? 'Available' : 'Sold Out',
         category: category,

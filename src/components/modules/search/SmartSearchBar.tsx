@@ -3,8 +3,8 @@
 import { Search, MapPin } from 'lucide-react';
 
 export interface SmartSearchBarProps {
-    category?: 'buy' | 'rent';
-    setCategory?: (category: 'buy' | 'rent') => void;
+    category?: 'buy' | 'rent' | 'plot' | 'all';
+    setCategory?: (category: 'buy' | 'rent' | 'plot' | 'all') => void;
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
 }
@@ -64,15 +64,16 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
 
     return (
         <div className="bg-black/40 backdrop-blur-xl rounded-[2rem] shadow-2xl p-4 md:p-6 max-w-3xl w-full relative border border-white/10">
-            {/* BUY / RENT Toggle */}
+            {/* BUY / RENT / PLOT Toggle */}
             <div className="flex gap-1 mb-3 md:mb-4 bg-white/5 rounded-full p-1 w-fit mx-auto border border-white/10">
                 {[
                     { id: 'buy', label: 'BUY' },
-                    { id: 'rent', label: 'RENT' }
+                    { id: 'rent', label: 'RENT' },
+                    { id: 'plot', label: 'PLOT' }
                 ].map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent')}
+                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot')}
                         className={`py-2 px-6 md:px-8 rounded-full text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] ${category === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'

@@ -22,6 +22,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
     const images = property.images && property.images.length > 0 ? property.images : [property.image];
 
     const isServiceOriented = property.type === 'PG' || property.type === 'Hostel';
+    const isPlot = property.type === 'Plot' || property.type?.toLowerCase() === 'plot';
 
     // Build amenity pills
     const amenities: string[] = [];
@@ -40,6 +41,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
     if (property.lounge && !isServiceOriented) amenities.push('Lounge');
     if (property.cctv) amenities.push('Security');
     if (property.geyser) amenities.push('Geyser');
+
+    if (isPlot && property.features) {
+        amenities.push(...property.features);
+    }
 
 
     return (
@@ -102,7 +107,20 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
                     {/* Stats Row */}
                     <div className="flex items-center gap-3 text-slate-500 text-xs mb-3 pb-3 border-b border-slate-100">
-                        {isServiceOriented ? (
+                        {isPlot ? (
+                            <>
+                                <div className="flex items-center gap-1">
+                                    <MapPin className="w-3.5 h-3.5 text-brand-red/60" />
+                                    <span>Plot Land</span>
+                                </div>
+                                {property.sqft && property.sqft !== 'On Request' && (
+                                    <>
+                                        <span className="text-slate-200">|</span>
+                                        <span>{property.sqft} sqft</span>
+                                    </>
+                                )}
+                            </>
+                        ) : isServiceOriented ? (
                             <>
                                 <div className="flex items-center gap-1">
                                     <Users className="w-3.5 h-3.5 text-brand-red/60" />

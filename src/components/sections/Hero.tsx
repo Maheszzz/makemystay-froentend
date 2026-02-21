@@ -4,8 +4,8 @@ import bgVideo from '@/assets/bgimage.mp4';
 
 
 interface HeroProps {
-    category: 'buy' | 'rent';
-    setCategory: (category: 'buy' | 'rent') => void;
+    category: 'buy' | 'rent' | 'plot' | 'all';
+    setCategory: (category: 'buy' | 'rent' | 'plot' | 'all') => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
 }

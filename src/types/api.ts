@@ -23,7 +23,7 @@ export interface RealtyProperty {
     location: string;
     phone?: string;
     map_link?: string;
-    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK' | '4BHK' | 'Villa'; // Extended list
+    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK' | '4BHK' | 'Villa' | 'Plot'; // Extended list
     furnishing: 'fully_furnished' | 'semi_furnished' | 'unfurnished';
     private_price?: number;
     single_price?: number;
