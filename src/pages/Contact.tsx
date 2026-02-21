@@ -106,10 +106,19 @@ export default function Contact() {
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Visit Us</h3>
                                 <p className="text-slate-500 mb-4">Come say hello at our office.</p>
-                                <p className="text-lg font-semibold text-slate-900">
+                                <a
+                                    href="https://www.google.com/maps/search/1142,+6th+Main+Rd,+7th+Sector,+HSR+Layout,+Bengaluru,+Karnataka+560102"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-lg font-semibold text-purple-600 hover:text-purple-700 hover:underline transition-colors block"
+                                >
                                     1142, 6th Main Rd, 7th Sector, <br />
-                                    HSR Layout, Bengaluru, Karnataka 560102
-                                </p>
+                                    HSR Layout, Bengaluru,<br />
+                                    Karnataka 560102
+                                </a>
+                                <span className="inline-flex items-center gap-1 mt-2 text-xs text-slate-400">
+                                    <MapPin className="w-3 h-3" /> Opens in Google Maps
+                                </span>
                             </div>
                         </div>
 

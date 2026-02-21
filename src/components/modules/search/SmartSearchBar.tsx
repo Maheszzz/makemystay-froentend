@@ -63,9 +63,9 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
     };
 
     return (
-        <div className="bg-black/40 backdrop-blur-xl rounded-[2rem] shadow-2xl p-4 md:p-6 max-w-3xl w-full relative border border-white/10">
+        <div className="bg-black/40 backdrop-blur-xl rounded-[2rem] shadow-2xl p-3 md:p-4 max-w-3xl w-full relative border border-white/10">
             {/* BUY / RENT Toggle */}
-            <div className="flex gap-1 mb-3 md:mb-4 bg-white/5 rounded-full p-1 w-fit mx-auto border border-white/10">
+            <div className="flex gap-1 mb-2 md:mb-3 bg-white/5 rounded-full p-1 w-fit mx-auto border border-white/10">
                 {[
                     { id: 'buy', label: 'BUY' },
                     { id: 'rent', label: 'RENT' }
@@ -73,7 +73,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                     <button
                         key={tab.id}
                         onClick={() => setCategory?.(tab.id as 'buy' | 'rent')}
-                        className={`py-2 px-6 md:px-8 rounded-full text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] ${category === tab.id
+                        className={`py-1.5 px-5 md:px-7 rounded-full text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[34px] ${category === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
                             }`}
@@ -95,7 +95,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                         if (searchQuery && searchQuery.length > 0) setShowSuggestions(true);
                     }}
                     placeholder="Search by property name, location, or project..."
-                    className="w-full pl-10 md:pl-12 pr-14 md:pr-16 py-3 md:py-4 bg-white/5 border border-white/10 focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 rounded-full text-white placeholder:text-white/50 outline-none transition-all text-sm group-hover:border-brand-gold/30"
+                    className="w-full pl-10 md:pl-12 pr-14 md:pr-16 py-2 md:py-3 bg-white/5 border border-white/10 focus:ring-2 focus:ring-brand-gold/50 focus:border-brand-gold/50 rounded-full text-white placeholder:text-white/50 outline-none transition-all text-sm group-hover:border-brand-gold/30"
                 />
                 <button
                     aria-label="Search"

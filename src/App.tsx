@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
+import { WhatsAppWidget } from './components/layout/WhatsAppWidget';
 import { WishlistProvider } from './context/WishlistContext';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -43,6 +44,7 @@ function App() {
                     </Routes>
                 </Suspense>
                 <MobileBottomCTA />
+                <WhatsAppWidget />
             </WishlistProvider>
         </Router>
     );

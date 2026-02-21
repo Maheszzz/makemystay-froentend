@@ -1,7 +1,43 @@
-import { useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
-import bgVideo from '@/assets/bgimage.mp4';
 
+const slides = [
+    {
+        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=90&w=1920',
+        eyebrow: 'PROFESSIONAL • TRUSTED • SEAMLESS',
+        headline: 'From Clicks to',
+        headlineItalic: 'Closure',
+        subheadline: 'Your Next Home Is Just a Click Away',
+        description: 'Affordable, flexible, and secure stays meticulously curated for students & professionals.',
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=90&w=1920',
+        eyebrow: 'CURATED • AFFORDABLE • SECURE',
+        headline: 'Find Your',
+        headlineItalic: 'Perfect Stay',
+        subheadline: 'Zero Broker Fees. 100% Verified.',
+        description: 'AI-powered matching connects you to the right property — instantly, seamlessly, affordably.',
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=90&w=1920',
+        eyebrow: 'SMART • MODERN • HASSLE-FREE',
+        headline: 'Live Where',
+        headlineItalic: 'You Belong',
+        subheadline: 'Premium Rooms for Students & Professionals',
+        description: 'Handpicked furnished rooms and apartments across prime city locations — move in today.',
+    },
+    {
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=90&w=1920',
+        eyebrow: 'TRUSTED • VERIFIED • SEAMLESS',
+        headline: 'Your Dream Home,',
+        headlineItalic: 'Delivered',
+        subheadline: 'Powered by AI. Built for You.',
+        description: 'MakeMyStay.ai automates your entire stay journey — from search to settlement.',
+    },
+];
+
+const SLIDE_INTERVAL = 4500;
+const FADE_DURATION = 1500;
 
 interface HeroProps {
     category: 'buy' | 'rent';
@@ -11,81 +47,152 @@ interface HeroProps {
 }
 
 export function Hero({ category, setCategory, searchQuery, setSearchQuery }: HeroProps) {
-    const videoRef = useRef<HTMLVideoElement>(null);
+    const [current, setCurrent] = useState(0);
+    const [contentVisible, setContentVisible] = useState(true);
+
+    // Preload images
+    useEffect(() => {
+        slides.forEach((slide) => {
+            const img = new Image();
+            img.src = slide.image;
+        });
+    }, []);
 
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.playbackRate = 0.5; // Slower speed for luxury feel
-        }
+        const timer = setInterval(() => {
+            setContentVisible(false);
+            setTimeout(() => {
+                setCurrent(prev => (prev + 1) % slides.length);
+                setContentVisible(true);
+            }, FADE_DURATION);
+        }, SLIDE_INTERVAL);
+        return () => clearInterval(timer);
     }, []);
+
+    const slide = slides[current];
+
     return (
-        <section id="home" className="relative min-h-[85vh] md:min-h-screen overflow-hidden flex items-center justify-center">
-            {/* Full-width Background Image */}
-            {/* Full-width Background Video */}
-            <div className="absolute inset-0 z-0">
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                    poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1920"
-                    width="1920"
-                    height="1080"
-                >
-                    <source src={bgVideo} type="video/mp4" />
-                </video>
-                {/* Dark Overlay - Adjusted for video visibility */}
-                <div className="absolute inset-0 bg-black/50"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60"></div>
+        <section
+            id="home"
+            className="relative w-full overflow-hidden"
+            style={{ height: '100dvh', minHeight: '600px' }}
+        >
+            {/* ── Background Image Layers (crossfade) ── */}
+            {slides.map((s, idx) => (
+                <div
+                    key={idx}
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                    style={{
+                        backgroundImage: `url(${s.image})`,
+                        opacity: idx === current ? 1 : 0,
+                        transition: `opacity ${FADE_DURATION}ms ease-in-out`,
+                        zIndex: 0,
+                    }}
+                    aria-hidden="true"
+                />
+            ))}
+
+            {/* ── Overlays ── */}
+            <div className="absolute inset-0 bg-black/55" style={{ zIndex: 1 }} />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" style={{ zIndex: 2 }} />
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 100%)', zIndex: 3 }} />
+
+            {/* ── Slide dot indicators ── */}
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
+                {slides.map((_, idx) => (
+                    <button
+                        key={idx}
+                        aria-label={`Go to slide ${idx + 1}`}
+                        onClick={() => {
+                            setContentVisible(false);
+                            setTimeout(() => { setCurrent(idx); setContentVisible(true); }, FADE_DURATION);
+                        }}
+                        className="rounded-full transition-all duration-500 cursor-pointer"
+                        style={{
+                            width: idx === current ? '28px' : '8px',
+                            height: '8px',
+                            background: idx === current ? '#C5A021' : 'rgba(255,255,255,0.45)',
+                        }}
+                    />
+                ))}
             </div>
 
-            {/* Content Container */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 md:pt-0 flex flex-col items-center text-center">
-
-                {/* 1. Eyebrow Tagline — Elegant & Spaced */}
-                <div className="mb-6 md:mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                    <span
-                        className="text-[10px] md:text-xs text-white/90 tracking-[0.4em] md:tracking-[0.8em] uppercase font-medium flex items-center gap-3 md:gap-6 before:h-[1px] before:w-6 md:before:w-12 before:bg-white/30 after:h-[1px] after:w-6 md:after:w-12 after:bg-white/30"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                        Professional • Trusted • Seamless
-                    </span>
-                </div>
-
-                {/* 2. Main Title — Cormorant Garamond / Luxury Height */}
-                <div className="relative mb-6 md:mb-8">
-                    {/* Subtle Gold Glow behind title */}
-                    <div className="absolute -inset-10 bg-brand-gold/5 blur-[80px] rounded-full pointer-events-none"></div>
-
-                    <h1
-                        className="text-4xl sm:text-6xl md:text-8xl text-white leading-[1.1] tracking-tight animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100"
-                        style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300 }}
-                    >
-                        From Clicks to <span className="italic font-normal">Closure</span>
-                    </h1>
-                </div>
-
-                {/* 3. Secondary Headline — Cormorant / Muted Gold */}
-                <h2
-                    className="text-xl sm:text-2xl md:text-3xl text-brand-gold/90 mb-8 md:mb-10 tracking-wide font-light animate-in fade-in slide-in-from-bottom-7 duration-1000 delay-200"
-                    style={{ fontFamily: "'Cormorant Garamond', serif" }}
+            {/* ── Single centered column: fading text + static search bar ── */}
+            <div
+                className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-8"
+                style={{ zIndex: 10, paddingTop: '72px' }}
+            >
+                {/* --- Fading text block --- */}
+                <div
+                    className="flex flex-col items-center text-center w-full"
+                    style={{
+                        opacity: contentVisible ? 1 : 0,
+                        transition: `opacity ${FADE_DURATION}ms ease-in-out`,
+                    }}
                 >
-                    Your Next Home Is Just a Click Away
-                </h2>
+                    {/* Eyebrow */}
+                    <div className="mb-4 md:mb-6">
+                        <span
+                            style={{
+                                fontFamily: "'Playfair Display', serif",
+                                letterSpacing: '0.35em',
+                                fontSize: 'clamp(9px, 1.5vw, 13px)',
+                            }}
+                            className="text-white/80 uppercase font-medium flex items-center gap-4
+                                       before:content-[''] before:block before:h-px before:w-8 md:before:w-14 before:bg-white/30
+                                       after:content-[''] after:block after:h-px after:w-8 md:after:w-14 after:bg-white/30"
+                        >
+                            {slide.eyebrow}
+                        </span>
+                    </div>
 
-                {/* 4. Description — Refined Balance */}
-                <div className="max-w-2xl mx-auto mb-12 md:mb-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-                    <p className="text-sm md:text-lg text-white/90 leading-relaxed font-light tracking-wide md:tracking-widest px-2 sm:px-8">
-                        Affordable, flexible, and secure stays meticulously curated for
-                        <span className="text-white font-normal mx-2 border-b border-brand-gold/50 pb-0.5">students</span> &
-                        <span className="text-white font-normal mx-2 border-b border-brand-gold/50 pb-0.5">professionals</span>.
+                    {/* Main Headline */}
+                    <div className="relative mb-4 md:mb-5">
+                        <div
+                            className="absolute -inset-12 pointer-events-none rounded-full"
+                            style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.08) 0%, transparent 70%)', filter: 'blur(30px)' }}
+                        />
+                        <h1
+                            className="text-white leading-[1.08] tracking-tight relative"
+                            style={{
+                                fontFamily: "'Cormorant Garamond', serif",
+                                fontWeight: 300,
+                                fontSize: 'clamp(38px, 7.5vw, 96px)',
+                                textShadow: '0 2px 24px rgba(0,0,0,0.35)',
+                            }}
+                        >
+                            {slide.headline}{' '}
+                            <em style={{ fontStyle: 'italic', fontWeight: 400 }}>{slide.headlineItalic}</em>
+                        </h1>
+                    </div>
+
+                    {/* Sub-headline */}
+                    <h2
+                        className="mb-3 md:mb-4 font-light tracking-wide"
+                        style={{
+                            fontFamily: "'Cormorant Garamond', serif",
+                            color: '#FFFFFF',
+                            fontSize: 'clamp(15px, 2.3vw, 28px)',
+                            textShadow: '0 2px 16px rgba(0,0,0,0.6)',
+                        }}
+                    >
+                        {slide.subheadline}
+                    </h2>
+
+                    {/* Description */}
+                    <p
+                        className="text-white/80 font-light leading-relaxed max-w-lg mx-auto"
+                        style={{
+                            fontSize: 'clamp(12px, 1.4vw, 15px)',
+                            letterSpacing: '0.03em',
+                        }}
+                    >
+                        {slide.description}
                     </p>
                 </div>
 
-                {/* 5. Smart Search Bar — Glassmorphism Effect */}
-                <div className="w-full max-w-4xl animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500 flex justify-center">
+                {/* --- Static search bar — never fades --- */}
+                <div className="w-full max-w-3xl mt-7 md:mt-9">
                     <SmartSearchBar
                         category={category}
                         setCategory={setCategory}
