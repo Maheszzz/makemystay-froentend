@@ -17,7 +17,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
         listing_type: category === 'buy' || category === 'rent' ? category : undefined,
         property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : undefined,
         search: searchQuery,
-        limit: 12
+        limit: 20
     }), [category, searchQuery]);
 
     const { properties, loading, error } = useProperties(params);
