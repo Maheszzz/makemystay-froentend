@@ -34,7 +34,7 @@ echo "📦 Using build folder: $BUILD_DIR"
 
 # ===== PREPARE EC2 =====
 echo "🧹 Preparing EC2..."
-ssh -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
+ssh -T -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
 sudo apt update -y
 sudo apt install -y nginx
 sudo mkdir -p $REMOTE_DIR
@@ -45,7 +45,7 @@ EOF
 echo "🚀 Uploading build to EC2..."
 scp -i "$PEM_KEY" -r $BUILD_DIR/* $EC2_USER@$EC2_HOST:/tmp/$APP_NAME/
 
-ssh -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
+ssh -T -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
 sudo cp -r /tmp/$APP_NAME/* $REMOTE_DIR/
 sudo chown -R www-data:www-data $REMOTE_DIR
 sudo rm -rf /tmp/$APP_NAME
