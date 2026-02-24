@@ -71,6 +71,7 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
 
     return {
         id: item.id || Math.random().toString(), // Fallback ID
+        slug: item.slug || '',
         title: item.property_name || 'Untitled Property',
         location: item.location || 'Unknown Location',
         price: priceDisplay,
@@ -138,6 +139,17 @@ export const propertyApi = {
         // Use generic get for now (or specific if implemented)
         // Usually backends implement /api/v1/realty/properties/{id}
         const response = await api.get<RealtyProperty>(`${REALTY_PATH}/${id}`);
+        return mapRealtyToProperty(response);
+    },
+
+    /**
+     * Get a single property by type and slug
+     * @param type - Property Type
+     * @param slug - Property Slug
+     * @returns Property object
+     */
+    getBySlug: async (type: string, slug: string): Promise<Property> => {
+        const response = await api.get<RealtyProperty>(`${REALTY_PATH}/by-slug/${encodeURIComponent(type)}/${encodeURIComponent(slug)}`);
         return mapRealtyToProperty(response);
     },
 

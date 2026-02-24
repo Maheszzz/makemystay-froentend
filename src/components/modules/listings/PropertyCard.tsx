@@ -47,8 +47,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
     }
 
 
+    const routeCategory = property.type === 'PG' ? 'pg' : property.category.toLowerCase();
+
     return (
-        <Link to={`/property/${property.id}`} className="block group">
+        <Link to={`/properties/${routeCategory}/${property.slug}`} className="block group">
             <div className="bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-slate-100">
 
                 {/* Image Section */}

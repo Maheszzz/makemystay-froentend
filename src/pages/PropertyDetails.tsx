@@ -5,7 +5,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Check, Star, Heart, ArrowLeft, Share2 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useProperty } from '@/hooks';
+import { usePropertyBySlug } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
@@ -16,9 +16,9 @@ import { amenityIconMap } from '@/lib/amenityIcons';
 
 
 export default function PropertyDetails() {
-    const { id } = useParams();
+    const { type, slug } = useParams();
     const navigate = useNavigate();
-    const { property, loading, error, refetch } = useProperty(id || '');
+    const { property, loading, error, refetch } = usePropertyBySlug(type, slug);
     const { isWishlisted, toggleWishlist } = useWishlist();
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -35,7 +35,7 @@ export default function PropertyDetails() {
     const handleShare = async () => {
         if (!property) return;
 
-        const productionUrl = `https://makemystay.ai/property/${id}`;
+        const productionUrl = `https://makemystay.ai/properties/${type}/${slug}`;
         const shareData = {
             title: property.title,
             text: `Check out this property: ${property.title} in ${property.location}`,
@@ -304,12 +304,12 @@ export default function PropertyDetails() {
                                         ? property.description
                                         : `Experience premium living at **${property.title}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
-                                    return desc.split('\n').map((line, i) => {
+                                    return desc.split('\n').map((line: string, i: number) => {
                                         if (!line.trim()) return <br key={i} className="hidden" />;
                                         const parts = line.split(/(\*\*.*?\*\*)/g);
                                         return (
                                             <p key={i}>
-                                                {parts.map((part, j) => {
+                                                {parts.map((part: string, j: number) => {
                                                     if (part.startsWith('**') && part.endsWith('**')) {
                                                         return <strong key={j} className="text-slate-900 font-semibold">{part.slice(2, -2)}</strong>;
                                                     }
@@ -360,7 +360,7 @@ export default function PropertyDetails() {
                                             ['kitchen', 'fully equipped kitchen'],
                                             ['water purifier', 'ro water purifier'],
                                         ];
-                                        const lowerSet = new Set(displayFeatures.map(f => f.toLowerCase()));
+                                        const lowerSet = new Set(displayFeatures.map((f: string) => f.toLowerCase()));
                                         const toRemove = new Set<string>();
                                         for (const [generic, specific] of duplicatePairs) {
                                             if (lowerSet.has(generic) && lowerSet.has(specific)) {
@@ -368,10 +368,10 @@ export default function PropertyDetails() {
                                             }
                                         }
                                         if (toRemove.size > 0) {
-                                            displayFeatures = displayFeatures.filter(f => !toRemove.has(f.toLowerCase()));
+                                            displayFeatures = displayFeatures.filter((f: string) => !toRemove.has(f.toLowerCase()));
                                         }
 
-                                        return displayFeatures.map((feature, idx) => {
+                                        return displayFeatures.map((feature: string, idx: number) => {
                                             const icon = amenityIconMap[feature.toLowerCase()] ?? <Check className="w-4 h-4" />;
                                             return (
                                                 <div key={idx} className="flex items-center gap-2 text-slate-600 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-colors">

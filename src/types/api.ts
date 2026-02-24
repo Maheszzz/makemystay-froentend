@@ -19,6 +19,7 @@ export type PropertyId = string | number;
 
 export interface RealtyProperty {
     id?: number;
+    slug?: string;
     property_name: string;
     location: string;
     phone?: string;
@@ -63,6 +64,7 @@ export interface PropertyImage {
 
 export interface Property {
     id: PropertyId;
+    slug?: string;
     title: string;
     location: string;
     price: string;

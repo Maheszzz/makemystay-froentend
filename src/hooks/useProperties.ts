@@ -102,3 +102,42 @@ export function useProperty(id: number | string): UsePropertyResult {
         refetch: fetchProperty,
     };
 }
+
+/**
+ * Custom hook to fetch a single property by type and slug
+ * @param type - Property Type
+ * @param slug - Property Slug
+ * @returns Property data, loading state, error state, and refetch function
+ */
+export function usePropertyBySlug(type: string | undefined, slug: string | undefined): UsePropertyResult {
+    const [property, setProperty] = useState<Property | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<ApiError | null>(null);
+
+    const fetchProperty = async () => {
+        if (!type || !slug) return;
+
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await propertyApi.getBySlug(type, slug);
+            setProperty(data);
+        } catch (err) {
+            setError(err as ApiError);
+            console.error(`Error fetching property ${type}/${slug}:`, err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProperty();
+    }, [type, slug]);
+
+    return {
+        property,
+        loading,
+        error,
+        refetch: fetchProperty,
+    };
+}

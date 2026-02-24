@@ -15,6 +15,7 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 const QuickPay = lazy(() => import('./pages/QuickPay'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 
 import { SkipLink } from './components/a11y/SkipLink';
@@ -36,14 +37,21 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/contact-us" element={<Contact />} />
-                        <Route path="/properties" element={<Properties />} />
-                        <Route path="/property/:id" element={<PropertyDetails />} />
+                        <Route path="/properties" element={<Properties key="all" />} />
+                        <Route path="/rent" element={<Properties key="rent" initialCategory="rent" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
+                        <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
+                        <Route path="/plots" element={<Properties key="plots" initialCategory="plot" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home" />} />
+                        <Route path="/buy" element={<Properties key="buy" initialCategory="buy" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy" />} />
+                        <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
+                        <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
+                        <Route path="/properties/:type/:slug" element={<PropertyDetails />} />
                         <Route path="/services/:serviceId" element={<ServiceDetail />} />
                         <Route path="/terms" element={<Terms />} />
                         <Route path="/privacy" element={<Privacy />} />
                         <Route path="/refund-policy" element={<RefundPolicy />} />
                         <Route path="/quick-pay" element={<QuickPay />} />
                         <Route path="/wishlist" element={<Wishlist />} />
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
                 </Suspense>
                 <MobileBottomCTA />

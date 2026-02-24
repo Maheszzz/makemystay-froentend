@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -10,8 +11,21 @@ import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 
-export default function Properties() {
-    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>('all');
+interface PropertiesProps {
+    initialCategory?: 'all' | 'pg' | 'rent' | 'buy' | 'plot';
+    initialTypeFilter?: string;
+    pageTitle?: string;
+    pageSubtitle?: string;
+}
+
+export default function Properties({
+    initialCategory = 'all',
+    initialTypeFilter,
+    pageTitle = 'Find Your Perfect Home',
+    pageSubtitle = 'Browse professional & verified listings'
+}: PropertiesProps) {
+    const location = useLocation();
+    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(initialCategory);
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
     const { wishlist, clearWishlist, toggleWishlist } = useWishlist();
@@ -26,8 +40,13 @@ export default function Properties() {
     }, [searchQuery]);
 
     const [locationFilter, setLocationFilter] = useState('all');
-    const [typeFilter, setTypeFilter] = useState('all');
+    const [typeFilter, setTypeFilter] = useState(initialTypeFilter || 'all');
     const [bhkFilter, setBhkFilter] = useState('all');
+
+    useEffect(() => {
+        setCategory(initialCategory);
+        setTypeFilter(initialTypeFilter || 'all');
+    }, [initialCategory, initialTypeFilter]);
     const [showFilters, setShowFilters] = useState(false);
     const params = useMemo(() => {
         return {
@@ -68,6 +87,12 @@ export default function Properties() {
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+            <Helmet>
+                <title>{pageTitle} | MakeMyStay.ai</title>
+                <meta name="description" content={pageSubtitle} />
+                <link rel="canonical" href={`https://www.makemystay.ai${location.pathname}`} />
+            </Helmet>
+
             <Navbar />
 
             <main id="main-content" className="pt-32 pb-20 flex-grow">
@@ -77,8 +102,8 @@ export default function Properties() {
                         <Link to="/" className="inline-flex items-center text-sm text-slate-500 hover:text-brand-red mb-4 transition-colors">
                             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
                         </Link>
-                        <h1 className="text-4xl font-bold text-slate-900 mb-2">Find Your Perfect Home</h1>
-                        <p className="text-slate-500 text-lg">Browse professional & verified listings</p>
+                        <h1 className="text-4xl font-bold text-slate-900 mb-2">{pageTitle}</h1>
+                        <p className="text-slate-500 text-lg">{pageSubtitle}</p>
                     </div>
 
                     {/* Search and Category Toggle */}
@@ -96,37 +121,37 @@ export default function Properties() {
                             </div>
                             <div className="flex items-center justify-between w-full md:w-auto gap-2">
                                 {/* Segmented Control */}
-                                <div className="flex p-1 bg-slate-100 rounded-xl shrink-0">
-                                    <button
-                                        onClick={() => setCategory('all')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'all' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                <div className="flex p-1 bg-slate-100 rounded-xl overflow-x-auto hide-scrollbar shrink-0">
+                                    <Link
+                                        to="/properties"
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${location.pathname === '/properties' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         All
-                                    </button>
-                                    <button
-                                        onClick={() => setCategory('pg')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    </Link>
+                                    <Link
+                                        to="/pg"
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${location.pathname === '/pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         PG
-                                    </button>
-                                    <button
-                                        onClick={() => setCategory('rent')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    </Link>
+                                    <Link
+                                        to="/rent"
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${location.pathname === '/rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         Rent
-                                    </button>
-                                    <button
-                                        onClick={() => setCategory('buy')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    </Link>
+                                    <Link
+                                        to="/buy"
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${location.pathname === '/buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         Buy
-                                    </button>
-                                    <button
-                                        onClick={() => setCategory('plot')}
-                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${category === 'plot' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    </Link>
+                                    <Link
+                                        to="/plots"
+                                        className={`px-3 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${location.pathname === '/plots' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         Plot
-                                    </button>
+                                    </Link>
                                 </div>
 
                                 {/* Right Side Actions */}
@@ -264,7 +289,7 @@ export default function Properties() {
                                             >
                                                 <div className="flex items-start gap-4 p-4 sm:p-5 hover:bg-slate-50/60 transition-colors">
                                                     {/* Thumbnail */}
-                                                    <Link to={`/property/${prop.id}`} className="shrink-0">
+                                                    <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`} className="shrink-0">
                                                         <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100">
                                                             <img
                                                                 src={(prop.images && prop.images[0]) || prop.image || ''}
@@ -276,7 +301,7 @@ export default function Properties() {
 
                                                     {/* Details */}
                                                     <div className="flex-1 min-w-0">
-                                                        <Link to={`/property/${prop.id}`}>
+                                                        <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}>
                                                             <h3 className="font-bold text-slate-900 text-base hover:text-brand-red transition-colors truncate">{prop.title}</h3>
                                                         </Link>
                                                         <p className="text-slate-400 text-xs mt-0.5 flex items-center gap-1">
@@ -304,7 +329,7 @@ export default function Properties() {
                                                             <X className="w-3.5 h-3.5" /> Remove
                                                         </button>
                                                         <Link
-                                                            to={`/property/${prop.id}`}
+                                                            to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}
                                                             className="mt-2 bg-brand-red text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-brand-red/90 transition-colors whitespace-nowrap"
                                                         >
                                                             View Property
