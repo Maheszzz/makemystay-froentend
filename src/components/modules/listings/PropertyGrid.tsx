@@ -16,6 +16,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo(() => ({
         listing_type: category === 'buy' || category === 'rent' ? category : undefined,
         property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : undefined,
+        exclude_property_type: category === 'rent' ? 'PG' : undefined,
         search: searchQuery,
         limit: 20
     }), [category, searchQuery]);

@@ -143,6 +143,7 @@ export interface PaginationParams {
     property_type?: string;
     listing_type?: string;
     search?: string;
+    exclude_property_type?: string;
 }
 
 export interface ContactCreateRequest {
