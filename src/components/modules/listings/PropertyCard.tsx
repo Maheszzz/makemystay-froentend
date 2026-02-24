@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
-    MapPin, Heart, Bed, Bath, Users, Utensils
+    MapPin, Heart, Bed, Bath, Users, Utensils, Pencil, Trash2
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api/client';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import type { Property } from '@/types/api';
 import { useWishlist } from '@/context/WishlistContext';
@@ -12,11 +14,25 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
     const { isWishlisted, toggleWishlist } = useWishlist();
+    const { isAdmin } = useAuth();
+    const navigate = useNavigate();
     const wishlisted = isWishlisted(String(property.id));
 
     const handleHeartClick = (e: React.MouseEvent) => {
         e.preventDefault();
         toggleWishlist(property);
+    };
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (window.confirm(`Are you sure you want to delete "${property.title}"?`)) {
+            try {
+                await api.delete(`/realty/properties/${property.id}`);
+                window.location.reload(); // Simple refresh to show changes
+            } catch (err: any) {
+                alert(`Error deleting property: ${err.message}`);
+            }
+        }
     };
 
     const images = property.images && property.images.length > 0 ? property.images : [property.image];
@@ -82,6 +98,29 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             {property.category === 'buy' ? 'For Sale' : 'For Rent'}
                         </span>
                     </div>
+
+                    {/* Admin Tools */}
+                    {isAdmin && (
+                        <div className="absolute top-3 right-14 z-20 flex gap-2">
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(`/admin/edit-property/${property.id}`);
+                                }}
+                                className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95"
+                                title="Edit Property"
+                            >
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="w-10 h-10 rounded-full bg-slate-900/80 text-white flex items-center justify-center backdrop-blur-sm shadow-lg transition-transform hover:scale-110 active:scale-95"
+                                title="Delete Property"
+                            >
+                                <Trash2 className="w-4 h-4 text-red-400" />
+                            </button>
+                        </div>
+                    )}
 
 
 

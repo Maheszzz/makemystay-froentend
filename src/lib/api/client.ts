@@ -16,11 +16,10 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth tokens if needed in the future
 apiClient.interceptors.request.use(
     (config) => {
-        // You can add auth tokens here when needed
-        // const token = localStorage.getItem('authToken');
-        // if (token) {
-        //     config.headers.Authorization = `Bearer ${token}`;
-        // }
+        const token = localStorage.getItem('admin_token');
+        if (token && config.headers) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
     },
     (error) => {
