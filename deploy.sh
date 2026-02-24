@@ -17,7 +17,7 @@ if [ ! -f ".env.production" ]; then
   exit 1
 fi
 
-npm ci
+npm ci --legacy-peer-deps
 npm run build -- --mode production
 
 # ===== DETECT BUILD DIR =====
