@@ -108,17 +108,17 @@ export default function ServiceDetail() {
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
                     {/* Back Button */}
                     <Link
                         to="/#services"
-                        className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8 transition-colors group"
+                        className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-8 lg:mb-12 transition-colors group -ml-2 p-2"
                     >
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                         <span className="text-sm tracking-wider uppercase">Back to Services</span>
                     </Link>
 
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                         {/* Left Content */}
                         <div>
                             {/* Badge */}
@@ -130,17 +130,17 @@ export default function ServiceDetail() {
                             </div>
 
                             <h1
-                                className="text-6xl md:text-7xl font-medium text-white mb-6 leading-tight tracking-tight"
+                                className="text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-6 leading-tight tracking-tight"
                                 style={{ fontFamily: "'Playfair Display', serif" }}
                             >
                                 {service.title}
                             </h1>
 
-                            <p className="text-xl text-white/80 leading-relaxed mb-6">
+                            <p className="text-lg lg:text-xl text-white/80 leading-relaxed mb-6">
                                 {service.description}
                             </p>
 
-                            <p className="text-lg text-white/70 leading-relaxed mb-10">
+                            <p className="text-base lg:text-lg text-white/70 leading-relaxed mb-10">
                                 {service.fullDescription}
                             </p>
 
@@ -148,14 +148,14 @@ export default function ServiceDetail() {
                             <div className="flex flex-wrap gap-4">
                                 <Link
                                     to="/contact-us"
-                                    className="group px-8 py-4 bg-brand-red text-white font-semibold rounded-lg hover:bg-brand-red/90 transition-all duration-300 flex items-center gap-2"
+                                    className="group px-8 py-4 bg-brand-red text-white font-semibold rounded-lg hover:bg-brand-red/90 transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto"
                                 >
                                     Get Started
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <Link
-                                    to="/"
-                                    className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300"
+                                    to="/#services"
+                                    className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 transition-all duration-300 text-center w-full sm:w-auto"
                                 >
                                     Explore More
                                 </Link>
@@ -163,11 +163,11 @@ export default function ServiceDetail() {
                         </div>
 
                         {/* Right - Icon Display */}
-                        <div className="hidden lg:flex items-center justify-center">
+                        <div className="flex items-center justify-center mt-8 lg:mt-0">
                             <div className="relative">
-                                <div className="w-80 h-80 rounded-full bg-gradient-to-br from-brand-red/20 to-amber-400/20 blur-3xl absolute inset-0"></div>
-                                <div className="relative w-64 h-64 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center">
-                                    <ServiceIcon className="w-32 h-32 text-brand-red" />
+                                <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full bg-gradient-to-br from-brand-red/20 to-amber-400/20 blur-3xl absolute inset-0"></div>
+                                <div className="relative w-48 h-48 lg:w-64 lg:h-64 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center">
+                                    <ServiceIcon className="w-24 h-24 lg:w-32 lg:h-32 text-brand-red" />
                                 </div>
                             </div>
                         </div>
