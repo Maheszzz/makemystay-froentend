@@ -6,6 +6,19 @@ import type {
     PaginationParams
 } from '@/types/api';
 
+export interface ScheduleDemoRequest {
+    name: string;
+    email: string;
+    phone: string;
+    selected_slot: string; // ISO string
+}
+
+export interface ScheduleDemoResponse {
+    message: string;
+    meet_link: string;
+    scheduled_at: string;
+}
+
 const BASE_PATH = '/contacts';
 const REALTY_CONTACT_PATH = '/realty/contacts';
 
@@ -79,6 +92,16 @@ export const contactApi = {
      */
     submitContactForm: async (data: ContactFormSubmission): Promise<any> => {
         const response = await api.post<any>(REALTY_CONTACT_PATH, data);
+        return response;
+    },
+
+    /**
+     * Schedule a demo
+     * @param data - Schedule demo request data
+     * @returns Success message and booking details
+     */
+    scheduleDemo: async (data: ScheduleDemoRequest): Promise<ScheduleDemoResponse> => {
+        const response = await api.post<ScheduleDemoResponse>('/schedule-demo', data);
         return response;
     },
 };
