@@ -16,6 +16,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo(() => ({
         listing_type: category === 'buy' || category === 'rent' ? category : undefined,
         property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : undefined,
+        exclude_property_type: category === 'rent' ? 'PG' : undefined,
         search: searchQuery,
         limit: 20
     }), [category, searchQuery]);
@@ -26,15 +27,8 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
 
 
     // Filter out plots from buy/rent categories and limit to 4 for the home page
-    const filteredProperties = properties.filter(prop => {
-        if (category === 'buy' || category === 'rent') {
-            const isNotPlot = prop.type?.toLowerCase() !== 'plot';
-            // Explicitly filter out PG if we are requesting Rent category items
-            const hidePgIfRent = category === 'rent' ? prop.type !== 'PG' : true;
-            return isNotPlot && hidePgIfRent;
-        }
-        return true;
-    }).slice(0, 4);
+    // Filter for the home page (limit to 4)
+    const filteredProperties = properties.slice(0, 4);
 
     if (loading) {
         return (

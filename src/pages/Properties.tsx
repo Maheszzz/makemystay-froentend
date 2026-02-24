@@ -52,7 +52,8 @@ export default function Properties({
         return {
             listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
             search: debouncedSearchQuery.trim() || undefined,
-            property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter)
+            property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter),
+            exclude_property_type: category === 'rent' ? 'PG' : undefined
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 
@@ -72,16 +73,7 @@ export default function Properties({
         return properties.filter(prop => {
             const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
             const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
-            const isBuyOrRentCategory = category === 'buy' || category === 'rent';
-            const hidePlotIfBuyRent = isBuyOrRentCategory ? prop.type?.toLowerCase() !== 'plot' : true;
-
-            // If the category is strictly 'PG', only show PG:
-            const hideOthersIfPg = category === 'pg' ? prop.type === 'PG' : true;
-
-            // If the category is strictly 'rent', hide PGs:
-            const hidePgIfRent = category === 'rent' ? prop.type !== 'PG' : true;
-
-            return matchesLocation && matchesBHK && hidePlotIfBuyRent && hideOthersIfPg && hidePgIfRent;
+            return matchesLocation && matchesBHK;
         });
     }, [properties, locationFilter, bhkFilter, category]);
 
