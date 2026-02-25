@@ -99,26 +99,28 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         </span>
                     </div>
 
-                    {/* Admin Tools */}
+                    {/* Admin Tools — slide-up action bar */}
                     {isAdmin && (
-                        <div className="absolute top-3 right-14 z-20 flex gap-2">
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    navigate(`/admin/edit-property/${property.id}`);
-                                }}
-                                className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95"
-                                title="Edit Property"
-                            >
-                                <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="w-10 h-10 rounded-full bg-slate-900/80 text-white flex items-center justify-center backdrop-blur-sm shadow-lg transition-transform hover:scale-110 active:scale-95"
-                                title="Delete Property"
-                            >
-                                <Trash2 className="w-4 h-4 text-red-400" />
-                            </button>
+                        <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
+                            <div className="flex items-center divide-x divide-white/20 bg-slate-900/75 backdrop-blur-md">
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        navigate(`/admin/edit-property/${property.id}`);
+                                    }}
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold hover:bg-white/10 transition-colors"
+                                    title="Edit Property"
+                                >
+                                    <Pencil className="w-3.5 h-3.5 text-blue-300" /> Edit
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold hover:bg-red-500/30 transition-colors"
+                                    title="Delete Property"
+                                >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-400" /> Delete
+                                </button>
+                            </div>
                         </div>
                     )}
 

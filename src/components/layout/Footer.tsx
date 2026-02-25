@@ -53,6 +53,11 @@ export function Footer() {
                                     </Link>
                                 </li>
                             ))}
+                            <li>
+                                <Link to="/admin" className="hover:text-brand-red hover:pl-2 transition-all duration-300 inline-block">
+                                    Dashboard
+                                </Link>
+                            </li>
                         </ul>
 
                     </div>

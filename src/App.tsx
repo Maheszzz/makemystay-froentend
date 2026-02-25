@@ -1,11 +1,10 @@
-import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Suspense, lazy, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
 import { WhatsAppWidget } from './components/layout/WhatsAppWidget';
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { Navigate } from 'react-router-dom';
 
 const Home = lazy(() => import('./pages/Home'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -26,6 +25,23 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
 
+// Toggles data-admin attribute on <html> ONLY on /admin routes
+function AdminThemeToggle() {
+    const { isAdmin } = useAuth();
+    const location = useLocation();
+    const isAdminRoute = location.pathname.startsWith('/admin');
+
+    useEffect(() => {
+        if (isAdmin && isAdminRoute) {
+            document.documentElement.setAttribute('data-admin', 'true');
+        } else {
+            document.documentElement.removeAttribute('data-admin');
+        }
+        return () => document.documentElement.removeAttribute('data-admin');
+    }, [isAdmin, isAdminRoute]);
+    return null;
+}
+
 // Private Route Component
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     const { isAuthenticated } = useAuth();
@@ -37,6 +53,7 @@ function App() {
         <Router>
             <AuthProvider>
                 <WishlistProvider>
+                    <AdminThemeToggle />
                     <SkipLink />
                     <ScrollToTop />
                     <Suspense fallback={

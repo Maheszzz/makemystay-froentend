@@ -106,9 +106,7 @@ export function Navbar() {
                             <Link to="/quick-pay" className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
                                 Quick Pay
                             </Link>
-                            <Link to="/admin" className={`text-sm font-bold transition-colors cursor-pointer text-brand-red`}>
-                                Dashboard
-                            </Link>
+
                             <Link to="/contact-us">
                                 <Button variant="gold" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
                             </Link>
@@ -189,14 +187,7 @@ export function Navbar() {
                                 <span>Quick Pay</span>
                                 <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Link>
-                            <Link
-                                to="/admin"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center justify-between py-4 text-lg font-bold text-brand-red border-b border-white/5 transition-colors group"
-                            >
-                                <span>Dashboard</span>
-                                <ArrowRight className="w-4 h-4 opacity-100 translate-x-0 transition-all" />
-                            </Link>
+
                         </div>
                     </div>
 

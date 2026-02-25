@@ -2,7 +2,11 @@ import React, { useState, useRef } from 'react';
 import {
     X, Upload, Trash2, Loader2, AlertCircle,
     CheckCircle2, MapPin, Phone, Home, Info,
-    Zap, Wifi, Shield, Coffee, Utensils
+    Zap, Wifi, Coffee, Utensils,
+    Dumbbell, Waves, Wind, ArrowUpDown, ParkingSquare, Bike,
+    ShieldCheck, Cctv, Fingerprint, Tv, AirVent, Thermometer,
+    WashingMachine, Shirt, BookOpen, Laptop, Archive, Armchair,
+    Mountain, Wrench, Sparkles, Trees, Heart, Users, ChefHat
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api/client';
@@ -14,19 +18,101 @@ interface PropertyFormProps {
     onClose: () => void;
     onSuccess: () => void;
     initialProperty?: RealtyProperty;
+    pageMode?: boolean;
 }
 
-const AMENITIES = [
-    { id: 'wifi', label: 'WiFi', icon: Wifi },
-    { id: 'power_backup', label: 'Backup', icon: Zap },
-    { id: 'housekeeping', label: 'Service', icon: Coffee },
-    { id: 'gym', label: 'Gym', icon: Info },
-    { id: 'pool', label: 'Pool', icon: Info },
-    { id: 'cctv', label: 'Security', icon: Shield },
-    { id: 'food', label: 'Food', icon: Utensils },
+const AMENITY_GROUPS = [
+    {
+        group: 'Connectivity',
+        items: [
+            { id: 'wifi', label: 'WiFi', icon: Wifi },
+            { id: 'power_backup', label: 'Power Backup', icon: Zap },
+        ],
+    },
+    {
+        group: 'Food',
+        items: [
+            { id: 'food', label: 'Food Included', icon: Utensils },
+            { id: 'housekeeping', label: 'Housekeeping', icon: Sparkles },
+            { id: 'in-house cafeteria', label: 'Cafeteria', icon: Coffee },
+        ],
+    },
+    {
+        group: 'Safety & Security',
+        items: [
+            { id: 'cctv', label: 'CCTV', icon: Cctv },
+            { id: 'security', label: '24/7 Security', icon: ShieldCheck },
+            { id: 'fingerprint', label: 'Biometric Access', icon: Fingerprint },
+        ],
+    },
+    {
+        group: 'Appliances',
+        items: [
+            { id: 'ac', label: 'Air Conditioning', icon: AirVent },
+            { id: 'geyser', label: 'Geyser', icon: Thermometer },
+            { id: 'tv', label: 'TV', icon: Tv },
+            { id: 'refrigerator', label: 'Fridge', icon: Info },
+            { id: 'washing machine', label: 'Washing Machine', icon: WashingMachine },
+        ],
+    },
+    {
+        group: 'Laundry',
+        items: [
+            { id: 'laundry', label: 'Laundry Service', icon: Shirt },
+        ],
+    },
+    {
+        group: 'Parking',
+        items: [
+            { id: 'parking', label: 'Car Parking', icon: ParkingSquare },
+            { id: 'bike parking', label: 'Bike Parking', icon: Bike },
+        ],
+    },
+    {
+        group: 'Fitness & Recreation',
+        items: [
+            { id: 'gym', label: 'Gym', icon: Dumbbell },
+            { id: 'pool', label: 'Swimming Pool', icon: Waves },
+        ],
+    },
+    {
+        group: 'Common Areas',
+        items: [
+            { id: 'lounge', label: 'Lounge', icon: Coffee },
+            { id: 'garden', label: 'Garden', icon: Trees },
+            { id: 'balcony', label: 'Balcony', icon: Wind },
+            { id: 'terrace', label: 'Terrace', icon: Mountain },
+            { id: 'lift', label: 'Lift', icon: ArrowUpDown },
+            { id: 'common kitchen', label: 'Common Kitchen', icon: ChefHat },
+        ],
+    },
+    {
+        group: 'Room Features',
+        items: [
+            { id: 'attached bathroom', label: 'Attached Bathroom', icon: Home },
+            { id: 'cupboards', label: 'Cupboards', icon: Archive },
+            { id: 'furniture', label: 'Furnished', icon: Armchair },
+        ],
+    },
+    {
+        group: 'Study & Work',
+        items: [
+            { id: 'study table', label: 'Study Table', icon: BookOpen },
+            { id: 'work desk', label: 'Work Desk', icon: Laptop },
+        ],
+    },
+    {
+        group: 'Extras',
+        items: [
+            { id: 'couple friendly', label: 'Couple Friendly', icon: Heart },
+            { id: 'maintenance', label: 'Maintenance', icon: Wrench },
+            { id: 'community', label: 'Community Events', icon: Users },
+        ],
+    },
 ];
 
-export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, initialProperty }) => {
+
+export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, initialProperty, pageMode = false }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
@@ -174,20 +260,22 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
     };
 
     return (
-        <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative z-10">
-            {/* Header */}
-            <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-20">
-                <div>
-                    <h2 className="text-xl font-bold text-slate-900">{isEdit ? 'Edit Property' : 'Add New Property'}</h2>
-                    <p className="text-sm text-slate-500">{isEdit ? 'Update details for this property' : 'Fill in the details to list a new property'}</p>
+        <div className={pageMode ? 'w-full' : 'bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative z-10'}>
+            {/* Header — only rendered in modal mode */}
+            {!pageMode && (
+                <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-white sticky top-0 z-20">
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-900">{isEdit ? 'Edit Property' : 'Add New Property'}</h2>
+                        <p className="text-sm text-slate-500">{isEdit ? 'Update details for this property' : 'Fill in the details to list a new property'}</p>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-xl transition-colors">
+                        <X className="w-5 h-5 text-slate-400" />
+                    </button>
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-xl transition-colors">
-                    <X className="w-5 h-5 text-slate-400" />
-                </button>
-            </div>
+            )}
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto p-8 space-y-8">
+            <form onSubmit={handleSubmit} className={pageMode ? 'space-y-8' : 'flex-grow overflow-y-auto p-8 space-y-8'}>
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 text-red-600">
                         <AlertCircle className="w-5 h-5 shrink-0" />
@@ -335,21 +423,28 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                         />
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         <label className="text-sm font-semibold text-slate-700 ml-1">Amenities / Features</label>
-                        <div className="flex flex-wrap gap-2">
-                            {AMENITIES.map((amenity) => (
-                                <button
-                                    key={amenity.id}
-                                    type="button"
-                                    onClick={() => toggleAmenity(amenity.id)}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all flex items-center gap-2 ${formData.features.includes(amenity.id)
-                                        ? 'bg-brand-red/10 border-brand-red text-brand-red'
-                                        : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'
-                                        }`}
-                                >
-                                    <amenity.icon className="w-4 h-4" /> {amenity.label}
-                                </button>
+                        <div className="space-y-4">
+                            {AMENITY_GROUPS.map((group) => (
+                                <div key={group.group}>
+                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">{group.group}</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {group.items.map((amenity) => (
+                                            <button
+                                                key={amenity.id}
+                                                type="button"
+                                                onClick={() => toggleAmenity(amenity.id)}
+                                                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 ${formData.features.includes(amenity.id)
+                                                    ? 'bg-brand-red/10 border-brand-red text-brand-red shadow-sm'
+                                                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                                                    }`}
+                                            >
+                                                <amenity.icon className="w-3.5 h-3.5" /> {amenity.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -405,8 +500,8 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                     <p className="text-[10px] text-slate-400 text-center italic">First image will be used as the main cover photo.</p>
                 </div>
 
-                {/* Sticky Footer for Form */}
-                <div className="sticky bottom-0 bg-white pt-4 pb-2">
+                {/* Submit */}
+                <div className={pageMode ? 'pt-4' : 'sticky bottom-0 bg-white pt-4 pb-2'}>
                     <Button
                         type="submit"
                         className="w-full py-4 rounded-2xl text-base font-bold shadow-glow"

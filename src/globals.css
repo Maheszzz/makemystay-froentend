@@ -109,3 +109,346 @@ h6 {
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ADMIN DARK MODE — Premium SaaS Theme (Linear / Vercel style)
+   Activates when html[data-admin] is set by AdminThemeToggle
+   ═══════════════════════════════════════════════════════════ */
+
+html[data-admin] {
+    color-scheme: dark;
+
+    /* ─── Color System ─── */
+    --adm-base: #0A0D14;
+    --adm-card: #111827;
+    --adm-elevated: #1C2333;
+    --adm-hover: #252D3D;
+    --adm-border: rgba(255, 255, 255, 0.07);
+    --adm-border-hi: rgba(255, 255, 255, 0.12);
+
+    /* ─── Accent palette ─── */
+    --adm-accent: #FF4D4D;
+    --adm-accent-lo: rgba(255, 77, 77, 0.12);
+    --adm-gold: #F5A623;
+    --adm-success: #10B981;
+    --adm-success-lo: rgba(16, 185, 129, 0.12);
+    --adm-purple-lo: rgba(139, 92, 246, 0.12);
+    --adm-blue-lo: rgba(59, 130, 246, 0.12);
+
+    /* ─── Text ─── */
+    --adm-text-primary: #F9FAFB;
+    --adm-text-muted: #6B7280;
+    --adm-text-subtle: #374151;
+}
+
+/* ── Smooth global transition ── */
+html[data-admin] *,
+html[data-admin] *::before,
+html[data-admin] *::after {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 0.35s;
+    transition-timing-function: ease;
+}
+
+/* ── Base ── */
+html[data-admin],
+html[data-admin] body,
+html[data-admin] #root {
+    background-color: var(--adm-base) !important;
+    color: var(--adm-text-primary) !important;
+    min-height: 100%;
+    width: 100%;
+    font-family: 'DM Sans', 'Inter', sans-serif !important;
+}
+
+/* ── Typography in admin ── */
+html[data-admin] h1,
+html[data-admin] h2,
+html[data-admin] h3,
+html[data-admin] h4 {
+    font-family: 'Sora', 'DM Sans', sans-serif !important;
+    color: var(--adm-text-primary) !important;
+}
+
+/* Stat numbers — large bold gradient */
+html[data-admin] .text-3xl {
+    background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Sora', sans-serif !important;
+    font-weight: 800 !important;
+}
+
+/* ── Whites → layered dark cards ── */
+html[data-admin] .bg-white {
+    background-color: var(--adm-card) !important;
+    border-color: var(--adm-border) !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Page/layout backgrounds ── */
+html[data-admin] main,
+html[data-admin] .bg-slate-50,
+html[data-admin] .min-h-screen,
+html[data-admin] div[class*="min-h-screen"],
+html[data-admin] div[style*="background: linear-gradient"],
+html[data-admin] div[style*="background:linear-gradient"] {
+    background-color: var(--adm-base) !important;
+    background-image: none !important;
+}
+
+/* ── Elevated surfaces (table header bg, sticky header) ── */
+html[data-admin] .bg-slate-50\/60,
+html[data-admin] .bg-slate-50\/80,
+html[data-admin] thead tr {
+    background-color: var(--adm-base) !important;
+}
+
+/* ── Text colors ── */
+html[data-admin] .text-slate-900 {
+    color: var(--adm-text-primary) !important;
+}
+
+html[data-admin] .text-slate-800 {
+    color: #e2e8f0 !important;
+}
+
+html[data-admin] .text-slate-700 {
+    color: #cbd5e1 !important;
+}
+
+html[data-admin] .text-slate-600 {
+    color: #94a3b8 !important;
+}
+
+html[data-admin] .text-slate-500 {
+    color: var(--adm-text-muted) !important;
+}
+
+html[data-admin] .text-slate-400 {
+    color: var(--adm-text-subtle) !important;
+}
+
+/* ── Borders ── */
+html[data-admin] .border-slate-100,
+html[data-admin] .border-slate-200 {
+    border-color: var(--adm-border) !important;
+}
+
+html[data-admin] .border-slate-50 {
+    border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Cards — frosted glass depth ── */
+html[data-admin] .rounded-3xl,
+html[data-admin] .rounded-2xl {
+    border: 1px solid var(--adm-border) !important;
+}
+
+/* ── Table ── */
+html[data-admin] table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+html[data-admin] tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
+    transition: background-color 0.15s ease, border-left 0.15s ease !important;
+    border-left: 2px solid transparent;
+}
+
+html[data-admin] tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-left: 2px solid var(--adm-accent) !important;
+}
+
+html[data-admin] thead tr th {
+    border-bottom: 1px solid var(--adm-border) !important;
+}
+
+/* ── Stat card icon glows ── */
+/* Blue glow — Total Properties (blue icon) */
+html[data-admin] .from-blue-500 {
+    filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+}
+
+/* Green glow — Active Listings */
+html[data-admin] .from-emerald-500 {
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.5));
+}
+
+/* Purple glow — Leads */
+html[data-admin] .from-violet-500 {
+    filter: drop-shadow(0 0 12px rgba(139, 92, 246, 0.5));
+}
+
+/* ── Stat card trend badges ── */
+html[data-admin] .bg-blue-50 {
+    background-color: var(--adm-blue-lo) !important;
+    border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+html[data-admin] .bg-emerald-50 {
+    background-color: var(--adm-success-lo) !important;
+    border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+html[data-admin] .bg-violet-50 {
+    background-color: var(--adm-purple-lo) !important;
+    border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+html[data-admin] .bg-orange-50 {
+    background-color: rgba(249, 115, 22, 0.1) !important;
+    border-color: rgba(249, 115, 22, 0.2) !important;
+}
+
+/* ── Pulsing Active status dot ── */
+@keyframes adm-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+    }
+}
+
+html[data-admin] span[class*="animate-ping"] {
+    animation: adm-pulse 2s infinite !important;
+}
+
+/* ── Frosted glass Navbar ── */
+html[data-admin] nav,
+html[data-admin] header {
+    background-color: rgba(10, 13, 20, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ── Footer ── */
+html[data-admin] footer {
+    background-color: var(--adm-base) !important;
+    border-top: 1px solid var(--adm-border) !important;
+}
+
+/* ── Inputs & selects ── */
+html[data-admin] input,
+html[data-admin] select,
+html[data-admin] textarea {
+    background-color: var(--adm-elevated) !important;
+    border-color: var(--adm-border) !important;
+    color: var(--adm-text-primary) !important;
+}
+
+html[data-admin] input:focus,
+html[data-admin] select:focus,
+html[data-admin] textarea:focus {
+    border-color: var(--adm-accent) !important;
+    box-shadow: 0 0 0 3px var(--adm-accent-lo) !important;
+    background-color: var(--adm-card) !important;
+}
+
+html[data-admin] input::placeholder,
+html[data-admin] textarea::placeholder {
+    color: var(--adm-text-muted) !important;
+}
+
+/* ── "Add Property" gradient button ── */
+html[data-admin] a[class*="bg-gradient-to-r"][class*="from-brand-red"],
+html[data-admin] button[class*="bg-gradient-to-r"][class*="from-brand-red"] {
+    background: linear-gradient(135deg, #FF4D4D 0%, #FF7B54 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 77, 77, 0.35) !important;
+}
+
+html[data-admin] button[class*="from-brand-red"]:hover {
+    box-shadow: 0 0 32px rgba(255, 77, 77, 0.55) !important;
+    transform: translateY(-1px);
+}
+
+/* ── Edit button — ghost style ── */
+html[data-admin] button[class*="bg-blue-50"] {
+    background-color: transparent !important;
+    border: 1px solid rgba(99, 102, 241, 0.4) !important;
+    color: #818cf8 !important;
+}
+
+html[data-admin] button[class*="bg-blue-50"]:hover {
+    background-color: rgba(99, 102, 241, 0.1) !important;
+    border-color: #818cf8 !important;
+    color: #fff !important;
+}
+
+/* ── Delete button — ghost style ── */
+html[data-admin] button[class*="bg-red-50"] {
+    background-color: transparent !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+html[data-admin] button[class*="bg-red-50"]:hover {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: #ef4444 !important;
+}
+
+/* ── Trash / Exit Trash button ── */
+html[data-admin] button[class*="bg-orange-50"] {
+    background-color: rgba(249, 115, 22, 0.08) !important;
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    color: #fb923c !important;
+}
+
+/* ── Type badge ── */
+html[data-admin] .bg-violet-50 {
+    background-color: rgba(139, 92, 246, 0.12) !important;
+}
+
+html[data-admin] .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+html[data-admin] .bg-amber-50 {
+    background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* ── Quick action cards hover ── */
+html[data-admin] .bg-white:hover {
+    background-color: var(--adm-elevated) !important;
+}
+
+/* ── Page header banner (edit property) ── */
+html[data-admin] .bg-white.border-b {
+    background-color: var(--adm-card) !important;
+}
+
+/* ── Pagination buttons ── */
+html[data-admin] .bg-slate-100 {
+    background-color: var(--adm-elevated) !important;
+}
+
+html[data-admin] .hover\:bg-slate-100:hover {
+    background-color: var(--adm-hover) !important;
+}
+
+/* ── Scrollbar styled for dark ── */
+html[data-admin] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+html[data-admin] ::-webkit-scrollbar-track {
+    background: var(--adm-base);
+}
+
+html[data-admin] ::-webkit-scrollbar-thumb {
+    background: var(--adm-elevated);
+    border-radius: 999px;
+}
+
+html[data-admin] ::-webkit-scrollbar-thumb:hover {
+    background: var(--adm-hover);
+}
