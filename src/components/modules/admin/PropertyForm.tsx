@@ -3,8 +3,8 @@ import {
     X, Upload, Trash2, Loader2, AlertCircle,
     CheckCircle2, MapPin, Phone, Home, Info,
     Zap, Wifi, Coffee, Utensils,
-    Dumbbell, Waves, Wind, ArrowUpDown, ParkingSquare, Bike,
-    ShieldCheck, Cctv, Fingerprint, Tv, AirVent, Thermometer,
+    Dumbbell, Waves, Wind, ArrowUpDown, SquareParking, Bike,
+    ShieldCheck, Cctv, Tv, AirVent, Thermometer,
     WashingMachine, Shirt, BookOpen, Laptop, Archive, Armchair,
     Mountain, Wrench, Sparkles, Trees, Heart, Users, ChefHat
 } from 'lucide-react';
@@ -42,7 +42,7 @@ const AMENITY_GROUPS = [
         items: [
             { id: 'cctv', label: 'CCTV', icon: Cctv },
             { id: 'security', label: '24/7 Security', icon: ShieldCheck },
-            { id: 'fingerprint', label: 'Biometric Access', icon: Fingerprint },
+            { id: 'fingerprint', label: 'Biometric Access', icon: ShieldCheck },
         ],
     },
     {
@@ -64,7 +64,7 @@ const AMENITY_GROUPS = [
     {
         group: 'Parking',
         items: [
-            { id: 'parking', label: 'Car Parking', icon: ParkingSquare },
+            { id: 'parking', label: 'Car Parking', icon: SquareParking },
             { id: 'bike parking', label: 'Bike Parking', icon: Bike },
         ],
     },
@@ -139,9 +139,12 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
 
     // Image upload state
     const [uploading, setUploading] = useState(false);
-    const [uploadedImages, setUploadedImages] = useState<{ url: string, key: string }[]>(
-        initialProperty?.images?.map(img => ({ url: img.image_url, key: '' })) || []
+    // Store existing images with their DB id so we can delete them from the server
+    const [uploadedImages, setUploadedImages] = useState<{ url: string, key: string, id?: number }[]>(
+        initialProperty?.images?.map(img => ({ url: img.image_url, key: '', id: img.id })) || []
     );
+    // Track which existing DB image IDs the user has removed
+    const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -171,7 +174,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                 const file = files[i];
 
                 // 1. Get presigned URL
-                const { upload_url, file_key } = await api.post<any>('/uploads/presigned-url', {
+                const { upload_url, file_key, public_url } = await api.post<any>('/uploads/presigned-url', {
                     filename: file.name,
                     content_type: file.type
                 });
@@ -183,10 +186,9 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                     headers: { 'Content-Type': file.type }
                 });
 
-                // 3. Track uploaded image (using public URL if possible, otherwise key)
-                // For now we'll store the key and assume backend handles signing or public access
-                const publicUrl = `https://${import.meta.env.VITE_S3_BUCKET_NAME}.s3.amazonaws.com/${file_key}`;
-                setUploadedImages(prev => [...prev, { url: publicUrl, key: file_key }]);
+                // 3. Track uploaded image using the public URL returned by the backend
+                console.log("Backend returned presigned URL details:", { upload_url, file_key, public_url });
+                setUploadedImages(prev => [...prev, { url: public_url, key: file_key }]);
             }
         } catch (err: any) {
             setError(err.message || 'Failed to upload images');
@@ -197,6 +199,11 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
     };
 
     const removeImage = (index: number) => {
+        const img = uploadedImages[index];
+        // If this image has a DB id, queue it for deletion on submit
+        if (img.id) {
+            setDeletedImageIds(prev => [...prev, img.id!]);
+        }
         setUploadedImages(prev => prev.filter((_, i) => i !== index));
     };
 
@@ -208,30 +215,39 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
         try {
             let propertyId = initialProperty?.id;
 
-            if (isEdit && propertyId) {
-                // 1. Update Property
-                await api.put(`/realty/properties/${propertyId}`, {
-                    ...formData,
-                    private_price: formData.private_price !== '' ? parseFloat(formData.private_price) : null,
-                    single_price: formData.single_price !== '' ? parseFloat(formData.single_price) : null,
-                    double_price: formData.double_price !== '' ? parseFloat(formData.double_price) : null,
-                    triple_price: formData.triple_price !== '' ? parseFloat(formData.triple_price) : null,
-                    starting_price: formData.starting_price !== '' ? parseFloat(formData.starting_price) : null,
-                });
+            let cleanedPhone = formData.phone;
+            if (cleanedPhone && cleanedPhone.length === 9) {
+                cleanedPhone = '0' + cleanedPhone;
+            }
 
-                // Note: Image management is complex. For now, we only add new ones or rely on the fact
-                // that they are already in the uploadedImages state.
-                // A better implementation would sync the images table with uploadedImages.
+            const cleanPayload = {
+                ...formData,
+                phone: cleanedPhone || null,
+                description: formData.description || null,
+                private_price: formData.private_price !== '' ? parseFloat(formData.private_price) : null,
+                single_price: formData.single_price !== '' ? parseFloat(formData.single_price) : null,
+                double_price: formData.double_price !== '' ? parseFloat(formData.double_price) : null,
+                triple_price: formData.triple_price !== '' ? parseFloat(formData.triple_price) : null,
+                starting_price: formData.starting_price !== '' ? parseFloat(formData.starting_price) : null,
+            };
+
+            if (isEdit && propertyId) {
+                // 1. Update property fields
+                await api.put(`/realty/properties/${propertyId}`, cleanPayload);
+
+                // 2. Delete images the user removed
+                for (const imgId of deletedImageIds) {
+                    try {
+                        await api.delete(`/realty/images/${imgId}`);
+                    } catch (e) {
+                        console.warn(`Failed to delete image ${imgId}`, e);
+                    }
+                }
+                // Clear the deleted list after processing
+                setDeletedImageIds([]);
             } else {
                 // 1. Create Property
-                const property = await api.post<any>('/realty/properties', {
-                    ...formData,
-                    private_price: formData.private_price !== '' ? parseFloat(formData.private_price) : null,
-                    single_price: formData.single_price !== '' ? parseFloat(formData.single_price) : null,
-                    double_price: formData.double_price !== '' ? parseFloat(formData.double_price) : null,
-                    triple_price: formData.triple_price !== '' ? parseFloat(formData.triple_price) : null,
-                    starting_price: formData.starting_price !== '' ? parseFloat(formData.starting_price) : null,
-                });
+                const property = await api.post<any>('/realty/properties', cleanPayload);
                 propertyId = property.id;
             }
 
@@ -253,7 +269,52 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                 onClose();
             }, 2000);
         } catch (err: any) {
-            setError(err.message || 'Failed to create property');
+            console.error(err);
+
+            let errorMessage = 'Failed to save property';
+            if (err.response?.data?.detail) {
+                const detail = err.response.data.detail;
+                if (typeof detail === 'string') {
+                    errorMessage = detail;
+                } else if (Array.isArray(detail)) {
+                    errorMessage = detail[0]?.msg || 'Validation error, please try again.';
+                } else {
+                    errorMessage = 'Validation error, please try again.';
+                }
+            } else if (err.message) {
+                if (typeof err.message === 'string') {
+                    errorMessage = err.message;
+                } else if (Array.isArray(err.message)) {
+                    errorMessage = err.message[0]?.msg || 'Validation failed. Please check inputs.';
+                }
+            } else if (err.detail) {
+                if (typeof err.detail === 'string') {
+                    errorMessage = err.detail;
+                } else if (Array.isArray(err.detail)) {
+                    errorMessage = err.detail[0]?.msg || 'Validation failed. Please check inputs.';
+                }
+            }
+
+            // Absolute catch-all to prevent React component crashing from objects as children
+            if (typeof errorMessage !== 'string') {
+                try {
+                    errorMessage = JSON.stringify(errorMessage);
+                } catch (e) {
+                    errorMessage = 'An unknown validation error occurred.';
+                }
+            }
+
+            // Absolute catch-all to prevent React component crashing from objects as children
+            if (typeof errorMessage !== 'string') {
+                try {
+                    errorMessage = JSON.stringify(errorMessage);
+                } catch (e) {
+                    errorMessage = 'An unknown validation error occurred.';
+                }
+            }
+
+            setError(errorMessage);
+            setSuccess(false);
         } finally {
             setLoading(false);
         }
@@ -331,6 +392,8 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
+                                minLength={10}
+                                maxLength={15}
                                 placeholder="+91 81500 99911"
                                 className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:bg-white transition-all"
                             />

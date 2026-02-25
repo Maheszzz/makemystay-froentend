@@ -53,7 +53,7 @@ export default function Properties({
             listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
             search: debouncedSearchQuery.trim() || undefined,
             property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter),
-            exclude_property_type: category === 'rent' ? 'PG' : undefined
+            exclude_property_type: category === 'rent' ? 'PG' : category === 'buy' ? 'Plot' : undefined
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 

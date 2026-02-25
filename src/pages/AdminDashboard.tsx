@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import {
     LayoutDashboard, Plus, Settings, LogOut, Home, Users, BarChart3,
     ChevronRight, X, Lock, Loader2, AlertCircle, CheckCircle2,
-    Trash2, RotateCcw, MapPin, Search, ChevronLeft, ChevronsLeft,
+    Trash2, MapPin, Search, ChevronLeft, ChevronsLeft,
     ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,18 +52,17 @@ export default function AdminDashboard() {
 
     const [properties, setProperties] = useState<RealtyProperty[]>([]);
     const [loadingProps, setLoadingProps] = useState(true);
-    const [showDeleted, setShowDeleted] = useState(false);
 
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-    useEffect(() => { fetchProperties(); }, [showDeleted]);
+    useEffect(() => { fetchProperties(); }, []);
 
     const fetchProperties = async () => {
         setLoadingProps(true);
         try {
-            const data = await api.get<any>(`/realty/properties?include_deleted=${showDeleted}`);
+            const data = await api.get<any>(`/realty/properties`);
             setProperties(data);
         } catch (err) {
             console.error("Failed to fetch properties", err);
@@ -73,14 +72,9 @@ export default function AdminDashboard() {
     };
 
     const handleDeleteProperty = async (id: number) => {
-        if (!confirm("Soft-delete this property?")) return;
+        if (!confirm("Are you sure you want to delete this property? This cannot be undone.")) return;
         try { await api.delete(`/realty/properties/${id}`); fetchProperties(); }
         catch { alert("Failed to delete property"); }
-    };
-
-    const handleRestoreProperty = async (id: number) => {
-        try { await api.post(`/realty/properties/${id}/restore`); fetchProperties(); }
-        catch { alert("Failed to restore property"); }
     };
 
     const handleLogout = () => { logout(); navigate('/'); };
@@ -100,7 +94,7 @@ export default function AdminDashboard() {
     };
 
     const totalCount = loadingProps ? null : properties.length;
-    const activeCount = loadingProps ? null : properties.filter((p: any) => !p.deleted_at).length;
+    const activeCount = loadingProps ? null : properties.length;
 
     const columns = useMemo(() => [
         columnHelper.accessor('property_name', {
@@ -193,13 +187,11 @@ export default function AdminDashboard() {
             header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Status</span>,
             cell: () => (
                 <div className="flex items-center gap-2">
-                    <span className={`relative flex h-2 w-2`}>
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 ${showDeleted ? 'bg-red-400' : 'bg-emerald-400'}`} />
-                        <span className={`relative inline-flex rounded-full h-2 w-2 ${showDeleted ? 'bg-red-500' : 'bg-emerald-500'}`} />
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60 bg-emerald-400" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <span className={`text-xs font-semibold ${showDeleted ? 'text-red-500' : 'text-emerald-600'}`}>
-                        {showDeleted ? 'Deleted' : 'Active'}
-                    </span>
+                    <span className="text-xs font-semibold text-emerald-600">Active</span>
                 </div>
             ),
         }),
@@ -209,29 +201,20 @@ export default function AdminDashboard() {
             cell: ({ row }: CellContext<RealtyProperty, any>) => {
                 const prop = row.original;
                 return (
-                    <div className="flex items-center gap-2">
-                        {showDeleted ? (
-                            <button onClick={() => prop.id && handleRestoreProperty(prop.id)}
-                                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 active:scale-95 transition-all text-xs font-semibold shadow-sm shadow-emerald-200">
-                                <RotateCcw className="w-3 h-3" /> Restore
-                            </button>
-                        ) : (
-                            <div className="flex items-center gap-1.5">
-                                <button onClick={() => navigate(`/admin/edit-property/${prop.id}`)}
-                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 active:scale-95 transition-all text-xs font-semibold">
-                                    <Settings className="w-3 h-3" /> Edit
-                                </button>
-                                <button onClick={() => prop.id && handleDeleteProperty(prop.id)}
-                                    className="p-1.5 bg-red-50 text-red-500 border border-red-100 rounded-lg hover:bg-red-500 hover:text-white active:scale-95 transition-all">
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        )}
+                    <div className="flex items-center gap-1.5">
+                        <button onClick={() => navigate(`/admin/edit-property/${prop.id}`)}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 active:scale-95 transition-all text-xs font-semibold">
+                            <Settings className="w-3 h-3" /> Edit
+                        </button>
+                        <button onClick={() => prop.id && handleDeleteProperty(prop.id)}
+                            className="p-1.5 bg-red-50 text-red-500 border border-red-100 rounded-lg hover:bg-red-500 hover:text-white active:scale-95 transition-all">
+                            <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                     </div>
                 );
             },
         }),
-    ], [showDeleted, navigate]);
+    ], [navigate]);
 
     const table = useReactTable({
         data: properties,
@@ -366,7 +349,7 @@ export default function AdminDashboard() {
                                     )}
                                 </div>
                                 <p className="text-sm text-slate-400">
-                                    {loadingProps ? 'Fetching your listings…' : showDeleted ? 'Showing deleted properties' : 'All active properties'}
+                                    {loadingProps ? 'Fetching your listings…' : 'All active properties'}
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
@@ -381,15 +364,6 @@ export default function AdminDashboard() {
                                         className="pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/80 focus:outline-none focus:ring-2 focus:ring-brand-red/15 focus:bg-white focus:border-slate-300 transition-all w-full sm:w-64 placeholder:text-slate-300"
                                     />
                                 </div>
-                                <button
-                                    onClick={() => setShowDeleted(!showDeleted)}
-                                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 border ${showDeleted
-                                        ? 'bg-orange-50 text-orange-600 border-orange-200 shadow-sm'
-                                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700'
-                                        }`}>
-                                    <Trash2 className="w-4 h-4" />
-                                    {showDeleted ? 'Exit Trash' : 'Trash'}
-                                </button>
                                 <button onClick={() => setIsAddModalOpen(true)}
                                     className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-red to-red-600 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-red/20 hover:shadow-lg hover:shadow-brand-red/30 hover:-translate-y-0.5 active:translate-y-0 transition-all">
                                     <Plus className="w-4 h-4" /> Add Property

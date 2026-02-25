@@ -42,8 +42,17 @@ apiClient.interceptors.response.use(
         if (error.response) {
             // Server responded with error status
             const data = error.response.data as any;
-            apiError.message = data?.message || data?.detail || 'Server error';
-            apiError.detail = data?.detail || error.message;
+
+            // Extract a clean string message, handling FastAPI's 422 array of validation details
+            let parsedDetail = data?.detail || error.message;
+            if (Array.isArray(data?.detail) && data.detail[0]?.msg) {
+                parsedDetail = data.detail[0].msg;
+            } else if (Array.isArray(data?.message) && data.message[0]?.msg) {
+                parsedDetail = data.message[0].msg;
+            }
+
+            apiError.message = typeof data?.message === 'string' ? data.message : parsedDetail;
+            apiError.detail = parsedDetail;
         } else if (error.request) {
             // Request made but no response received
             apiError.message = 'No response from server. Please check if the backend is running.';
