@@ -24,6 +24,12 @@ import {
     createColumnHelper,
     SortingState,
     ColumnFiltersState,
+    HeaderGroup,
+    Header,
+    Row,
+    Cell,
+    HeaderContext,
+    CellContext,
 } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<RealtyProperty>();
@@ -98,7 +104,7 @@ export default function AdminDashboard() {
 
     const columns = useMemo(() => [
         columnHelper.accessor('property_name', {
-            header: ({ column }) => (
+            header: ({ column }: HeaderContext<RealtyProperty, any>) => (
                 <button onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                     className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors group">
                     Property
@@ -109,7 +115,7 @@ export default function AdminDashboard() {
                     </span>
                 </button>
             ),
-            cell: ({ row }) => {
+            cell: ({ row }: CellContext<RealtyProperty, any>) => {
                 const prop = row.original;
                 return (
                     <div className="flex items-center gap-3.5">
@@ -135,7 +141,7 @@ export default function AdminDashboard() {
             },
         }),
         columnHelper.accessor('property_type', {
-            header: ({ column }) => (
+            header: ({ column }: HeaderContext<RealtyProperty, any>) => (
                 <button onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                     className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors group">
                     Type
@@ -146,7 +152,7 @@ export default function AdminDashboard() {
                     </span>
                 </button>
             ),
-            cell: ({ getValue }) => {
+            cell: ({ getValue }: CellContext<RealtyProperty, any>) => {
                 const type = getValue();
                 const colors: Record<string, string> = {
                     PG: 'bg-violet-50 text-violet-700 border-violet-100',
@@ -162,9 +168,9 @@ export default function AdminDashboard() {
                 );
             },
         }),
-        columnHelper.accessor((row) => row.starting_price || row.private_price, {
+        columnHelper.accessor((row: RealtyProperty) => row.starting_price || row.private_price, {
             id: 'price',
-            header: ({ column }) => (
+            header: ({ column }: HeaderContext<RealtyProperty, any>) => (
                 <button onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                     className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors group">
                     Price
@@ -175,7 +181,7 @@ export default function AdminDashboard() {
                     </span>
                 </button>
             ),
-            cell: ({ getValue }) => {
+            cell: ({ getValue }: CellContext<RealtyProperty, any>) => {
                 const val = getValue();
                 return val
                     ? <span className="text-sm font-bold text-slate-800">₹{Number(val).toLocaleString('en-IN')}</span>
@@ -200,7 +206,7 @@ export default function AdminDashboard() {
         columnHelper.display({
             id: 'actions',
             header: () => <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Actions</span>,
-            cell: ({ row }) => {
+            cell: ({ row }: CellContext<RealtyProperty, any>) => {
                 const prop = row.original;
                 return (
                     <div className="flex items-center gap-2">
@@ -396,9 +402,9 @@ export default function AdminDashboard() {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                {table.getHeaderGroups().map(hg => (
+                                {table.getHeaderGroups().map((hg: HeaderGroup<RealtyProperty>) => (
                                     <tr key={hg.id} className="bg-slate-50/60">
-                                        {hg.headers.map(h => (
+                                        {hg.headers.map((h: Header<RealtyProperty, unknown>) => (
                                             <th key={h.id} className="px-6 py-3.5 text-left">
                                                 {flexRender(h.column.columnDef.header, h.getContext())}
                                             </th>
@@ -430,7 +436,7 @@ export default function AdminDashboard() {
                                         </td>
                                     </tr>
                                 ) : (
-                                    table.getRowModel().rows.map((row, i) => (
+                                    table.getRowModel().rows.map((row: Row<RealtyProperty>, i: number) => (
                                         <motion.tr
                                             key={row.id}
                                             initial={{ opacity: 0 }}
@@ -438,7 +444,7 @@ export default function AdminDashboard() {
                                             transition={{ delay: i * 0.015 }}
                                             className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors group"
                                         >
-                                            {row.getVisibleCells().map(cell => (
+                                            {row.getVisibleCells().map((cell: Cell<RealtyProperty, unknown>) => (
                                                 <td key={cell.id} className="px-6 py-3.5">
                                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </td>
