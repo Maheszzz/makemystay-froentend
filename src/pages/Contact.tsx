@@ -44,6 +44,13 @@ export default function Contact() {
             };
             await contactApi.submitContactForm(submissionData);
 
+            // Fire Google Ads conversion event for "Submit lead form"
+            if (typeof (window as any).gtag === 'function') {
+                (window as any).gtag('event', 'conversion', {
+                    send_to: 'AW-17957274528/AWAMCPrJo_8bEKCH2fJC'
+                });
+            }
+
             // Success!
             setSuccess(true);
             setFormData({ name: '', phone: '', email: '', location: '', property_type: '', message: '' });
