@@ -21,6 +21,7 @@ const EmployeeLogin = lazy(() => import('./pages/EmployeeLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const EditProperty = lazy(() => import('./pages/EditProperty'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const FAQ = lazy(() => import('./pages/FAQ'));
 
 
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
@@ -82,6 +83,7 @@ function App() {
                             <Route path="/refund-policy" element={<RefundPolicy />} />
                             <Route path="/quick-pay" element={<QuickPay />} />
                             <Route path="/wishlist" element={<Wishlist />} />
+                            <Route path="/faq" element={<FAQ />} />
 
                             {/* Auth Routes */}
                             <Route path="/employee-login" element={<EmployeeLogin />} />
