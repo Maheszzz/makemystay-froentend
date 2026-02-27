@@ -90,83 +90,57 @@ export default function Properties({
             <main id="main-content" className="pt-32 pb-20 flex-grow">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
-                    <div className="mb-12">
-                        <Link to="/" className="inline-flex items-center text-sm text-slate-500 hover:text-brand-red mb-4 transition-colors">
-                            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
+                    <div className="mb-6 md:mb-12">
+                        <Link to="/" className="inline-flex items-center text-xs text-slate-500 hover:text-brand-red mb-3 transition-colors">
+                            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Back to Home
                         </Link>
-                        <h1 className="text-4xl font-bold text-slate-900 mb-2">{pageTitle}</h1>
-                        <p className="text-slate-500 text-lg">{pageSubtitle}</p>
+                        <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
+                        <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
                     </div>
 
                     {/* Search and Category Toggle */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-12">
-                        <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search by property name, city, or project..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400"
-                                />
-                            </div>
-                            <div className="flex items-center justify-between w-full md:w-auto gap-2">
-                                {/* Segmented Control */}
-                                <div className="flex p-1 bg-slate-100 rounded-xl overflow-x-auto scrollbar-hide shrink-0 max-w-[calc(100vw-140px)] md:max-w-none">
-                                    <Link
-                                        to="/properties"
-                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/properties' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        All
-                                    </Link>
-                                    <Link
-                                        to="/pg"
-                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        PG
-                                    </Link>
-                                    <Link
-                                        to="/rent"
-                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        Rent
-                                    </Link>
-                                    <Link
-                                        to="/buy"
-                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        Buy
-                                    </Link>
-                                    <Link
-                                        to="/plots"
-                                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/plots' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        Plot
-                                    </Link>
-                                </div>
+                    <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 mb-8 md:mb-12">
 
-                                {/* Right Side Actions */}
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={() => {
-                                            setLocationFilter('all');
-                                            setTypeFilter('all');
-                                            setBhkFilter('all');
-                                        }}
-                                        className="h-9 px-3 text-xs font-bold text-slate-400 hover:text-brand-red transition-colors flex items-center"
-                                    >
-                                        Reset
-                                    </button>
-                                    <button
-                                        onClick={() => setShowFilters(!showFilters)}
-                                        className={`h-9 md:h-10 px-2.5 md:px-4 rounded-xl flex items-center justify-center gap-1.5 border border-slate-200 transition-all shadow-sm ${showFilters ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 hover:border-emerald-600 hover:text-emerald-600'}`}
-                                        aria-label="Toggle Filters"
-                                    >
-                                        {showFilters ? <X className="w-4 h-4" /> : <Filter className="w-3.5 h-3.5" />}
-                                        <span className="font-bold text-[10px] md:text-sm">Filter</span>
-                                    </button>
+                        {/* Row 1: Search Input */}
+                        <div className="relative mb-3">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by property name, city..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-11 pr-4 py-3 md:py-4 rounded-xl md:rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:bg-white transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
+                            />
+                        </div>
+
+                        {/* Row 2: Category tabs + Filter button — always on one line */}
+                        <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+                                <div className="inline-flex p-1 bg-slate-100 rounded-xl min-w-max gap-0.5">
+                                    <Link to="/properties" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/properties' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>All</Link>
+                                    <Link to="/pg" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>PG</Link>
+                                    <Link to="/rent" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Rent</Link>
+                                    <Link to="/buy" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/buy' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Buy</Link>
+                                    <Link to="/plots" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/plots' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Plot</Link>
                                 </div>
+                            </div>
+
+                            {/* Reset + Filter — pinned right, never overflow */}
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                <button
+                                    onClick={() => { setLocationFilter('all'); setTypeFilter('all'); setBhkFilter('all'); }}
+                                    className="h-8 px-2.5 text-[11px] font-bold text-slate-400 hover:text-brand-red transition-colors flex items-center whitespace-nowrap"
+                                >
+                                    Reset
+                                </button>
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className={`h-8 px-3 rounded-xl flex items-center justify-center gap-1 border transition-all shadow-sm shrink-0 ${showFilters ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-600 hover:text-emerald-600'}`}
+                                    aria-label="Toggle Filters"
+                                >
+                                    {showFilters ? <X className="w-3.5 h-3.5" /> : <Filter className="w-3.5 h-3.5" />}
+                                    <span className="font-bold text-[11px]">Filter</span>
+                                </button>
                             </div>
                         </div>
 
