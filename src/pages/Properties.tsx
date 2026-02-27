@@ -115,8 +115,9 @@ export default function Properties({
 
                         {/* Row 2: Category tabs + Filter button — always on one line */}
                         <div className="flex items-center gap-2 min-w-0">
-                            <div className="flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-                                <div className="inline-flex p-1 bg-slate-100 rounded-xl min-w-max gap-0.5">
+                            {/* Wrapping category strip instead of scrolling */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap p-1 bg-slate-100 rounded-xl gap-0.5">
                                     <Link to="/properties" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/properties' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>All</Link>
                                     <Link to="/pg" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/pg' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>PG</Link>
                                     <Link to="/rent" className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all whitespace-nowrap ${location.pathname === '/rent' ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>Rent</Link>
@@ -253,55 +254,61 @@ export default function Properties({
                                                 transition={{ duration: 0.25 }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="flex items-start gap-4 p-4 sm:p-5 hover:bg-slate-50/60 transition-colors">
+                                                <div className="relative flex items-start gap-3 sm:gap-4 p-4 sm:p-5 hover:bg-slate-50/60 transition-colors group">
+                                                    {/* Absolute Remove Button for mobile space saving */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            toggleWishlist(prop);
+                                                        }}
+                                                        className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 text-slate-400 hover:text-brand-red hover:bg-red-50 rounded-full transition-colors z-10"
+                                                        aria-label="Remove from Wishlist"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+
                                                     {/* Thumbnail */}
-                                                    <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`} className="shrink-0">
-                                                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100">
+                                                    <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`} className="shrink-0 block mt-1">
+                                                        <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100 shadow-sm">
                                                             <img
                                                                 src={(prop.images && prop.images[0]) || prop.image || ''}
                                                                 alt={prop.title}
-                                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                             />
                                                         </div>
                                                     </Link>
 
-                                                    {/* Details */}
-                                                    <div className="flex-1 min-w-0 flex flex-col justify-between">
-                                                        <div>
+                                                    {/* Details & Actions combined */}
+                                                    <div className="flex-1 min-w-0 pr-6 sm:pr-8">
+                                                        <div className="mb-2">
                                                             <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}>
-                                                                <h3 className="font-bold text-slate-900 text-sm sm:text-base hover:text-brand-red transition-colors truncate">{prop.title}</h3>
+                                                                <h3 className="font-bold text-slate-900 text-[15px] sm:text-base hover:text-brand-red transition-colors truncate leading-tight">{prop.title}</h3>
                                                             </Link>
-                                                            <p className="text-slate-400 text-[10px] sm:text-xs mt-0.5 flex items-center gap-1">
+                                                            <p className="text-slate-400 text-[11px] sm:text-xs mt-1 flex items-center gap-1">
                                                                 <MapPin className="w-3 h-3 shrink-0" />
                                                                 <span className="truncate">{prop.location}</span>
                                                             </p>
                                                         </div>
-                                                        <div className="mt-2 flex items-center justify-between sm:justify-start gap-3">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="text-brand-red font-bold text-base sm:text-lg">{prop.price}</span>
-                                                                {prop.category === 'rent' && <span className="text-slate-400 text-[10px] sm:text-xs">/mo</span>}
-                                                            </div>
-                                                            <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${prop.category === 'buy' ? 'bg-brand-red/10 text-brand-red' : 'bg-slate-100 text-slate-500'
-                                                                }`}>
-                                                                {prop.category === 'buy' ? 'For Sale' : 'For Rent'}
-                                                            </span>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* Actions */}
-                                                    <div className="flex flex-col items-end justify-between self-stretch shrink-0">
-                                                        <button
-                                                            onClick={() => toggleWishlist(prop)}
-                                                            className="text-[10px] sm:text-xs text-slate-400 hover:text-brand-red transition-colors flex items-center gap-1 whitespace-nowrap"
-                                                        >
-                                                            <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Remove</span>
-                                                        </button>
-                                                        <Link
-                                                            to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}
-                                                            className="bg-brand-red text-white text-[10px] sm:text-xs font-bold px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl hover:bg-brand-red/90 transition-colors whitespace-nowrap"
-                                                        >
-                                                            View
-                                                        </Link>
+                                                        {/* Bottom Row: Price, Tag, View Button */}
+                                                        <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-2 mt-1">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
+                                                                <div className="flex items-baseline gap-1">
+                                                                    <span className="text-brand-red font-bold text-base sm:text-lg leading-none">{prop.price}</span>
+                                                                    {prop.category === 'rent' && <span className="text-slate-400 text-[10px] sm:text-xs">/mo</span>}
+                                                                </div>
+                                                                <span className={`w-fit text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${prop.category === 'buy' ? 'bg-brand-red/10 text-brand-red' : 'bg-slate-100 text-slate-500'}`}>
+                                                                    {prop.category === 'buy' ? 'Sale' : 'Rent'}
+                                                                </span>
+                                                            </div>
+
+                                                            <Link
+                                                                to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}
+                                                                className="bg-brand-red text-white text-[11px] sm:text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-sm hover:bg-brand-red/90 hover:shadow transition-all whitespace-nowrap mt-1 sm:mt-0"
+                                                            >
+                                                                View
+                                                            </Link>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </motion.div>
