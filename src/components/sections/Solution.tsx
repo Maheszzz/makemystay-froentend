@@ -29,7 +29,7 @@ export function Solution() {
                             <button
                                 key={idx}
                                 onClick={() => setActiveFeature(idx)}
-                                className={`text-left p-4 lg:p-6 rounded-2xl transition-all duration-300 border flex-shrink-0 w-[200px] lg:w-auto snap-start ${activeFeature === idx
+                                className={`text-left p-4 lg:p-6 rounded-2xl transition-all duration-300 border flex-shrink-0 w-[240px] lg:w-auto snap-start ${activeFeature === idx
                                     ? 'bg-slate-50 border-brand-red/20 shadow-md lg:scale-105'
                                     : 'bg-white border-slate-100 lg:border-transparent hover:bg-slate-50'
                                     }`}
@@ -44,7 +44,7 @@ export function Solution() {
 
                     {/* Feature Display */}
                     <div className="lg:w-2/3">
-                        <div className="relative h-full min-h-[400px] bg-brand-charcoal rounded-3xl overflow-hidden shadow-2xl">
+                        <div className="relative h-full min-h-[320px] md:min-h-[400px] bg-brand-charcoal rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
                             {/* Decorative Pattern */}
                             <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none"></div>
                             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-red/20 rounded-full blur-3xl opacity-50"></div>
@@ -57,8 +57,8 @@ export function Solution() {
                                                 <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-8 backdrop-blur-sm border border-white/10 shadow-glow">
                                                     <item.icon className="w-8 h-8 text-brand-red" />
                                                 </div>
-                                                <h3 className="text-3xl font-bold text-white mb-6">{item.title}</h3>
-                                                <p className="text-lg text-slate-300 mb-8 leading-relaxed max-w-xl">{item.text}</p>
+                                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">{item.title}</h3>
+                                                <p className="text-base md:text-lg text-slate-300 mb-6 md:mb-8 leading-relaxed max-w-xl">{item.text}</p>
                                                 <div className="inline-flex items-center px-4 py-2 rounded-full bg-brand-red/10 text-brand-red border border-brand-red/20 text-sm font-bold">
                                                     <CheckCircle2 className="w-4 h-4 mr-2" />
                                                     {item.stats}

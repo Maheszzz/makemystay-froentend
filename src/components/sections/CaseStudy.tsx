@@ -8,10 +8,10 @@ export function CaseStudy() {
             <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none z-0"></div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="flex flex-col md:flex-row gap-16 items-start">
+                <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
                     <div className="md:w-1/2">
                         <div className="inline-block px-4 py-1.5 rounded-full bg-brand-red/10 text-brand-red border border-brand-red/20 text-xs font-bold uppercase tracking-wider mb-6">Real Results</div>
-                        <h2 className="text-4xl font-bold text-white mb-6">Case Study: <span className="text-brand-red">Astro Living</span></h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-white mb-6">Case Study: <span className="text-brand-red">Astro Living</span></h2>
                         <div className="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 backdrop-blur-sm">
                             <div className="flex flex-wrap gap-4 text-sm text-slate-300">
                                 <span className="flex items-center"><MapPin className="w-4 h-4 mr-1 text-brand-red" /> Bangalore</span>
@@ -39,7 +39,7 @@ export function CaseStudy() {
                     </div>
 
                     <div className="md:w-1/2 w-full">
-                        <div className="bg-gradient-to-br from-brand-red to-[#B91C1C] rounded-3xl p-8 text-white shadow-glow relative overflow-hidden border border-white/10">
+                        <div className="bg-gradient-to-br from-brand-red to-[#B91C1C] rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-glow relative overflow-hidden border border-white/10">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
 
                             <h3 className="text-2xl font-bold mb-8 relative z-10">Impact Summary</h3>

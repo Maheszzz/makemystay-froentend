@@ -13,11 +13,11 @@ export function CTA() {
             {/* Subtle Accent */}
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
 
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <h2 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 font-heading">
+            <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 text-center relative z-10">
+                <h2 className="text-xl sm:text-2xl md:text-5xl font-bold mb-4 md:mb-6 font-heading">
                     Ready to Transform Your Rental Business?
                 </h2>
-                <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+                <p className="text-base md:text-xl text-white/90 mb-8 md:mb-10 max-w-2xl mx-auto">
                     Join 50+ operators who have already automated their growth and reclaimed their profits.
                 </p>
 

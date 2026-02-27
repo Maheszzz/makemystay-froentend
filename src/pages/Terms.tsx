@@ -10,7 +10,7 @@ export default function Terms() {
                     <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Terms and Conditions</h1>
                     <p className="text-slate-500 mb-8">Last Updated: February 2026</p>
 
-                    <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm prose prose-slate max-w-none text-slate-700">
+                    <div className="bg-white rounded-2xl p-5 md:p-12 shadow-sm prose prose-slate max-w-none text-slate-700">
                         <p>
                             These Terms and Conditions govern the use of <a href="http://www.makemystay.ai" className="text-brand-red hover:underline">www.makemystay.ai</a>, operated by <strong>MakeMyStay Realty</strong>.
                         </p>

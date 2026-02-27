@@ -2,7 +2,7 @@ import { Target, Lightbulb, Users, Award, CheckCircle, Heart } from 'lucide-reac
 
 export function About() {
     return (
-        <section id="about-us" className="py-20 bg-white">
+        <section id="about-us" className="py-14 md:py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12 md:mb-16">
@@ -24,8 +24,8 @@ export function About() {
                 </div>
 
                 {/* Our Story */}
-                <div className="mb-20 bg-slate-50 rounded-2xl p-8 md:p-12">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Our Story</h3>
+                <div className="mb-14 md:mb-20 bg-slate-50 rounded-2xl p-6 md:p-12">
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mb-6">Our Story</h3>
                     <p className="text-slate-700 leading-relaxed mb-4">
                         MakeMyStay was founded in <strong>2026</strong> in <strong>Bengaluru</strong> with a vision to modernize the way people search for homes.
                     </p>
@@ -39,11 +39,11 @@ export function About() {
 
                 {/* What We Do */}
                 <div className="mb-20">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-8 text-center">What We Do</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 md:mb-8 text-center">What We Do</h3>
                     <p className="text-center text-slate-600 mb-10 max-w-3xl mx-auto">
                         MakeMyStay simplifies the property journey from search to decision:
                     </p>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {[
                             { icon: CheckCircle, text: "Verified property listings" },
                             { icon: Lightbulb, text: "Smart property recommendations" },
@@ -97,8 +97,8 @@ export function About() {
                 </div>
 
                 {/* Founder */}
-                <div className="mb-20 bg-slate-50 rounded-2xl p-8 md:p-12">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-8 text-center">Our Founder</h3>
+                <div className="mb-14 md:mb-20 bg-slate-50 rounded-2xl p-6 md:p-12">
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">Our Founder</h3>
                     <div className="max-w-3xl mx-auto text-center">
                         <div className="mb-6">
                             <h4 className="text-2xl font-bold text-slate-900">Madhava R</h4>
@@ -112,7 +112,7 @@ export function About() {
 
                 {/* Our Team */}
                 <div className="mb-20 text-center">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-4">Our Team</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Our Team</h3>
                     <p className="text-slate-700 leading-relaxed max-w-3xl mx-auto mb-6">
                         MakeMyStay is powered by a growing team of professionals across technology, marketing, and real estate, all working toward improving the property search experience.
                     </p>
@@ -124,7 +124,7 @@ export function About() {
 
                 {/* Why MakeMyStay */}
                 <div className="mb-20">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-8 text-center">Why MakeMyStay</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 md:mb-8 text-center">Why MakeMyStay</h3>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {[
                             "Technology-driven platform",
@@ -142,7 +142,7 @@ export function About() {
                 </div>
 
                 {/* Our Commitment */}
-                <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-10 md:p-16 text-center text-white">
+                <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 md:p-16 text-center text-white">
                     <Heart className="w-12 md:w-16 h-12 md:h-16 mx-auto mb-6 text-brand-red" />
                     <h3 className="text-2xl sm:text-3xl font-bold mb-6">Our Commitment</h3>
                     <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto mb-4">

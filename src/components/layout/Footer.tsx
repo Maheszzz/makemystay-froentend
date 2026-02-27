@@ -5,7 +5,7 @@ import logoImage from '@/assets/MakeMysStaylogo.svg';
 
 export function Footer() {
     return (
-        <footer className="bg-brand-charcoal relative pt-14 md:pt-20 pb-24 md:pb-10 text-slate-300 overflow-hidden">
+        <footer className="bg-brand-charcoal relative pt-12 md:pt-20 pb-28 md:pb-10 text-slate-300 overflow-hidden">
             {/* Background Gradient & Pattern */}
             <div className="absolute inset-0 bg-diagonal-grid opacity-5 pointer-events-none"></div>
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-red/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -45,7 +45,7 @@ export function Footer() {
 
                     {/* Explore column */}
                     <div>
-                        <h4 className="text-white font-bold text-base mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Explore</h4>
+                        <h4 className="font-bold mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Explore</h4>
                         <ul className="space-y-3 text-sm font-medium">
                             {navigationLinks.map((item) => (
                                 <li key={item}>
@@ -72,7 +72,7 @@ export function Footer() {
 
                     {/* Contact column */}
                     <div>
-                        <h4 className="text-white font-bold text-base mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Contact Us</h4>
+                        <h4 className="font-bold mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Contact Us</h4>
                         <ul className="space-y-4 text-sm font-medium">
                             <li className="flex items-start group">
                                 <MapPin size={16} className="mr-3 mt-0.5 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />

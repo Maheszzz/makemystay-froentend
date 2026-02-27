@@ -98,7 +98,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
             <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 100%)', zIndex: 3 }} />
 
             {/* ── Slide dot indicators ── */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
+            <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
                 {slides.map((_, idx) => (
                     <button
                         key={idx}
@@ -119,8 +119,8 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
 
             {/* ── Single centered column: fading text + static search bar ── */}
             <div
-                className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-8"
-                style={{ zIndex: 30, paddingTop: '72px' }}
+                className="absolute inset-0 flex flex-col items-center justify-center px-5 sm:px-8"
+                style={{ zIndex: 30, paddingTop: '64px' }}
             >
                 {/* --- Fading text block --- */}
                 <div
@@ -192,7 +192,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
-                <div className="w-full max-w-3xl mt-7 md:mt-9">
+                <div className="w-full max-w-3xl mt-6 md:mt-9 mb-16 md:mb-0">
                     <SmartSearchBar
                         category={category}
                         setCategory={setCategory}

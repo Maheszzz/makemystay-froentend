@@ -58,7 +58,7 @@ export function Stats() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center">
                     {statsData.map((stat, idx) => (
                         <div key={idx} className="animate-on-scroll" style={{ transitionDelay: `${idx * 100}ms` }}>
-                            <div className="text-4xl md:text-5xl font-extrabold text-white mb-2 leading-none">
+                            <div className="text-3xl md:text-5xl font-extrabold text-white mb-2 leading-none">
                                 <CountUp target={stat.target} suffix={stat.suffix} isDecimal={stat.isDecimal} />
                             </div>
                             <p className="text-white/70 text-sm font-medium uppercase tracking-wider">{stat.label}</p>

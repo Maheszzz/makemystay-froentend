@@ -68,7 +68,7 @@ export default function Contact() {
 
             <main>
                 {/* Hero Section */}
-                <div className="pt-32 pb-20 bg-white relative overflow-hidden">
+                <div className="pt-28 md:pt-32 pb-16 md:pb-20 bg-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 -z-10 w-1/2 h-full bg-gradient-to-b from-emerald-50/50 to-transparent blur-3xl opacity-50" />
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-medium mb-6 border border-emerald-100">
@@ -83,9 +83,9 @@ export default function Contact() {
                 </div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                    <div className="grid lg:grid-cols-3 gap-12">
+                    <div className="grid lg:grid-cols-3 gap-8 md:gap-12">
                         {/* Contact Info Cards */}
-                        <div className="lg:col-span-1 space-y-8">
+                        <div className="lg:col-span-1 space-y-5 md:space-y-8">
                             <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
                                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6">
                                     <Phone className="w-6 h-6" />
@@ -129,7 +129,7 @@ export default function Contact() {
 
                         {/* Contact Form */}
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-slate-100">
+                            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 shadow-xl border border-slate-100">
                                 <h2 className="text-3xl font-bold text-slate-900 mb-8">Send us a message</h2>
 
                                 {/* Success Message */}

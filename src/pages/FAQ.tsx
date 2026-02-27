@@ -249,7 +249,7 @@ function AccordionItem({ item, index, isOpen, onToggle }: { item: FAQItem; index
         <div className={`border border-slate-200 rounded-xl overflow-hidden transition-all duration-200 ${isOpen ? 'shadow-md' : 'hover:shadow-sm'}`}>
             <button
                 onClick={onToggle}
-                className="w-full flex items-center justify-between px-6 py-4 text-left bg-white hover:bg-slate-50 transition-colors duration-200 group"
+                className="w-full flex items-center justify-between px-4 md:px-6 py-3.5 md:py-4 text-left bg-white hover:bg-slate-50 transition-colors duration-200 group"
                 aria-expanded={isOpen}
             >
                 <span className="flex items-center gap-3 pr-4">
@@ -266,8 +266,8 @@ function AccordionItem({ item, index, isOpen, onToggle }: { item: FAQItem; index
             <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
-                <div className="px-6 pb-5 pt-1 border-t border-slate-100 bg-slate-50/50">
-                    <div className="pl-9 text-slate-600 text-sm md:text-base leading-relaxed">{item.a}</div>
+                <div className="px-4 md:px-6 pb-4 md:pb-5 pt-1 border-t border-slate-100 bg-slate-50/50">
+                    <div className="pl-9 text-slate-600 text-sm leading-relaxed">{item.a}</div>
                 </div>
             </div>
         </div>
@@ -329,12 +329,12 @@ export default function FAQ() {
 
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Section nav pills */}
-                    <div className="flex flex-wrap gap-2 mb-10 justify-center">
+                    <div className="flex gap-2 mb-8 md:mb-10 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap md:justify-center scrollbar-hide">
                         <button
                             onClick={() => setActiveSection(null)}
-                            className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${activeSection === null
-                                    ? 'bg-brand-red text-white border-brand-red shadow-sm'
-                                    : 'bg-white text-slate-600 border-slate-200 hover:border-brand-red hover:text-brand-red'
+                            className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${activeSection === null
+                                ? 'bg-brand-red text-white border-brand-red shadow-sm'
+                                : 'bg-white text-slate-600 border-slate-200 hover:border-brand-red hover:text-brand-red'
                                 }`}
                         >
                             All Topics
@@ -343,9 +343,9 @@ export default function FAQ() {
                             <button
                                 key={section.title}
                                 onClick={() => setActiveSection(section.title === activeSection ? null : section.title)}
-                                className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${activeSection === section.title
-                                        ? 'bg-brand-red text-white border-brand-red shadow-sm'
-                                        : 'bg-white text-slate-600 border-slate-200 hover:border-brand-red hover:text-brand-red'
+                                className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 whitespace-nowrap ${activeSection === section.title
+                                    ? 'bg-brand-red text-white border-brand-red shadow-sm'
+                                    : 'bg-white text-slate-600 border-slate-200 hover:border-brand-red hover:text-brand-red'
                                     }`}
                             >
                                 {section.emoji} {section.title}

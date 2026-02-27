@@ -51,7 +51,7 @@ export function Testimonials() {
                 <div className="testimonials-track-outer">
                     <div className="testimonials-track">
                         {loopedTestimonials.map((t, idx) => (
-                            <div key={idx} className="w-[350px] md:w-[500px] flex-shrink-0">
+                            <div key={idx} className="w-[300px] sm:w-[350px] md:w-[500px] flex-shrink-0">
                                 <div className="h-full bg-white border border-slate-100 rounded-3xl p-8 shadow-card relative hover:border-brand-red/20 hover:shadow-lg transition-all duration-300">
                                     {/* Stars */}
                                     <div className="flex gap-1 mb-4">
