@@ -92,6 +92,11 @@ export default function ScheduleDemo() {
                 selected_slot: finalDate.toISOString()
             });
 
+            // Fire Google Ads conversion event for "Submit lead form"
+            if (typeof (window as any).gtag_report_conversion === 'function') {
+                (window as any).gtag_report_conversion();
+            }
+
             setStep(3);
         } catch (error: any) {
             console.error("Error scheduling demo:", error);

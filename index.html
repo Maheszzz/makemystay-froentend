@@ -41,6 +41,21 @@
     gtag('config', 'AW-17957274528');
     gtag('config', 'G-0XDSF9N2C5');
   </script>
+  <!-- Google Ads Conversion: Submit lead form -->
+  <script>
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof (url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'conversion', {
+        'send_to': 'AW-17957274528/o83LCKSBtv8bEKCH2fJC',
+        'event_callback': callback
+      });
+      return false;
+    }
+  </script>
 </head>
 
 <body>
