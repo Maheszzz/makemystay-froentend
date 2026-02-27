@@ -1,9 +1,35 @@
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { navigationLinks } from '@/data/content';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 
 export function Footer() {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleNavClick = (item: string, e: React.MouseEvent) => {
+        e.preventDefault();
+        const sectionId = item.toLowerCase().replace(' ', '-');
+
+        if (item === 'Home') {
+            if (location.pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                navigate('/');
+            }
+            return;
+        }
+
+        if (location.pathname === '/') {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } else {
+            navigate(`/#${sectionId}`);
+        }
+    };
+
     return (
         <footer className="bg-brand-charcoal relative pt-12 md:pt-20 pb-28 md:pb-10 text-slate-300 overflow-hidden">
             {/* Background Gradient & Pattern */}
@@ -49,12 +75,13 @@ export function Footer() {
                         <ul className="space-y-3 text-sm font-medium">
                             {navigationLinks.map((item) => (
                                 <li key={item}>
-                                    <Link
-                                        to={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
-                                        className="text-slate-400 hover:text-white hover:pl-1.5 transition-all duration-200 inline-block"
+                                    <a
+                                        href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
+                                        onClick={(e) => handleNavClick(item, e)}
+                                        className="text-slate-400 hover:text-white hover:pl-1.5 transition-all duration-200 inline-block cursor-pointer"
                                     >
                                         {item}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                             <li>

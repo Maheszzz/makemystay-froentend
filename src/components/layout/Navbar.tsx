@@ -92,11 +92,7 @@ export function Navbar() {
                             {navigationLinks.map((item) => (
                                 <a
                                     key={item}
-                                    href={
-                                        item === 'Home' ? '/' :
-                                            item === 'Home' ? '/' :
-                                                `/#${item.toLowerCase().replace(' ', '-')}`
-                                    }
+                                    href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                     onClick={(e) => handleNavClick(item, e)}
                                     className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
                                 >
@@ -166,11 +162,7 @@ export function Navbar() {
                             {navigationLinks.map((item, idx) => (
                                 <a
                                     key={item}
-                                    href={
-                                        item === 'Home' ? '/' :
-                                            item === 'Home' ? '/' :
-                                                `/#${item.toLowerCase().replace(' ', '-')}`
-                                    }
+                                    href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                     onClick={(e) => handleNavClick(item, e)}
                                     className="flex items-center justify-between py-4 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5 transition-colors group"
                                     style={{ animationDelay: `${idx * 50}ms` }}
