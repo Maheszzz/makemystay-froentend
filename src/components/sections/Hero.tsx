@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
 
 const slides = [
@@ -74,8 +75,8 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
     return (
         <section
             id="home"
-            className="relative w-full"
-            style={{ height: '100dvh', minHeight: '600px', zIndex: 20 }}
+            className="relative w-full h-[75svh] md:h-screen min-h-[500px] md:min-h-[600px]"
+            style={{ zIndex: 20 }}
         >
             {/* ── Background Image Layers (crossfade) ── */}
             {slides.map((s, idx) => (
@@ -131,7 +132,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     }}
                 >
                     {/* Eyebrow */}
-                    <div className="mb-4 md:mb-6">
+                    <div className="mb-2 md:mb-6">
                         <span
                             style={{
                                 fontFamily: "'Playfair Display', serif",
@@ -147,7 +148,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     </div>
 
                     {/* Main Headline */}
-                    <div className="relative mb-4 md:mb-5">
+                    <div className="relative mb-2 md:mb-5">
                         <div
                             className="absolute -inset-12 pointer-events-none rounded-full"
                             style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.08) 0%, transparent 70%)', filter: 'blur(30px)' }}
@@ -168,7 +169,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
 
                     {/* Sub-headline */}
                     <h2
-                        className="mb-3 md:mb-4 font-light tracking-wide"
+                        className="mb-1.5 md:mb-4 font-light tracking-wide"
                         style={{
                             fontFamily: "'Cormorant Garamond', serif",
                             color: '#FFFFFF',
@@ -192,13 +193,19 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
-                <div className="w-full max-w-3xl mt-6 md:mt-9 mb-16 md:mb-0">
+                <div className="w-full max-w-3xl mt-4 md:mt-9 mb-10 md:mb-0">
                     <SmartSearchBar
                         category={category}
                         setCategory={setCategory}
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                     />
+                </div>
+
+                {/* Scroll Indicator - Mobile Only */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce opacity-80 md:hidden pointer-events-none" style={{ zIndex: 40 }}>
+                    <span className="text-[10px] text-white/40 tracking-[0.2em] uppercase font-medium">Explore</span>
+                    <ChevronDown className="w-4 h-4 text-white/30" />
                 </div>
             </div>
         </section>

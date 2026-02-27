@@ -68,9 +68,9 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
     };
 
     return (
-        <div className="bg-black/40 backdrop-blur-xl rounded-2xl md:rounded-[2rem] shadow-2xl p-3 md:p-6 max-w-3xl w-full relative border border-white/10">
+        <div className="bg-black/40 backdrop-blur-xl rounded-2xl md:rounded-[2rem] shadow-2xl p-2.5 md:p-6 max-w-3xl w-full relative border border-white/10">
             {/* BUY / RENT / PLOT Toggle */}
-            <div className="flex w-full max-w-[340px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-3 md:mb-4 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar">
+            <div className="flex w-full max-w-[340px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-4 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar">
                 {[
                     { id: 'pg', label: 'PG' },
                     { id: 'rent', label: 'RENT' },
@@ -80,7 +80,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                     <button
                         key={tab.id}
                         onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot' | 'pg')}
-                        className={`flex-1 sm:flex-none py-2.5 px-3 sm:px-6 md:px-8 rounded-full text-[11px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[42px] whitespace-nowrap flex items-center justify-center ${category === tab.id
+                        className={`flex-1 sm:flex-none py-2 px-3 sm:px-6 md:px-8 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${category === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
                             }`}
@@ -91,7 +91,7 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
             </div>
 
             {/* Search Input Area */}
-            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full group focus-within:ring-2 focus-within:ring-brand-gold/50 focus-within:border-brand-gold/50 transition-all min-h-[48px] md:min-h-[52px] pl-10 md:pl-12 pr-24 md:pr-28 py-1.5 md:py-2">
+            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full group focus-within:ring-2 focus-within:ring-brand-gold/50 focus-within:border-brand-gold/50 transition-all min-h-[44px] md:min-h-[52px] pl-10 md:pl-12 pr-24 md:pr-28 py-1 md:py-2">
                 <MapPin className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300 pointer-events-none" />
 
                 <div className="flex flex-wrap items-center gap-2 w-full">
