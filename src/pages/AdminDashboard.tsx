@@ -8,12 +8,13 @@ import {
     LayoutDashboard, Plus, Settings, LogOut, Home, Users, BarChart3,
     ChevronRight, X, Lock, Loader2, AlertCircle, CheckCircle2,
     Trash2, MapPin, Search, ChevronLeft, ChevronsLeft,
-    ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, TrendingUp
+    ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, Presentation, Clock, Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api/client';
+import { contactApi } from '@/lib/api/contacts';
 import { PropertyForm } from '@/components/modules/admin/PropertyForm';
-import { RealtyProperty } from '@/types/api';
+import { RealtyProperty, DemoBooking } from '@/types/api';
 import {
     useReactTable,
     getCoreRowModel,
@@ -24,15 +25,12 @@ import {
     createColumnHelper,
     SortingState,
     ColumnFiltersState,
-    HeaderGroup,
-    Header,
-    Row,
-    Cell,
     HeaderContext,
     CellContext,
 } from '@tanstack/react-table';
 
 const columnHelper = createColumnHelper<RealtyProperty>();
+const demoColumnHelper = createColumnHelper<DemoBooking>();
 
 export default function AdminDashboard() {
     const { user, logout } = useAuth();
@@ -50,14 +48,22 @@ export default function AdminDashboard() {
     const [pwdError, setPwdError] = useState<string | null>(null);
     const [pwdSuccess, setPwdSuccess] = useState(false);
 
+    const [activeTab, setActiveTab] = useState<'properties' | 'demos'>('properties');
+
     const [properties, setProperties] = useState<RealtyProperty[]>([]);
     const [loadingProps, setLoadingProps] = useState(true);
+
+    const [demos, setDemos] = useState<DemoBooking[]>([]);
+    const [loadingDemos, setLoadingDemos] = useState(false);
 
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-    useEffect(() => { fetchProperties(); }, []);
+    useEffect(() => {
+        if (activeTab === 'properties' && properties.length === 0) fetchProperties();
+        if (activeTab === 'demos' && demos.length === 0) fetchDemos();
+    }, [activeTab]);
 
     const fetchProperties = async () => {
         setLoadingProps(true);
@@ -68,6 +74,18 @@ export default function AdminDashboard() {
             console.error("Failed to fetch properties", err);
         } finally {
             setLoadingProps(false);
+        }
+    };
+
+    const fetchDemos = async () => {
+        setLoadingDemos(true);
+        try {
+            const data = await contactApi.getDemos();
+            setDemos(data);
+        } catch (err) {
+            console.error("Failed to fetch demos", err);
+        } finally {
+            setLoadingDemos(false);
         }
     };
 
@@ -230,8 +248,85 @@ export default function AdminDashboard() {
         initialState: { pagination: { pageSize: 10 } },
     });
 
-    const { pageIndex, pageSize } = table.getState().pagination;
-    const totalRows = table.getFilteredRowModel().rows.length;
+    const demoColumns = useMemo(() => [
+        demoColumnHelper.accessor('name', {
+            header: 'Operator',
+            cell: ({ row }) => (
+                <div>
+                    <p className="font-semibold text-slate-800 text-sm">{row.original.name}</p>
+                    <p className="text-xs text-slate-500">{row.original.email}</p>
+                    <p className="text-xs text-slate-400">{row.original.phone}</p>
+                </div>
+            ),
+        }),
+        demoColumnHelper.accessor('company', {
+            header: 'Company & Scale',
+            cell: ({ row }) => (
+                <div>
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+                        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        {row.original.company || <span className="text-slate-300 italic">Not provided</span>}
+                    </div>
+                    {row.original.units && (
+                        <p className="text-xs text-slate-500 mt-0.5 ml-5 bg-slate-100 inline-block px-1.5 py-0.5 rounded">
+                            {row.original.units}
+                        </p>
+                    )}
+                </div>
+            )
+        }),
+        demoColumnHelper.accessor('selected_slot', {
+            header: 'Scheduled Time',
+            cell: ({ getValue }) => {
+                const date = new Date(getValue());
+                return (
+                    <div>
+                        <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-brand-red/70" />
+                            {date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+                        </p>
+                        <p className="text-xs text-slate-500 ml-5">
+                            {date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}
+                        </p>
+                    </div>
+                );
+            }
+        }),
+        demoColumnHelper.display({
+            id: 'actions',
+            header: 'Meeting',
+            cell: ({ row }) => (
+                row.original.meeting_link ? (
+                    <a href={row.original.meeting_link} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-xs font-semibold">
+                        <Presentation className="w-3 h-3" /> Join Meet
+                    </a>
+                ) : (
+                    <span className="text-xs text-slate-400 italic">No link</span>
+                )
+            )
+        })
+    ], []);
+
+    const demoTable = useReactTable({
+        data: demos,
+        columns: demoColumns,
+        state: { globalFilter, sorting, columnFilters },
+        onGlobalFilterChange: setGlobalFilter,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        initialState: { pagination: { pageSize: 10 } },
+    });
+
+    const activeTable = activeTab === 'properties' ? table : demoTable;
+    const isLoading = activeTab === 'properties' ? loadingProps : loadingDemos;
+
+    const { pageIndex, pageSize } = activeTable.getState().pagination;
+    const totalRows = activeTable.getFilteredRowModel().rows.length;
     const startRow = pageIndex * pageSize + 1;
     const endRow = Math.min((pageIndex + 1) * pageSize, totalRows);
 
@@ -296,13 +391,13 @@ export default function AdminDashboard() {
                         },
                         {
                             label: "Leads / Enquiries",
-                            value: 12,
+                            value: loadingDemos ? null : demos.length,
                             icon: Users,
                             gradient: "from-violet-500 to-violet-600",
                             bg: "bg-violet-50",
                             text: "text-violet-600",
                             border: "border-violet-100",
-                            trend: "+4 this week",
+                            trend: "Demos scheduled",
                         },
                     ].map((stat, idx) => (
                         <motion.div key={idx}
@@ -332,26 +427,30 @@ export default function AdminDashboard() {
                     ))}
                 </div>
 
-                {/* Property Table Card */}
+                {/* Property / Demos Table Card */}
                 <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.5 }}
                     className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-8">
 
                     {/* Table toolbar */}
                     <div className="px-6 pt-6 pb-5 border-b border-slate-50">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <h2 className="text-xl font-bold text-slate-900">Property Listings</h2>
-                                    {!loadingProps && (
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-brand-red/10 text-brand-red text-xs font-bold">
-                                            {totalRows}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="text-sm text-slate-400">
-                                    {loadingProps ? 'Fetching your listings…' : 'All active properties'}
-                                </p>
+                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+
+                            {/* Tabs */}
+                            <div className="flex items-center p-1 bg-slate-100/80 rounded-xl w-fit">
+                                <button
+                                    onClick={() => { setActiveTab('properties'); setGlobalFilter(''); }}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'properties' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    <Home className="w-4 h-4" /> Properties
+                                </button>
+                                <button
+                                    onClick={() => { setActiveTab('demos'); setGlobalFilter(''); }}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'demos' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    <Presentation className="w-4 h-4" /> Demos
+                                </button>
                             </div>
+
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                                 {/* Search */}
                                 <div className="relative">
@@ -360,14 +459,16 @@ export default function AdminDashboard() {
                                         type="text"
                                         value={globalFilter ?? ''}
                                         onChange={e => setGlobalFilter(e.target.value)}
-                                        placeholder="Search by name, location…"
+                                        placeholder={`Search ${activeTab === 'properties' ? 'properties' : 'demos'}…`}
                                         className="pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-slate-50/80 focus:outline-none focus:ring-2 focus:ring-brand-red/15 focus:bg-white focus:border-slate-300 transition-all w-full sm:w-64 placeholder:text-slate-300"
                                     />
                                 </div>
-                                <button onClick={() => setIsAddModalOpen(true)}
-                                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-red to-red-600 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-red/20 hover:shadow-lg hover:shadow-brand-red/30 hover:-translate-y-0.5 active:translate-y-0 transition-all">
-                                    <Plus className="w-4 h-4" /> Add Property
-                                </button>
+                                {activeTab === 'properties' && (
+                                    <button onClick={() => setIsAddModalOpen(true)}
+                                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-brand-red to-red-600 text-white rounded-xl text-sm font-bold shadow-md shadow-brand-red/20 hover:shadow-lg hover:shadow-brand-red/30 hover:-translate-y-0.5 active:translate-y-0 transition-all shrink-0">
+                                        <Plus className="w-4 h-4" /> Add Property
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -376,41 +477,41 @@ export default function AdminDashboard() {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                {table.getHeaderGroups().map((hg: HeaderGroup<RealtyProperty>) => (
+                                {activeTable.getHeaderGroups().map((hg) => (
                                     <tr key={hg.id} className="bg-slate-50/60">
-                                        {hg.headers.map((h: Header<RealtyProperty, unknown>) => (
-                                            <th key={h.id} className="px-6 py-3.5 text-left">
-                                                {flexRender(h.column.columnDef.header, h.getContext())}
+                                        {hg.headers.map((h) => (
+                                            <th key={h.id} className="px-6 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                                                {h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}
                                             </th>
                                         ))}
                                     </tr>
                                 ))}
                             </thead>
                             <tbody>
-                                {loadingProps ? (
+                                {isLoading ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <tr key={i} className="border-t border-slate-50">
-                                            {Array.from({ length: 5 }).map((_, j) => (
+                                            {Array.from({ length: activeTab === 'properties' ? 5 : 4 }).map((_, j) => (
                                                 <td key={j} className="px-6 py-4">
                                                     <div className="h-4 bg-slate-100 rounded-lg animate-pulse" style={{ width: j === 0 ? '180px' : j === 4 ? '80px' : '80px' }} />
                                                 </td>
                                             ))}
                                         </tr>
                                     ))
-                                ) : table.getRowModel().rows.length === 0 ? (
+                                ) : activeTable.getRowModel().rows.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="py-20 text-center">
+                                        <td colSpan={10} className="py-20 text-center">
                                             <div className="flex flex-col items-center gap-3">
                                                 <div className="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center">
-                                                    <Home className="w-8 h-8 text-slate-300" />
+                                                    {activeTab === 'properties' ? <Home className="w-8 h-8 text-slate-300" /> : <Presentation className="w-8 h-8 text-slate-300" />}
                                                 </div>
-                                                <p className="font-semibold text-slate-500">No properties found</p>
+                                                <p className="font-semibold text-slate-500">No {activeTab} found</p>
                                                 {globalFilter && <p className="text-sm text-slate-300">Try a different search term</p>}
                                             </div>
                                         </td>
                                     </tr>
                                 ) : (
-                                    table.getRowModel().rows.map((row: Row<RealtyProperty>, i: number) => (
+                                    activeTable.getRowModel().rows.map((row, i: number) => (
                                         <motion.tr
                                             key={row.id}
                                             initial={{ opacity: 0 }}
@@ -418,7 +519,7 @@ export default function AdminDashboard() {
                                             transition={{ delay: i * 0.015 }}
                                             className="border-t border-slate-50 hover:bg-slate-50/50 transition-colors group"
                                         >
-                                            {row.getVisibleCells().map((cell: Cell<RealtyProperty, unknown>) => (
+                                            {(row.getVisibleCells() as any[]).map((cell) => (
                                                 <td key={cell.id} className="px-6 py-3.5">
                                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                 </td>
@@ -431,34 +532,34 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Pagination */}
-                    {!loadingProps && totalRows > 0 && (
+                    {!isLoading && totalRows > 0 && (
                         <div className="px-6 py-4 border-t border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4">
                             <div className="flex items-center gap-3">
                                 <p className="text-sm text-slate-400">
                                     <span className="font-semibold text-slate-600">{startRow}–{endRow}</span>
                                     {' '}of{' '}
-                                    <span className="font-semibold text-slate-600">{totalRows}</span> properties
+                                    <span className="font-semibold text-slate-600">{totalRows}</span> {activeTab}
                                 </p>
-                                <select value={pageSize} onChange={e => table.setPageSize(Number(e.target.value))}
+                                <select value={pageSize} onChange={e => activeTable.setPageSize(Number(e.target.value))}
                                     className="text-xs font-medium border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-red/15 cursor-pointer">
                                     {[5, 10, 20, 50].map(s => <option key={s} value={s}>Per page: {s}</option>)}
                                 </select>
                             </div>
                             <div className="flex items-center gap-1">
-                                <button onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}
+                                <button onClick={() => activeTable.setPageIndex(0)} disabled={!activeTable.getCanPreviousPage()}
                                     className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-25 disabled:cursor-not-allowed transition-all">
                                     <ChevronsLeft className="w-4 h-4" />
                                 </button>
-                                <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}
+                                <button onClick={() => activeTable.previousPage()} disabled={!activeTable.getCanPreviousPage()}
                                     className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-25 disabled:cursor-not-allowed transition-all">
                                     <ChevronLeft className="w-4 h-4" />
                                 </button>
                                 <div className="flex items-center gap-0.5 px-1">
-                                    {Array.from({ length: table.getPageCount() }, (_, i) => i).map(page => {
+                                    {Array.from({ length: activeTable.getPageCount() }, (_, i) => i).map(page => {
                                         const cur = pageIndex;
-                                        if (page === 0 || page === table.getPageCount() - 1 || Math.abs(page - cur) <= 1) {
+                                        if (page === 0 || page === activeTable.getPageCount() - 1 || Math.abs(page - cur) <= 1) {
                                             return (
-                                                <button key={page} onClick={() => table.setPageIndex(page)}
+                                                <button key={page} onClick={() => activeTable.setPageIndex(page)}
                                                     className={`min-w-[32px] h-8 px-2 rounded-lg text-sm font-semibold transition-all ${page === cur
                                                         ? 'bg-brand-red text-white shadow-sm shadow-brand-red/30'
                                                         : 'text-slate-500 hover:bg-slate-100'
@@ -471,11 +572,11 @@ export default function AdminDashboard() {
                                         return null;
                                     })}
                                 </div>
-                                <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}
+                                <button onClick={() => activeTable.nextPage()} disabled={!activeTable.getCanNextPage()}
                                     className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-25 disabled:cursor-not-allowed transition-all">
                                     <ChevronRight className="w-4 h-4" />
                                 </button>
-                                <button onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}
+                                <button onClick={() => activeTable.setPageIndex(activeTable.getPageCount() - 1)} disabled={!activeTable.getCanNextPage()}
                                     className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-25 disabled:cursor-not-allowed transition-all">
                                     <ChevronsRight className="w-4 h-4" />
                                 </button>

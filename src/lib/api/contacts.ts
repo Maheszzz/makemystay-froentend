@@ -15,6 +15,19 @@ export interface ScheduleDemoRequest {
     selected_slot: string; // ISO string
 }
 
+export interface DemoBooking {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    company?: string;
+    units?: string;
+    selected_slot: string;
+    status: string;
+    meeting_link?: string;
+    created_at: string;
+}
+
 export interface ScheduleDemoResponse {
     message: string;
     meet_link: string;
@@ -104,6 +117,14 @@ export const contactApi = {
      */
     scheduleDemo: async (data: ScheduleDemoRequest): Promise<ScheduleDemoResponse> => {
         const response = await api.post<ScheduleDemoResponse>('/schedule-demo', data);
+        return response;
+    },
+
+    /**
+     * Get all scheduled demos (Admin only)
+     */
+    getDemos: async (): Promise<DemoBooking[]> => {
+        const response = await api.get<DemoBooking[]>('/schedule-demo');
         return response;
     },
 };

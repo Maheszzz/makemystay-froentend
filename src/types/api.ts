@@ -14,6 +14,19 @@ export interface Contact {
     updated_at?: string;
 }
 
+export interface DemoBooking {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    company?: string;
+    units?: string;
+    selected_slot: string;
+    status: string;
+    meeting_link?: string;
+    created_at: string;
+}
+
 // Raw ID from backend might be number or string depending on implementation
 export type PropertyId = string | number;
 
