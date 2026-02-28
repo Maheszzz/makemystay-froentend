@@ -105,8 +105,15 @@ export default function ScheduleDemo() {
                 units: formData.units,
                 selected_slot: finalDate.toISOString(),
             });
-            if (typeof (window as any).gtag_report_conversion === 'function') {
-                (window as any).gtag_report_conversion();
+            // Google tag (gtag.js) - Added to submit button
+            const w = window as any;
+            w.dataLayer = w.dataLayer || [];
+            function gtagTracker(..._args: any[]) { w.dataLayer.push(arguments); }
+            gtagTracker('js', new Date());
+            gtagTracker('config', 'AW-11313350010');
+
+            if (typeof w.gtag_report_conversion === 'function') {
+                w.gtag_report_conversion();
             }
             setStep(3);
         } catch (err: any) {
