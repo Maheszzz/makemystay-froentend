@@ -232,56 +232,6 @@ export default function Contact() {
                                         </div>
                                     </div>
 
-                                    {/* Qualification Fields */}
-                                    <div className="pt-2 pb-1">
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Property Details (Helps us tailor your plan)</p>
-                                        <div className="grid md:grid-cols-2 gap-5">
-                                            <div className="space-y-1.5">
-                                                <label htmlFor="units" className="text-xs font-bold text-slate-600 uppercase tracking-wide">No. of Beds / Units</label>
-                                                <select id="units" value={formData.units} onChange={handleChange}
-                                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none appearance-none cursor-pointer">
-                                                    <option value="">Select range</option>
-                                                    <option value="1-10">1 – 10 beds</option>
-                                                    <option value="11-30">11 – 30 beds</option>
-                                                    <option value="31-80">31 – 80 beds</option>
-                                                    <option value="80+">80+ beds</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label htmlFor="current_occupancy" className="text-xs font-bold text-slate-600 uppercase tracking-wide">Current Occupancy %</label>
-                                                <select id="current_occupancy" value={formData.current_occupancy} onChange={handleChange}
-                                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none appearance-none cursor-pointer">
-                                                    <option value="">Select range</option>
-                                                    <option value="below-60">Below 60%</option>
-                                                    <option value="60-80">60 – 80%</option>
-                                                    <option value="80-95">80 – 95%</option>
-                                                    <option value="above-95">Above 95%</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label htmlFor="monthly_revenue" className="text-xs font-bold text-slate-600 uppercase tracking-wide">Monthly Revenue Range</label>
-                                                <select id="monthly_revenue" value={formData.monthly_revenue} onChange={handleChange}
-                                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none appearance-none cursor-pointer">
-                                                    <option value="">Select range</option>
-                                                    <option value="below-1L">Below ₹1 Lakh</option>
-                                                    <option value="1-3L">₹1 – 3 Lakhs</option>
-                                                    <option value="3-10L">₹3 – 10 Lakhs</option>
-                                                    <option value="10L+">Above ₹10 Lakhs</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-1.5">
-                                                <label htmlFor="uses_brokers" className="text-xs font-bold text-slate-600 uppercase tracking-wide">Currently Using Brokers?</label>
-                                                <select id="uses_brokers" value={formData.uses_brokers} onChange={handleChange}
-                                                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none appearance-none cursor-pointer">
-                                                    <option value="">Select</option>
-                                                    <option value="yes">Yes, heavily dependent</option>
-                                                    <option value="partially">Partially</option>
-                                                    <option value="no">No, self-managed</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     {/* Message */}
                                     <div className="space-y-1.5">
                                         <label htmlFor="message" className="text-xs font-bold text-slate-600 uppercase tracking-wide">Anything else? (Optional)</label>
