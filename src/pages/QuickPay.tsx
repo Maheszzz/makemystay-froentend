@@ -143,11 +143,12 @@ export default function QuickPay() {
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-gold/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
                         <div className="relative z-10">
-                            <h2 className="text-2xl md:text-3xl font-bold mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            <h2 className="text-2xl md:text-3xl font-bold mb-1" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
                                 <span className="text-white">MakeMyStay</span>
                                 <span className="text-brand-gold">.ai</span>
                             </h2>
-                            <p className="text-white/60 text-sm">Premium Property Payments</p>
+                            <p className="text-white/60 text-sm mb-1">Premium Property Payments</p>
+                            <p className="text-white/40 text-xs">Fast, secure payments for bookings, deposits &amp; services.</p>
                         </div>
 
                         {/* 3D Layered Cards Visual */}
@@ -177,18 +178,30 @@ export default function QuickPay() {
                             </div>
                         </div>
 
-                        <div className="relative z-10 space-y-4">
-                            <div className="flex items-center gap-3 text-sm text-white/70">
+                        <div className="relative z-10 space-y-3">
+                            <div className="flex items-center gap-3 text-xs text-white/60">
                                 <div className="p-1.5 rounded-full bg-brand-gold/10">
-                                    <CheckCircle2 className="w-4 h-4 text-brand-gold" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold" />
                                 </div>
                                 <span>SSL Encrypted Transaction</span>
                             </div>
-                            <div className="flex items-center gap-3 text-sm text-white/70">
+                            <div className="flex items-center gap-3 text-xs text-white/60">
                                 <div className="p-1.5 rounded-full bg-brand-gold/10">
-                                    <CheckCircle2 className="w-4 h-4 text-brand-gold" />
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold" />
                                 </div>
                                 <span>Instant Payment Confirmation</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-white/60">
+                                <div className="p-1.5 rounded-full bg-brand-gold/10">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold" />
+                                </div>
+                                <span>256-bit Encryption · Razorpay Secured</span>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-white/60">
+                                <div className="p-1.5 rounded-full bg-brand-gold/10">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-brand-gold" />
+                                </div>
+                                <span>&#9889; Instant receipt via SMS</span>
                             </div>
                         </div>
                     </div>
@@ -208,9 +221,9 @@ export default function QuickPay() {
                             <p className="text-slate-500 text-sm">Complete your secure transaction</p>
                         </div>
 
-                        <form onSubmit={handlePayment} className="space-y-6">
+                        <form onSubmit={handlePayment} className="space-y-5">
 
-                            {/* Payment Amount */}
+                            {/* 1. Payment Amount */}
                             <div className="space-y-2">
                                 <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider">
                                     Payment Amount
@@ -221,47 +234,18 @@ export default function QuickPay() {
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-2xl font-bold text-slate-900 placeholder:text-slate-300"
-                                        placeholder="0"
+                                        className="w-full pl-10 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-2xl font-bold text-slate-900 placeholder:text-slate-300 placeholder:font-normal"
+                                        placeholder="Enter amount"
                                         required
                                         min="1"
-                                        step="0.01"
+                                        step="1"
+                                        inputMode="numeric"
                                     />
                                 </div>
-                                <p className="text-xs text-slate-500">Enter the amount you wish to pay</p>
+                                <p className="text-xs text-slate-400">Booking fee, deposit or rent — enter the exact amount</p>
                             </div>
 
-                            {/* Name and Phone - Side by Side */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-medium text-slate-600">
-                                        Full Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
-                                        placeholder="Enter your name"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-medium text-slate-600">
-                                        Phone Number
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
-                                        placeholder="Enter your phone number"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Purpose/Reference */}
+                            {/* 2. Purpose / Reference */}
                             <div className="space-y-2">
                                 <label className="block text-xs font-medium text-slate-600">
                                     Purpose / Reference <span className="text-slate-400">(Optional)</span>
@@ -275,8 +259,43 @@ export default function QuickPay() {
                                 />
                             </div>
 
+                            {/* 3. Name and Phone - Side by Side */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-medium text-slate-600">
+                                        Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
+                                        placeholder="Your full name"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="block text-xs font-medium text-slate-600">
+                                        Phone Number
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        inputMode="numeric"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                                        className="w-full px-3 md:px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all text-slate-900 placeholder:text-slate-400 text-sm md:text-base"
+                                        placeholder="10-digit mobile number"
+                                        required
+                                        maxLength={10}
+                                    />
+                                </div>
+                            </div>
+
                             {/* Submit Button */}
                             <div className="pt-2">
+                                <p className="text-center text-xs text-slate-400 mb-3">
+                                    🔒 You'll receive instant confirmation after payment.
+                                </p>
                                 <Button
                                     type="submit"
                                     variant="gold"
@@ -291,8 +310,9 @@ export default function QuickPay() {
                                     ) : (
                                         <>
                                             <Lock className="w-4 h-4" />
-                                            Pay Now
-                                            {amount && <span className="ml-2 font-normal opacity-90">₹{amount}</span>}
+                                            {amount && parseFloat(amount) > 0
+                                                ? `Pay ₹${Number(amount).toLocaleString('en-IN')} Securely`
+                                                : 'Pay Securely'}
                                         </>
                                     )}
                                 </Button>

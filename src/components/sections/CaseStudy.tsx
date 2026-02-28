@@ -19,21 +19,28 @@ export function CaseStudy() {
                                 <span className="flex items-center"><UserCheck className="w-4 h-4 mr-1 text-brand-red" /> 80 Beds</span>
                             </div>
                         </div>
-                        <p className="text-lg text-slate-300 mb-6 font-medium">From 78% occupancy to 94% in just 18 days.</p>
-                        <p className="text-slate-400 mb-8 leading-relaxed">
+                        <p className="text-xl font-semibold text-slate-300 mb-6 leading-relaxed">From 78% occupancy to 94% in just 18 days.</p>
+                        <blockquote className="text-lg text-slate-300 mb-8 leading-[1.8] italic border-l-4 pl-5" style={{ borderColor: '#C5A021' }}>
                             "Before MakeMyStay, we were dependent on brokers who took one month's rent as commission. We had no data on our leads. Within a week of switching, our lead volume tripled and we stopped paying broker commissions entirely."
-                        </p>
+                        </blockquote>
                         <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-slate-700 rounded-full overflow-hidden border border-white/10">
-                                <img
-                                    src="https://api.dicebear.com/7.x/notionists/svg?seed=TejaReddy&backgroundColor=1e293b"
-                                    alt="Teja Reddy"
-                                    className="w-full h-full object-cover"
-                                />
+                            <div className="relative">
+                                <div className="w-12 h-12 bg-slate-700 rounded-full overflow-hidden border border-white/10">
+                                    <img
+                                        src="https://api.dicebear.com/7.x/notionists/svg?seed=TejaReddy&backgroundColor=1e293b"
+                                        alt="Teja Reddy"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                {/* Verified badge */}
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#C5A021' }}>
+                                    <svg className="w-3 h-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
+                                </div>
                             </div>
                             <div>
                                 <div className="font-bold text-white">Teja Reddy</div>
-                                <div className="text-sm text-slate-500">Owner, Astro Living</div>
+                                <div className="text-sm text-slate-400">Owner, Astro Living</div>
+                                <div className="text-xs font-semibold mt-0.5" style={{ color: '#C5A021' }}>✓ Verified Client</div>
                             </div>
                         </div>
                     </div>
@@ -60,7 +67,7 @@ export function CaseStudy() {
                                     </div>
                                     <div className="text-right">
                                         <div className="text-white/80 text-sm mb-1">ROI Timeline</div>
-                                        <div className="text-xl font-bold">18 Days</div>
+                                        <div className="text-3xl font-bold" style={{ color: '#FFD700' }}>18 Days</div>
                                     </div>
                                 </div>
                             </div>

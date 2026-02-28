@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { X, Menu, Phone, ArrowRight } from 'lucide-react';
+import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -157,29 +157,78 @@ export function Navbar() {
                     </div>
 
                     {/* Nav Links */}
-                    <div className="flex-1 overflow-y-auto py-6 px-6">
-                        <div className="space-y-1">
+                    <div className="flex-1 overflow-y-auto py-4 px-5">
+
+                        {/* ── Primary Booking Actions ── */}
+                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 px-1 mb-3">Quick Actions</p>
+                        <div className="space-y-1.5 mb-5">
+                            <Link
+                                to="/properties"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
+                            >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(197,160,33,0.15)' }}>
+                                    <Search className="w-4 h-4" style={{ color: '#C5A021' }} />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="font-semibold text-sm">Find Homes</div>
+                                    <div className="text-[11px] text-slate-400">Browse verified PG & rentals</div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                            </Link>
+
+                            <Link
+                                to="/wishlist"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
+                            >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-red-500/15">
+                                    <Heart className="w-4 h-4 text-red-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="font-semibold text-sm">Wishlist</div>
+                                    <div className="text-[11px] text-slate-400">Your saved properties</div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                            </Link>
+
+                            <Link
+                                to="/quick-pay"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
+                            >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500/15">
+                                    <CreditCard className="w-4 h-4 text-emerald-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <div className="font-semibold text-sm">Quick Pay</div>
+                                    <div className="text-[11px] text-slate-400">Pay booking fee securely</div>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                            </Link>
+                        </div>
+
+                        {/* ── Divider ── */}
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="flex-1 h-px bg-white/8" />
+                            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">More</p>
+                            <div className="flex-1 h-px bg-white/8" />
+                        </div>
+
+                        {/* ── Info Pages ── */}
+                        <div className="space-y-0.5">
                             {navigationLinks.map((item, idx) => (
                                 <a
                                     key={item}
                                     href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                     onClick={(e) => handleNavClick(item, e)}
-                                    className="flex items-center justify-between py-4 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5 transition-colors group"
+                                    className="flex items-center justify-between py-3 px-2 text-sm font-medium text-slate-400 hover:text-white border-b border-white/5 transition-colors group"
                                     style={{ animationDelay: `${idx * 50}ms` }}
                                 >
                                     <span>{item}</span>
-                                    <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                    <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                                 </a>
                             ))}
-                            <Link
-                                to="/quick-pay"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="flex items-center justify-between py-4 text-lg font-medium text-slate-300 hover:text-white border-b border-white/5 transition-colors group"
-                            >
-                                <span>Quick Pay</span>
-                                <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                            </Link>
-
                         </div>
                     </div>
 

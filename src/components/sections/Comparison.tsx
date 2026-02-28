@@ -77,8 +77,10 @@ export function Comparison() {
                                 <div className="text-center">
                                     <div className="text-sm font-medium text-slate-300">Generic CRM</div>
                                 </div>
-                                <div className="text-center pr-8">
-                                    <div className="px-5 py-2 bg-brand-red rounded-full inline-block shadow-glow">
+                                {/* Winner column header */}
+                                <div className="text-center pr-8 relative">
+                                    <div className="absolute inset-0 -top-6 bg-amber-400/8 rounded-t-xl" />
+                                    <div className="px-5 py-2 rounded-full inline-block relative" style={{ background: 'linear-gradient(135deg,#C5A021,#A8761A)', boxShadow: '0 4px 16px rgba(197,160,33,0.4)' }}>
                                         <span className="text-white font-bold text-sm">MakeMyStay.ai</span>
                                     </div>
                                 </div>
@@ -112,9 +114,9 @@ export function Comparison() {
                                         </span>
                                     </div>
                                     <div className="text-center pr-8 relative">
-                                        {/* Highlight background for the winner */}
-                                        <div className="absolute inset-y-[-20px] inset-x-2 bg-red-50/50 -z-10 rounded-lg hidden group-hover:block"></div>
-                                        <span className="inline-flex items-center gap-2 text-brand-red font-bold bg-red-50 py-2 px-4 rounded-full text-sm border border-red-100">
+                                        {/* Persistent gold tint column */}
+                                        <div className="absolute inset-y-0 -inset-x-1 rounded-lg -z-10" style={{ background: 'rgba(197,160,33,0.06)' }} />
+                                        <span className="inline-flex items-center gap-2 font-bold py-2 px-4 rounded-full text-sm" style={{ color: '#B11226', background: 'rgba(177,18,38,0.08)', border: '1px solid rgba(177,18,38,0.15)' }}>
                                             {getValueIcon(row.m)}
                                             {row.m}
                                         </span>

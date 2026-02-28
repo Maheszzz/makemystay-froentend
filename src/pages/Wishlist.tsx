@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, ArrowLeft, Trash2 } from 'lucide-react';
+import { Heart, ArrowLeft, Trash2, TrendingUp } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
@@ -30,15 +30,23 @@ export default function Wishlist() {
                             </p>
                         </div>
 
-                        {wishlist.length > 0 && (
-                            <button
-                                onClick={clearWishlist}
-                                className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-red-500 transition-colors border border-slate-200 hover:border-red-200 px-4 py-2 rounded-xl"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                                Clear all
-                            </button>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {wishlist.length > 1 && (
+                                <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border" style={{ color: '#B11226', background: 'rgba(177,18,38,0.05)', borderColor: 'rgba(177,18,38,0.15)' }}>
+                                    <TrendingUp className="w-3.5 h-3.5" />
+                                    {wishlist.length} properties saved
+                                </div>
+                            )}
+                            {wishlist.length > 0 && (
+                                <button
+                                    onClick={clearWishlist}
+                                    className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-red-500 transition-colors border border-slate-200 hover:border-red-200 px-4 py-2 rounded-xl"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    Clear all
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 

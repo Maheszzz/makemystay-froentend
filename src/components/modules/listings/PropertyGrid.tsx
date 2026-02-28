@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
 import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
@@ -56,27 +57,30 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     }
 
     return (
-        <section className="py-12 md:py-20 bg-slate-50">
+        <section className="py-10 md:py-20 bg-slate-50 pb-20 md:pb-20">
+            {/* Section Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 md:mb-12 gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 md:mb-12 gap-4">
                     <div>
-                        <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                            {category === 'buy' ? 'Featured Properties for Sale'
-                                : category === 'plot' ? 'Premium Plots & Lands'
-                                    : category === 'all' ? 'All Verified Properties'
-                                        : 'Latest Rental Listings'}
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 md:mb-2">
+                            Explore Our{' '}
+                            <span className="text-brand-red">Premium</span>{' '}Spaces
                         </h2>
-                        <p className="text-slate-500">Handpicked luxury properties that represent the best of what MakeMyStay has to offer</p>
+                        <p className="text-slate-500 text-sm md:text-base">Thoughtfully designed for urban professionals</p>
                     </div>
                 </div>
+            </div>
 
+            {/* Mobile: horizontal swipe carousel (1 card visible) */}
+            <MobilePropertyCarousel properties={filteredProperties} />
+
+            {/* Desktop: 4-col grid */}
+            <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
                     {filteredProperties.length > 0 ? (
-                        filteredProperties.map((prop) => {
-                            return (
-                                <PropertyCard key={prop.id} property={prop} />
-                            );
-                        })
+                        filteredProperties.map((prop) => (
+                            <PropertyCard key={prop.id} property={prop} />
+                        ))
                     ) : (
                         <div className="col-span-full text-center py-12">
                             <h3 className="text-xl font-semibold text-slate-900">No properties found</h3>
@@ -84,13 +88,13 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
                         </div>
                     )}
                 </div>
+            </div>
 
-                <div className="mt-12 flex justify-center">
-                    <Link to="/properties" className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group">
-                        View All Properties
-                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                </div>
+            <div className="mt-8 md:mt-12 flex justify-center px-4">
+                <Link to="/properties" className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group w-full md:w-auto justify-center">
+                    View All Properties
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
             </div>
         </section>
     );

@@ -10,6 +10,8 @@ export interface ScheduleDemoRequest {
     name: string;
     email: string;
     phone: string;
+    company?: string;
+    units?: string;
     selected_slot: string; // ISO string
 }
 

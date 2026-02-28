@@ -259,9 +259,18 @@ export default function PropertyDetails() {
                                 </p>
                             </div>
                             <div className="hidden md:flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-white">
-                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                <span className="font-bold">{(property.rating ?? 0) > 0 ? (property.rating ?? 0).toFixed(1) : 'N/A'}</span>
-                                <span className="text-white/60 text-sm">&middot; {property.reviews || 0} reviews</span>
+                                {(property.rating ?? 0) > 0 ? (
+                                    <>
+                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                        <span className="font-bold">{(property.rating ?? 0).toFixed(1)}</span>
+                                        <span className="text-white/60 text-sm">&middot; {property.reviews || 0} reviews</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Star className="w-4 h-4 text-amber-300" />
+                                        <span className="font-semibold text-sm">New Listing</span>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -302,6 +311,12 @@ export default function PropertyDetails() {
                                 {/* Amenities */}
                                 {displayFeatures.length > 0 && (
                                     <div className="border-t border-slate-50 px-8 py-8">
+                                        {/* Trust decision tags */}
+                                        <div className="flex flex-wrap gap-2 mb-5">
+                                            {['✓ Fully Furnished', '✓ Move-in Ready', '✓ No Brokerage', '✓ Verified Property'].map((tag) => (
+                                                <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full border" style={{ color: '#1d7a4a', background: 'rgba(16,185,129,0.07)', borderColor: 'rgba(16,185,129,0.2)' }}>{tag}</span>
+                                            ))}
+                                        </div>
                                         <h3 className="text-base font-bold text-slate-900 mb-5 uppercase tracking-widest text-xs text-slate-400">What this place offers</h3>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                             {displayFeatures.map((feature: string, idx: number) => {
@@ -372,7 +387,7 @@ export default function PropertyDetails() {
 
                                     <div className="p-7">
                                         {/* Price */}
-                                        <div className="mb-6">
+                                        <div className="mb-5">
                                             <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Starting from</p>
                                             <div className="flex items-end gap-1">
                                                 <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{property.price}</span>
@@ -380,18 +395,39 @@ export default function PropertyDetails() {
                                             </div>
                                         </div>
 
+                                        {/* Price breakdown */}
+                                        <div className="mb-5 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2.5 text-sm">
+                                            <div className="flex justify-between text-slate-600">
+                                                <span>Monthly Rent</span>
+                                                <span className="font-semibold text-slate-900">{property.price}</span>
+                                            </div>
+                                            <div className="flex justify-between text-slate-600">
+                                                <span>Maintenance</span>
+                                                <span className="font-semibold text-emerald-600">Included</span>
+                                            </div>
+                                        </div>
+
                                         {/* Rating row */}
-                                        <div className="flex items-center justify-between mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="flex items-center justify-between mb-5 p-3 bg-slate-50 rounded-2xl border border-slate-100">
                                             <div className="flex items-center gap-2">
-                                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                                <span className="font-bold text-slate-900">{(property.rating ?? 0) > 0 ? (property.rating ?? 0).toFixed(1) : 'N/A'}</span>
-                                                <span className="text-slate-400 text-sm">&middot; {property.reviews || 0} reviews</span>
+                                                {(property.rating ?? 0) > 0 ? (
+                                                    <>
+                                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                                        <span className="font-bold text-slate-900">{(property.rating ?? 0).toFixed(1)}</span>
+                                                        <span className="text-slate-400 text-sm">&middot; {property.reviews || 0} reviews</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Star className="w-4 h-4 text-amber-300" />
+                                                        <span className="text-sm font-semibold text-slate-700">New Listing</span>
+                                                    </>
+                                                )}
                                             </div>
                                             <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Verified</span>
                                         </div>
 
                                         {/* Posted Date */}
-                                        <div className="flex items-center justify-between mb-6 text-sm">
+                                        <div className="flex items-center justify-between mb-5 text-sm">
                                             <div className="flex items-center gap-2 text-slate-500">
                                                 <CalendarDays className="w-4 h-4 text-slate-300" />
                                                 <span className="font-medium">Posted on</span>
@@ -404,9 +440,9 @@ export default function PropertyDetails() {
                                             onClick={handlePayNow}
                                             className="w-full py-4 text-base font-extrabold rounded-2xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 transition-all transform hover:scale-[1.02] active:scale-[0.98] border-0 text-white"
                                         >
-                                            Book Now
+                                            🔥 Secure This Room Now
                                         </Button>
-                                        <p className="text-center text-xs text-slate-400 mt-3">No hidden charges · Instant confirmation</p>
+                                        <p className="text-center text-xs text-slate-400 mt-3">Token ₹5,000 · No hidden charges · Instant confirmation</p>
                                     </div>
                                 </div>
 

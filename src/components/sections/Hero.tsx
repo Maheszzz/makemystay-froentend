@@ -1,40 +1,42 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, CheckCircle } from 'lucide-react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
 
 const slides = [
     {
         image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=90&w=1920',
         eyebrow: 'PROFESSIONAL • TRUSTED • SEAMLESS',
-        headline: 'From Clicks to',
-        headlineItalic: 'Closure',
-        subheadline: 'Your Next Home Is Just a Click Away',
-        description: 'Affordable, flexible, and secure stays meticulously curated for students & professionals.',
+        headline: 'Premium Living.',
+        headlineItalic: 'Simplified.',
+        subheadline: 'Verified stays for students & professionals.',
     },
     {
         image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=90&w=1920',
         eyebrow: 'CURATED • AFFORDABLE • SECURE',
-        headline: 'Find Your',
-        headlineItalic: 'Perfect Stay',
-        subheadline: 'Zero Broker Fees. 100% Verified.',
-        description: 'AI-powered matching connects you to the right property — instantly, seamlessly, affordably.',
+        headline: 'Live Closer',
+        headlineItalic: 'to Work.',
+        subheadline: 'Smart stays near Bangalore tech parks.',
     },
     {
         image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=90&w=1920',
         eyebrow: 'SMART • MODERN • HASSLE-FREE',
-        headline: 'Live Where',
-        headlineItalic: 'You Belong',
-        subheadline: 'Premium Rooms for Students & Professionals',
-        description: 'Handpicked furnished rooms and apartments across prime city locations — move in today.',
+        headline: 'Where Comfort',
+        headlineItalic: 'Meets Convenience.',
+        subheadline: 'Curated homes in prime Bangalore locations.',
     },
     {
         image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=90&w=1920',
         eyebrow: 'TRUSTED • VERIFIED • SEAMLESS',
-        headline: 'Your Dream Home,',
-        headlineItalic: 'Delivered',
-        subheadline: 'Powered by AI. Built for You.',
-        description: 'MakeMyStay.ai automates your entire stay journey — from search to settlement.',
+        headline: 'Move In',
+        headlineItalic: 'This Week.',
+        subheadline: 'Seamless process. Fully managed. Zero hassle.',
     },
+];
+
+const trustItems = [
+    'Instant Online Booking',
+    'Prime Locations',
+    'Dedicated Support',
 ];
 
 const SLIDE_INTERVAL = 4500;
@@ -75,7 +77,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
     return (
         <section
             id="home"
-            className="relative w-full h-[75svh] md:h-screen min-h-[500px] md:min-h-[600px]"
+            className="relative w-full h-[45svh] md:h-screen min-h-[300px] md:min-h-[600px] overflow-hidden"
             style={{ zIndex: 20 }}
         >
             {/* ── Background Image Layers (crossfade) ── */}
@@ -93,37 +95,18 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                 />
             ))}
 
-            {/* ── Overlays ── */}
-            <div className="absolute inset-0 bg-black/55" style={{ zIndex: 1 }} />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" style={{ zIndex: 2 }} />
-            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.55) 100%)', zIndex: 3 }} />
+            {/* ── Overlays (60% darkness) ── */}
+            <div className="absolute inset-0 bg-black/62" style={{ zIndex: 1 }} />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" style={{ zIndex: 2 }} />
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%)', zIndex: 3 }} />
 
-            {/* ── Slide dot indicators ── */}
-            <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
-                {slides.map((_, idx) => (
-                    <button
-                        key={idx}
-                        aria-label={`Go to slide ${idx + 1}`}
-                        onClick={() => {
-                            setContentVisible(false);
-                            setTimeout(() => { setCurrent(idx); setContentVisible(true); }, FADE_DURATION);
-                        }}
-                        className="rounded-full transition-all duration-500 cursor-pointer"
-                        style={{
-                            width: idx === current ? '28px' : '8px',
-                            height: '8px',
-                            background: idx === current ? '#C5A021' : 'rgba(255,255,255,0.45)',
-                        }}
-                    />
-                ))}
-            </div>
 
             {/* ── Single centered column: fading text + static search bar ── */}
             <div
                 className="absolute inset-0 flex flex-col items-center justify-center px-5 sm:px-8"
                 style={{ zIndex: 30, paddingTop: '64px' }}
             >
-                {/* --- Fading text block --- */}
+                {/* --- Fading content block --- */}
                 <div
                     className="flex flex-col items-center text-center w-full"
                     style={{
@@ -132,7 +115,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     }}
                 >
                     {/* Eyebrow */}
-                    <div className="mb-2 md:mb-6">
+                    <div className="mb-2 md:mb-6 hidden md:block">
                         <span
                             style={{
                                 fontFamily: "'Playfair Display', serif",
@@ -151,14 +134,14 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     <div className="relative mb-2 md:mb-5">
                         <div
                             className="absolute -inset-12 pointer-events-none rounded-full"
-                            style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.08) 0%, transparent 70%)', filter: 'blur(30px)' }}
+                            style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.10) 0%, transparent 70%)', filter: 'blur(30px)' }}
                         />
                         <h1
                             className="text-white leading-[1.08] tracking-tight relative"
                             style={{
                                 fontFamily: "'Cormorant Garamond', serif",
                                 fontWeight: 300,
-                                fontSize: 'clamp(38px, 7.5vw, 96px)',
+                                fontSize: 'clamp(42px, 7.5vw, 96px)',
                                 textShadow: '0 2px 24px rgba(0,0,0,0.35)',
                             }}
                         >
@@ -173,37 +156,73 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                         style={{
                             fontFamily: "'Cormorant Garamond', serif",
                             color: '#FFFFFF',
-                            fontSize: 'clamp(15px, 2.3vw, 28px)',
+                            fontSize: 'clamp(12px, 2.3vw, 28px)',
                             textShadow: '0 2px 16px rgba(0,0,0,0.6)',
                         }}
                     >
                         {slide.subheadline}
                     </h2>
-
-                    {/* Description */}
-                    <p
-                        className="text-white/80 font-light leading-relaxed max-w-lg mx-auto"
-                        style={{
-                            fontSize: 'clamp(12px, 1.4vw, 15px)',
-                            letterSpacing: '0.03em',
-                        }}
-                    >
-                        {slide.description}
-                    </p>
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
-                <div className="w-full max-w-3xl mt-4 md:mt-9 mb-10 md:mb-0">
-                    <SmartSearchBar
-                        category={category}
-                        setCategory={setCategory}
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                    />
+                <div className="w-full max-w-3xl mt-3 md:mt-9 mb-3 md:mb-4">
+                    {/* Subtle glow ring behind search */}
+                    <div
+                        className="relative"
+                        style={{
+                            filter: 'drop-shadow(0 0 18px rgba(197,160,33,0.22))',
+                        }}
+                    >
+                        <SmartSearchBar
+                            category={category}
+                            setCategory={setCategory}
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                        />
+                    </div>
                 </div>
 
-                {/* Scroll Indicator - Mobile Only */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce opacity-80 md:hidden pointer-events-none" style={{ zIndex: 40 }}>
+                {/* --- Trust Indicators --- */}
+                <div className="hidden md:flex flex-wrap justify-center gap-x-6 gap-y-2 mt-2">
+                    {trustItems.map((item) => (
+                        <div key={item} className="flex items-center gap-1.5">
+                            <CheckCircle
+                                className="w-3.5 h-3.5 shrink-0"
+                                style={{ color: '#C5A021' }}
+                                strokeWidth={2.5}
+                            />
+                            <span
+                                className="text-white/80 text-xs font-medium tracking-wide"
+                                style={{ fontFamily: "'Montserrat', sans-serif" }}
+                            >
+                                {item}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* ── Slide dot indicators — in flow, never overlaps ── */}
+                <div className="hidden md:flex justify-center gap-2 mt-4">
+                    {slides.map((_, idx) => (
+                        <button
+                            key={idx}
+                            aria-label={`Go to slide ${idx + 1}`}
+                            onClick={() => {
+                                setContentVisible(false);
+                                setTimeout(() => { setCurrent(idx); setContentVisible(true); }, FADE_DURATION);
+                            }}
+                            className="rounded-full transition-all duration-500 cursor-pointer"
+                            style={{
+                                width: idx === current ? '28px' : '8px',
+                                height: '8px',
+                                background: idx === current ? '#C5A021' : 'rgba(255,255,255,0.45)',
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Scroll Indicator - desktop only */}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce opacity-80 hidden md:flex pointer-events-none" style={{ zIndex: 40 }}>
                     <span className="text-[10px] text-white/40 tracking-[0.2em] uppercase font-medium">Explore</span>
                     <ChevronDown className="w-4 h-4 text-white/30" />
                 </div>
