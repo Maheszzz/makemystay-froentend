@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard } from 'lucide-react';
+import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard, Video } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -101,6 +101,14 @@ export function Navbar() {
                             ))}
                             <Link to="/quick-pay" className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
                                 Quick Pay
+                            </Link>
+
+                            <Link
+                                to="/schedule-demo"
+                                className={`flex items-center gap-1.5 text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
+                            >
+                                <Video className="w-4 h-4" />
+                                Schedule a Demo
                             </Link>
 
                             <Link to="/contact-us">
@@ -207,6 +215,21 @@ export function Navbar() {
                                 <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                             </Link>
                         </div>
+
+                        <Link
+                            to="/schedule-demo"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
+                        >
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-blue-500/15">
+                                <Video className="w-4 h-4 text-blue-400" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="font-semibold text-sm">Schedule a Demo</div>
+                                <div className="text-[11px] text-slate-400">Book a live walkthrough</div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                        </Link>
 
                         {/* ── Divider ── */}
                         <div className="flex items-center gap-3 mb-3">
