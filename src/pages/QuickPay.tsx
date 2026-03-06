@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { paymentApi } from '@/lib/api';
 import { Shield, Lock, CheckCircle2, CreditCard, Smartphone } from 'lucide-react';
-import logoImage from '@/assets/Logo A.png';
+import logoImage from '@/assets/MakeMysStaylogo.svg';
 export default function QuickPay() {
     const [amount, setAmount] = useState<string>('');
     const [name, setName] = useState('');

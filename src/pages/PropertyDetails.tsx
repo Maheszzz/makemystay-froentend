@@ -13,6 +13,7 @@ import { ReviewSection } from '@/components/property/ReviewSection';
 import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
+import logoImage from '@/assets/MakeMysStaylogo.svg';
 
 
 export default function PropertyDetails() {
@@ -81,7 +82,7 @@ export default function PropertyDetails() {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: order.amount, currency: order.currency,
                 name: "MakeMyStay", description: `Booking Fee - ${option.label}`,
-                image: "https://makemystay.ai/logo.png", order_id: order.id,
+                image: logoImage, order_id: order.id,
                 handler: async function (response: any) {
                     try {
                         await paymentApi.verifyPayment({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature });

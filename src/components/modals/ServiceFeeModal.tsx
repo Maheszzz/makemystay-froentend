@@ -96,10 +96,7 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
 
     const selectedOption = options.find(o => o.id === selectedOptionId);
 
-    const handleProceed = () => {
-        if (!selectedOption) return;
-        onProceed(selectedOption);
-    };
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -133,8 +130,8 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
                                 key={option.id}
                                 onClick={() => setSelectedOptionId(option.id)}
                                 className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-150 ${isSelected
-                                        ? 'border-[#B11226] bg-red-50/40 ring-1 ring-[#B11226]/20'
-                                        : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'
+                                    ? 'border-[#B11226] bg-red-50/40 ring-1 ring-[#B11226]/20'
+                                    : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'
                                     }`}
                             >
                                 {/* Badge */}
@@ -187,21 +184,11 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
                 {/* Footer */}
                 <div className="px-5 pb-5">
                     <button
-                        onClick={handleProceed}
-                        disabled={!selectedOptionId}
-                        className={`w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all ${selectedOptionId
-                                ? 'text-white hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]'
-                                : 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                            }`}
-                        style={selectedOptionId ? {
-                            background: 'linear-gradient(135deg,#B11226,#8B0D1C)',
-                            boxShadow: '0 4px 16px rgba(177,18,38,0.25)'
-                        } : {}}
+                        disabled={true}
+                        className="w-full py-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 bg-slate-100 text-slate-400 cursor-not-allowed"
                     >
                         <Lock className="w-4 h-4" />
-                        {selectedOption
-                            ? `Pay ₹${selectedOption.amount.toLocaleString('en-IN')} & Secure Room`
-                            : 'Select an option above'}
+                        Payments Temporarily Paused
                     </button>
                     <p className="text-center text-[11px] text-slate-400 mt-2.5">
                         🔒 Razorpay secured · No hidden charges · Instant room lock
