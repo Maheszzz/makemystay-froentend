@@ -19,7 +19,7 @@ interface ServiceFeeModalProps {
     propertyType: string;
 }
 
-export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: ServiceFeeModalProps) {
+export function ServiceFeeModal({ isOpen, onClose, propertyType }: ServiceFeeModalProps) {
     const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
     const [options, setOptions] = useState<ServiceFeeOption[]>([]);
 
@@ -93,8 +93,6 @@ export function ServiceFeeModal({ isOpen, onClose, onProceed, propertyType }: Se
     }, [propertyType, isOpen]);
 
     if (!isOpen) return null;
-
-    const selectedOption = options.find(o => o.id === selectedOptionId);
 
 
 
