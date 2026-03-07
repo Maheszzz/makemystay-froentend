@@ -162,8 +162,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
         });
     };
 
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
+    const uploadFiles = async (files: File[] | FileList) => {
         if (!files || files.length === 0) return;
 
         setUploading(true);
@@ -175,15 +174,15 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
 
                 // 1. Get presigned URL
                 const { upload_url, file_key, public_url } = await api.post<any>('/uploads/presigned-url', {
-                    filename: file.name,
-                    content_type: file.type
+                    filename: file.name || `image_${Date.now()}_${i}.png`,
+                    content_type: file.type || 'image/png'
                 });
 
                 // 2. Upload to S3
                 await fetch(upload_url, {
                     method: 'PUT',
                     body: file,
-                    headers: { 'Content-Type': file.type }
+                    headers: { 'Content-Type': file.type || 'image/png' }
                 });
 
                 // 3. Track uploaded image using the public URL returned by the backend
@@ -195,6 +194,30 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
         } finally {
             setUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            await uploadFiles(e.target.files);
+        }
+    };
+
+    const handlePaste = async (e: React.ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        const files: File[] = [];
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const file = items[i].getAsFile();
+                if (file) files.push(file);
+            }
+        }
+
+        if (files.length > 0) {
+            e.preventDefault();
+            await uploadFiles(files);
         }
     };
 
@@ -336,7 +359,7 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
             )}
 
             {/* Form Content */}
-            <form onSubmit={handleSubmit} className={pageMode ? 'space-y-8' : 'flex-grow overflow-y-auto p-8 space-y-8'}>
+            <form onSubmit={handleSubmit} onPaste={handlePaste} className={pageMode ? 'space-y-8' : 'flex-grow overflow-y-auto p-8 space-y-8'}>
                 {error && (
                     <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3 text-red-600">
                         <AlertCircle className="w-5 h-5 shrink-0" />
@@ -515,7 +538,10 @@ export const PropertyForm: React.FC<PropertyFormProps> = ({ onClose, onSuccess, 
 
                 {/* Image Upload Section */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-slate-900 border-l-4 border-brand-red pl-4">Property Images</h3>
+                    <div className="flex items-center justify-between border-l-4 border-brand-red pl-4">
+                        <h3 className="text-lg font-bold text-slate-900">Property Images</h3>
+                        <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">You can also Paste (Ctrl+V) images directly here</span>
+                    </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {uploadedImages.map((img, idx) => (
