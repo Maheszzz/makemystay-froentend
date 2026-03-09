@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { paymentApi } from '@/lib/api';
 import { Shield, Lock, CheckCircle2, CreditCard, Smartphone } from 'lucide-react';
+import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 export default function QuickPay() {
     const [amount, setAmount] = useState<string>('');
@@ -12,6 +13,11 @@ export default function QuickPay() {
     const [phone, setPhone] = useState('');
     const [description, setDescription] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const [successData, setSuccessData] = useState<{
+        isOpen: boolean; paymentId: string; amount: number; receiptUrl: string;
+    }>({
+        isOpen: false, paymentId: '', amount: 0, receiptUrl: ''
+    });
 
     // Load Razorpay Script
     const loadRazorpay = () => {
@@ -79,14 +85,21 @@ export default function QuickPay() {
                 handler: async function (response: any) {
                     try {
                         // 4. Verify Payment
-                        await paymentApi.verifyPayment({
+                        const verification = await paymentApi.verifyPayment({
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature
                         });
 
                         // Success!
-                        alert(`Payment of ₹${amountNum} Successful! Transaction ID: ${response.razorpay_payment_id}`);
+                        const pId = verification.payment_id || response.razorpay_payment_id;
+                        setSuccessData({
+                            isOpen: true,
+                            paymentId: pId,
+                            amount: amountNum,
+                            receiptUrl: paymentApi.getReceiptUrl(pId)
+                        });
+
                         // Reset form
                         setAmount('');
                         setName('');
@@ -359,6 +372,14 @@ export default function QuickPay() {
                     </div>
                 </div>
             )}
+
+            <PaymentSuccessModal
+                isOpen={successData.isOpen}
+                onClose={() => setSuccessData(prev => ({ ...prev, isOpen: false }))}
+                paymentId={successData.paymentId}
+                amount={successData.amount}
+                receiptUrl={successData.receiptUrl}
+            />
         </div>
     );
 }

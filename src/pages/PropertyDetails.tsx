@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
+import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 
 
 export default function PropertyDetails() {
@@ -26,6 +27,11 @@ export default function PropertyDetails() {
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const [heroIdx, setHeroIdx] = useState(0);
+    const [successData, setSuccessData] = useState<{
+        isOpen: boolean; paymentId: string; amount: number; receiptUrl: string;
+    }>({
+        isOpen: false, paymentId: '', amount: 0, receiptUrl: ''
+    });
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
 
@@ -85,8 +91,14 @@ export default function PropertyDetails() {
                 image: logoImage, order_id: order.id,
                 handler: async function (response: any) {
                     try {
-                        await paymentApi.verifyPayment({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature });
-                        alert("Payment Successful! Your booking is confirmed.");
+                        const verification = await paymentApi.verifyPayment({ razorpay_order_id: response.razorpay_order_id, razorpay_payment_id: response.razorpay_payment_id, razorpay_signature: response.razorpay_signature });
+                        const pId = verification.payment_id || response.razorpay_payment_id;
+                        setSuccessData({
+                            isOpen: true,
+                            paymentId: pId,
+                            amount: option.amount,
+                            receiptUrl: paymentApi.getReceiptUrl(pId)
+                        });
                     } catch { alert("Payment verification failed. Please contact support."); }
                     finally { setIsPaymentProcessing(false); }
                 },
@@ -523,6 +535,14 @@ export default function PropertyDetails() {
                     <p className="text-sm text-slate-300">Please do not close this window</p>
                 </div>
             )}
+
+            <PaymentSuccessModal
+                isOpen={successData.isOpen}
+                onClose={() => setSuccessData(prev => ({ ...prev, isOpen: false }))}
+                paymentId={successData.paymentId}
+                amount={successData.amount}
+                receiptUrl={successData.receiptUrl}
+            />
         </div>
     );
 }

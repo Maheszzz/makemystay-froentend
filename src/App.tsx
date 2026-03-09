@@ -1,10 +1,10 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
 import { WhatsAppWidget } from './components/layout/WhatsAppWidget';
 import { WishlistProvider } from './context/WishlistContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 
 const Home = lazy(() => import('./pages/Home'));
 const Contact = lazy(() => import('./pages/Contact'));
@@ -17,9 +17,6 @@ const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 const QuickPay = lazy(() => import('./pages/QuickPay'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
-const EmployeeLogin = lazy(() => import('./pages/EmployeeLogin'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const EditProperty = lazy(() => import('./pages/EditProperty'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 
@@ -28,11 +25,7 @@ const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ de
 
 
 
-// Private Route Component
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-    const { isAuthenticated } = useAuth();
-    return isAuthenticated ? <>{children}</> : <Navigate to="/employee-login" />;
-};
+
 
 function App() {
     return (
@@ -69,18 +62,7 @@ function App() {
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
 
-                            {/* Auth Routes */}
-                            <Route path="/employee-login" element={<EmployeeLogin />} />
-                            <Route path="/admin" element={
-                                <PrivateRoute>
-                                    <AdminDashboard />
-                                </PrivateRoute>
-                            } />
-                            <Route path="/admin/edit-property/:id" element={
-                                <PrivateRoute>
-                                    <EditProperty />
-                                </PrivateRoute>
-                            } />
+
 
                             <Route path="*" element={<NotFound />} />
                         </Routes>

@@ -35,7 +35,12 @@ export const paymentApi = {
         return await api.post<RazorpayOrder>('/payments/create-order', data);
     },
 
-    verifyPayment: async (data: VerifyPaymentRequest): Promise<{ status: string }> => {
-        return await api.post<{ status: string }>('/payments/verify', data);
+    verifyPayment: async (data: VerifyPaymentRequest): Promise<{ status: string; payment_id: string }> => {
+        return await api.post<{ status: string; payment_id: string }>('/payments/verify', data);
+    },
+
+    getReceiptUrl: (paymentId: string): string => {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+        return `${baseUrl}/payments/receipt/${paymentId}`;
     }
 };
