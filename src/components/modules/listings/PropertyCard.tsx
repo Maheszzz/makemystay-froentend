@@ -1,9 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
-    MapPin, Heart, Bed, Bath, Users, Utensils, Pencil, Trash2, Star
+    MapPin, Heart, Bed, Bath, Users, Utensils, Star
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { api } from '@/lib/api/client';
+
 import { amenityIconMap } from '@/lib/amenityIcons';
 import type { Property } from '@/types/api';
 import { useWishlist } from '@/context/WishlistContext';
@@ -14,8 +13,6 @@ interface PropertyCardProps {
 
 export function PropertyCard({ property }: PropertyCardProps) {
     const { isWishlisted, toggleWishlist } = useWishlist();
-    const { isAdmin } = useAuth();
-    const navigate = useNavigate();
     const wishlisted = isWishlisted(String(property.id));
 
     const handleHeartClick = (e: React.MouseEvent) => {
@@ -23,17 +20,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
         toggleWishlist(property);
     };
 
-    const handleDelete = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (window.confirm(`Are you sure you want to delete "${property.title}"?`)) {
-            try {
-                await api.delete(`/realty/properties/${property.id}`);
-                window.location.reload();
-            } catch (err: any) {
-                alert(`Error deleting property: ${err.message}`);
-            }
-        }
-    };
 
     const images = property.images && property.images.length > 0 ? property.images : [property.image];
     const isServiceOriented = property.type === 'PG' || property.type === 'Hostel';
@@ -111,27 +97,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         </span>
                     </div>
 
-                    {/* Admin Tools */}
-                    {isAdmin && (
-                        <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
-                            <div className="flex items-center divide-x divide-white/20 bg-slate-900/75 backdrop-blur-md">
-                                <button
-                                    onClick={(e) => { e.preventDefault(); navigate(`/admin/edit-property/${property.id}`); }}
-                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold hover:bg-white/10 transition-colors"
-                                    title="Edit Property"
-                                >
-                                    <Pencil className="w-3.5 h-3.5 text-blue-300" /> Edit
-                                </button>
-                                <button
-                                    onClick={handleDelete}
-                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-white text-xs font-semibold hover:bg-red-500/30 transition-colors"
-                                    title="Delete Property"
-                                >
-                                    <Trash2 className="w-3.5 h-3.5 text-red-400" /> Delete
-                                </button>
-                            </div>
-                        </div>
-                    )}
+
                 </div>
 
                 {/* Content Section */}
