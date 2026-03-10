@@ -89,11 +89,6 @@ export function Footer() {
                                     FAQ
                                 </Link>
                             </li>
-                            <li>
-                                <Link to="/admin" className="text-slate-400 hover:text-white hover:pl-1.5 transition-all duration-200 inline-block">
-                                    Dashboard
-                                </Link>
-                            </li>
                         </ul>
                     </div>
 
