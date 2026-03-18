@@ -1,12 +1,35 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Heart, ArrowLeft, Trash2, TrendingUp } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { useWishlist } from '@/context/WishlistContext';
+import { useEffect } from 'react';
+import { useSmartBack } from '@/hooks/useSmartBack';
 
 export default function Wishlist() {
     const { wishlist, clearWishlist } = useWishlist();
+    const location = useLocation();
+    const goBack = useSmartBack({ fallback: '/properties' });
+    // Minimal scroll restore for back/forward navigations
+    useEffect(() => {
+        const saved = sessionStorage.getItem(`scroll:${location.key}`);
+        if (!saved) return;
+        const y = Number(saved);
+        if (!Number.isFinite(y)) return;
+        requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'auto' }));
+    }, [location.key]);
+
+    useEffect(() => {
+        const key = location.key;
+        return () => {
+            try {
+                sessionStorage.setItem(`scroll:${key}`, String(window.scrollY || 0));
+            } catch {
+                // ignore
+            }
+        };
+    }, [location.key]);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -15,10 +38,14 @@ export default function Wishlist() {
             <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
                 {/* Header */}
                 <div className="mb-8">
-                    <Link to="/properties" className="inline-flex items-center gap-1.5 text-slate-500 text-sm hover:text-brand-red transition-colors mb-6">
+                    <button
+                        type="button"
+                        onClick={goBack}
+                        className="inline-flex items-center gap-1.5 text-slate-500 text-sm hover:text-brand-red transition-colors mb-6"
+                    >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to listings
-                    </Link>
+                        Back
+                    </button>
 
                     <div className="flex items-center justify-between">
                         <div>

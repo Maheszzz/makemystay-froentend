@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { MapPin, Star } from 'lucide-react';
 import type { Property } from '@/types/api';
 
@@ -8,6 +8,8 @@ interface MobilePropertyCarouselProps {
 
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
     if (properties.length === 0) return null;
+    const location = useLocation();
+    const from = `${location.pathname}${location.search}${location.hash}`;
 
     return (
         <div className="md:hidden px-4 flex flex-col gap-4">
@@ -88,6 +90,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                             <div className="flex gap-2 mt-3">
                                 <Link
                                     to={`/properties/${routeCategory}/${property.slug}`}
+                                    state={{ from }}
                                     className="flex-1 text-center py-2.5 rounded-xl text-white text-xs font-bold tracking-wide transition-transform active:scale-95"
                                     style={{ background: 'linear-gradient(135deg,#B11226,#8B0D1C)' }}
                                 >

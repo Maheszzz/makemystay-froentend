@@ -10,6 +10,7 @@ import { Search, ArrowLeft, Filter, X, ChevronDown, Heart, Trash2, MapPin } from
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
+import { useSmartBack } from '@/hooks/useSmartBack';
 
 interface PropertiesProps {
     initialCategory?: 'all' | 'pg' | 'rent' | 'buy' | 'plot';
@@ -25,6 +26,7 @@ export default function Properties({
     pageSubtitle = 'Browse professional & verified listings'
 }: PropertiesProps) {
     const location = useLocation();
+    const goBack = useSmartBack({ fallback: '/' });
     const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(initialCategory);
     const [searchQuery, setSearchQuery] = useState('');
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
@@ -43,6 +45,30 @@ export default function Properties({
     const [typeFilter, setTypeFilter] = useState(initialTypeFilter || 'all');
     const [bhkFilter, setBhkFilter] = useState('all');
 
+    // Restore scroll position when navigating back to this page.
+    // We key by location.key so each history entry gets its own scrollY.
+    useEffect(() => {
+        const key = location.key;
+        const saved = sessionStorage.getItem(`scroll:${key}`);
+        if (!saved) return;
+        const y = Number(saved);
+        if (!Number.isFinite(y)) return;
+        // Defer to allow layout/content to paint.
+        requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'auto' }));
+    }, [location.key]);
+
+    // Save scroll position for this history entry when leaving the page.
+    useEffect(() => {
+        const key = location.key;
+        return () => {
+            try {
+                sessionStorage.setItem(`scroll:${key}`, String(window.scrollY || 0));
+            } catch {
+                // ignore storage errors (private mode, quota, etc.)
+            }
+        };
+    }, [location.key]);
+
     useEffect(() => {
         setCategory(initialCategory);
         setTypeFilter(initialTypeFilter || 'all');
@@ -53,7 +79,6 @@ export default function Properties({
             listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
             search: debouncedSearchQuery.trim() || undefined,
             property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter),
-            exclude_property_type: category === 'rent' ? 'PG' : category === 'buy' ? 'Plot' : undefined
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 
@@ -91,9 +116,13 @@ export default function Properties({
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-6 md:mb-12">
-                        <Link to="/" className="inline-flex items-center text-xs text-slate-500 hover:text-brand-red mb-3 transition-colors">
-                            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Back to Home
-                        </Link>
+                        <button
+                            type="button"
+                            onClick={goBack}
+                            className="inline-flex items-center text-xs text-slate-500 hover:text-brand-red mb-3 transition-colors"
+                        >
+                            <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Back
+                        </button>
                         <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
                         <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
                     </div>

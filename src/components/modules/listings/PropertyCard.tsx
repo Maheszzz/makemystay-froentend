@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     MapPin, Heart, Bed, Bath, Users, Utensils, Star
 } from 'lucide-react';
@@ -12,6 +12,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
+    const location = useLocation();
     const { isWishlisted, toggleWishlist } = useWishlist();
     const wishlisted = isWishlisted(String(property.id));
 
@@ -55,8 +56,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
     const waLink = `https://wa.me/919844594800?text=${encodeURIComponent(`Hi! I'm interested in ${property.title} at ${property.location}. Please share more details.`)}`;
 
+    const from = `${location.pathname}${location.search}${location.hash}`;
+
     return (
-        <Link to={`/properties/${routeCategory}/${property.slug}`} className="block group">
+        <Link
+            to={`/properties/${routeCategory}/${property.slug}`}
+            state={{ from }}
+            className="block group"
+        >
             <div className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 border border-slate-100" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
 
                 {/* Image Section */}

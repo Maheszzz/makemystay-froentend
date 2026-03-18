@@ -2,9 +2,11 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2, Wallet, Users, BarChart3, ArrowLeft, CheckCircle, ArrowRight, Phone } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { useSmartBack } from '@/hooks/useSmartBack';
 
 export default function ServiceDetail() {
     const { serviceId } = useParams();
+    const goBack = useSmartBack({ fallback: '/#services' });
 
     const servicesData: Record<string, any> = {
         'property-management': {
@@ -108,7 +110,13 @@ export default function ServiceDetail() {
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Service Not Found</h1>
-                    <Link to="/" className="text-brand-red hover:underline">← Back to Home</Link>
+                    <button
+                        type="button"
+                        onClick={goBack}
+                        className="text-brand-red hover:underline"
+                    >
+                        ← Back
+                    </button>
                 </div>
             </div>
         );
@@ -133,13 +141,14 @@ export default function ServiceDetail() {
 
                 <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
                     {/* Back Button */}
-                    <Link
-                        to="/#services"
+                    <button
+                        type="button"
+                        onClick={goBack}
                         className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-10 lg:mb-14 transition-colors group -ml-2 p-2"
                     >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-xs tracking-widest uppercase">Back to Services</span>
-                    </Link>
+                        <span className="text-xs tracking-widest uppercase">Back</span>
+                    </button>
 
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                         {/* Left Content */}

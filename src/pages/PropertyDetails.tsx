@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { usePropertyBySlug } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 
@@ -15,11 +15,12 @@ import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
+import { useSmartBack } from '@/hooks/useSmartBack';
 
 
 export default function PropertyDetails() {
     const { type, slug } = useParams();
-    const navigate = useNavigate();
+    const goBack = useSmartBack({ fallback: '/properties' });
     const { property, loading, error, refetch } = usePropertyBySlug(type, slug);
     const { isWishlisted, toggleWishlist } = useWishlist();
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
@@ -60,10 +61,7 @@ export default function PropertyDetails() {
         }
     };
 
-    const handleBack = () => {
-        if (window.history.length > 2) navigate(-1);
-        else navigate('/properties');
-    };
+    const handleBack = goBack;
 
     const handlePayNow = () => setShowServiceFeeModal(true);
 
@@ -191,119 +189,205 @@ export default function PropertyDetails() {
         : `Experience premium living at **${property.title}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
     return (
-        <div className="bg-[#f8f9fb] min-h-screen font-sans flex flex-col">
+        <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
             <Navbar />
 
             <main id="main-content" className="pb-24 flex-grow">
 
-                {/* ─── Hero Gallery ─── */}
-                <div className="relative h-[55vh] md:h-[72vh] bg-slate-900 overflow-hidden group">
-                    {heroImage ? (
-                        <img
-                            key={heroIdx}
-                            src={heroImage}
-                            alt={property.title}
-                            className="w-full h-full object-cover transition-all duration-700 scale-[1.02] group-hover:scale-100"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                            <div className="text-center text-slate-500">
-                                <div className="text-6xl mb-2">🏠</div>
-                                <p className="text-sm font-medium">No image available</p>
-                            </div>
-                        </div>
-                    )}
+                {/* ─── Hero Slider (clean, high-clarity) ─── */}
+                <section className="relative bg-black">
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/35 via-black/25 to-black/70" />
 
-                    {/* gradient overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30 pointer-events-none" />
-
-                    {/* Back & actions */}
-                    <div className="absolute top-24 left-4 md:left-8 z-20 flex items-center gap-3">
-                        <button onClick={handleBack} className="p-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full text-white hover:bg-white/30 transition-all shadow-lg cursor-pointer">
-                            <ArrowLeft className="w-5 h-5" />
-                        </button>
-                    </div>
-                    <div className="absolute top-24 right-4 md:right-8 z-20 flex items-center gap-2">
-                        {allImages.length > 0 && (
-                            <button onClick={() => setLightboxIndex(heroIdx)} className="p-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full text-white hover:bg-white/30 transition-all">
-                                <Maximize2 className="w-4 h-4" />
-                            </button>
-                        )}
-                        {copied && <span className="text-emerald-300 text-xs font-semibold bg-black/40 px-3 py-1.5 rounded-full backdrop-blur-sm">Link copied!</span>}
-                        <button onClick={handleShare} className="p-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full text-white hover:bg-white/30 transition-all">
-                            <Share2 className="w-4 h-4" />
-                        </button>
-                        <button onClick={handleWishlistToggle} className={`p-2.5 backdrop-blur-md border rounded-full transition-all ${wishlisted ? 'bg-brand-red/80 border-brand-red text-white' : 'bg-white/15 border-white/25 text-white hover:bg-white/30'}`}>
-                            <Heart className={`w-4 h-4 ${wishlisted ? 'fill-white' : ''}`} />
-                        </button>
-                    </div>
-
-                    {/* Multi-image prev/next */}
-                    {allImages.length > 1 && (
-                        <>
-                            <button onClick={() => setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1))}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full text-white hover:bg-white/30 transition-all shadow-lg">
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <button onClick={() => setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1))}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-white/15 backdrop-blur-md border border-white/25 rounded-full text-white hover:bg-white/30 transition-all shadow-lg">
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                            {/* Dot indicators */}
-                            <div className="absolute bottom-36 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
-                                {allImages.map((_, i) => (
-                                    <button key={i} onClick={() => setHeroIdx(i)}
-                                        className={`rounded-full transition-all ${i === heroIdx ? 'w-6 h-2 bg-white' : 'w-2 h-2 bg-white/40'}`} />
-                                ))}
-                            </div>
-                        </>
-                    )}
-
-                    {/* Property Details Bar floating at the bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 pt-16 max-w-7xl mx-auto">
-                        <div className="flex items-end justify-between">
-                            <div>
-                                <span className="inline-flex items-center bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-                                    {property.tag || 'Available'}
+                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-32 pb-6 md:pb-8">
+                        {/* Top actions */}
+                        <div className="flex items-center justify-between gap-4 mb-4">
+                            <button
+                                onClick={handleBack}
+                                className="inline-flex items-center gap-2 text-white/85 hover:text-white transition-colors"
+                            >
+                                <span className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
+                                    <ArrowLeft className="w-5 h-5" />
                                 </span>
-                                <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg mb-1">{property.title}</h1>
-                                <p className="text-white/80 flex items-center gap-1.5 font-medium">
-                                    <MapPin className="w-4 h-4 shrink-0" />{property.type} &bull; {property.location}
-                                </p>
-                            </div>
-                            <div className="hidden md:flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-white">
-                                {(property.rating ?? 0) > 0 ? (
-                                    <>
-                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                        <span className="font-bold">{(property.rating ?? 0).toFixed(1)}</span>
-                                        <span className="text-white/60 text-sm">&middot; {property.reviews || 0} reviews</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Star className="w-4 h-4 text-amber-300" />
-                                        <span className="font-semibold text-sm">New Listing</span>
-                                    </>
+                                <span className="text-sm font-semibold tracking-wide hidden sm:inline">Back</span>
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                                {copied && (
+                                    <span className="hidden sm:inline text-emerald-200 text-xs font-semibold bg-white/10 border border-white/15 px-3 py-2 rounded-full">
+                                        Link copied
+                                    </span>
                                 )}
+                                {allImages.length > 0 && (
+                                    <button
+                                        onClick={() => setLightboxIndex(heroIdx)}
+                                        className="w-10 h-10 rounded-full bg-white/10 border border-white/15 text-white/90 hover:text-white hover:bg-white/15 transition-all"
+                                        aria-label="Open gallery"
+                                    >
+                                        <Maximize2 className="w-4 h-4 mx-auto" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={handleShare}
+                                    className="w-10 h-10 rounded-full bg-white/10 border border-white/15 text-white/90 hover:text-white hover:bg-white/15 transition-all"
+                                    aria-label="Share property"
+                                >
+                                    <Share2 className="w-4 h-4 mx-auto" />
+                                </button>
+                                <button
+                                    onClick={handleWishlistToggle}
+                                    className={`w-10 h-10 rounded-full border transition-all ${wishlisted ? 'bg-brand-red/90 border-brand-red text-white' : 'bg-white/10 border-white/15 text-white/90 hover:text-white hover:bg-white/15'}`}
+                                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                                >
+                                    <Heart className={`w-4 h-4 mx-auto ${wishlisted ? 'fill-white' : ''}`} />
+                                </button>
                             </div>
                         </div>
+
+                        {/* Main slider image (no blur/scale; clarity-first) */}
+                        <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-black shadow-2xl shadow-black/40">
+                            {heroImage ? (
+                                <img
+                                    key={heroIdx}
+                                    src={heroImage}
+                                    alt={property.title}
+                                    className="w-full h-[54vh] sm:h-[58vh] md:h-[70vh] object-cover"
+                                    loading="eager"
+                                    decoding="async"
+                                    style={{ transform: 'translateZ(0)' }}
+                                />
+                            ) : (
+                                <div className="w-full h-[54vh] sm:h-[58vh] md:h-[70vh] flex items-center justify-center bg-gradient-to-br from-slate-900 to-black">
+                                    <div className="text-center text-slate-400">
+                                        <div className="text-6xl mb-2">🏠</div>
+                                        <p className="text-sm font-medium">No image available</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Overlay for readability (minimal) */}
+                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+                            {/* Prev/next */}
+                            {allImages.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1))}
+                                        className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
+                                        aria-label="Previous image"
+                                    >
+                                        <ChevronLeft className="w-5 h-5 mx-auto" />
+                                    </button>
+                                    <button
+                                        onClick={() => setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1))}
+                                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
+                                        aria-label="Next image"
+                                    >
+                                        <ChevronRight className="w-5 h-5 mx-auto" />
+                                    </button>
+                                </>
+                            )}
+
+                            {/* Bottom content */}
+                            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest border ${property.is_available ? 'bg-emerald-500/15 text-emerald-200 border-emerald-500/25' : 'bg-amber-500/15 text-amber-200 border-amber-500/25'}`}>
+                                        {property.tag || (property.is_available ? 'Available' : 'Limited availability')}
+                                    </span>
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest bg-white/10 text-white/80 border border-white/15">
+                                        {Math.max(allImages.length, 1)} photos
+                                    </span>
+                                </div>
+                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-[1.1] tracking-tight">
+                                    {property.title}
+                                </h1>
+                                <p className="mt-2 text-white/80 flex items-center gap-2 text-sm sm:text-base font-medium">
+                                    <MapPin className="w-4 h-4 shrink-0 text-white/70" />
+                                    <span>{property.type}</span>
+                                    <span className="text-white/40">•</span>
+                                    <span className="truncate">{property.location}</span>
+                                </p>
+
+                                <div className="mt-4 flex flex-wrap items-center gap-3">
+                                    {(property.rating ?? 0) > 0 ? (
+                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 text-white">
+                                            <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
+                                            <span className="font-extrabold">{(property.rating ?? 0).toFixed(1)}</span>
+                                            <span className="text-white/60 text-sm font-semibold">({property.reviews || 0} reviews)</span>
+                                        </div>
+                                    ) : (
+                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 text-white/90">
+                                            <Star className="w-4 h-4 text-amber-200" />
+                                            <span className="text-sm font-semibold">New Listing</span>
+                                        </div>
+                                    )}
+
+                                    <div className="ml-auto hidden md:flex items-end gap-2">
+                                        <span className="text-white/60 text-xs font-bold uppercase tracking-[0.22em]">Starting from</span>
+                                        <span className="text-white font-extrabold text-xl">{property.price}</span>
+                                        {property.category === 'rent' && <span className="text-white/60 font-semibold pb-[2px]">/mo</span>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Thumbnail strip (aligned, consistent aspect) */}
+                        {allImages.length > 1 && (
+                            <div className="mt-4">
+                                <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                    {allImages.map((url, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setHeroIdx(idx)}
+                                            className={`shrink-0 w-28 sm:w-32 aspect-[4/3] rounded-2xl overflow-hidden border transition-all ${idx === heroIdx ? 'border-white/40 shadow-lg' : 'border-white/10 hover:border-white/25'}`}
+                                            aria-label={`Select image ${idx + 1}`}
+                                        >
+                                            <img
+                                                src={url}
+                                                alt={`Thumbnail ${idx + 1}`}
+                                                className="w-full h-full object-cover"
+                                                loading="lazy"
+                                                decoding="async"
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                </div>
+                </section>
 
                 {/* ─── Main Content ─── */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-start">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
                         {/* LEFT — Main Details */}
                         <div className="lg:col-span-2 space-y-6">
 
                             {/* About Section */}
-                            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                                <div className="p-8">
+                            <div className="relative rounded-3xl border border-slate-200/70 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.40)] overflow-hidden">
+                                {/* Subtle luxury background */}
+                                <div className="absolute inset-0 pointer-events-none">
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white to-slate-50" />
+                                    <div className="absolute -top-28 -left-28 w-[26rem] h-[26rem] rounded-full blur-3xl" style={{ background: 'rgba(177,18,38,0.10)' }} />
+                                    <div className="absolute -top-36 -right-36 w-[30rem] h-[30rem] rounded-full blur-3xl" style={{ background: 'rgba(245,158,11,0.10)' }} />
+                                    <div className="absolute inset-0" style={{ background: 'radial-gradient(900px 450px at 10% 0%, rgba(2,6,23,0.06) 0%, transparent 60%)' }} />
+                                </div>
+
+                                {/* Top accent */}
+                                <div className="relative h-1 bg-gradient-to-r from-brand-red via-red-400 to-amber-400" />
+
+                                <div className="relative p-6 md:p-8">
                                     <div className="flex items-center gap-3 mb-6">
                                         <div className="w-1 h-7 bg-brand-red rounded-full" />
-                                        <h2 className="text-2xl font-extrabold text-slate-900">About this home</h2>
+                                        <div className="min-w-0">
+                                            <h2 className="text-2xl font-extrabold text-slate-900">About this home</h2>
+                                            <p className="text-slate-500 text-sm mt-1">
+                                                Verified listing · Premium amenities · High-demand location
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="text-slate-600 leading-relaxed text-base space-y-3">
+                                    <div className="rounded-2xl border border-white/70 bg-white/70 backdrop-blur-sm p-5 md:p-6 shadow-sm">
+                                        <div className="text-slate-700 leading-relaxed text-[15px] md:text-base space-y-3">
                                         {desc.split('\n').map((line: string, i: number) => {
                                             if (!line.trim()) return null;
                                             const parts = line.split(/(\*\*.*?\*\*)/g);
@@ -318,12 +402,13 @@ export default function PropertyDetails() {
                                                 </p>
                                             );
                                         })}
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Amenities */}
                                 {displayFeatures.length > 0 && (
-                                    <div className="border-t border-slate-50 px-8 py-8">
+                                    <div className="relative border-t border-white/70 px-6 md:px-8 py-7 md:py-8">
                                         {/* Trust decision tags */}
                                         <div className="flex flex-wrap gap-2 mb-5">
                                             {['✓ Fully Furnished', '✓ Move-in Ready', '✓ No Brokerage', '✓ Verified Property'].map((tag) => (
@@ -350,7 +435,7 @@ export default function PropertyDetails() {
 
                             {/* Visual Tour */}
                             {allImages.length > 0 && (
-                                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+                                <div className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8">
                                     <div className="mb-7 flex items-center gap-3">
                                         <div className="w-1 h-7 bg-brand-red rounded-full" />
                                         <div>
@@ -363,7 +448,7 @@ export default function PropertyDetails() {
                                             <div
                                                 key={idx}
                                                 onClick={() => setLightboxIndex(idx)}
-                                                className="aspect-[4/3] rounded-2xl overflow-hidden group cursor-zoom-in relative shadow-sm border border-slate-100 hover:border-slate-200 transition-all hover:shadow-md"
+                                                className="aspect-[4/3] rounded-2xl overflow-hidden group cursor-zoom-in relative shadow-sm border border-slate-200/70 hover:border-slate-300 transition-all hover:shadow-md"
                                             >
                                                 <img
                                                     src={url}
@@ -380,7 +465,7 @@ export default function PropertyDetails() {
                             )}
 
                             {/* Reviews */}
-                            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+                            <div className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8">
                                 <ReviewSection
                                     propertyId={property.id}
                                     initialReviews={property.reviews_list || []}
@@ -394,11 +479,11 @@ export default function PropertyDetails() {
                             <div className="sticky top-24 space-y-5">
 
                                 {/* Price + Book */}
-                                <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+                                <div className="bg-white rounded-3xl shadow-[0_22px_70px_-48px_rgba(15,23,42,0.45)] border border-slate-200/70 overflow-hidden">
                                     {/* top accent */}
                                     <div className="h-1 bg-gradient-to-r from-brand-red via-red-400 to-orange-400" />
 
-                                    <div className="p-7">
+                                    <div className="p-6 md:p-7">
                                         {/* Price */}
                                         <div className="mb-5">
                                             <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Starting from</p>
@@ -409,7 +494,7 @@ export default function PropertyDetails() {
                                         </div>
 
                                         {/* Price breakdown */}
-                                        <div className="mb-5 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2.5 text-sm">
+                                        <div className="mb-5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-200/70 space-y-2.5 text-sm">
                                             <div className="flex justify-between text-slate-600">
                                                 <span>Monthly Rent</span>
                                                 <span className="font-semibold text-slate-900">{property.price}</span>
@@ -421,7 +506,7 @@ export default function PropertyDetails() {
                                         </div>
 
                                         {/* Rating row */}
-                                        <div className="flex items-center justify-between mb-5 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="flex items-center justify-between mb-5 p-3 bg-slate-50/70 rounded-2xl border border-slate-200/70">
                                             <div className="flex items-center gap-2">
                                                 {(property.rating ?? 0) > 0 ? (
                                                     <>
@@ -451,7 +536,7 @@ export default function PropertyDetails() {
                                         {/* CTA */}
                                         <Button
                                             onClick={handlePayNow}
-                                            className="w-full py-4 text-base font-extrabold rounded-2xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 transition-all transform hover:scale-[1.02] active:scale-[0.98] border-0 text-white"
+                                            className="w-full py-4 text-base font-extrabold rounded-2xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-lg shadow-brand-red/25 hover:shadow-brand-red/40 transition-all transform hover:scale-[1.01] active:scale-[0.99] border-0 text-white"
                                         >
                                             🔥 Secure This Room Now
                                         </Button>
