@@ -5,7 +5,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { usePropertyBySlug } from '@/hooks';
+import { useProperty, usePropertyBySlug, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
@@ -15,13 +15,18 @@ import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
-import { useSmartBack } from '@/hooks/useSmartBack';
 
 
 export default function PropertyDetails() {
-    const { type, slug } = useParams();
+    const { type, slug, id } = useParams();
     const goBack = useSmartBack({ fallback: '/properties' });
-    const { property, loading, error, refetch } = usePropertyBySlug(type, slug);
+    const bySlug = usePropertyBySlug(type, slug);
+    const byId = useProperty(id ?? '');
+    const isIdRoute = Boolean(id);
+    const property = isIdRoute ? byId.property : bySlug.property;
+    const loading = isIdRoute ? byId.loading : bySlug.loading;
+    const error = isIdRoute ? byId.error : bySlug.error;
+    const refetch = isIdRoute ? byId.refetch : bySlug.refetch;
     const { isWishlisted, toggleWishlist } = useWishlist();
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -110,7 +115,8 @@ export default function PropertyDetails() {
         } catch (error: any) {
             const msg = error?.message || "Unknown error";
             const detail = error?.detail || "";
-            alert(`Payment Initialization Failed: ${msg} ${detail}`);
+            const suffix = detail && detail !== msg ? ` ${detail}` : "";
+            alert(`Payment Initialization Failed: ${msg}${suffix}`);
             setIsPaymentProcessing(false);
         }
     };

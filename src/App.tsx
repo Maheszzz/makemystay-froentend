@@ -53,6 +53,7 @@ function App() {
                             <Route path="/schedule-demo" element={<ScheduleDemo />} />
                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
+                            <Route path="/properties/id/:id" element={<PropertyDetails />} />
                             <Route path="/properties/:type/:slug" element={<PropertyDetails />} />
                             <Route path="/services/:serviceId" element={<ServiceDetail />} />
                             <Route path="/terms" element={<Terms />} />

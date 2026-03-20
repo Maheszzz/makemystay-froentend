@@ -10,7 +10,9 @@ const apiClient: AxiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000, // 10 seconds
+    // Payment + DB calls can take a moment on cold start.
+    // Keep this long enough to avoid classifying slow backend as "no response".
+    timeout: 30000, // 30 seconds
 });
 
 // Request interceptor for adding auth tokens if needed in the future
@@ -54,9 +56,15 @@ apiClient.interceptors.response.use(
             apiError.message = typeof data?.message === 'string' ? data.message : parsedDetail;
             apiError.detail = parsedDetail;
         } else if (error.request) {
-            // Request made but no response received
-            apiError.message = 'No response from server. Please check if the backend is running.';
-            apiError.detail = 'Network error or server is not responding';
+            // Request made but no response received (or we hit a timeout)
+            if (error.code === 'ECONNABORTED') {
+                apiError.message = 'Request timed out while waiting for backend.';
+                apiError.detail =
+                    'Backend may be slow or blocked (often due to DB connectivity). Check backend logs.';
+            } else {
+                apiError.message = 'No response from server. Please check if the backend is running.';
+                apiError.detail = 'Network error or server is not responding';
+            }
         }
 
         console.error('API Error:', apiError);

@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { useWishlist } from '@/context/WishlistContext';
 import { useEffect } from 'react';
-import { useSmartBack } from '@/hooks/useSmartBack';
+import { useSmartBack } from '@/hooks';
 
 export default function Wishlist() {
     const { wishlist, clearWishlist } = useWishlist();

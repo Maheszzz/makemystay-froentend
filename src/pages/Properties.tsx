@@ -5,12 +5,12 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties } from '@/hooks';
+import { useProperties, useSmartBack } from '@/hooks';
 import { Search, ArrowLeft, Filter, X, ChevronDown, Heart, Trash2, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
-import { useSmartBack } from '@/hooks/useSmartBack';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 
 interface PropertiesProps {
     initialCategory?: 'all' | 'pg' | 'rent' | 'buy' | 'plot';
@@ -43,7 +43,6 @@ export default function Properties({
 
     const [locationFilter, setLocationFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState(initialTypeFilter || 'all');
-    const [bhkFilter, setBhkFilter] = useState('all');
 
     // Restore scroll position when navigating back to this page.
     // We key by location.key so each history entry gets its own scrollY.
@@ -94,13 +93,13 @@ export default function Properties({
     }, [properties]);
 
     const filteredProperties = useMemo(() => {
-        // Only apply filters that AREN'T handled by server yet
+        // Only apply filters that AREN'T handled by server yet.
+        // `property_type` is already handled server-side via `typeFilter` in `params`.
         return properties.filter(prop => {
             const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
-            const matchesBHK = bhkFilter === 'all' || prop.type.includes(bhkFilter);
-            return matchesLocation && matchesBHK;
+            return matchesLocation;
         });
-    }, [properties, locationFilter, bhkFilter, category]);
+    }, [properties, locationFilter]);
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
@@ -158,7 +157,7 @@ export default function Properties({
                             {/* Reset + Filter — pinned right, never overflow */}
                             <div className="flex items-center gap-1.5 shrink-0">
                                 <button
-                                    onClick={() => { setLocationFilter('all'); setTypeFilter('all'); setBhkFilter('all'); }}
+                                    onClick={() => { setLocationFilter('all'); setTypeFilter('all'); }}
                                     className="h-8 px-2.5 text-[11px] font-bold text-slate-400 hover:text-brand-red transition-colors flex items-center whitespace-nowrap"
                                 >
                                     Reset
@@ -203,22 +202,32 @@ export default function Properties({
 
                                         <div className="flex flex-col gap-2">
                                             <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Property Type</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={typeFilter}
-                                                    onChange={(e) => setTypeFilter(e.target.value)}
-                                                    className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red/20 bg-slate-50/50 text-sm font-medium appearance-none"
-                                                >
-                                                    <option value="all">Any Type</option>
-                                                    {category !== 'rent' && category !== 'all' && <option value="PG">Paying Guest (PG)</option>}
-                                                    <option value="1RK">1 RK</option>
-                                                    <option value="1BHK">1 BHK</option>
-                                                    <option value="2BHK">2 BHK</option>
-                                                    <option value="3BHK">3 BHK</option>
-                                                    <option value="Villa">Villa</option>
-                                                </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                                            </div>
+                                            {category === 'plot' ? (
+                                                <div className="w-full pl-4 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-slate-500">
+                                                    Plot
+                                                </div>
+                                            ) : category === 'pg' ? (
+                                                <div className="w-full pl-4 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm font-medium text-slate-500">
+                                                    PG
+                                                </div>
+                                            ) : (
+                                                <div className="relative">
+                                                    <select
+                                                        value={typeFilter}
+                                                        onChange={(e) => setTypeFilter(e.target.value)}
+                                                        className="w-full pl-4 pr-10 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-red/20 bg-slate-50/50 text-sm font-medium appearance-none"
+                                                    >
+                                                        <option value="all">Any Type</option>
+                                                        {category !== 'rent' && category !== 'all' && <option value="PG">Paying Guest (PG)</option>}
+                                                        <option value="1RK">1 RK</option>
+                                                        <option value="1BHK">1 BHK</option>
+                                                        <option value="2BHK">2 BHK</option>
+                                                        <option value="3BHK">3 BHK</option>
+                                                        <option value="Villa">Villa</option>
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                                                </div>
+                                            )}
                                         </div>
 
 
@@ -297,7 +306,7 @@ export default function Properties({
                                                     </button>
 
                                                     {/* Thumbnail */}
-                                                    <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`} className="shrink-0 block mt-1">
+                                                    <Link to={getPropertyDetailPath(prop)} className="shrink-0 block mt-1">
                                                         <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100 shadow-sm">
                                                             <img
                                                                 src={(prop.images && prop.images[0]) || prop.image || ''}
@@ -310,7 +319,7 @@ export default function Properties({
                                                     {/* Details & Actions combined */}
                                                     <div className="flex-1 min-w-0 pr-6 sm:pr-8">
                                                         <div className="mb-2">
-                                                            <Link to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}>
+                                                            <Link to={getPropertyDetailPath(prop)}>
                                                                 <h3 className="font-bold text-slate-900 text-[15px] sm:text-base hover:text-brand-red transition-colors truncate leading-tight">{prop.title}</h3>
                                                             </Link>
                                                             <p className="text-slate-400 text-[11px] sm:text-xs mt-1 flex items-center gap-1">
@@ -332,7 +341,7 @@ export default function Properties({
                                                             </div>
 
                                                             <Link
-                                                                to={`/properties/${prop.type === 'PG' ? 'pg' : prop.category?.toLowerCase() || 'rent'}/${prop.slug}`}
+                                                                to={getPropertyDetailPath(prop)}
                                                                 className="bg-brand-red text-white text-[11px] sm:text-xs font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl shadow-sm hover:bg-brand-red/90 hover:shadow transition-all whitespace-nowrap mt-1 sm:mt-0"
                                                             >
                                                                 View

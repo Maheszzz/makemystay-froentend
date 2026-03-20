@@ -76,7 +76,10 @@ export function useProperty(id: number | string): UsePropertyResult {
     const [error, setError] = useState<ApiError | null>(null);
 
     const fetchProperty = async () => {
-        if (!id) return;
+        if (!id) {
+            setLoading(false);
+            return;
+        }
 
         try {
             setLoading(true);
@@ -115,7 +118,10 @@ export function usePropertyBySlug(type: string | undefined, slug: string | undef
     const [error, setError] = useState<ApiError | null>(null);
 
     const fetchProperty = async () => {
-        if (!type || !slug) return;
+        if (!type || !slug) {
+            setLoading(false);
+            return;
+        }
 
         try {
             setLoading(true);

@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 
 import { amenityIconMap } from '@/lib/amenityIcons';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';
 import { useWishlist } from '@/context/WishlistContext';
 
@@ -45,7 +46,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
     if (property.geyser) amenities.push('Geyser');
     if (isPlot && property.features) amenities.push(...property.features);
 
-    const routeCategory = property.type === 'PG' ? 'pg' : property.category.toLowerCase();
+    const propertyPath = getPropertyDetailPath(property);
 
     // Deterministic social proof & scarcity (vary by id)
     const idx = (Number(property.id) || 0) % 3;
@@ -60,7 +61,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
     return (
         <Link
-            to={`/properties/${routeCategory}/${property.slug}`}
+            to={propertyPath}
             state={{ from }}
             className="block group"
         >

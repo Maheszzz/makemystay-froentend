@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { MapPin, Star } from 'lucide-react';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';
 
 interface MobilePropertyCarouselProps {
@@ -15,7 +16,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
         <div className="md:hidden px-4 flex flex-col gap-4">
             {properties.map((property) => {
                 const images = property.images && property.images.length > 0 ? property.images : [property.image];
-                const routeCategory = property.type === 'PG' ? 'pg' : property.category.toLowerCase();
+                const propertyPath = getPropertyDetailPath(property);
                 const contactNumber = '919844594800';
 
                 // Deterministic social proof & scarcity
@@ -89,7 +90,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                             {/* CTA row */}
                             <div className="flex gap-2 mt-3">
                                 <Link
-                                    to={`/properties/${routeCategory}/${property.slug}`}
+                                    to={propertyPath}
                                     state={{ from }}
                                     className="flex-1 text-center py-2.5 rounded-xl text-white text-xs font-bold tracking-wide transition-transform active:scale-95"
                                     style={{ background: 'linear-gradient(135deg,#B11226,#8B0D1C)' }}

@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Building2, Wallet, Users, BarChart3, ArrowLeft, CheckCircle, ArrowRight, Phone } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { useSmartBack } from '@/hooks/useSmartBack';
+import { useSmartBack } from '@/hooks';
 
 export default function ServiceDetail() {
     const { serviceId } = useParams();
