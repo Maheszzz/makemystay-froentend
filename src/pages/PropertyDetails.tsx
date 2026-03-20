@@ -5,8 +5,9 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { useProperty, usePropertyBySlug, useSmartBack } from '@/hooks';
+import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
+import { parsePropertySlugParam } from '@/lib/propertyRouting';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { ReviewSection } from '@/components/property/ReviewSection';
@@ -18,16 +19,13 @@ import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 
 
 export default function PropertyDetails() {
-    const { type, slug, id } = useParams();
+    // Route: /properties/:slug  (e.g. "102-slc-bhk-2" or bare "102")
+    const { slug: slugParam } = useParams<{ slug: string }>();
+    const propertyId = parsePropertySlugParam(slugParam ?? '');
     const goBack = useSmartBack({ fallback: '/properties' });
-    const bySlug = usePropertyBySlug(type, slug);
-    const byId = useProperty(id ?? '');
-    const isIdRoute = Boolean(id);
-    const property = isIdRoute ? byId.property : bySlug.property;
-    const loading = isIdRoute ? byId.loading : bySlug.loading;
-    const error = isIdRoute ? byId.error : bySlug.error;
-    const refetch = isIdRoute ? byId.refetch : bySlug.refetch;
+    const { property, loading, error, refetch } = useProperty(propertyId);
     const { isWishlisted, toggleWishlist } = useWishlist();
+
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
@@ -49,7 +47,7 @@ export default function PropertyDetails() {
 
     const handleShare = async () => {
         if (!property) return;
-        const productionUrl = `https://makemystay.ai/properties/${type}/${slug}`;
+        const productionUrl = `https://makemystay.ai/properties/${slugParam}`;
         const shareData = {
             title: property.title,
             text: `Check out this property: ${property.title} in ${property.location}`,

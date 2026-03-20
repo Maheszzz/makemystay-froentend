@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
 import { WhatsAppWidget } from './components/layout/WhatsAppWidget';
@@ -19,9 +19,19 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
-
-
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
+
+/** Backward-compat: redirect /properties/id/102 → /properties/102 */
+function LegacyIdRedirect() {
+    const { id } = useParams<{ id: string }>();
+    return <Navigate to={`/properties/${id}`} replace />;
+}
+
+/** Backward-compat: redirect /properties/rent/slc-bhk-2 → /properties/slc-bhk-2 */
+function LegacyTypeSlugRedirect() {
+    const { slug } = useParams<{ type: string; slug: string }>();
+    return <Navigate to={`/properties/${slug}`} replace />;
+}
 
 
 
@@ -53,8 +63,9 @@ function App() {
                             <Route path="/schedule-demo" element={<ScheduleDemo />} />
                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
-                            <Route path="/properties/id/:id" element={<PropertyDetails />} />
-                            <Route path="/properties/:type/:slug" element={<PropertyDetails />} />
+                            <Route path="/properties/id/:id" element={<LegacyIdRedirect />} />
+                            <Route path="/properties/:type/:slug" element={<LegacyTypeSlugRedirect />} />
+                            <Route path="/properties/:slug" element={<PropertyDetails />} />
                             <Route path="/services/:serviceId" element={<ServiceDetail />} />
                             <Route path="/terms" element={<Terms />} />
                             <Route path="/privacy" element={<Privacy />} />
