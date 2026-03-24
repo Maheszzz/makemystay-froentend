@@ -35,10 +35,9 @@ echo "📦 Using build folder: $BUILD_DIR"
 # ===== PREPARE EC2 =====
 echo "🧹 Preparing EC2..."
 ssh -T -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
-sudo apt update -y
-sudo apt install -y nginx
 sudo mkdir -p $REMOTE_DIR
 sudo rm -rf $REMOTE_DIR/*
+mkdir -p /tmp/$APP_NAME
 EOF
 
 # ===== UPLOAD BUILD =====

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     MapPin, Heart, Bed, Bath, Users, Utensils, Star
@@ -12,6 +13,20 @@ interface PropertyCardProps {
     property: Property;
 }
 
+function getFallbackImageForType(type?: string): string {
+    const t = (type || '').toLowerCase();
+    if (t === 'pg' || t === 'hostel') {
+        return 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (t === 'plot') {
+        return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (t.includes('villa') || t.includes('4bhk') || t.includes('3bhk')) {
+        return 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80';
+}
+
 export function PropertyCard({ property }: PropertyCardProps) {
     const location = useLocation();
     const { isWishlisted, toggleWishlist } = useWishlist();
@@ -22,8 +37,29 @@ export function PropertyCard({ property }: PropertyCardProps) {
         toggleWishlist(property);
     };
 
+    const fallbackImage = useMemo(() => getFallbackImageForType(property.type), [property.type]);
+    
+    // Explicit requested dynamic resolver
+    const getImage = (prop: any) => {
+        // Backend nested object extraction
+        const parsedImages = prop.images && prop.images.length > 0 
+            ? prop.images.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
+            : [];
+            
+        const parsedPhotos = prop.photos && prop.photos.length > 0
+            ? prop.photos.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
+            : [];
 
-    const images = property.images && property.images.length > 0 ? property.images : [property.image];
+        return (
+            parsedImages[0] ||      // RENT
+            prop.image ||           // PG fallback
+            parsedPhotos[0] ||      // Secondary backend fallback
+            fallbackImage ||        // Unsplash generated context fallback
+            "/default-property.jpg" // Final explicit
+        );
+    };
+
+    const displayImage = getImage(property);
     const isServiceOriented = property.type === 'PG' || property.type === 'Hostel';
     const isPlot = property.type === 'Plot' || property.type?.toLowerCase() === 'plot';
 
@@ -68,15 +104,23 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <div className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 border border-slate-100" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
 
                 {/* Image Section */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                    <img
-                        src={images[0] ?? ''}
-                        alt={property.title}
-                        loading="lazy"
-                        width="400"
-                        height="300"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
+                <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-100 rounded-t-3xl">
+                    {displayImage ? (
+                        <img
+                            src={displayImage}
+                            alt={property.title}
+                            loading="lazy"
+                            onError={(e) => {
+                                const target = e.currentTarget;
+                                if (target.src !== '/default-property.jpg') {
+                                    target.src = '/default-property.jpg';
+                                }
+                            }}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200" />
+                    )}
 
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />

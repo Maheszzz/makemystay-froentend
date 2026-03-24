@@ -1,6 +1,7 @@
 import { api } from './client';
 import type {
     Property,
+    PropertyImage,
     RealtyProperty,
     PropertyCreateRequest,
     PropertyUpdateRequest,
@@ -8,6 +9,16 @@ import type {
 } from '@/types/api';
 
 const REALTY_PATH = '/realty/properties';
+
+/** HTTPS placeholders only — `data:` URIs are often blocked by CSP `img-src`, so cards looked blank while detail pages used real URLs. */
+const PLACEHOLDER_GENERIC =
+    'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80';
+const PLACEHOLDER_PG =
+    'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80';
+const PLACEHOLDER_PLOT =
+    'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80';
+const PLACEHOLDER_VILLA =
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80';
 
 /**
  * Maps the backend RealtyProperty to the frontend Property interface
@@ -33,11 +44,14 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     // Determine default image based on type if none exists
     // Using some Unsplash placeholders
     const defaultImages: Record<string, string> = {
-        // 'PG': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-        // '1RK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
-        // '1BHK': 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=1000',
-        // '2BHK': 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=1000',
-        // 'Villa': 'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&q=80&w=1000'
+        PG: PLACEHOLDER_PG,
+        '1RK': PLACEHOLDER_GENERIC,
+        '1BHK': PLACEHOLDER_GENERIC,
+        '2BHK': PLACEHOLDER_GENERIC,
+        '3BHK': PLACEHOLDER_GENERIC,
+        '4BHK': PLACEHOLDER_GENERIC,
+        Villa: PLACEHOLDER_VILLA,
+        Plot: PLACEHOLDER_PLOT,
     };
 
     // Heuristics for beds/baths based on type
@@ -54,9 +68,24 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     const rawListingType = (item.listing_type || 'rent').toLowerCase();
     const category = (rawListingType === 'sale' || rawListingType === 'buy') ? 'buy' : 'rent';
 
-    // Extract images from DB response
-    const dbImages = item.images?.sort((a, b) => a.sort_order - b.sort_order).map(img => img.image_url) || [];
-    const primaryImage = item.images?.find(img => img.is_primary)?.image_url || dbImages[0];
+    // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
+    const rawImages = item.images ?? [];
+    const sortedImages = [...rawImages].sort((a, b) => {
+        const ao = typeof a === 'object' && a && 'sort_order' in a ? (a as PropertyImage).sort_order ?? 0 : 0;
+        const bo = typeof b === 'object' && b && 'sort_order' in b ? (b as PropertyImage).sort_order ?? 0 : 0;
+        return ao - bo;
+    });
+    const imageUrlFromEntry = (img: string | PropertyImage): string | undefined => {
+        if (typeof img === 'string') return img.trim() || undefined;
+        const u = img?.image_url;
+        return typeof u === 'string' && u.trim() ? u : undefined;
+    };
+    const dbImages = sortedImages.map(imageUrlFromEntry).filter((x): x is string => Boolean(x));
+    const primaryEntry = sortedImages.find(
+        (img): img is PropertyImage =>
+            typeof img === 'object' && img != null && 'is_primary' in img && (img as PropertyImage).is_primary === true
+    );
+    const primaryImage = imageUrlFromEntry(primaryEntry ?? sortedImages[0]) ?? dbImages[0];
 
     // Determine sharing options
     const sharingOptions: string[] = [];
@@ -90,7 +119,11 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         cctv: true,
         washing_machine: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG'),
         geyser: !isPlot,
-        image: primaryImage || defaultImages[item.property_type] || defaultImages['PG'],
+        image:
+            primaryImage ||
+            defaultImages[item.property_type] ||
+            defaultImages['PG'] ||
+            PLACEHOLDER_GENERIC,
         modern_kitchen: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
         balcony: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
         attached_bathroom: !isPlot, // Standard for most listed properties

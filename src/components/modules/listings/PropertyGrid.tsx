@@ -5,21 +5,27 @@ import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
 import { useProperties } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import type { PaginationParams } from '@/types/api';
 
 interface PropertyGridProps {
     category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
     searchQuery: string;
 }
 
-import { ErrorMessage } from '@/components/ui/ErrorMessage';
-
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
-    const params = useMemo(() => ({
-        listing_type: category === 'buy' || category === 'rent' ? category : undefined,
-        property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : undefined,
-        search: searchQuery,
-        limit: 20
-    }), [category, searchQuery]);
+    const params = useMemo((): PaginationParams => {
+        const p: PaginationParams = { limit: 20 };
+        // Align with backend tab semantics: pg | rent | buy | plot ("all" = no category filter).
+        if (category !== 'all') {
+            p.category = category;
+        }
+        const q = searchQuery.trim();
+        if (q) {
+            p.search = q;
+        }
+        return p;
+    }, [category, searchQuery]);
 
     const { properties, loading, error } = useProperties(params);
 
@@ -29,6 +35,15 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     // Filter out plots from buy/rent categories and limit to 4 for the home page
     // Filter for the home page (limit to 4)
     const filteredProperties = properties.slice(0, 4);
+
+    const viewAllByCategory: Record<PropertyGridProps['category'], string> = {
+        all: '/properties',
+        pg: '/pg',
+        rent: '/rent',
+        buy: '/buy',
+        plot: '/plots',
+    };
+    const viewAllPath = viewAllByCategory[category];
 
     if (loading) {
         return (
@@ -90,7 +105,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
             </div>
 
             <div className="mt-8 md:mt-12 flex justify-center px-4">
-                <Link to="/properties" className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group w-full md:w-auto justify-center">
+                <Link to={viewAllPath} className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group w-full md:w-auto justify-center">
                     View All Properties
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>

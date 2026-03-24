@@ -70,8 +70,9 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
     return (
         <div className="bg-black/40 backdrop-blur-xl rounded-2xl md:rounded-[2rem] shadow-2xl p-2.5 md:p-6 max-w-3xl w-full relative border border-white/10">
             {/* BUY / RENT / PLOT Toggle */}
-            <div className="flex w-full max-w-[340px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-4 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar">
+            <div className="flex w-full max-w-[380px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-4 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar flex-wrap sm:flex-nowrap justify-center">
                 {[
+                    { id: 'all', label: 'ALL' },
                     { id: 'pg', label: 'PG' },
                     { id: 'rent', label: 'RENT' },
                     { id: 'buy', label: 'BUY' },
@@ -79,8 +80,9 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                 ].map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot' | 'pg')}
-                        className={`flex-1 sm:flex-none py-2 px-3 sm:px-6 md:px-8 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${category === tab.id
+                        type="button"
+                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot' | 'pg' | 'all')}
+                        className={`flex-1 sm:flex-none py-2 px-2.5 sm:px-4 md:px-6 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${category === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
                             }`}

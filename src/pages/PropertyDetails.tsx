@@ -248,19 +248,18 @@ export default function PropertyDetails() {
                         </div>
 
                         {/* Main slider image (no blur/scale; clarity-first) */}
-                        <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-black shadow-2xl shadow-black/40">
+                        <div className="relative w-full h-[320px] sm:h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-white/10 bg-black shadow-2xl shadow-black/40">
                             {heroImage ? (
                                 <img
                                     key={heroIdx}
                                     src={heroImage}
                                     alt={property.title}
-                                    className="w-full h-[54vh] sm:h-[58vh] md:h-[70vh] object-cover"
+                                    className="w-full h-full object-cover"
                                     loading="eager"
                                     decoding="async"
-                                    style={{ transform: 'translateZ(0)' }}
                                 />
                             ) : (
-                                <div className="w-full h-[54vh] sm:h-[58vh] md:h-[70vh] flex items-center justify-center bg-gradient-to-br from-slate-900 to-black">
+                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-black">
                                     <div className="text-center text-slate-400">
                                         <div className="text-6xl mb-2">🏠</div>
                                         <p className="text-sm font-medium">No image available</p>

@@ -12,30 +12,44 @@ import { Comparison } from '@/components/sections/Comparison';
 import { CTA } from '@/components/sections/CTA';
 import { CaseStudy } from '@/components/sections/CaseStudy';
 
+const HOME_CATEGORIES = new Set(['pg', 'rent', 'buy', 'plot', 'all']);
+
 export default function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Get values from URL or default
-    const category = (searchParams.get('category') as 'pg' | 'rent' | 'buy' | 'plot') || 'rent';
+    // Match /properties default: "All" (mixed PG + BHK + …). Do not default to rent — that hid PG on the home grid.
+    const rawCategory = searchParams.get('category');
+    const category: 'pg' | 'rent' | 'buy' | 'plot' | 'all' =
+        rawCategory && HOME_CATEGORIES.has(rawCategory)
+            ? (rawCategory as 'pg' | 'rent' | 'buy' | 'plot' | 'all')
+            : 'all';
     const searchQuery = searchParams.get('q') || '';
 
-    // Wrapped setters to update URL
+    // Copy URLSearchParams — mutating `prev` and returning it can skip updates in react-router.
     const setCategory = (newCategory: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => {
-        setSearchParams(prev => {
-            prev.set('category', newCategory);
-            return prev;
-        }, { replace: true });
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.set('category', newCategory);
+                return next;
+            },
+            { replace: true }
+        );
     };
 
     const setSearchQuery = (newQuery: string) => {
-        setSearchParams(prev => {
-            if (newQuery) {
-                prev.set('q', newQuery);
-            } else {
-                prev.delete('q');
-            }
-            return prev;
-        }, { replace: true });
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                if (newQuery) {
+                    next.set('q', newQuery);
+                } else {
+                    next.delete('q');
+                }
+                return next;
+            },
+            { replace: true }
+        );
     };
 
     return (

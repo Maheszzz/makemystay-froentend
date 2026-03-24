@@ -321,7 +321,7 @@ export default function Properties({
                                                     <Link to={getPropertyDetailPath(prop)} className="shrink-0 block mt-1">
                                                         <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-slate-100 shadow-sm">
                                                             <img
-                                                                src={(prop.images && prop.images[0]) || prop.image || ''}
+                                                                src={(prop.images && typeof prop.images[0] === 'string' ? prop.images[0] : (prop.images?.[0] as any)?.image_url) || prop.image || ''}
                                                                 alt={prop.title}
                                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                                             />

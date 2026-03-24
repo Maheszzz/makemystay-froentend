@@ -7,6 +7,20 @@ interface MobilePropertyCarouselProps {
     properties: Property[];
 }
 
+function getFallbackImageForType(type?: string): string {
+    const t = (type || '').toLowerCase();
+    if (t === 'pg' || t === 'hostel') {
+        return 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (t === 'plot') {
+        return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80';
+    }
+    if (t.includes('villa') || t.includes('4bhk') || t.includes('3bhk')) {
+        return 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80';
+}
+
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
     if (properties.length === 0) return null;
     const location = useLocation();
@@ -15,7 +29,8 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
     return (
         <div className="md:hidden px-4 flex flex-col gap-4">
             {properties.map((property) => {
-                const images = property.images && property.images.length > 0 ? property.images : [property.image];
+                const rawImages = property.images && property.images.length > 0 ? property.images : (property.image ? [property.image] : []);
+                const images = rawImages.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean);
                 const propertyPath = getPropertyDetailPath(property);
                 const contactNumber = '919844594800';
 
@@ -35,13 +50,32 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                 return (
                     <div key={property.id} className="bg-white rounded-3xl overflow-hidden border border-slate-100" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
                         {/* Property Image */}
-                        <div className="relative w-full" style={{ aspectRatio: '16/9' }}>
-                            <img
-                                src={images[0] ?? ''}
-                                alt={property.title}
-                                loading="lazy"
-                                className="w-full h-full object-cover"
-                            />
+                        <div className="relative w-full bg-slate-100" style={{ aspectRatio: '16/9' }}>
+                            {images[0] ? (
+                                <img
+                                    src={images[0]}
+                                    alt={property.title}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        const target = e.currentTarget;
+                                        const fallback = getFallbackImageForType(property.type);
+                                        if (target.src !== fallback) {
+                                            target.src = fallback;
+                                            return;
+                                        }
+                                        // Hide broken image icon as final fallback.
+                                        target.style.display = 'none';
+                                    }}
+                                />
+                            ) : (
+                                <img
+                                    src={getFallbackImageForType(property.type)}
+                                    alt={property.title}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
                             {/* Stacked badges */}
                             <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
                                 <span className="text-[9px] font-semibold tracking-widest uppercase px-2 py-0.5 rounded-full bg-white/85 text-slate-600 backdrop-blur-sm">
