@@ -155,6 +155,8 @@ export interface PaginationParams {
     location?: string;
     property_type?: string;
     listing_type?: string;
+    /** Server-side tab filter (aligned with GET /realty/properties?category=) */
+    category?: 'pg' | 'rent' | 'buy' | 'plot';
     search?: string;
     exclude_property_type?: string;
 }

@@ -73,11 +73,19 @@ export default function Properties({
         setTypeFilter(initialTypeFilter || 'all');
     }, [initialCategory, initialTypeFilter]);
     const [showFilters, setShowFilters] = useState(false);
+    // Use backend `category` (pg|rent|buy|plot) so PG never appears under RENT, etc.
+    // For "All", keep legacy property_type + no category. For rent/buy + BHK filter, narrow client-side.
     const params = useMemo(() => {
+        const search = debouncedSearchQuery.trim() || undefined;
+        if (category === 'all') {
+            return {
+                search,
+                property_type: typeFilter === 'all' ? undefined : typeFilter,
+            };
+        }
         return {
-            listing_type: category === 'all' || category === 'plot' || category === 'pg' ? undefined : category,
-            search: debouncedSearchQuery.trim() || undefined,
-            property_type: category === 'plot' ? 'Plot' : category === 'pg' ? 'PG' : (typeFilter === 'all' ? undefined : typeFilter),
+            search,
+            category,
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 
@@ -93,13 +101,17 @@ export default function Properties({
     }, [properties]);
 
     const filteredProperties = useMemo(() => {
-        // Only apply filters that AREN'T handled by server yet.
-        // `property_type` is already handled server-side via `typeFilter` in `params`.
-        return properties.filter(prop => {
-            const matchesLocation = locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
-            return matchesLocation;
+        return properties.filter((prop) => {
+            const matchesLocation =
+                locationFilter === 'all' || prop.location.toLowerCase().includes(locationFilter.toLowerCase());
+            if (!matchesLocation) return false;
+            // "All" tab: BHK/type already applied via API `property_type`.
+            if (category === 'all' || typeFilter === 'all') return true;
+            if (category === 'pg' || category === 'plot') return true;
+            const t = String(prop.type || '');
+            return t === typeFilter || t.toLowerCase() === typeFilter.toLowerCase();
         });
-    }, [properties, locationFilter]);
+    }, [properties, locationFilter, category, typeFilter]);
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
