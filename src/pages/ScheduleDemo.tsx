@@ -1,14 +1,22 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Calendar as CalendarIcon, Clock, ChevronLeft, ChevronRight,
-    CheckCircle2, ArrowLeft, Phone, MessageCircle, Building2,
-    Users, TrendingUp, Zap
-} from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Link } from 'react-router-dom';
+import { Navbar } from '@/components/layout/Navbar';
 import { contactApi } from '@/lib/api';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+    ArrowLeft,
+    Building2,
+    Calendar as CalendarIcon,
+    CheckCircle2,
+    ChevronLeft, ChevronRight,
+    Clock,
+    MessageCircle,
+    Phone,
+    TrendingUp,
+    Users,
+    Zap
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const TIME_SLOTS = [
     "10:00 AM", "11:00 AM", "12:00 PM",
@@ -471,7 +479,7 @@ export default function ScheduleDemo() {
                                             <Phone className="w-4 h-4" style={{ color: '#B11226' }} />
                                             Call Now
                                         </a>
-                                        <a href="https://wa.me/919844594800?text=Hi, I just scheduled a demo on MakeMyStay.ai"
+                                        <a href="https://wa.me/918150099911?text=Hi, I just scheduled a demo on MakeMyStay.ai"
                                             target="_blank" rel="noopener noreferrer"
                                             className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-all">
                                             <MessageCircle className="w-4 h-4" />

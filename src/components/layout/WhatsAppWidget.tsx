@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const WHATSAPP_NUMBER = '919844594800'; // +91 98445 94800
+const WHATSAPP_NUMBER = '8150099911'; // +91 98445 94800
 const WHATSAPP_MESSAGE = encodeURIComponent(
     "Hi MakeMyStay! 👋 I'm interested in finding a property. Can you help me?"
 );

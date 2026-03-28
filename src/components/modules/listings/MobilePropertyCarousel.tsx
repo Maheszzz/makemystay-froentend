@@ -32,7 +32,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                 const rawImages = property.images && property.images.length > 0 ? property.images : (property.image ? [property.image] : []);
                 const images = rawImages.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean);
                 const propertyPath = getPropertyDetailPath(property);
-                const contactNumber = '919844594800';
+                const contactNumber = '8150099911';
 
                 // Deterministic social proof & scarcity
                 const idx = (Number(property.id) || 0) % 3;

@@ -1,8 +1,8 @@
-import { useParams, Link } from 'react-router-dom';
-import { Building2, Wallet, Users, BarChart3, ArrowLeft, CheckCircle, ArrowRight, Phone } from 'lucide-react';
-import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { Navbar } from '@/components/layout/Navbar';
 import { useSmartBack } from '@/hooks';
+import { ArrowLeft, ArrowRight, BarChart3, Building2, CheckCircle, Phone, Users, Wallet } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
 
 export default function ServiceDetail() {
     const { serviceId } = useParams();
@@ -198,7 +198,7 @@ export default function ServiceDetail() {
                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </Link>
                                 <a
-                                    href="https://wa.me/919844594800?text=Hi%2C%20I%20want%20to%20know%20more%20about%20your%20services."
+                                    href="https://wa.me/918150099911?text=Hi%2C%20I%20want%20to%20know%20more%20about%20your%20services."
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group px-8 py-4 font-semibold rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto transition-all duration-300 hover:-translate-y-0.5"

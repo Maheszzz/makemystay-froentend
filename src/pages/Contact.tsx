@@ -1,8 +1,8 @@
-import { useState, FormEvent } from 'react';
-import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { Navbar } from '@/components/layout/Navbar';
 import { contactApi } from '@/lib/api';
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Mail, MapPin, Phone, Send } from 'lucide-react';
+import { FormEvent, useState } from 'react';
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -103,7 +103,7 @@ export default function Contact() {
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-1">Talk to Growth Team</h3>
                                 <p className="text-slate-500 text-sm mb-4">Available 7 days a week, Mon–Sun</p>
-                                <a href="tel:+919844594800" className="text-base font-semibold hover:underline" style={{ color: '#B11226' }}>+91 98445 94800</a>
+                                <a href="tel:+918150099911" className="text-base font-semibold hover:underline" style={{ color: '#B11226' }}>+91 98445 94800</a>
                             </div>
 
                             <div className="bg-white p-7 rounded-3xl shadow-lg border border-slate-100 hover:-translate-y-1 transition-all duration-300">

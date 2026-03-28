@@ -1,6 +1,6 @@
+import { Calendar, MessageCircle, Phone, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { X, Phone, MessageCircle, Calendar } from 'lucide-react';
 
 export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
@@ -80,7 +80,7 @@ export function CTA() {
                         <div className="p-6 pt-3 space-y-3">
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-center mb-3">Or reach us directly</p>
                             <a
-                                href="tel:+919844594800"
+                                href="tel:+918150099911"
                                 className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-100 transition-colors group"
                             >
                                 <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(177,18,38,0.08)' }}>
@@ -93,7 +93,7 @@ export function CTA() {
                             </a>
 
                             <a
-                                href="https://wa.me/919844594800?text=Hi, I'm interested in MakeMyStay"
+                                href="https://wa.me/918150099911?text=Hi, I'm interested in MakeMyStay"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-green-50 border border-slate-100 transition-colors group"

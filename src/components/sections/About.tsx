@@ -1,4 +1,4 @@
-import { Target, Lightbulb, Users, Award, CheckCircle, Heart, ArrowRight, Phone } from 'lucide-react';
+import { ArrowRight, Award, CheckCircle, Heart, Lightbulb, Phone, Target, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const whatWeDo = [
@@ -241,7 +241,7 @@ export function About() {
                             <ArrowRight className="w-4 h-4" />
                         </Link>
                         <a
-                            href="https://wa.me/919844594800?text=Hi%2C%20I%20want%20to%20find%20a%20home%20through%20MakeMyStay."
+                            href="https://wa.me/918150099911?text=Hi%2C%20I%20want%20to%20find%20a%20home%20through%20MakeMyStay."
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center justify-center gap-2 px-9 py-4 rounded-xl font-semibold transition-all hover:-translate-y-0.5 hover:bg-[rgba(197,160,33,0.08)]"

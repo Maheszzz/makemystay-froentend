@@ -1,13 +1,18 @@
+import {
+    Bath,
+    Bed,
+    Heart,
+    MapPin,
+    Star,
+    Users, Utensils
+} from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {
-    MapPin, Heart, Bed, Bath, Users, Utensils, Star
-} from 'lucide-react';
 
+import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';
-import { useWishlist } from '@/context/WishlistContext';
 
 interface PropertyCardProps {
     property: Property;
@@ -38,14 +43,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
     };
 
     const fallbackImage = useMemo(() => getFallbackImageForType(property.type), [property.type]);
-    
+
     // Explicit requested dynamic resolver
     const getImage = (prop: any) => {
         // Backend nested object extraction
-        const parsedImages = prop.images && prop.images.length > 0 
+        const parsedImages = prop.images && prop.images.length > 0
             ? prop.images.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
             : [];
-            
+
         const parsedPhotos = prop.photos && prop.photos.length > 0
             ? prop.photos.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
             : [];
@@ -91,7 +96,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
     const roomsLeft = [2, 3, 1];
     const rooms = roomsLeft[idx];
 
-    const waLink = `https://wa.me/919844594800?text=${encodeURIComponent(`Hi! I'm interested in ${property.title} at ${property.location}. Please share more details.`)}`;
+    const waLink = `https://wa.me/918150099911?text=${encodeURIComponent(`Hi! I'm interested in ${property.title} at ${property.location}. Please share more details.`)}`;
 
     const from = `${location.pathname}${location.search}${location.hash}`;
 
