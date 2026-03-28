@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ===== CONFIG =====
 EC2_USER="ubuntu"
-EC2_HOST="ec2-3-110-184-129.ap-south-1.compute.amazonaws.com"
+EC2_HOST="ec2-13-233-112-159.ap-south-1.compute.amazonaws.com"
 PEM_KEY="/Users/maheswaranm/Downloads/makemystayrealty.pem"
 
 APP_NAME="react-app"
