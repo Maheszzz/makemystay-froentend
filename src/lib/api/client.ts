@@ -1,11 +1,45 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/types/api';
 
+/** Public site hostnames that serve this SPA (www vs apex are different browser origins). */
+const SAME_BRAND_SITE_HOSTS = new Set(['makemystay.ai', 'www.makemystay.ai']);
+
+/**
+ * Resolve API base URL. When `VITE_API_BASE_URL` points at `makemystay.ai` but the user is on
+ * `www.makemystay.ai` (or the reverse), calling the env host is cross-origin and triggers CORS.
+ * For those two hosts we use the current page origin + `/api/v1` so nginx can proxy to FastAPI
+ * on the same host (no CORS). Dedicated API hosts (e.g. api.*) are left unchanged.
+ */
+function resolveApiBaseUrl(): string {
+    const raw = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+    if (import.meta.env.DEV) {
+        return raw || 'http://localhost:8000/api/v1';
+    }
+    if (!raw) {
+        return typeof window !== 'undefined' ? `${window.location.origin}/api/v1` : '/api/v1';
+    }
+    const normalized = raw.replace(/\/+$/, '');
+    if (typeof window === 'undefined') return normalized;
+    try {
+        const envUrl = normalized.startsWith('http')
+            ? new URL(normalized)
+            : new URL(normalized, window.location.origin);
+        const pageHost = new URL(window.location.origin).hostname;
+        if (envUrl.origin === window.location.origin) return normalized;
+        if (
+            SAME_BRAND_SITE_HOSTS.has(envUrl.hostname) &&
+            SAME_BRAND_SITE_HOSTS.has(pageHost)
+        ) {
+            return `${window.location.origin}/api/v1`;
+        }
+        return normalized;
+    } catch {
+        return normalized;
+    }
+}
+
 /** Prefer VITE_API_BASE_URL; VITE_API_URL kept for older .env / README compatibility. */
-export const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL ||
-    import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? 'http://localhost:8000/api/v1' : '');
+export const API_BASE_URL = resolveApiBaseUrl();
 
 // Create axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
