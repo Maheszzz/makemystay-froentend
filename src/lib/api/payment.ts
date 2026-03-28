@@ -1,4 +1,4 @@
-import { api } from './client';
+import { api, API_BASE_URL } from './client';
 
 export interface CreateOrderRequest {
     amount: number;
@@ -40,7 +40,7 @@ export const paymentApi = {
     },
 
     getReceiptUrl: (paymentId: string): string => {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+        const baseUrl = API_BASE_URL || 'http://localhost:8000/api/v1';
         return `${baseUrl}/payments/receipt/${paymentId}`;
     }
 };

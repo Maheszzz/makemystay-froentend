@@ -86,7 +86,8 @@ make-my-stay/
 Create a `.env` file in the root directory to configure your environment:
 
 ```env
-VITE_API_URL=http://localhost:8000/api/v1
+# Use either name (both are supported; VITE_API_BASE_URL wins if both are set)
+VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
 
 ## 🤝 Contributing

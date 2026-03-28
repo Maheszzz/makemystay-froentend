@@ -1,12 +1,15 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/types/api';
 
-// Get API base URL from environment variable
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+/** Prefer VITE_API_BASE_URL; VITE_API_URL kept for older .env / README compatibility. */
+export const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? 'http://localhost:8000/api/v1' : '');
 
 // Create axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL || undefined,
     headers: {
         'Content-Type': 'application/json',
     },
