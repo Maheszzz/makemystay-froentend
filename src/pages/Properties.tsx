@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Navbar } from '@/components/layout/Navbar';
@@ -89,8 +89,34 @@ export default function Properties({
         };
     }, [category, debouncedSearchQuery, typeFilter]);
 
-    // Fetch properties from API with server-side filters
-    const { properties: apiProperties, loading, error, refetch } = useProperties(params);
+    const PAGE_SIZE = 24;
+    const {
+        properties: apiProperties,
+        loading,
+        error,
+        refetch,
+        loadMore,
+        hasMore,
+        loadingMore,
+    } = useProperties(params, { infiniteScroll: true, pageSize: PAGE_SIZE });
+
+    const loadMoreRef = useRef(loadMore);
+    loadMoreRef.current = loadMore;
+
+    const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
+    useEffect(() => {
+        if (!sentinelEl || !hasMore) return;
+        const obs = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) {
+                    void loadMoreRef.current?.();
+                }
+            },
+            { root: null, rootMargin: '240px', threshold: 0 }
+        );
+        obs.observe(sentinelEl);
+        return () => obs.disconnect();
+    }, [sentinelEl, hasMore]);
 
     const properties = apiProperties;
 
@@ -374,7 +400,8 @@ export default function Properties({
                     {/* Results count */}
                     {!loading && !error && (
                         <p className="text-slate-500 mb-6">
-                            {filteredProperties.length} properties found
+                            {filteredProperties.length} propert{filteredProperties.length === 1 ? 'y' : 'ies'} shown
+                            {hasMore ? ' · scroll for more' : ''}
                         </p>
                     )}
 
@@ -391,6 +418,23 @@ export default function Properties({
                                     <p className="text-slate-500 mt-2">Try adjusting your search criteria</p>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {hasMore && !loading && filteredProperties.length > 0 && (
+                        <div className="mt-10 flex flex-col items-center gap-4">
+                            <div ref={setSentinelEl} className="h-px w-full max-w-md" aria-hidden />
+                            {loadingMore && (
+                                <p className="text-sm text-slate-500">Loading more listings…</p>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => void loadMore?.()}
+                                disabled={loadingMore}
+                                className="px-6 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 hover:border-brand-red/40 hover:text-brand-red disabled:opacity-50 transition-colors"
+                            >
+                                {loadingMore ? 'Loading…' : 'Load more'}
+                            </button>
                         </div>
                     )}
                 </div>
