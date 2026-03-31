@@ -3,7 +3,8 @@ set -euo pipefail
 
 # ===== CONFIG =====
 EC2_USER="ubuntu"
-EC2_HOST="ec2-13-233-112-159.ap-south-1.compute.amazonaws.com"
+# Must match makemystay instance public DNS (changes after stop/start unless Elastic IP)
+EC2_HOST="ec2-3-109-47-194.ap-south-1.compute.amazonaws.com"
 PEM_KEY="/Users/maheswaranm/Downloads/makemystayrealty.pem"
 
 APP_NAME="react-app"
@@ -34,7 +35,7 @@ echo "📦 Using build folder: $BUILD_DIR"
 
 # ===== PREPARE EC2 =====
 echo "🧹 Preparing EC2..."
-ssh -T -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
+ssh -T -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
 sudo mkdir -p $REMOTE_DIR
 sudo rm -rf $REMOTE_DIR/*
 mkdir -p /tmp/$APP_NAME
@@ -42,9 +43,9 @@ EOF
 
 # ===== UPLOAD BUILD =====
 echo "🚀 Uploading build to EC2..."
-scp -i "$PEM_KEY" -r $BUILD_DIR/* $EC2_USER@$EC2_HOST:/tmp/$APP_NAME/
+scp -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i "$PEM_KEY" -r $BUILD_DIR/* $EC2_USER@$EC2_HOST:/tmp/$APP_NAME/
 
-ssh -T -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
+ssh -T -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i "$PEM_KEY" $EC2_USER@$EC2_HOST << EOF
 sudo cp -r /tmp/$APP_NAME/* $REMOTE_DIR/
 sudo chown -R www-data:www-data $REMOTE_DIR
 sudo rm -rf /tmp/$APP_NAME
