@@ -104,8 +104,11 @@ export default function Properties({
     loadMoreRef.current = loadMore;
 
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
+    // Re-attach observer when loadingMore/loading finish. If deps were only [sentinelEl, hasMore],
+    // after a page load the sentinel often stays intersecting (large rootMargin) and no new
+    // IntersectionObserver event fires — scroll feels "stuck" until the user scrolls away and back.
     useEffect(() => {
-        if (!sentinelEl || !hasMore) return;
+        if (!sentinelEl || !hasMore || loading || loadingMore) return;
         const obs = new IntersectionObserver(
             (entries) => {
                 if (entries[0]?.isIntersecting) {
@@ -116,7 +119,7 @@ export default function Properties({
         );
         obs.observe(sentinelEl);
         return () => obs.disconnect();
-    }, [sentinelEl, hasMore]);
+    }, [sentinelEl, hasMore, loading, loadingMore]);
 
     const properties = apiProperties;
 

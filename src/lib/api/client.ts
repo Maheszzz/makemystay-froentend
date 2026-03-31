@@ -5,15 +5,21 @@ import type { ApiError } from '@/types/api';
 const SAME_BRAND_SITE_HOSTS = new Set(['makemystay.ai', 'www.makemystay.ai']);
 
 /**
- * Resolve API base URL. When `VITE_API_BASE_URL` points at `makemystay.ai` but the user is on
- * `www.makemystay.ai` (or the reverse), calling the env host is cross-origin and triggers CORS.
- * For those two hosts we use the current page origin + `/api/v1` so nginx can proxy to FastAPI
- * on the same host (no CORS). Dedicated API hosts (e.g. api.*) are left unchanged.
+ * Resolve API base URL.
+ * On makemystay.ai / www we always use relative `/api/v1` so requests stay same-origin even if
+ * an old build baked in `https://www...` vs apex — cross-origin + CORS caused pending requests
+ * and "Provisional headers" in DevTools. Other hosts still use env / fallbacks.
  */
 function resolveApiBaseUrl(): string {
     const raw = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
     if (import.meta.env.DEV) {
         return raw || 'http://localhost:8000/api/v1';
+    }
+    if (typeof window !== 'undefined') {
+        const pageHost = window.location.hostname;
+        if (SAME_BRAND_SITE_HOSTS.has(pageHost)) {
+            return '/api/v1';
+        }
     }
     if (!raw) {
         return typeof window !== 'undefined' ? `${window.location.origin}/api/v1` : '/api/v1';

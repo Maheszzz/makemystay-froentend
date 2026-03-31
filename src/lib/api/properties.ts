@@ -157,8 +157,11 @@ export const propertyApi = {
      * @returns Array of properties
      */
     getAll: async (params?: PaginationParams): Promise<Property[]> => {
-        // Fetch from new realty endpoint
-        const response = await api.get<RealtyProperty[]>(REALTY_PATH, { params });
+        // Fetch from new realty endpoint (shorter timeout so grids don’t spin for 30s on failure)
+        const response = await api.get<RealtyProperty[]>(REALTY_PATH, {
+            params,
+            timeout: 15000,
+        });
         // Map to frontend Property model
         return response.map(mapRealtyToProperty);
     },

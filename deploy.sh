@@ -55,7 +55,7 @@ ssh -T -o ConnectTimeout=20 -o StrictHostKeyChecking=no -i "$PEM_KEY" $EC2_USER@
 # ===== UPLOAD BUILD (rsync: reliable for many hashed chunks; scp * can skip files) =====
 RSYNC_RSH="ssh -o ConnectTimeout=60 -o StrictHostKeyChecking=no -i $PEM_KEY"
 echo "🚀 Uploading build to EC2 (rsync)..."
-rsync -az --delete --info=stats2 \
+rsync -az --delete --stats \
   -e "$RSYNC_RSH" \
   "$BUILD_DIR/" "$EC2_USER@$EC2_HOST:$STAGING/"
 
