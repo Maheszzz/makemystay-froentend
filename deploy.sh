@@ -4,8 +4,10 @@ set -euo pipefail
 # ===== CONFIG =====
 EC2_USER="ubuntu"
 # Must match makemystay instance public DNS (changes after stop/start unless Elastic IP)
-EC2_HOST="ec2-43-205-233-181.ap-south-1.compute.amazonaws.com"
-PEM_KEY="/Users/maheswaranm/Downloads/makemystayrealty.pem"
+SERVER_HOST="43.205.233.181"   # makemystay-2 (healthy production node)
+EC2_HOST="$SERVER_HOST"
+
+PEM_KEY="/Users/maheswaranm/Makemystayrealty/makemystayrealty.pem"
 
 APP_NAME="react-app"
 REMOTE_DIR="/var/www/$APP_NAME"

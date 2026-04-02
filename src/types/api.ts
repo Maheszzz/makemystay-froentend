@@ -159,6 +159,10 @@ export interface PaginationParams {
     category?: 'pg' | 'rent' | 'buy' | 'plot';
     search?: string;
     exclude_property_type?: string;
+    min_price?: number;
+    max_price?: number;
+    city?: string;
+    sort_by?: string;
 }
 
 export interface ContactCreateRequest {

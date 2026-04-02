@@ -36,6 +36,22 @@ function LegacyTypeSlugRedirect() {
 
 
 
+/** Wrapper for City-specific SEO pages */
+function CityProperties({ category, title, subtitle }: { category: any, title?: string, subtitle?: string }) {
+    const { city } = useParams<{ city: string }>();
+    // Capitalize city for display
+    const cityTitle = city ? city.charAt(0).toUpperCase() + city.slice(1) : '';
+    const displayTitle = title || (category === 'all' ? `Properties in ${cityTitle}` : `${category.toUpperCase()} in ${cityTitle}`);
+    const displaySubtitle = subtitle || `Explore the best verified ${category === 'all' ? 'homes' : category} in ${cityTitle}`;
+
+    return <Properties
+        key={`${category}-${city}`}
+        initialCategory={category}
+        initialCity={city}
+        pageTitle={displayTitle}
+        pageSubtitle={displaySubtitle}
+    />;
+}
 
 function App() {
     return (
@@ -56,10 +72,19 @@ function App() {
                             <Route path="/" element={<Home />} />
                             <Route path="/contact-us" element={<Contact />} />
                             <Route path="/properties" element={<Properties key="all" />} />
+                            <Route path="/properties/in/:city" element={<CityProperties category="all" />} />
+
                             <Route path="/rent" element={<Properties key="rent" initialCategory="rent" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
+                            <Route path="/rent/in/:city" element={<CityProperties category="rent" />} />
+
                             <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
+                            <Route path="/pg/in/:city" element={<CityProperties category="pg" />} />
+
                             <Route path="/plots" element={<Properties key="plots" initialCategory="plot" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home" />} />
+                            <Route path="/plots/in/:city" element={<CityProperties category="plot" />} />
+
                             <Route path="/buy" element={<Properties key="buy" initialCategory="buy" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy" />} />
+                            <Route path="/buy/in/:city" element={<CityProperties category="buy" />} />
                             <Route path="/schedule-demo" element={<ScheduleDemo />} />
                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />

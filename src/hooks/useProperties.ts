@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { propertyApi } from '@/lib/api';
 import type { Property, ApiError, PaginationParams } from '@/types/api';
 
 /** Stable key for filters (excludes pagination). */
 function filterKeyFromParams(params?: PaginationParams): string {
     if (!params) return '';
-    const { skip, limit, page, page_size, ...rest } = params as Record<string, unknown>;
+    const { skip, limit, page, page_size, ...rest } = params as Record<string, any>;
     return JSON.stringify(rest);
 }
 
@@ -17,146 +17,131 @@ export interface UsePropertiesOptions {
 
 export interface UsePropertiesResult {
     properties: Property[];
+    totalCount: number;
+    shownCount: number;
     loading: boolean;
+    loadingMore: boolean;
     error: ApiError | null;
-    refetch: () => void;
-    loadMore?: () => Promise<void>;
-    hasMore?: boolean;
-    loadingMore?: boolean;
+    refetch: () => Promise<void>;
+    loadMore: () => Promise<void>;
+    hasMore: boolean;
 }
 
-const DEFAULT_PAGE = 24;
+const DEFAULT_PAGE_SIZE = 24;
 
 /**
- * Custom hook to fetch properties from the API.
- * Pass `{ infiniteScroll: true, pageSize: 24 }` on browse pages; default single-page fetch elsewhere.
+ * Custom hook to fetch properties from the API with support for advanced filtering, sorting, and infinite scroll.
  */
 export function useProperties(
-    params?: PaginationParams,
-    options?: UsePropertiesOptions
+    params: PaginationParams = {},
+    options: UsePropertiesOptions = {}
 ): UsePropertiesResult {
-    const infinite = options?.infiniteScroll === true;
-    const pageSize = options?.pageSize ?? DEFAULT_PAGE;
+    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE } = options;
 
     const [properties, setProperties] = useState<Property[]>([]);
+    const [totalCount, setTotalCount] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const [error, setError] = useState<ApiError | null>(null);
-    const [refreshSignal, setRefreshSignal] = useState<number>(0);
-    const [skip, setSkip] = useState(0);
+    const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
     const filterKey = useMemo(() => filterKeyFromParams(params), [params]);
-    const paramsRef = useRef(params);
-    paramsRef.current = params;
 
-    // Single fetch (home grid, etc.)
+    // Initial fetch and reset when filters change
     useEffect(() => {
-        if (infinite) return;
-        let isCurrent = true;
+        let isMounted = true;
 
-        const fetchData = async () => {
+        const fetchInitial = async () => {
+            setLoading(true);
+            setError(null);
+            setPage(1);
+
             try {
-                setLoading(true);
-                setError(null);
-                const data = await propertyApi.getAll(params);
-                if (isCurrent) {
-                    setProperties(data);
-                }
-            } catch (err) {
-                if (isCurrent) {
-                    setError(err as ApiError);
-                    console.error('Error fetching properties:', err);
-                }
-            } finally {
-                if (isCurrent) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        void fetchData();
-
-        return () => {
-            isCurrent = false;
-        };
-    }, [params, refreshSignal, infinite]);
-
-    // Infinite: reset when filters change
-    useEffect(() => {
-        if (!infinite) return;
-        let isCurrent = true;
-
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-                setSkip(0);
-                const p = paramsRef.current;
-                const data = await propertyApi.getAll({
-                    ...p,
-                    limit: pageSize,
+                const response = await propertyApi.getAll({
+                    ...params,
                     skip: 0,
+                    limit: pageSize,
                 });
-                if (!isCurrent) return;
-                setProperties(data);
-                setHasMore(data.length >= pageSize);
-                setSkip(data.length);
+
+                if (isMounted) {
+                    setProperties(response.items);
+                    setTotalCount(response.total);
+                    setHasMore(response.items.length < response.total);
+                }
             } catch (err) {
-                if (isCurrent) {
+                if (isMounted) {
                     setError(err as ApiError);
-                    console.error('Error fetching properties:', err);
                 }
             } finally {
-                if (isCurrent) {
+                if (isMounted) {
                     setLoading(false);
                 }
             }
         };
 
-        void fetchData();
-
-        return () => {
-            isCurrent = false;
-        };
-    }, [filterKey, refreshSignal, infinite, pageSize]);
+        void fetchInitial();
+        return () => { isMounted = false; };
+    }, [filterKey, pageSize]);
 
     const loadMore = useCallback(async () => {
-        if (!infinite || !hasMore || loadingMore || loading) return;
+        if (loading || loadingMore || !hasMore) return;
+
         setLoadingMore(true);
-        setError(null);
+        const nextPage = page + 1;
+
         try {
-            const p = paramsRef.current;
-            const data = await propertyApi.getAll({
-                ...p,
+            const response = await propertyApi.getAll({
+                ...params,
+                skip: (nextPage - 1) * pageSize,
                 limit: pageSize,
-                skip,
             });
-            setProperties((prev) => [...prev, ...data]);
-            setSkip((s) => s + data.length);
-            setHasMore(data.length >= pageSize);
+
+            setProperties(prev => [...prev, ...response.items]);
+            setPage(nextPage);
+            setHasMore((properties.length + response.items.length) < response.total);
+            setTotalCount(response.total);
         } catch (err) {
-            setError(err as ApiError);
-            console.error('Error loading more properties:', err);
+            console.error('Failed to load more properties:', err);
         } finally {
             setLoadingMore(false);
         }
-    }, [infinite, hasMore, loadingMore, loading, pageSize, skip]);
+    }, [loading, loadingMore, hasMore, page, pageSize, params, properties.length]);
 
-    const refetch = useCallback(() => setRefreshSignal((s) => s + 1), []);
+    const refetch = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        setPage(1);
+        try {
+            const response = await propertyApi.getAll({
+                ...params,
+                skip: 0,
+                limit: pageSize,
+            });
+            setProperties(response.items);
+            setTotalCount(response.total);
+            setHasMore(response.items.length < response.total);
+        } catch (err) {
+            setError(err as ApiError);
+        } finally {
+            setLoading(false);
+        }
+    }, [params, pageSize]);
 
     return {
         properties,
+        totalCount,
+        shownCount: properties.length,
         loading,
+        loadingMore,
         error,
-        refetch,
-        ...(infinite
-            ? { loadMore, hasMore, loadingMore }
-            : {}),
+        hasMore,
+        loadMore,
+        refetch
     };
 }
 
-interface UsePropertyResult {
+export interface UsePropertyResult {
     property: Property | null;
     loading: boolean;
     error: ApiError | null;
@@ -165,8 +150,6 @@ interface UsePropertyResult {
 
 /**
  * Custom hook to fetch a single property by ID
- * @param id - Property ID
- * @returns Property data, loading state, error state, and refetch function
  */
 export function useProperty(id: number | string): UsePropertyResult {
     const [property, setProperty] = useState<Property | null>(null);
@@ -206,9 +189,6 @@ export function useProperty(id: number | string): UsePropertyResult {
 
 /**
  * Custom hook to fetch a single property by type and slug
- * @param type - Property Type
- * @param slug - Property Slug
- * @returns Property data, loading state, error state, and refetch function
  */
 export function usePropertyBySlug(type: string | undefined, slug: string | undefined): UsePropertyResult {
     const [property, setProperty] = useState<Property | null>(null);

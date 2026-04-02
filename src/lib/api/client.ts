@@ -72,9 +72,28 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Response interceptor for handling errors globally
+// Response interceptor for handling standardized API format {success, data, error}
 apiClient.interceptors.response.use(
     (response) => {
+        const data = response.data as any;
+        
+        // If it's a standardized successful response, unwrap and return just the data
+        if (data && typeof data === 'object' && 'success' in data && data.success === true) {
+            // Update the response data to be the unwrapped payload
+            response.data = data.data;
+            return response;
+        }
+        
+        // If it's a standardized failure but with 200 OK (from global_exception_handler)
+        if (data && typeof data === 'object' && 'success' in data && data.success === false) {
+            const error: ApiError = {
+                message: data.error || 'An unexpected error occurred',
+                status: response.status,
+                detail: data.error,
+            };
+            return Promise.reject(error);
+        }
+
         return response;
     },
     (error: AxiosError) => {
@@ -88,16 +107,22 @@ apiClient.interceptors.response.use(
             // Server responded with error status
             const data = error.response.data as any;
 
-            // Extract a clean string message, handling FastAPI's 422 array of validation details
-            let parsedDetail = data?.detail || error.message;
-            if (Array.isArray(data?.detail) && data.detail[0]?.msg) {
-                parsedDetail = data.detail[0].msg;
-            } else if (Array.isArray(data?.message) && data.message[0]?.msg) {
-                parsedDetail = data.message[0].msg;
-            }
+            // Handle standardized error format even if status is not 200
+            if (data && typeof data === 'object' && data.success === false) {
+                apiError.message = data.error || 'A server error occurred';
+                apiError.detail = data.error;
+            } else {
+                // Extract a clean string message, handling FastAPI's 422 array of validation details
+                let parsedDetail = data?.detail || error.message;
+                if (Array.isArray(data?.detail) && data.detail[0]?.msg) {
+                    parsedDetail = data.detail[0].msg;
+                } else if (Array.isArray(data?.message) && data.message[0]?.msg) {
+                    parsedDetail = data.message[0].msg;
+                }
 
-            apiError.message = typeof data?.message === 'string' ? data.message : parsedDetail;
-            apiError.detail = parsedDetail;
+                apiError.message = typeof data?.message === 'string' ? data.message : parsedDetail;
+                apiError.detail = parsedDetail;
+            }
         } else if (error.request) {
             // Request made but no response received (or we hit a timeout)
             if (error.code === 'ECONNABORTED') {

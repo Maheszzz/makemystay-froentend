@@ -4,8 +4,7 @@ import type {
     PropertyImage,
     RealtyProperty,
     PropertyCreateRequest,
-    PropertyUpdateRequest,
-    PaginationParams
+    PropertyUpdateRequest
 } from '@/types/api';
 
 const REALTY_PATH = '/realty/properties';
@@ -154,16 +153,49 @@ export const propertyApi = {
     /**
      * Get all properties
      * @param params - Optional pagination parameters
-     * @returns Array of properties
+     * @returns Object containing array of properties and total count
      */
-    getAll: async (params?: PaginationParams): Promise<Property[]> => {
-        // Fetch from new realty endpoint (shorter timeout so grids don’t spin for 30s on failure)
-        const response = await api.get<RealtyProperty[]>(REALTY_PATH, {
-            params,
+    getAll: async (params: {
+        skip?: number;
+        limit?: number;
+        category?: string;
+        property_type?: string;
+        listing_type?: string;
+        is_available?: boolean;
+        search?: string;
+        exclude_property_type?: string;
+        min_price?: number;
+        max_price?: number;
+        city?: string;
+        sort_by?: string;
+    } = {}): Promise<{ items: Property[]; total: number }> => {
+        const queryParams = new URLSearchParams();
+        if (params.skip !== undefined) queryParams.append('skip', params.skip.toString());
+        if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+        if (params.category) queryParams.append('category', params.category);
+        if (params.property_type) queryParams.append('property_type', params.property_type);
+        if (params.listing_type) queryParams.append('listing_type', params.listing_type);
+        if (params.is_available !== undefined) queryParams.append('is_available', params.is_available.toString());
+        if (params.search) queryParams.append('search', params.search);
+        if (params.exclude_property_type) queryParams.append('exclude_property_type', params.exclude_property_type);
+        if (params.min_price !== undefined) queryParams.append('min_price', params.min_price.toString());
+        if (params.max_price !== undefined) queryParams.append('max_price', params.max_price.toString());
+        if (params.city) queryParams.append('city', params.city);
+        if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+
+        const response = await api.get<any>(REALTY_PATH, {
+            params: queryParams,
             timeout: 15000,
         });
-        // Map to frontend Property model
-        return response.map(mapRealtyToProperty);
+
+        // Robust handling for both old array format and new paginated object format
+        const items = Array.isArray(response) ? response : (response?.items || []);
+        const total = Array.isArray(response) ? response.length : (response?.total || items.length);
+
+        return {
+            items: items.map(mapRealtyToProperty),
+            total
+        };
     },
 
     /**
