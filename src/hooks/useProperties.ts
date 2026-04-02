@@ -46,7 +46,9 @@ export function useProperties(
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
 
-    const filterKey = useMemo(() => filterKeyFromParams(params), [params]);
+    // Stabilize params by stringifying them as the dependency
+    const paramsString = JSON.stringify(params);
+    const filterKey = useMemo(() => filterKeyFromParams(params), [paramsString]);
 
     // Initial fetch and reset when filters change
     useEffect(() => {
