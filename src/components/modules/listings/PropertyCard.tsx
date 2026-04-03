@@ -44,16 +44,19 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
     const fallbackImage = useMemo(() => getFallbackImageForType(property.type), [property.type]);
 
-    // Explicit requested dynamic resolver
+    // Explicit requested dynamic resolver (never .map on non-arrays: API may send a string URL or odd shapes)
     const getImage = (prop: any) => {
-        // Backend nested object extraction
-        const parsedImages = prop.images && prop.images.length > 0
-            ? prop.images.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
-            : [];
+        const imgs = Array.isArray(prop.images) ? prop.images : [];
+        const parsedImages =
+            imgs.length > 0
+                ? imgs.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean)
+                : [];
 
-        const parsedPhotos = prop.photos && prop.photos.length > 0
-            ? prop.photos.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean)
-            : [];
+        const ph = Array.isArray(prop.photos) ? prop.photos : [];
+        const parsedPhotos =
+            ph.length > 0
+                ? ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean)
+                : [];
 
         return (
             parsedImages[0] ||      // RENT
@@ -85,7 +88,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
     if (property.lounge && !isServiceOriented) amenities.push('Lounge');
     if (property.cctv) amenities.push('Security');
     if (property.geyser) amenities.push('Geyser');
-    if (isPlot && property.features) amenities.push(...property.features);
+    if (isPlot && Array.isArray(property.features) && property.features.length > 0) {
+        amenities.push(...property.features);
+    }
 
     const propertyPath = getPropertyDetailPath(property);
 
@@ -198,7 +203,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             </>
                         ) : isServiceOriented ? (
                             <>
-                                <div className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-[#B11226]/60" /><span>{(property.sharing ?? []).filter(s => s === 'Single' || s === 'Double').join('/') || 'Shared'} Sharing</span></div>
+                                <div className="flex items-center gap-1"><Users className="w-3.5 h-3.5 text-[#B11226]/60" /><span>{(Array.isArray(property.sharing) ? property.sharing : []).filter(s => s === 'Single' || s === 'Double').join('/') || 'Shared'} Sharing</span></div>
                                 <span className="text-slate-200">|</span>
                                 <div className="flex items-center gap-1"><Utensils className="w-3.5 h-3.5 text-[#B11226]/60" /><span>{property.food ? 'Food Included' : 'No Food'}</span></div>
                             </>

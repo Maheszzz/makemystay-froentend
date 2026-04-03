@@ -120,6 +120,8 @@ export default function Properties({
         loadingMore,
     } = useProperties(apiParams, { infiniteScroll: true, pageSize: PAGE_SIZE });
 
+    const propertyList = Array.isArray(properties) ? properties : [];
+
     // Infinite scroll observer
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
     useEffect(() => {
@@ -304,7 +306,7 @@ export default function Properties({
                     {!loading && !error && (
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-slate-500 text-xs md:text-sm font-medium">
-                                Showing <span className="text-slate-900 font-bold">{properties.length}</span> of <span className="text-slate-900 font-bold">{totalCount}</span> properties
+                                Showing <span className="text-slate-900 font-bold">{propertyList.length}</span> of <span className="text-slate-900 font-bold">{totalCount}</span> properties
                                 {locationFilter !== 'all' && ` in ${locationFilter}`}
                             </p>
                             {loadingMore && <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>}
@@ -312,7 +314,7 @@ export default function Properties({
                     )}
 
                     {/* API Status Messages */}
-                    {loading && properties.length === 0 && (
+                    {loading && propertyList.length === 0 && (
                         <div className="py-20">
                             <LoadingSpinner size={48} message="Fetching verified listings..." />
                         </div>
@@ -324,8 +326,8 @@ export default function Properties({
 
                     {/* Property Grid */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                        {properties.length > 0 ? (
-                            properties.map((prop) => <PropertyCard key={prop.id} property={prop} />)
+                        {propertyList.length > 0 ? (
+                            propertyList.map((prop) => <PropertyCard key={prop.id} property={prop} />)
                         ) : !loading && (
                             <div className="col-span-full py-20 px-6 text-center bg-white rounded-3xl border border-dashed border-slate-200">
                                 <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">

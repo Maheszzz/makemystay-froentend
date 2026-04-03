@@ -20,6 +20,40 @@ const PLACEHOLDER_VILLA =
     'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80';
 
 /**
+ * Unwrap list endpoints that may return a bare array, paginated `{ items, total }`,
+ * or alternate keys — always coerce to an array so `.map` never runs on a non-array.
+ */
+function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
+    if (Array.isArray(response)) {
+        return { rows: response, total: response.length };
+    }
+    if (response && typeof response === 'object') {
+        const r = response as Record<string, unknown>;
+        let raw: unknown =
+            r.items ??
+            (Array.isArray(r.data) ? r.data : undefined) ??
+            r.properties ??
+            r.results;
+
+        let nested: Record<string, unknown> | undefined;
+        if (raw === undefined && r.data && typeof r.data === 'object' && !Array.isArray(r.data)) {
+            nested = r.data as Record<string, unknown>;
+            raw = nested.items ?? nested.properties ?? nested.results;
+        }
+
+        const rows = Array.isArray(raw) ? raw : [];
+        let totalRaw = r.total ?? r.count;
+        if (totalRaw === undefined && nested) {
+            totalRaw = nested.total ?? nested.count;
+        }
+        const total =
+            typeof totalRaw === 'number' && Number.isFinite(totalRaw) ? totalRaw : rows.length;
+        return { rows, total };
+    }
+    return { rows: [], total: 0 };
+}
+
+/**
  * Maps the backend RealtyProperty to the frontend Property interface
  */
 function mapRealtyToProperty(item: RealtyProperty): Property {
@@ -62,13 +96,16 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     if (item.property_type?.toLowerCase() === 'plot') { beds = 0; baths = 0; }
 
     const isPlot = item.property_type?.toLowerCase() === 'plot';
+    const featuresList: string[] = Array.isArray(item.features)
+        ? item.features.filter((f): f is string => typeof f === 'string')
+        : [];
 
     // Safely map listing_type (handle missing or case mismatch)
     const rawListingType = (item.listing_type || 'rent').toLowerCase();
     const category = (rawListingType === 'sale' || rawListingType === 'buy') ? 'buy' : 'rent';
 
     // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
-    const rawImages = item.images ?? [];
+    const rawImages = Array.isArray(item.images) ? item.images : [];
     const sortedImages = [...rawImages].sort((a, b) => {
         const ao = typeof a === 'object' && a && 'sort_order' in a ? (a as PropertyImage).sort_order ?? 0 : 0;
         const bo = typeof b === 'object' && b && 'sort_order' in b ? (b as PropertyImage).sort_order ?? 0 : 0;
@@ -113,26 +150,26 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         wifi: !isPlot, // Mocking these as they are new feature requests
         housekeeping: !isPlot,
         power_backup: !isPlot,
-        gym: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK'),
-        lounge: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa'),
+        gym: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK'),
+        lounge: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa'),
         cctv: true,
-        washing_machine: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG'),
+        washing_machine: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG'),
         geyser: !isPlot,
         image:
             primaryImage ||
             defaultImages[item.property_type] ||
             defaultImages['PG'] ||
             PLACEHOLDER_GENERIC,
-        modern_kitchen: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
-        balcony: !isPlot && ((item.features && item.features.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
+        modern_kitchen: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('kitchen'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
+        balcony: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
         attached_bathroom: !isPlot, // Standard for most listed properties
         images: dbImages,
         tag: item.is_available ? 'Available' : 'Sold Out',
         category: category,
         description: item.description || `A premium ${item.property_type} property in ${item.location}.`,
         sharing: sharingOptions,
-        food: item.property_type === 'PG' || item.features?.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
-        features: (item.features && item.features.length > 0) ? item.features : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
+        food: item.property_type === 'PG' || featuresList.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
+        features: featuresList.length > 0 ? featuresList : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
         rating: item.average_rating || 0,
         reviews: item.review_count || 0,
         average_rating: item.average_rating,
@@ -188,14 +225,16 @@ export const propertyApi = {
             timeout: 15000,
         });
 
-        // Robust handling for both old array format and new paginated object format
-        const items = Array.isArray(response) ? response : (response?.items || []);
-        const total = Array.isArray(response) ? response.length : (response?.total || items.length);
-
-        return {
-            items: items.map(mapRealtyToProperty),
-            total
-        };
+        const { rows, total } = normalizePropertyListResponse(response);
+        const items: Property[] = [];
+        for (const row of rows) {
+            try {
+                items.push(mapRealtyToProperty(row as RealtyProperty));
+            } catch (e) {
+                console.warn('[propertyApi.getAll] Skipping malformed property row:', e, row);
+            }
+        }
+        return { items, total };
     },
 
     /**

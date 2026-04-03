@@ -154,7 +154,7 @@ export default function PropertyDetails() {
 
     // Build the images list
     const allImages: string[] = [];
-    if (property.images && property.images.length > 0) {
+    if (Array.isArray(property.images) && property.images.length > 0) {
         property.images.forEach((img: any) => {
             const url = typeof img === 'string' ? img : img?.image_url;
             if (url) allImages.push(url);
@@ -165,8 +165,8 @@ export default function PropertyDetails() {
 
     const heroImage = allImages[heroIdx] || null;
 
-    // Build display features
-    let displayFeatures = property.features || [];
+    // Build display features (non-array truthy `{}` must not reach .map)
+    let displayFeatures = Array.isArray(property.features) ? property.features : [];
     const isPG = property.type === 'PG' || property.type === 'Hostel';
     if (isPG) {
         const standardAmenities = ["High-Speed WiFi", "Nutritious Food", "Daily Housekeeping", "Power Backup", "24/7 Security", "Washing Machine", "Refrigerator", "RO Water Purifier"];

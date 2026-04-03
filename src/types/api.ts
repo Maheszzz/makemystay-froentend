@@ -70,6 +70,9 @@ export interface PropertyImage {
     id: number;
     property_id: number;
     image_url: string;
+    content_type?: string;
+    mime_validated?: boolean;
+    file_size?: number | null;
     is_primary: boolean;
     sort_order: number;
     created_at: string;

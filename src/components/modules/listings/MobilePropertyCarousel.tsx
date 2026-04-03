@@ -22,14 +22,20 @@ function getFallbackImageForType(type?: string): string {
 }
 
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
-    if (properties.length === 0) return null;
+    const list = Array.isArray(properties) ? properties : [];
+    if (list.length === 0) return null;
     const location = useLocation();
     const from = `${location.pathname}${location.search}${location.hash}`;
 
     return (
         <div className="md:hidden px-4 flex flex-col gap-4">
-            {properties.map((property) => {
-                const rawImages = property.images && property.images.length > 0 ? property.images : (property.image ? [property.image] : []);
+            {list.map((property) => {
+                const rawImages =
+                    Array.isArray(property.images) && property.images.length > 0
+                        ? property.images
+                        : property.image
+                          ? [property.image]
+                          : [];
                 const images = rawImages.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean);
                 const propertyPath = getPropertyDetailPath(property);
                 const contactNumber = '8150099911';

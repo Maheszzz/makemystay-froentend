@@ -67,9 +67,10 @@ export function useProperties(
                 });
 
                 if (isMounted) {
-                    setProperties(response.items);
+                    const list = Array.isArray(response.items) ? response.items : [];
+                    setProperties(list);
                     setTotalCount(response.total);
-                    setHasMore(response.items.length < response.total);
+                    setHasMore(list.length < response.total);
                 }
             } catch (err) {
                 if (isMounted) {
@@ -99,9 +100,10 @@ export function useProperties(
                 limit: pageSize,
             });
 
-            setProperties(prev => [...prev, ...response.items]);
+            const pageItems = Array.isArray(response.items) ? response.items : [];
+            setProperties(prev => [...prev, ...pageItems]);
             setPage(nextPage);
-            setHasMore((properties.length + response.items.length) < response.total);
+            setHasMore((properties.length + pageItems.length) < response.total);
             setTotalCount(response.total);
         } catch (err) {
             console.error('Failed to load more properties:', err);
@@ -120,9 +122,10 @@ export function useProperties(
                 skip: 0,
                 limit: pageSize,
             });
-            setProperties(response.items);
+            const list = Array.isArray(response.items) ? response.items : [];
+            setProperties(list);
             setTotalCount(response.total);
-            setHasMore(response.items.length < response.total);
+            setHasMore(list.length < response.total);
         } catch (err) {
             setError(err as ApiError);
         } finally {

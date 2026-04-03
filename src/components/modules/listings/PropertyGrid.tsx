@@ -29,12 +29,9 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
 
     const { properties, loading, error } = useProperties(params);
 
-    // Fallback data in case of API error - Mirrors actual DB content
-
-
-    // Filter out plots from buy/rent categories and limit to 4 for the home page
+    const safeProperties = Array.isArray(properties) ? properties : [];
     // Filter for the home page (limit to 4)
-    const filteredProperties = properties.slice(0, 4);
+    const filteredProperties = safeProperties.slice(0, 4);
 
     const viewAllByCategory: Record<PropertyGridProps['category'], string> = {
         all: '/properties',
