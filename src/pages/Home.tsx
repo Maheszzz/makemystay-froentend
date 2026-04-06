@@ -11,6 +11,7 @@ import { Solution } from '@/components/sections/Solution';
 import { Comparison } from '@/components/sections/Comparison';
 import { CTA } from '@/components/sections/CTA';
 import { CaseStudy } from '@/components/sections/CaseStudy';
+import { ExitPopup } from '@/components/modals/ExitPopup';
 
 const HOME_CATEGORIES = new Set(['pg', 'rent', 'buy', 'plot', 'all']);
 
@@ -89,6 +90,7 @@ export default function Home() {
             </main>
 
             <Footer />
+            <ExitPopup />
         </>
     );
 }

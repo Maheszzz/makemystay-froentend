@@ -43,7 +43,8 @@ export default function Contact() {
         try {
             // Submit to backend API
             const submissionData = {
-                ...formData
+                ...formData,
+                source: 'Website - Contact'
             };
             await contactApi.submitContactForm(submissionData);
 

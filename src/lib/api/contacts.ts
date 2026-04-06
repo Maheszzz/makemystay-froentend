@@ -43,6 +43,9 @@ export interface ContactFormSubmission {
     phone: string;
     email: string;
     message: string;
+    source?: string;
+    location?: string;
+    property_type?: string;
 }
 
 /**

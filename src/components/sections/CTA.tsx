@@ -1,6 +1,7 @@
 import { Calendar, MessageCircle, Phone, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { contactApi } from '@/lib/api/contacts';
 
 export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
@@ -96,12 +97,22 @@ export function CTA() {
                                 href="https://wa.me/918150099911?text=Hi, I'm interested in MakeMyStay"
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={() => {
+                                    // Fire-and-forget lead creation
+                                    contactApi.submitContactForm({
+                                        name: 'WhatsApp User',
+                                        phone: '918150099911', // Placeholder for now
+                                        email: 'whatsapp@makemystay.ai',
+                                        message: 'User clicked WhatsApp CTA on Website',
+                                        source: 'Website - WhatsApp'
+                                    }).catch(console.error);
+                                }}
                                 className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-green-50 border border-slate-100 transition-colors group"
                             >
                                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                     <MessageCircle className="w-4 h-4 text-green-600" />
                                 </div>
-                                <div>
+                                <div className="flex-grow">
                                     <div className="text-xs text-slate-400">WhatsApp</div>
                                     <div className="font-bold text-slate-900 text-sm">Chat now → Response in 5 mins</div>
                                 </div>

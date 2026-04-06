@@ -3,7 +3,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react';
+import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Phone } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -16,6 +16,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
+import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 
 
 export default function PropertyDetails() {
@@ -35,6 +36,20 @@ export default function PropertyDetails() {
         isOpen: boolean; paymentId: string; amount: number; receiptUrl: string;
     }>({
         isOpen: false, paymentId: '', amount: 0, receiptUrl: ''
+    });
+
+    const [leadModal, setLeadModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        subtitle: string;
+        source: string;
+        actionLabel: string;
+    }>({
+        isOpen: false,
+        title: '',
+        subtitle: '',
+        source: '',
+        actionLabel: ''
     });
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
@@ -544,6 +559,39 @@ export default function PropertyDetails() {
                                             🔥 Secure This Room Now
                                         </Button>
                                         <p className="text-center text-xs text-slate-400 mt-3">Token ₹5,000 · No hidden charges · Instant confirmation</p>
+
+                                        <div className="mt-4 grid grid-cols-2 gap-3">
+                                            <button 
+                                                onClick={() => setLeadModal({
+                                                    isOpen: true,
+                                                    title: 'Book a Site Visit',
+                                                    subtitle: `Schedule a personal tour of ${property.title}. Our team will confirm the slot via WhatsApp.`,
+                                                    source: 'Website - Book Visit',
+                                                    actionLabel: 'Confirm Visit Slot'
+                                                })}
+                                                className="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all group"
+                                            >
+                                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                                                    <CalendarDays className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-700">Book Visit</span>
+                                            </button>
+                                            <button 
+                                                onClick={() => setLeadModal({
+                                                    isOpen: true,
+                                                    title: 'Request a Call Back',
+                                                    subtitle: `Have questions about ${property.title}? Our agent will call you within 15 minutes.`,
+                                                    source: 'Website - Call Back',
+                                                    actionLabel: 'Call Me ASAP'
+                                                })}
+                                                className="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all group"
+                                            >
+                                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                                                    <Phone className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-xs font-bold text-slate-700">Call Back</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -630,6 +678,17 @@ export default function PropertyDetails() {
                 paymentId={successData.paymentId}
                 amount={successData.amount}
                 receiptUrl={successData.receiptUrl}
+            />
+
+            <LeadCaptureModal
+                isOpen={leadModal.isOpen}
+                onClose={() => setLeadModal(prev => ({ ...prev, isOpen: false }))}
+                title={leadModal.title}
+                subtitle={leadModal.subtitle}
+                source={leadModal.source}
+                actionLabel={leadModal.actionLabel}
+                propertyTitle={property.title}
+                propertyLocation={property.location}
             />
         </div>
     );
