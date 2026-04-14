@@ -7,11 +7,12 @@ import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLef
 import { Link, useParams } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
+import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { parsePropertySlugParam } from '@/lib/propertyRouting';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { ReviewSection } from '@/components/property/ReviewSection';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
@@ -55,6 +56,8 @@ export default function PropertyDetails() {
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
 
+    const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
+
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -65,8 +68,8 @@ export default function PropertyDetails() {
         if (!property) return;
         const productionUrl = `https://makemystay.ai/properties/${slugParam}`;
         const shareData = {
-            title: property.title,
-            text: `Check out this property: ${property.title} in ${property.location}`,
+            title: displayTitle || property.title,
+            text: `Check out this property: ${displayTitle || property.title} in ${property.location}`,
             url: productionUrl,
         };
         if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
@@ -211,7 +214,7 @@ export default function PropertyDetails() {
     // Description
     const desc = property.description && property.description.length > 50
         ? property.description
-        : `Experience premium living at **${property.title}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
+        : `Experience premium living at **${displayTitle}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
     return (
         <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
@@ -219,13 +222,13 @@ export default function PropertyDetails() {
 
             <main id="main-content" className="pb-24 flex-grow">
 
-                {/* ─── Hero Slider (clean, high-clarity) ─── */}
-                <section className="relative bg-black">
-                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/35 via-black/25 to-black/70" />
+                {/* ─── Hero gallery: image frame is overflow-hidden; metadata sits below to avoid clipping ─── */}
+                <section className="relative bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950">
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-slate-900/50 via-transparent to-slate-950/80" aria-hidden />
 
-                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 md:pt-32 pb-6 md:pb-8">
+                    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 md:pt-28 pb-5 md:pb-6">
                         {/* Top actions */}
-                        <div className="flex items-center justify-between gap-4 mb-4">
+                        <div className="flex items-center justify-between gap-4 mb-3">
                             <button
                                 onClick={handleBack}
                                 className="inline-flex items-center gap-2 text-white/85 hover:text-white transition-colors"
@@ -268,124 +271,136 @@ export default function PropertyDetails() {
                             </div>
                         </div>
 
-                        {/* Main slider — full photo visible (portrait / landscape), never cropped like object-cover */}
-                        <div className="relative w-full rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl shadow-black/40 group">
-                            <div className="absolute inset-0 z-0 bg-slate-800 animate-pulse" aria-hidden />
+                        {/* Gallery card: image area uses overflow-hidden only; summary is in normal flow below */}
+                        <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-900/60 shadow-xl shadow-black/25 overflow-hidden">
+                            <div className="relative w-full group">
+                                <div className="absolute inset-0 z-0 bg-gradient-to-b from-slate-800 to-slate-900" aria-hidden />
+                                <div className="absolute inset-0 z-[15] pointer-events-none bg-gradient-to-t from-black/20 via-transparent to-black/5" aria-hidden />
 
-                            {heroImage ? (
-                                <div
-                                    className="relative z-[5] w-full overflow-hidden"
-                                    style={{ aspectRatio: heroIsPortrait ? '3/4' : '16/9' }}
-                                >
-                                    <img
-                                        key={heroIdx}
-                                        src={heroImage}
-                                        alt={property.title}
-                                        onLoad={handleHeroImageLoad}
-                                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
-                                        loading="eager"
-                                        decoding="async"
-                                    />
-                                </div>
-                            ) : (
-                                <div className="relative z-10 flex min-h-[280px] w-full items-center justify-center bg-gradient-to-br from-slate-900 to-black">
-                                    <div className="text-center text-slate-400">
-                                        <div className="text-6xl mb-2">🏠</div>
-                                        <p className="text-sm font-medium">No image available</p>
+                                {heroImage ? (
+                                    <div
+                                        className={`relative z-[5] w-full overflow-hidden ${
+                                            heroIsPortrait
+                                                ? 'mx-auto max-w-[min(100%,280px)] h-[clamp(240px,min(40vh,380px),420px)]'
+                                                : 'h-[clamp(220px,min(38vh,360px),400px)] sm:h-[clamp(240px,min(40vh,380px),440px)]'
+                                        }`}
+                                    >
+                                        {/* object-contain shows the full photo (letterboxing on slate); switch to object-cover for edge-to-edge crop */}
+                                        <img
+                                            key={heroIdx}
+                                            src={heroImage}
+                                            alt={displayTitle}
+                                            onLoad={handleHeroImageLoad}
+                                            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
+                                            loading="eager"
+                                            decoding="async"
+                                        />
                                     </div>
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="relative z-10 flex min-h-[280px] w-full items-center justify-center bg-gradient-to-br from-slate-900 to-black">
+                                        <div className="text-center text-slate-400">
+                                            <div className="text-6xl mb-2">🏠</div>
+                                            <p className="text-sm font-medium">No image available</p>
+                                        </div>
+                                    </div>
+                                )}
 
-                            {/* Main Readability Overlay for texts (matches cinematic level) */}
-                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-black/10 to-transparent z-20" />
+                                {allImages.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                setHeroIsPortrait(false);
+                                                setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1));
+                                            }}
+                                            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/35 border border-white/20 text-white hover:bg-black/45 backdrop-blur-sm transition-all"
+                                            aria-label="Previous image"
+                                        >
+                                            <ChevronLeft className="w-5 h-5 mx-auto" />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setHeroIsPortrait(false);
+                                                setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1));
+                                            }}
+                                            className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/35 border border-white/20 text-white hover:bg-black/45 backdrop-blur-sm transition-all"
+                                            aria-label="Next image"
+                                        >
+                                            <ChevronRight className="w-5 h-5 mx-auto" />
+                                        </button>
+                                    </>
+                                )}
+                            </div>
 
-                            {/* Prev/next */}
-                            {allImages.length > 1 && (
-                                <>
-                                    <button
-                                        onClick={() => {
-                                            setHeroIsPortrait(false);
-                                            setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1));
-                                        }}
-                                        className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
-                                        aria-label="Previous image"
-                                    >
-                                        <ChevronLeft className="w-5 h-5 mx-auto" />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setHeroIsPortrait(false);
-                                            setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1));
-                                        }}
-                                        className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
-                                        aria-label="Next image"
-                                    >
-                                        <ChevronRight className="w-5 h-5 mx-auto" />
-                                    </button>
-                                </>
-                            )}
-
-                            {/* Bottom content */}
-                            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-7">
-                                <div className="flex flex-wrap items-center gap-2 mb-3">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest border ${property.is_available ? 'bg-emerald-500/15 text-emerald-200 border-emerald-500/25' : 'bg-amber-500/15 text-amber-200 border-amber-500/25'}`}>
+                            {/* Property summary — compact so gallery + key facts stay above the fold */}
+                            <div className="relative border-t border-white/10 bg-slate-950/90 px-4 py-3.5 sm:px-5 sm:py-4 backdrop-blur-md">
+                                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${property.is_available ? 'bg-emerald-500/15 text-emerald-200 border-emerald-500/30' : 'bg-amber-500/15 text-amber-200 border-amber-500/30'}`}>
                                         {property.tag || (property.is_available ? 'Available' : 'Limited availability')}
                                     </span>
-                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest bg-white/10 text-white/80 border border-white/15">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/85 border border-white/15">
                                         {Math.max(allImages.length, 1)} photos
                                     </span>
                                 </div>
-                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-[1.1] tracking-tight">
-                                    {property.title}
+                                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight tracking-tight break-words">
+                                    {displayTitle}
                                 </h1>
-                                <p className="mt-2 text-white/80 flex items-center gap-2 text-sm sm:text-base font-medium">
-                                    <MapPin className="w-4 h-4 shrink-0 text-white/70" />
-                                    <span>{property.type}</span>
-                                    <span className="text-white/40">•</span>
-                                    <span className="truncate">{property.location}</span>
+                                <p className="mt-1.5 text-white/80 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs sm:text-sm font-medium">
+                                    <span className="inline-flex items-center gap-2 min-w-0">
+                                        <MapPin className="w-4 h-4 shrink-0 text-white/70" />
+                                        <span>{property.type}</span>
+                                    </span>
+                                    <span className="text-white/40 hidden sm:inline">•</span>
+                                    <span className="text-white/90 min-w-0 sm:truncate max-w-full">{property.location}</span>
                                 </p>
 
-                                <div className="mt-4 flex flex-wrap items-center gap-3">
-                                    {(property.rating ?? 0) > 0 ? (
-                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 text-white">
-                                            <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
-                                            <span className="font-extrabold">{(property.rating ?? 0).toFixed(1)}</span>
-                                            <span className="text-white/60 text-sm font-semibold">({property.reviews || 0} reviews)</span>
-                                        </div>
-                                    ) : (
-                                        <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-white/10 border border-white/15 text-white/90">
-                                            <Star className="w-4 h-4 text-amber-200" />
-                                            <span className="text-sm font-semibold">New Listing</span>
-                                        </div>
-                                    )}
+                                <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {(property.rating ?? 0) > 0 ? (
+                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white text-sm">
+                                                <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300 shrink-0" />
+                                                <span className="font-extrabold">{(property.rating ?? 0).toFixed(1)}</span>
+                                                <span className="text-white/65 text-xs font-semibold">({reviewsLabel(property.reviews || 0)})</span>
+                                            </div>
+                                        ) : (
+                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white/90 text-sm">
+                                                <Star className="w-3.5 h-3.5 text-amber-200 shrink-0" />
+                                                <span className="font-semibold">New Listing</span>
+                                            </div>
+                                        )}
+                                    </div>
 
-                                    <div className="ml-auto hidden md:flex items-end gap-2">
-                                        <span className="text-white/60 text-xs font-bold uppercase tracking-[0.22em]">Starting from</span>
-                                        <span className="text-white font-extrabold text-xl">{property.price}</span>
-                                        {property.category === 'rent' && <span className="text-white/60 font-semibold pb-[2px]">/mo</span>}
+                                    <div className="flex flex-row items-baseline justify-between gap-3 sm:flex-col sm:items-end sm:text-right sm:ml-auto sm:justify-end border-t border-white/10 pt-3 sm:border-0 sm:pt-0">
+                                        <span className="text-white/50 text-[10px] font-bold uppercase tracking-[0.15em]">Starting from</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-white font-extrabold text-xl sm:text-2xl tabular-nums tracking-tight">{property.price}</span>
+                                            {property.category === 'rent' && (
+                                                <span className="text-white/60 font-semibold text-sm">/mo</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Thumbnail strip (aligned, consistent aspect) */}
                         {allImages.length > 1 && (
-                            <div className="mt-4">
-                                <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                            <div className="mt-3 rounded-xl border border-slate-200/90 bg-slate-100 p-2 sm:p-2.5 shadow-inner">
+                                <div className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                     {allImages.map((url, idx) => (
                                         <button
                                             key={idx}
+                                            type="button"
                                             onClick={() => {
                                                 setHeroIsPortrait(false);
                                                 setHeroIdx(idx);
                                             }}
-                                            className={`flex h-24 w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-slate-950 sm:h-28 sm:w-32 transition-all ${idx === heroIdx ? 'border-white/40 shadow-lg' : 'border-white/10 hover:border-white/25'}`}
+                                            className={`flex h-14 w-[4.5rem] shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 bg-white transition-all sm:h-16 sm:w-24 ${idx === heroIdx ? 'border-brand-red ring-2 ring-brand-red/30 ring-offset-1 ring-offset-slate-100 shadow-sm' : 'border-slate-200 hover:border-slate-300'}`}
                                             aria-label={`Select image ${idx + 1}`}
+                                            aria-current={idx === heroIdx ? 'true' : undefined}
                                         >
                                             <img
                                                 src={url}
                                                 alt={`Thumbnail ${idx + 1}`}
-                                                className="max-h-full max-w-full object-contain"
+                                                className="h-full w-full object-cover"
                                                 loading="lazy"
                                                 decoding="async"
                                             />
@@ -398,7 +413,7 @@ export default function PropertyDetails() {
                 </section>
 
                 {/* ─── Main Content ─── */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-12">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
                         {/* LEFT — Main Details */}
@@ -553,7 +568,7 @@ export default function PropertyDetails() {
                                                     <>
                                                         <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                                                         <span className="font-bold text-slate-900">{(property.rating ?? 0).toFixed(1)}</span>
-                                                        <span className="text-slate-400 text-sm">&middot; {property.reviews || 0} reviews</span>
+                                                        <span className="text-slate-400 text-sm">&middot; {reviewsLabel(property.reviews || 0)}</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -588,7 +603,7 @@ export default function PropertyDetails() {
                                                 onClick={() => setLeadModal({
                                                     isOpen: true,
                                                     title: 'Book a Site Visit',
-                                                    subtitle: `Schedule a personal tour of ${property.title}. Our team will confirm the slot via WhatsApp.`,
+                                                    subtitle: `Schedule a personal tour of ${displayTitle}. Our team will confirm the slot via WhatsApp.`,
                                                     source: 'Website - Book Visit',
                                                     actionLabel: 'Confirm Visit Slot'
                                                 })}
@@ -603,7 +618,7 @@ export default function PropertyDetails() {
                                                 onClick={() => setLeadModal({
                                                     isOpen: true,
                                                     title: 'Request a Call Back',
-                                                    subtitle: `Have questions about ${property.title}? Our agent will call you within 15 minutes.`,
+                                                    subtitle: `Have questions about ${displayTitle}? Our agent will call you within 15 minutes.`,
                                                     source: 'Website - Call Back',
                                                     actionLabel: 'Call Me ASAP'
                                                 })}
@@ -710,7 +725,7 @@ export default function PropertyDetails() {
                 subtitle={leadModal.subtitle}
                 source={leadModal.source}
                 actionLabel={leadModal.actionLabel}
-                propertyTitle={property.title}
+                propertyTitle={displayTitle}
                 propertyLocation={property.location}
             />
         </div>

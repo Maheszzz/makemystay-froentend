@@ -87,7 +87,7 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
 
             {/* Desktop: 4-col grid */}
             <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7">
                     {filteredProperties.length > 0 ? (
                         filteredProperties.map((prop) => (
                             <PropertyCard key={prop.id} property={prop} />

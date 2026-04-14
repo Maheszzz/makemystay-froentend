@@ -112,7 +112,7 @@ export function Navbar() {
                             </Link>
 
                             <Link to="/contact-us">
-                                <Button variant="gold" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
+                                <Button variant="primary" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
                             </Link>
                         </div>
 
@@ -258,7 +258,7 @@ export function Navbar() {
                     {/* Menu Footer */}
                     <div className="p-6 border-t border-white/10 space-y-4">
                         <Link to="/contact-us" onClick={() => setIsMenuOpen(false)}>
-                            <Button variant="gold" className="w-full py-3.5 text-base shadow-glow">
+                            <Button variant="primary" className="w-full py-3.5 text-base shadow-glow">
                                 Contact Us
                             </Button>
                         </Link>
