@@ -262,19 +262,33 @@ export default function PropertyDetails() {
                             </div>
                         </div>
 
-                        {/* Main slider image (no blur/scale; clarity-first) */}
-                        <div className="relative w-full h-[320px] sm:h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-white/10 bg-black shadow-2xl shadow-black/40">
+                        {/* Main slider image (premium glass effect) */}
+                        <div className="relative w-full h-[320px] sm:h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl shadow-black/40 group">
+                            {/* Skeleton loader / dark base layer */}
+                            <div className="absolute inset-0 bg-slate-800 animate-pulse" />
+
                             {heroImage ? (
-                                <img
-                                    key={heroIdx}
-                                    src={heroImage}
-                                    alt={property.title}
-                                    className="w-full h-full object-cover"
-                                    loading="eager"
-                                    decoding="async"
-                                />
+                                <>
+                                    {/* Blurred background (smooth transition alongside image) */}
+                                    <div 
+                                        className="absolute inset-0 bg-cover bg-center scale-125 blur-2xl opacity-60 transition-all duration-700 ease-in-out"
+                                        style={{ backgroundImage: `url(${heroImage})` }}
+                                    />
+                                    {/* Cinematic gradient overlay over blur (improves text visibility if any overlaps) */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                                    
+                                    {/* Main image with luxury zoom on hover */}
+                                    <img
+                                        key={heroIdx}
+                                        src={heroImage}
+                                        alt={property.title}
+                                        className="relative w-full h-full object-contain z-10 transition-transform duration-700 ease-in-out group-hover:scale-[1.03]"
+                                        loading="eager"
+                                        decoding="async"
+                                    />
+                                </>
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-black">
+                                <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-black z-10">
                                     <div className="text-center text-slate-400">
                                         <div className="text-6xl mb-2">🏠</div>
                                         <p className="text-sm font-medium">No image available</p>
@@ -282,8 +296,8 @@ export default function PropertyDetails() {
                                 </div>
                             )}
 
-                            {/* Overlay for readability (minimal) */}
-                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                            {/* Main Readability Overlay for texts (matches cinematic level) */}
+                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-black/10 to-transparent z-20" />
 
                             {/* Prev/next */}
                             {allImages.length > 1 && (

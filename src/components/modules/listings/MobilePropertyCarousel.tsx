@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useRef, useState } from 'react';
 import { MapPin, Star } from 'lucide-react';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';
@@ -19,6 +20,70 @@ function getFallbackImageForType(type?: string): string {
         return 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80';
     }
     return 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80';
+}
+
+function SwipeableImageGallery({ images, fallbackImg, title }: { images: string[], fallbackImg: string, title: string }) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const handleScroll = () => {
+        const el = scrollRef.current;
+        if (!el) return;
+        const index = Math.round(el.scrollLeft / el.clientWidth);
+        if (index !== currentIndex) {
+            setCurrentIndex(index);
+        }
+    };
+
+    const displayImages = images.length > 0 ? images : [fallbackImg];
+
+    return (
+        <>
+            {/* Carousel */}
+            <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar"
+                style={{ WebkitOverflowScrolling: "touch" }}
+            >
+                {displayImages.map((img, i) => (
+                    <div key={i} className="min-w-full h-full snap-center relative shrink-0">
+                        <img
+                            src={img}
+                            alt={`${title} - view ${i + 1}`}
+                            className="w-full h-full object-cover transition-opacity duration-500"
+                            draggable={false}
+                            loading="lazy"
+                            onError={(e) => {
+                                const target = e.currentTarget;
+                                if (target.src !== fallbackImg) {
+                                    target.src = fallbackImg;
+                                } else {
+                                    target.style.display = 'none';
+                                }
+                            }}
+                        />
+                    </div>
+                ))}
+            </div>
+
+            {/* Dots */}
+            {displayImages.length > 1 && (
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2 pointer-events-none z-10">
+                    {displayImages.map((_, i) => (
+                        <div
+                            key={i}
+                            className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                                currentIndex === i
+                                    ? "bg-white scale-125 shadow-sm"
+                                    : "bg-white/50 shadow-sm"
+                            }`}
+                        />
+                    ))}
+                </div>
+            )}
+        </>
+    );
 }
 
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
@@ -57,31 +122,11 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                     <div key={property.id} className="bg-white rounded-3xl overflow-hidden border border-slate-100" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
                         {/* Property Image */}
                         <div className="relative w-full bg-slate-100" style={{ aspectRatio: '16/9' }}>
-                            {images[0] ? (
-                                <img
-                                    src={images[0]}
-                                    alt={property.title}
-                                    loading="lazy"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        const target = e.currentTarget;
-                                        const fallback = getFallbackImageForType(property.type);
-                                        if (target.src !== fallback) {
-                                            target.src = fallback;
-                                            return;
-                                        }
-                                        // Hide broken image icon as final fallback.
-                                        target.style.display = 'none';
-                                    }}
-                                />
-                            ) : (
-                                <img
-                                    src={getFallbackImageForType(property.type)}
-                                    alt={property.title}
-                                    loading="lazy"
-                                    className="w-full h-full object-cover"
-                                />
-                            )}
+                            <SwipeableImageGallery
+                                images={images}
+                                fallbackImg={getFallbackImageForType(property.type)}
+                                title={property.title}
+                            />
                             {/* Stacked badges */}
                             <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
                                 <span className="text-[9px] font-semibold tracking-widest uppercase px-2 py-0.5 rounded-full bg-white/85 text-slate-600 backdrop-blur-sm">
