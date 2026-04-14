@@ -466,12 +466,12 @@ export default function PropertyDetails() {
                                             <div
                                                 key={idx}
                                                 onClick={() => setLightboxIndex(idx)}
-                                                className="aspect-[4/3] rounded-2xl overflow-hidden group cursor-zoom-in relative shadow-sm border border-slate-200/70 hover:border-slate-300 transition-all hover:shadow-md"
+                                                className="aspect-[4/3] rounded-2xl overflow-hidden group cursor-zoom-in relative shadow-sm border border-slate-200/70 hover:border-slate-300 transition-all hover:shadow-md bg-slate-100"
                                             >
                                                 <img
                                                     src={url}
                                                     alt={`Property view ${idx + 1}`}
-                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                                                 />
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                     <Maximize2 className="w-6 h-6 text-white drop-shadow-lg" />
