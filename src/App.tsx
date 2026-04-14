@@ -19,6 +19,7 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
+const PGInBangalore = lazy(() => import('./pages/PGInBangalore'));
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
 
 /** Backward-compat: redirect /properties/id/102 → /properties/102 */
@@ -98,8 +99,7 @@ function App() {
                             <Route path="/quick-pay" element={<QuickPay />} />
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
-
-
+                            <Route path="/pg-in-bangalore" element={<PGInBangalore />} />
 
                             <Route path="*" element={<NotFound />} />
                         </Routes>

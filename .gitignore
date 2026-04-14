@@ -11,8 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
-.env.production
+.env*
 build
 
 # Editor directories and files
@@ -25,3 +24,9 @@ build
 *.njsproj
 *.sln
 *.sw?
+
+# SSH keys and sensitive files
+*.pem
+*.key
+coworker_key
+coworker_key.pub

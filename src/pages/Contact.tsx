@@ -104,7 +104,7 @@ export default function Contact() {
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-1">Talk to Growth Team</h3>
                                 <p className="text-slate-500 text-sm mb-4">Available 7 days a week, Mon–Sun</p>
-                                <a href="tel:+918150099911" className="text-base font-semibold hover:underline" style={{ color: '#B11226' }}>+91 98445 94800</a>
+                                <a href="tel:+918150099911" className="text-base font-semibold hover:underline" style={{ color: '#B11226' }}>+91 81500 99911</a>
                             </div>
 
                             <div className="bg-white p-7 rounded-3xl shadow-lg border border-slate-100 hover:-translate-y-1 transition-all duration-300">
