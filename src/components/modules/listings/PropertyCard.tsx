@@ -114,7 +114,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             <div className="bg-white rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1.5 border border-slate-100" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
 
                 {/* Image Section */}
-                <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-slate-100 rounded-t-3xl">
+                <div className="relative w-full h-[220px] sm:h-[240px] overflow-hidden bg-[#111] rounded-t-3xl">
                     {displayImage ? (
                         <img
                             src={displayImage}
@@ -126,10 +126,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     target.src = '/default-property.jpg';
                                 }
                             }}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                         />
                     ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200" />
+                        <div className="w-full h-full bg-[#111]" />
                     )}
 
                     {/* Gradient overlay */}

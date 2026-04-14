@@ -32,6 +32,7 @@ export default function PropertyDetails() {
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const [heroIdx, setHeroIdx] = useState(0);
+    const [heroIsPortrait, setHeroIsPortrait] = useState(false);
     const [successData, setSuccessData] = useState<{
         isOpen: boolean; paymentId: string; amount: number; receiptUrl: string;
     }>({
@@ -80,6 +81,11 @@ export default function PropertyDetails() {
     };
 
     const handleBack = goBack;
+
+    const handleHeroImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget;
+        setHeroIsPortrait(img.naturalHeight > img.naturalWidth);
+    };
 
     const handlePayNow = () => setShowServiceFeeModal(true);
 
@@ -262,33 +268,27 @@ export default function PropertyDetails() {
                             </div>
                         </div>
 
-                        {/* Main slider image (premium glass effect) */}
-                        <div className="relative w-full h-[320px] sm:h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl shadow-black/40 group">
-                            {/* Skeleton loader / dark base layer */}
-                            <div className="absolute inset-0 bg-slate-800 animate-pulse" />
+                        {/* Main slider — full photo visible (portrait / landscape), never cropped like object-cover */}
+                        <div className="relative w-full rounded-3xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl shadow-black/40 group">
+                            <div className="absolute inset-0 z-0 bg-slate-800 animate-pulse" aria-hidden />
 
                             {heroImage ? (
-                                <>
-                                    {/* Blurred background (smooth transition alongside image) */}
-                                    <div 
-                                        className="absolute inset-0 bg-cover bg-center scale-125 blur-2xl opacity-60 transition-all duration-700 ease-in-out"
-                                        style={{ backgroundImage: `url(${heroImage})` }}
-                                    />
-                                    {/* Cinematic gradient overlay over blur (improves text visibility if any overlaps) */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                                    
-                                    {/* Main image with luxury zoom on hover */}
+                                <div
+                                    className="relative z-[5] w-full overflow-hidden"
+                                    style={{ aspectRatio: heroIsPortrait ? '3/4' : '16/9' }}
+                                >
                                     <img
                                         key={heroIdx}
                                         src={heroImage}
                                         alt={property.title}
-                                        className="relative w-full h-full object-contain z-10 transition-transform duration-700 ease-in-out group-hover:scale-[1.03]"
+                                        onLoad={handleHeroImageLoad}
+                                        className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
                                         loading="eager"
                                         decoding="async"
                                     />
-                                </>
+                                </div>
                             ) : (
-                                <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 to-black z-10">
+                                <div className="relative z-10 flex min-h-[280px] w-full items-center justify-center bg-gradient-to-br from-slate-900 to-black">
                                     <div className="text-center text-slate-400">
                                         <div className="text-6xl mb-2">🏠</div>
                                         <p className="text-sm font-medium">No image available</p>
@@ -303,14 +303,20 @@ export default function PropertyDetails() {
                             {allImages.length > 1 && (
                                 <>
                                     <button
-                                        onClick={() => setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1))}
+                                        onClick={() => {
+                                            setHeroIsPortrait(false);
+                                            setHeroIdx((i) => (i === 0 ? allImages.length - 1 : i - 1));
+                                        }}
                                         className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
                                         aria-label="Previous image"
                                     >
                                         <ChevronLeft className="w-5 h-5 mx-auto" />
                                     </button>
                                     <button
-                                        onClick={() => setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1))}
+                                        onClick={() => {
+                                            setHeroIsPortrait(false);
+                                            setHeroIdx((i) => (i === allImages.length - 1 ? 0 : i + 1));
+                                        }}
                                         className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/10 border border-white/15 text-white hover:bg-white/15 transition-all"
                                         aria-label="Next image"
                                     >
@@ -369,14 +375,17 @@ export default function PropertyDetails() {
                                     {allImages.map((url, idx) => (
                                         <button
                                             key={idx}
-                                            onClick={() => setHeroIdx(idx)}
-                                            className={`shrink-0 w-28 sm:w-32 aspect-[4/3] rounded-2xl overflow-hidden border transition-all ${idx === heroIdx ? 'border-white/40 shadow-lg' : 'border-white/10 hover:border-white/25'}`}
+                                            onClick={() => {
+                                                setHeroIsPortrait(false);
+                                                setHeroIdx(idx);
+                                            }}
+                                            className={`flex h-24 w-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-slate-950 sm:h-28 sm:w-32 transition-all ${idx === heroIdx ? 'border-white/40 shadow-lg' : 'border-white/10 hover:border-white/25'}`}
                                             aria-label={`Select image ${idx + 1}`}
                                         >
                                             <img
                                                 src={url}
                                                 alt={`Thumbnail ${idx + 1}`}
-                                                className="w-full h-full object-cover"
+                                                className="max-h-full max-w-full object-contain"
                                                 loading="lazy"
                                                 decoding="async"
                                             />

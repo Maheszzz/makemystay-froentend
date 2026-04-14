@@ -51,7 +51,7 @@ function SwipeableImageGallery({ images, fallbackImg, title }: { images: string[
                         <img
                             src={img}
                             alt={`${title} - view ${i + 1}`}
-                            className="w-full h-full object-cover transition-opacity duration-500"
+                            className="w-full h-full object-contain transition-opacity duration-500"
                             draggable={false}
                             loading="lazy"
                             onError={(e) => {
@@ -121,7 +121,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                 return (
                     <div key={property.id} className="bg-white rounded-3xl overflow-hidden border border-slate-100" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
                         {/* Property Image */}
-                        <div className="relative w-full bg-slate-100" style={{ aspectRatio: '16/9' }}>
+                        <div className="relative w-full bg-[#111]" style={{ aspectRatio: '16/9' }}>
                             <SwipeableImageGallery
                                 images={images}
                                 fallbackImg={getFallbackImageForType(property.type)}

@@ -21,6 +21,10 @@ export $(grep -v '^#' "$ENV_FILE" | xargs)
 # -----------------------------
 DEPLOY_USER=${DEPLOY_USER:-ubuntu}
 PEM_KEY=${PEM_KEY:-"$HOME/.ssh/mmsr_deploy_key.pem"}
+# Sync built static assets only (nginx root). Set DEPLOY_SOURCE=. to rsync the whole repo (legacy).
+DEPLOY_SOURCE=${DEPLOY_SOURCE:-dist}
+# If true, run sudo mkdir + chown on DEPLOY_PATH before rsync so ubuntu can replace root-owned files.
+REMOTE_PREP_OWNERSHIP=${REMOTE_PREP_OWNERSHIP:-true}
 DRY_RUN=${DRY_RUN:-false}
 
 # -----------------------------
@@ -67,13 +71,29 @@ npm run build
 # -----------------------------
 # UPLOAD
 # -----------------------------
-echo "📤 Syncing files..."
+if [[ "$DEPLOY_SOURCE" != "." && ! -d "$DEPLOY_SOURCE" ]]; then
+  echo "❌ Build output not found: $DEPLOY_SOURCE (run npm run build first)"
+  exit 1
+fi
+
+echo "📤 Syncing files (${DEPLOY_SOURCE}/ → $DEPLOY_PATH)..."
+
+if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
+  echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
+  ssh -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" \
+    "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_USER '$DEPLOY_PATH'"
+fi
+
+RSYNC_FROM="./"
+if [[ "$DEPLOY_SOURCE" != "." ]]; then
+  RSYNC_FROM="${DEPLOY_SOURCE}/"
+fi
 
 rsync $RSYNC_FLAGS \
   -e "ssh -i $PEM_KEY" \
   --exclude '.git' \
   --exclude 'node_modules' \
-  ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
+  "$RSYNC_FROM" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
 
 # -----------------------------
 # REMOTE EXECUTION
