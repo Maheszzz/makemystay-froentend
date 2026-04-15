@@ -11,6 +11,36 @@ export function titleToSlug(title: string): string {
         .replace(/^-|-$/g, '');
 }
 
+function tokenizeSlugSource(value: string | undefined): string[] {
+    if (!value) return [];
+    return value
+        .toLowerCase()
+        .replace(/\bin\b/g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+}
+
+/**
+ * SEO-first semantic slug:
+ * name + type + locality/city while deduping repeated words.
+ *
+ * Example:
+ * "New Living Homes" + "1BHK" + "Bellandur, Bangalore"
+ *   → "new-living-homes-1bhk-bellandur-bangalore"
+ */
+export function buildPropertySeoSlug(property: Pick<Property, 'title' | 'type' | 'location' | 'slug'>): string {
+    const orderedTokens = [
+        ...tokenizeSlugSource(property.title),
+        ...tokenizeSlugSource(property.type),
+        ...tokenizeSlugSource(property.location),
+    ];
+    const deduped = orderedTokens.filter((token, index) => orderedTokens.indexOf(token) === index);
+    const semanticSlug = deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return semanticSlug || property.slug?.trim() || titleToSlug(property.title || '');
+}
+
 /**
  * Build the canonical property detail path: /properties/{id}-{slug}
  * Using the ID prefix means the detail page can always fetch by ID — no
@@ -22,7 +52,7 @@ export function titleToSlug(title: string): string {
  */
 export function getPropertyDetailPath(property: Property): string {
     const id = String(property.id);
-    const slugPart = property.slug?.trim() || titleToSlug(property.title || '');
+    const slugPart = buildPropertySeoSlug(property);
     if (slugPart) {
         // High-authority semantic route: /pg/{id}-{slug}
         return `/pg/${id}-${slugPart}`;

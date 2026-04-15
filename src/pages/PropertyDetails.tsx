@@ -9,7 +9,7 @@ import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
-import { parsePropertySlugParam } from '@/lib/propertyRouting';
+import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
@@ -87,15 +87,15 @@ export default function PropertyDetails() {
 
     const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
 
-    const detailPath = slugParam ? `/pg/${slugParam}` : '/pg';
+    const canonicalDetailPath = property ? getPropertyDetailPath(property) : (slugParam ? `/pg/${slugParam}` : '/pg');
     const detailHelmet = useMemo(() => {
         if (!property) return null;
-        return buildPageSEO(propertyDetailPageSeo(property, detailPath));
-    }, [property, detailPath]);
+        return buildPageSEO(propertyDetailPageSeo(property, canonicalDetailPath));
+    }, [property, canonicalDetailPath]);
     const detailJsonLd = useMemo(() => {
         if (!property) return null;
-        return buildPropertyDetailGraph(property, detailPath, undefined, buildPropertyPdpFaqs(property));
-    }, [property, detailPath]);
+        return buildPropertyDetailGraph(property, canonicalDetailPath, undefined, buildPropertyPdpFaqs(property));
+    }, [property, canonicalDetailPath]);
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -105,7 +105,7 @@ export default function PropertyDetails() {
 
     const handleShare = async () => {
         if (!property) return;
-        const productionUrl = `${SITE_URL}/pg/${slugParam}`;
+        const productionUrl = `${SITE_URL}${canonicalDetailPath}`;
         const shareData = {
             title: displayTitle || property.title,
             text: `Check out this property: ${displayTitle || property.title} in ${property.location}`,
@@ -215,6 +215,10 @@ export default function PropertyDetails() {
         );
     }
 
+    if (location.pathname !== canonicalDetailPath) {
+        return <Navigate to={`${canonicalDetailPath}${location.search}${location.hash}`} replace />;
+    }
+
     // Build the images list
     const allImages: string[] = [];
     if (Array.isArray(property.images) && property.images.length > 0) {
@@ -263,16 +267,16 @@ export default function PropertyDetails() {
     const seoHeading = buildPropertySeoHeading(property);
     const heroLead =
         extractHeroLeadFromNarrative(aboutNarrative, 520) || buildPropertyHeroIntro(property);
-    const crumbLabel = (displayTitle || property.title).trim();
+    const crumbLabel = seoHeading.trim();
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
         ...(isPG
             ? [
-                  { name: 'PG', path: '/pg' },
-                  ...(pgLoc ? [{ name: pgLoc.name, path: `/pg/${pgLoc.slug}` }] : []),
+                  { name: 'PG in Bangalore', path: '/pg/bangalore' },
+                  ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
               ]
             : [{ name: 'Listings', path: '/properties' }]),
-        { name: crumbLabel.length > 56 ? `${crumbLabel.slice(0, 55)}…` : crumbLabel },
+        { name: crumbLabel.length > 72 ? `${crumbLabel.slice(0, 71)}…` : crumbLabel },
     ];
 
     const galleryAltBase = `${displayTitle || property.title} room in ${property.location} Bangalore with premium furnishings and clean interiors`;

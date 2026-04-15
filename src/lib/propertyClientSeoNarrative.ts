@@ -144,6 +144,20 @@ export function buildPropertyPdpFaqs(property: Property): PropertyPdpFaq[] {
     const loc = property.location?.trim() || 'Bangalore';
     const price = fmtPrice(property);
     const type = property.type || 'property';
+    const bookingText =
+        property.is_available === false
+            ? 'Availability changes quickly, so use the enquiry or call option on this page to confirm current openings before planning a visit.'
+            : 'Use the Book visit, Call, or WhatsApp options on this page to schedule a walkthrough and confirm the next available slot.';
+    const amenityParts = [
+        property.wifi ? 'WiFi' : '',
+        property.food ? 'food' : '',
+        property.housekeeping ? 'housekeeping' : '',
+        property.power_backup ? 'power backup' : '',
+    ].filter(Boolean);
+    const amenitySummary =
+        amenityParts.length > 0
+            ? `${amenityParts.slice(0, 3).join(', ')}, and other listed amenities shown on this page`
+            : 'the amenities shown on this page';
 
     const items: PropertyPdpFaq[] = [
         {
@@ -154,32 +168,42 @@ export function buildPropertyPdpFaqs(property: Property): PropertyPdpFaq[] {
         },
         {
             question: `Is ${name} in ${loc} furnished and suitable for professionals?`,
-            answer: `The listing describes a ${type} in ${loc} with details shown on this page. Furnishing level and house rules should be confirmed during a site visit or call.`,
+            answer: `The listing describes a ${type} in ${loc} with details shown on this page. Furnishing level, flatmate mix where applicable, and house rules should be confirmed during a site visit or call.`,
         },
         {
             question: 'How do I book a visit or enquire on MakeMyStay?',
-            answer:
-                'Use the Book visit, Call, or WhatsApp options on this page. Our team can help you schedule a walkthrough and clarify deposit or token steps.',
+            answer: bookingText,
         },
         {
-            question: `Is this ${type} listing in ${loc} verified?`,
+            question: `What amenities are available at ${name} in ${loc}?`,
+            answer: `${name} highlights ${amenitySummary}. Always reconfirm what is included in the monthly price, especially meals, internet speed, laundry, AC, and maintenance support.`,
+        },
+        {
+            question: `Is this ${type} listing in ${loc} verified on MakeMyStay?`,
             answer:
                 'MakeMyStay highlights structured listing data and verification cues where available. Always validate photos, pricing, and availability directly before paying any booking amount.',
         },
         {
-            question: `What area is ${loc} connected to in Bangalore?`,
-            answer: `${loc} is a sought-after micro-market in Bangalore. Commute times vary by time of day — plan a visit near your typical travel hours and check connectivity to your workplace or campus.`,
+            question: `Where is ${name} located in Bangalore?`,
+            answer: `${name} is listed in ${loc}, Bangalore. Commute times vary by time of day, so plan a visit near your usual travel hours and check connectivity to your workplace, campus, or nearest transit points.`,
         },
     ];
     if (property.type === 'PG' || property.type === 'Hostel') {
         items.splice(2, 0, 
             {
                 question: `Does ${name} in ${loc} include WiFi, food, or housekeeping?`,
-                answer: 'Professional PG listings usually bundle WiFi, meals, and housekeeping to simplify stays. Review the amenity tags on this listing and confirm the meal frequency (typically 2-3 per day) and WiFi speed on enquiry.',
+                answer: `Professional PG listings usually bundle WiFi, meals, and housekeeping to simplify stays. Review the amenity tags on this listing and confirm the meal frequency, WiFi speed, laundry setup, and guest policy on enquiry.`,
             },
             {
                 question: `Is there a security deposit for this PG in ${loc}?`,
                 answer: `Most PGs in ${loc} require a 1 to 2 months security deposit along with a notice period (typically 30 days). Confirm the specific token amount and refund policies directly with the operator through MakeMyStay.`,
+            },
+            {
+                question: `Is ${name} currently available in ${loc}?`,
+                answer:
+                    property.is_available === false
+                        ? `This listing may have limited or changing availability right now. Contact the team through this page to confirm whether a room or bed is still open.`
+                        : `This listing appears available, but PG inventory in ${loc} can change quickly. Confirm room type, occupancy, and move-in date before paying any token.`,
             }
         );
     }

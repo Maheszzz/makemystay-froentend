@@ -2,7 +2,7 @@ import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { stripMarkdownLight } from '@/lib/propertySeoUtils';
-import { buildPropertySeoHeading, trimMetaTitle } from '@/lib/propertyDetailCopy';
+import { trimMetaTitle } from '@/lib/propertyDetailCopy';
 import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 
 export interface PageSEOInput {
@@ -148,33 +148,85 @@ function ogImageFromProperty(property: Property): string | undefined {
     return absoluteUrl(u.startsWith('/') ? u : `/${u}`);
 }
 
+function normalizeLocationForSeo(location: string | undefined): string {
+    const raw = (location || '').replace(/\s+/g, ' ').trim();
+    if (!raw) return 'Bangalore';
+    return /bangalore/i.test(raw) ? raw : `${raw}, Bangalore`;
+}
+
+function buildPropertyMetaTitle(property: Property): string {
+    const name = formatPropertyTitle(property.title) || property.title || 'Property';
+    const type = (property.type || 'Property').trim();
+    const location = normalizeLocationForSeo(property.location);
+    const isRent = property.category === 'rent';
+    const price = (property.price || '').trim();
+    const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
+
+    const base = `${name} ${type} in ${location}`.replace(/\s+/g, ' ').trim();
+
+    if (isRent && hasPrice) {
+        return trimMetaTitle(`${base} (${price}/month) | Rent, Photos & Visit Booking`, 68);
+    }
+
+    if (isRent) {
+        return trimMetaTitle(`${base} | Rent, Photos & Visit Booking`, 68);
+    }
+
+    return trimMetaTitle(`${base} | Photos, Details & Site Visit`, 68);
+}
+
+function buildPropertyMetaDescription(property: Property): string {
+    const name = formatPropertyTitle(property.title) || property.title || 'This property';
+    const type = (property.type || 'property').trim();
+    const location = normalizeLocationForSeo(property.location);
+    const isRent = property.category === 'rent';
+    const price = (property.price || '').trim();
+    const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
+
+    const amenityBits = [
+        property.wifi ? 'WiFi' : '',
+        property.food ? 'food' : '',
+        property.housekeeping ? 'housekeeping' : '',
+        property.power_backup ? 'power backup' : '',
+    ].filter(Boolean);
+    const amenityText = amenityBits.length > 0 ? ` Explore ${amenityBits.slice(0, 3).join(', ')}, amenities,` : ' Explore amenities,';
+
+    if (isRent && hasPrice) {
+        return `${name} offers a ${type} for rent in ${location} from ${price}/month. View photos, location highlights,${amenityText} and book a visit online with ${SITE_NAME}.`;
+    }
+
+    if (isRent) {
+        return `${name} offers a ${type} for rent in ${location}. View photos, location highlights,${amenityText} and book a visit online with ${SITE_NAME}.`;
+    }
+
+    return `Explore ${name}, a ${type} in ${location}. View photos, locality details, amenities, pricing guidance, and schedule a site visit with ${SITE_NAME}.`;
+}
+
 /** Meta + canonical for `/properties/:slug` detail pages. */
 export function propertyDetailPageSeo(property: Property, detailPath: string): PageSEOInput {
     // Canonical should prioritize /pg/ authority route
     const path = detailPath.startsWith('/pg/') ? detailPath : `/pg${detailPath.startsWith('/') ? detailPath : `/${detailPath}`}`.replace('/properties/', '/pg/');
-    const heading = buildPropertySeoHeading(property);
-    const title = trimMetaTitle(heading);
     const longPlain = stripMarkdownLight(
         property.seo_about || buildClientSeoAbout(property) || property.description || ''
     )
         .replace(/\s+/g, ' ')
         .trim();
-    const plain = longPlain.slice(0, 160);
-    const description =
-        plain ||
-        `${formatPropertyTitle(property.title)} — ${property.type} in ${property.location}. Enquire, book a visit, or pay a token on ${SITE_NAME}.`;
+    const description = buildPropertyMetaDescription(property) || longPlain.slice(0, 160);
     const keywords = [
         formatPropertyTitle(property.title),
         property.type,
         property.location,
+        normalizeLocationForSeo(property.location),
         'Bangalore rent',
         'PG coliving',
+        'property visit booking',
+        'verified property listing',
         SITE_NAME,
     ]
         .filter(Boolean)
         .join(', ');
     return {
-        title,
+        title: buildPropertyMetaTitle(property),
         description,
         path,
         ogImage: ogImageFromProperty(property) ?? DEFAULT_OG_IMAGE,
