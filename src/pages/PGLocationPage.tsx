@@ -13,7 +13,8 @@ import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/pages/Properties';
 
 export default function PGLocationPage() {
-    const { location: locationParam } = useParams<{ location: string }>();
+    /** Must match `<Route path="/pg/:slug" />` — was incorrectly `location`, so slugs were always undefined. */
+    const { slug: locationParam } = useParams<{ slug: string }>();
     const [searchParams] = useSearchParams();
     const [hasEmptyListings, setHasEmptyListings] = useState(false);
     const legacyTarget = resolveLegacyPgSlug(locationParam);

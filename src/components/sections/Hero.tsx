@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, CheckCircle } from 'lucide-react';
@@ -166,7 +167,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
-                <div className="w-full max-w-3xl mt-3 md:mt-9 mb-3 md:mb-4">
+                <div className="w-full max-w-3xl mt-4 md:mt-10 mb-2 md:mb-3">
                     {/* Subtle glow ring behind search */}
                     <div
                         className="relative"
@@ -183,18 +184,19 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                     </div>
                 </div>
 
-                {/* --- Trust Indicators --- */}
-                <div className="hidden md:flex flex-wrap justify-center gap-y-2 mt-4">
-                    <div className="flex items-center gap-x-6">
+                {/* --- Trust + CTA + carousel + scroll hint — one centered column (no absolute overlap) --- */}
+                <div className="hidden md:flex flex-col items-center w-full max-w-3xl mx-auto mt-6 md:mt-7 gap-4 md:gap-5">
+                    <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 w-full px-2">
                         {trustItems.map((item) => (
-                            <div key={item} className="flex items-center gap-1.5">
+                            <div key={item} className="flex items-center gap-1.5 min-w-0">
                                 <CheckCircle
-                                    className="w-3.5 h-3.5 shrink-0"
+                                    className="w-3.5 h-3.5 shrink-0 block overflow-visible"
                                     style={{ color: '#C5A021' }}
                                     strokeWidth={2.5}
+                                    aria-hidden
                                 />
                                 <span
-                                    className="text-white/80 text-xs font-medium tracking-wide"
+                                    className="text-white/[0.88] text-xs font-medium tracking-wide"
                                     style={{ fontFamily: "'Montserrat', sans-serif" }}
                                 >
                                     {item}
@@ -202,41 +204,52 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                             </div>
                         ))}
                     </div>
-                    <div className="w-full flex justify-center mt-2.5">
-                        <Link 
-                            to="/pg/bangalore" 
-                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-white/90 hover:bg-brand-red hover:border-brand-red transition-all duration-300"
-                        >
-                            <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse" />
-                            Explore Best PG in Bangalore →
-                        </Link>
+
+                    <Link
+                        to="/pg/bangalore"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-white/90 hover:bg-brand-red hover:border-brand-red transition-all duration-300 text-center max-w-[min(100%,22rem)]"
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse shrink-0" />
+                        Explore Best PG in Bangalore →
+                    </Link>
+
+                    {/* Slide dots — full-width row so indicators stay visually centered */}
+                    <div
+                        className="flex w-full min-h-[12px] justify-center items-center gap-2 px-4"
+                        role="tablist"
+                        aria-label="Hero slides"
+                    >
+                        {slides.map((_, idx) => (
+                            <button
+                                key={idx}
+                                type="button"
+                                role="tab"
+                                aria-selected={idx === current}
+                                aria-label={`Go to slide ${idx + 1}`}
+                                onClick={() => {
+                                    setContentVisible(false);
+                                    setTimeout(() => {
+                                        setCurrent(idx);
+                                        setContentVisible(true);
+                                    }, FADE_DURATION);
+                                }}
+                                className="rounded-full transition-all duration-500 cursor-pointer shrink-0 p-0 border-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/70"
+                                style={{
+                                    width: idx === current ? '28px' : '8px',
+                                    height: '8px',
+                                    background: idx === current ? '#C5A021' : 'rgba(255,255,255,0.45)',
+                                }}
+                            />
+                        ))}
                     </div>
-                </div>
 
-                {/* ── Slide dot indicators — in flow, never overlaps ── */}
-                <div className="hidden md:flex justify-center gap-2 mt-4">
-                    {slides.map((_, idx) => (
-                        <button
-                            key={idx}
-                            aria-label={`Go to slide ${idx + 1}`}
-                            onClick={() => {
-                                setContentVisible(false);
-                                setTimeout(() => { setCurrent(idx); setContentVisible(true); }, FADE_DURATION);
-                            }}
-                            className="rounded-full transition-all duration-500 cursor-pointer"
-                            style={{
-                                width: idx === current ? '28px' : '8px',
-                                height: '8px',
-                                background: idx === current ? '#C5A021' : 'rgba(255,255,255,0.45)',
-                            }}
-                        />
-                    ))}
-                </div>
-
-                {/* Scroll Indicator - desktop only */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 animate-bounce opacity-80 hidden md:flex pointer-events-none" style={{ zIndex: 40 }}>
-                    <span className="text-[10px] text-white/40 tracking-[0.2em] uppercase font-medium">Explore</span>
-                    <ChevronDown className="w-4 h-4 text-white/30" />
+                    {/* Scroll hint — in document flow below dots (replaces absolute; avoids clash with CTA) */}
+                    <div className="flex flex-col items-center gap-1 pt-1 pb-1 animate-bounce opacity-75 pointer-events-none select-none">
+                        <span className="text-[10px] text-white/35 tracking-[0.2em] uppercase font-medium">
+                            Explore
+                        </span>
+                        <ChevronDown className="w-4 h-4 text-white/30" aria-hidden />
+                    </div>
                 </div>
             </div>
         </section>

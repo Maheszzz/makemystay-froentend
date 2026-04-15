@@ -54,7 +54,7 @@ export function PgLocalitySeoContent({ name, slug, faqSectionId = 'pg-locality-f
 
             <QuickAnswersBlock locationName={name} />
 
-            <PeopleAlsoAsk locationName={name} />
+            <PeopleAlsoAsk items={faqs} />
 
             <FaqSection
                 id={faqSectionId}

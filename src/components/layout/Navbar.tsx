@@ -80,51 +80,51 @@ export function Navbar() {
             <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-3 md:py-4 border-b border-brand-gray' : 'bg-transparent py-4 md:py-6'
                 }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] md:justify-normal md:items-center md:gap-3 lg:gap-4">
+                        <div className="flex items-center space-x-2 shrink-0">
                             <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-md bg-white" />
                             <Link to="/" className={`text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors ${showScrolledStyle ? 'text-brand-charcoal' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'}`}>
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
                         </div>
 
-                        <div className="hidden md:flex items-center space-x-8">
+                        <div className="hidden md:flex items-center justify-center gap-x-4 lg:gap-x-6 xl:gap-x-7 min-w-0 mx-1">
                             {navigationLinks.map((item) => (
                                 <a
                                     key={item}
                                     href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                     onClick={(e) => handleNavClick(item, e)}
-                                    className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
+                                    className={`text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
                                 >
                                     {item}
                                 </a>
                             ))}
-                            <Link to="/quick-pay" className={`text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
+                            <Link to="/quick-pay" className={`text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
                                 Quick Pay
                             </Link>
 
                             <Link
                                 to="/schedule-demo"
-                                className={`flex items-center gap-1.5 text-sm font-medium transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
+                                className={`flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
                             >
-                                <Video className="w-4 h-4" />
+                                <Video className="w-4 h-4 shrink-0" />
                                 Schedule a Demo
-                            </Link>
-
-                            <Link to="/contact-us">
-                                <Button variant="primary" className="px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
                             </Link>
                         </div>
 
-                        {/* Mobile Hamburger */}
-                        <button
-                            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${showScrolledStyle ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
-                                }`}
-                        >
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                        </button>
+                        <div className="flex items-center justify-end shrink-0 gap-2">
+                            <Link to="/contact-us" className="hidden md:block">
+                                <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
+                            </Link>
+                            <button
+                                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${showScrolledStyle ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
+                                    }`}
+                            >
+                                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </nav>
