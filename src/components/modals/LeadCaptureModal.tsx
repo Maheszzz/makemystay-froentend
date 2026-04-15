@@ -158,7 +158,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                                             value={formData.phone}
                                             onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10)})}
                                             className="w-full pl-16 pr-5 py-3.5 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none text-slate-900 font-medium tracking-wider"
-                                            placeholder="98765 43210"
+                                            placeholder="Enter Your Mobile Number "
                                         />
                                     </div>
                                 </div>
