@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "check:local": "node scripts/check-local.mjs",
     "build": "vite build && node scripts/generate-version.js && node scripts/generate-sitemap.mjs",
     "preview": "vite preview",
     "clean:code": "knip && unimported && ts-prune",

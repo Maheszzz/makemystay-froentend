@@ -47,6 +47,11 @@ function resolveApiBaseUrl(): string {
 /** Prefer VITE_API_BASE_URL; VITE_API_URL kept for older .env / README compatibility. */
 export const API_BASE_URL = resolveApiBaseUrl();
 
+function localhostApiHint(): string {
+    const base = API_BASE_URL || 'http://localhost:8000/api/v1';
+    return `Expected backend at ${base}. If you're developing locally, start FastAPI on port 8000 and use ENV=development so localhost origins are allowed.`;
+}
+
 // Create axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL || undefined,
@@ -128,10 +133,10 @@ apiClient.interceptors.response.use(
             if (error.code === 'ECONNABORTED') {
                 apiError.message = 'Request timed out while waiting for backend.';
                 apiError.detail =
-                    'Backend may be slow or blocked (often due to DB connectivity). Check backend logs.';
+                    `Backend may be slow or blocked (often due to DB connectivity). ${localhostApiHint()}`;
             } else {
-                apiError.message = 'No response from server. Please check if the backend is running.';
-                apiError.detail = 'Network error or server is not responding';
+                apiError.message = 'Cannot reach the backend from this page.';
+                apiError.detail = `${localhostApiHint()} This can also happen when CORS is blocking localhost requests.`;
             }
         }
 

@@ -59,9 +59,15 @@
    ```
    The application will run at `http://localhost:5173`.
 
-4. **Build for production**
+4. **Verify local API wiring before opening the listings pages**
    ```bash
-   npm build
+   npm run check:local
+   ```
+   This checks the frontend API base URL, backend health, backend `ENV`, database connectivity, and a live PG listings request.
+
+5. **Build for production**
+   ```bash
+   npm run build
    ```
 
 ## 📂 Project Structure
@@ -89,6 +95,8 @@ Create a `.env` file in the root directory to configure your environment:
 # Use either name (both are supported; VITE_API_BASE_URL wins if both are set)
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
+
+For local development, make sure the backend is running with `ENV=development`. If the backend is started in production mode, browser requests from `localhost` can be blocked by CORS even when the API itself is healthy.
 
 ## 🤝 Contributing
 
