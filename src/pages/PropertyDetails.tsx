@@ -1,24 +1,36 @@
+import { Fragment } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Check, Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Phone } from 'lucide-react';
+import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Check } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { parsePropertySlugParam } from '@/lib/propertyRouting';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { buildPropertyDetailGraph } from '@/lib/schema';
+import { buildPageSEO, propertyDetailPageSeo } from '@/lib/seo';
+import { SITE_URL } from '@/lib/siteConfig';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { ReviewSection } from '@/components/property/ReviewSection';
 import { useMemo, useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
-import { amenityIconMap } from '@/lib/amenityIcons';
+import { getAmenityIcon } from '@/lib/amenityIcons';
+import { dedupePropertyFeatures, normalizeFeatureKey } from '@/lib/propertyFeatures';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
-
+import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
+import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
+import { PropertyStickyActions } from '@/components/property/PropertyStickyActions';
+import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
+import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
+import { findPgLocationForArea } from '@/data/pgLocations';
 
 export default function PropertyDetails() {
     // Route: /properties/:slug  (e.g. "102-slc-bhk-2" or bare "102")
@@ -51,12 +63,22 @@ export default function PropertyDetails() {
         title: '',
         subtitle: '',
         source: '',
-        actionLabel: ''
+        actionLabel: 'Send request',
     });
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
 
     const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
+
+    const detailPath = slugParam ? `/properties/${slugParam}` : '/properties';
+    const detailHelmet = useMemo(() => {
+        if (!property) return null;
+        return buildPageSEO(propertyDetailPageSeo(property, detailPath));
+    }, [property, detailPath]);
+    const detailJsonLd = useMemo(() => {
+        if (!property) return null;
+        return buildPropertyDetailGraph(property, detailPath);
+    }, [property, detailPath]);
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -66,7 +88,7 @@ export default function PropertyDetails() {
 
     const handleShare = async () => {
         if (!property) return;
-        const productionUrl = `https://makemystay.ai/properties/${slugParam}`;
+        const productionUrl = `${SITE_URL}/properties/${slugParam}`;
         const shareData = {
             title: displayTitle || property.title,
             text: `Check out this property: ${displayTitle || property.title} in ${property.location}`,
@@ -190,34 +212,50 @@ export default function PropertyDetails() {
     const heroImage = allImages[heroIdx] || null;
 
     // Build display features (non-array truthy `{}` must not reach .map)
-    let displayFeatures = Array.isArray(property.features) ? property.features : [];
     const isPG = property.type === 'PG' || property.type === 'Hostel';
+    let displayFeatures = Array.isArray(property.features) ? [...property.features] : [];
     if (isPG) {
-        const standardAmenities = ["High-Speed WiFi", "Nutritious Food", "Daily Housekeeping", "Power Backup", "24/7 Security", "Washing Machine", "Refrigerator", "RO Water Purifier"];
-        displayFeatures = Array.from(new Set([...displayFeatures, ...standardAmenities]));
+        const standardAmenities = [
+            'High-Speed WiFi',
+            'Nutritious Food',
+            'Daily Housekeeping',
+            'Power Backup',
+            '24/7 Security',
+            'Washing Machine',
+            'Refrigerator',
+            'RO Water Purifier',
+        ];
+        displayFeatures = [...displayFeatures, ...standardAmenities];
     }
-    const duplicatePairs: [string, string][] = [
-        ['ro water', 'ro water purifier'], ['wifi', 'high-speed wifi'], ['wifi', 'wi-fi'],
-        ['security', '24/7 security'], ['security', 'cctv security'], ['housekeeping', 'daily housekeeping'],
-        ['housekeeping', 'professional housekeeping'], ['tv', 'smart tv'],
-        ['parking', 'bike parking'], ['parking', 'car parking'], ['kitchen', 'common kitchen'],
-        ['kitchen', 'shared kitchen'], ['kitchen', 'modern kitchen'], ['kitchen', 'fully equipped kitchen'],
-        ['water purifier', 'ro water purifier'],
-    ];
-    const lowerSet = new Set(displayFeatures.map((f: string) => f.toLowerCase()));
-    const toRemove = new Set<string>();
-    for (const [generic, specific] of duplicatePairs) {
-        if (lowerSet.has(generic) && lowerSet.has(specific)) toRemove.add(generic);
-    }
-    if (toRemove.size > 0) displayFeatures = displayFeatures.filter((f: string) => !toRemove.has(f.toLowerCase()));
+    displayFeatures = dedupePropertyFeatures(displayFeatures);
 
     // Description
     const desc = property.description && property.description.length > 50
         ? property.description
         : `Experience premium living at **${displayTitle}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
+    const seoHeading = buildPropertySeoHeading(property);
+    const heroIntro = buildPropertyHeroIntro(property);
+    const pgLoc = findPgLocationForArea(property.location);
+    const crumbLabel = (displayTitle || property.title).trim();
+    const breadcrumbItems = [
+        { name: 'Home', path: '/' },
+        { name: 'PG', path: '/pg' },
+        ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
+        { name: crumbLabel.length > 56 ? `${crumbLabel.slice(0, 55)}…` : crumbLabel },
+    ];
+
+    const galleryAltBase = `${displayTitle || property.title} ${property.type} in ${property.location}`;
+    const heroAlt =
+        allImages.length > 0
+            ? `${galleryAltBase} — photo ${heroIdx + 1} of ${allImages.length}`
+            : `${galleryAltBase} — main photo`;
+
     return (
-        <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
+        <Fragment>
+            {detailHelmet && <SEOHead {...detailHelmet} ogType="article" />}
+            {detailJsonLd && <JsonLd id="property-detail-jsonld" data={detailJsonLd} />}
+            <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
             <Navbar />
 
             <main id="main-content" className="pb-24 flex-grow">
@@ -289,7 +327,7 @@ export default function PropertyDetails() {
                                         <img
                                             key={heroIdx}
                                             src={heroImage}
-                                            alt={displayTitle}
+                                            alt={heroAlt}
                                             onLoad={handleHeroImageLoad}
                                             className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
                                             loading="eager"
@@ -341,9 +379,12 @@ export default function PropertyDetails() {
                                         {Math.max(allImages.length, 1)} photos
                                     </span>
                                 </div>
-                                <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white leading-tight tracking-tight break-words">
-                                    {displayTitle}
+                                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-[1.65rem] font-extrabold text-white leading-snug tracking-tight break-words">
+                                    {seoHeading}
                                 </h1>
+                                <p className="mt-2 text-white/80 text-sm sm:text-[15px] leading-relaxed max-w-3xl">
+                                    {heroIntro}
+                                </p>
                                 <p className="mt-1.5 text-white/80 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs sm:text-sm font-medium">
                                     <span className="inline-flex items-center gap-2 min-w-0">
                                         <MapPin className="w-4 h-4 shrink-0 text-white/70" />
@@ -352,6 +393,15 @@ export default function PropertyDetails() {
                                     <span className="text-white/40 hidden sm:inline">•</span>
                                     <span className="text-white/90 min-w-0 sm:truncate max-w-full">{property.location}</span>
                                 </p>
+
+                                <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-[11px] sm:text-xs text-emerald-100/95 font-semibold list-none p-0">
+                                    {['Verified listing', '24/7 support', 'No brokerage', 'Book online'].map((label) => (
+                                        <li key={label} className="inline-flex items-center gap-1.5">
+                                            <Check className="h-3.5 w-3.5 text-emerald-300 shrink-0" aria-hidden />
+                                            {label}
+                                        </li>
+                                    ))}
+                                </ul>
 
                                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
                                     <div className="flex flex-wrap items-center gap-2">
@@ -371,11 +421,16 @@ export default function PropertyDetails() {
 
                                     <div className="flex flex-row items-baseline justify-between gap-3 sm:flex-col sm:items-end sm:text-right sm:ml-auto sm:justify-end border-t border-white/10 pt-3 sm:border-0 sm:pt-0">
                                         <span className="text-white/50 text-[10px] font-bold uppercase tracking-[0.15em]">Starting from</span>
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-white font-extrabold text-xl sm:text-2xl tabular-nums tracking-tight">{property.price}</span>
-                                            {property.category === 'rent' && (
-                                                <span className="text-white/60 font-semibold text-sm">/mo</span>
-                                            )}
+                                        <div className="flex flex-col items-end gap-0.5">
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-white font-extrabold text-xl sm:text-2xl tabular-nums tracking-tight">{property.price}</span>
+                                                {property.category === 'rent' && (
+                                                    <span className="text-white/60 font-semibold text-sm">/mo</span>
+                                                )}
+                                            </div>
+                                            <span className="text-[10px] sm:text-[11px] text-white/55 font-medium max-w-[14rem] text-right leading-snug">
+                                                All-inclusive options may be available — confirm on enquiry
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -399,7 +454,7 @@ export default function PropertyDetails() {
                                         >
                                             <img
                                                 src={url}
-                                                alt={`Thumbnail ${idx + 1}`}
+                                                alt={`${galleryAltBase} — thumbnail ${idx + 1}`}
                                                 className="h-full w-full object-cover"
                                                 loading="lazy"
                                                 decoding="async"
@@ -414,10 +469,14 @@ export default function PropertyDetails() {
 
                 {/* ─── Main Content ─── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-8">
+                    <div className="mb-6">
+                        <BreadcrumbNav items={breadcrumbItems} />
+                    </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
                         {/* LEFT — Main Details */}
                         <div className="lg:col-span-2 space-y-6">
+                            <PropertyQuickAnswers property={property} />
 
                             {/* About Section */}
                             <div className="relative rounded-3xl border border-slate-200/70 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.40)] overflow-hidden">
@@ -464,27 +523,50 @@ export default function PropertyDetails() {
 
                                 {/* Amenities */}
                                 {displayFeatures.length > 0 && (
-                                    <div className="relative border-t border-white/70 px-6 md:px-8 py-7 md:py-8">
-                                        {/* Trust decision tags */}
-                                        <div className="flex flex-wrap gap-2 mb-5">
-                                            {['✓ Fully Furnished', '✓ Move-in Ready', '✓ No Brokerage', '✓ Verified Property'].map((tag) => (
-                                                <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full border" style={{ color: '#1d7a4a', background: 'rgba(16,185,129,0.07)', borderColor: 'rgba(16,185,129,0.2)' }}>{tag}</span>
+                                    <div className="relative border-t border-slate-200/60 px-6 md:px-8 py-7 md:py-8 bg-gradient-to-b from-slate-50/40 to-transparent">
+                                        <div className="flex flex-wrap gap-2 mb-6">
+                                            {['Fully furnished', 'Move-in ready', 'No brokerage', 'Verified listing'].map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="text-[11px] font-semibold uppercase tracking-wide text-slate-600 px-3 py-1.5 rounded-lg bg-white border border-slate-200/90 shadow-sm"
+                                                >
+                                                    {tag}
+                                                </span>
                                             ))}
                                         </div>
-                                        <h3 className="text-base font-bold text-slate-900 mb-5 uppercase tracking-widest text-xs text-slate-400">What this place offers</h3>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                            {displayFeatures.map((feature: string, idx: number) => {
-                                                const icon = amenityIconMap[feature.toLowerCase()] ?? <Check className="w-4 h-4" />;
+                                        <div className="mb-6">
+                                            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 mb-1">
+                                                Amenities
+                                            </p>
+                                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
+                                                What this place offers
+                                            </h3>
+                                            <p className="text-sm text-slate-500 mt-1.5 max-w-xl">
+                                                Everything included with your stay — curated for comfort and convenience.
+                                            </p>
+                                        </div>
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 list-none p-0 m-0">
+                                            {displayFeatures.map((feature: string) => {
+                                                const lookupKey = normalizeFeatureKey(feature);
+                                                const icon = getAmenityIcon(lookupKey);
                                                 return (
-                                                    <div key={idx} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-colors group cursor-default border border-transparent hover:border-slate-100">
-                                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-sm">
+                                                    <li
+                                                        key={lookupKey}
+                                                        className="flex items-start gap-3 rounded-xl border border-slate-200/80 bg-white/90 backdrop-blur-sm p-3.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:border-slate-300/90 hover:shadow-md transition-all duration-200"
+                                                    >
+                                                        <div
+                                                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-slate-50 to-slate-100 text-brand-red border border-slate-200/80 [&_svg]:shrink-0"
+                                                            aria-hidden
+                                                        >
                                                             {icon}
                                                         </div>
-                                                        <span className="text-sm font-medium text-slate-700 leading-tight">{feature}</span>
-                                                    </div>
+                                                        <span className="text-sm font-medium text-slate-800 leading-snug pt-1.5 min-w-0">
+                                                            {feature}
+                                                        </span>
+                                                    </li>
                                                 );
                                             })}
-                                        </div>
+                                        </ul>
                                     </div>
                                 )}
                             </div>
@@ -508,7 +590,7 @@ export default function PropertyDetails() {
                                             >
                                                 <img
                                                     src={url}
-                                                    alt={`Property view ${idx + 1}`}
+                                                    alt={`${galleryAltBase} — gallery photo ${idx + 1}`}
                                                     className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                                                 />
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -519,6 +601,8 @@ export default function PropertyDetails() {
                                     </div>
                                 </div>
                             )}
+
+                            <SimilarPropertiesSection current={property} />
 
                             {/* Reviews */}
                             <div className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8">
@@ -535,114 +619,122 @@ export default function PropertyDetails() {
                             <div className="sticky top-24 space-y-5">
 
                                 {/* Price + Book */}
-                                <div className="bg-white rounded-3xl shadow-[0_22px_70px_-48px_rgba(15,23,42,0.45)] border border-slate-200/70 overflow-hidden">
-                                    {/* top accent */}
-                                    <div className="h-1 bg-gradient-to-r from-brand-red via-red-400 to-orange-400" />
+                                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-[0_8px_30px_-8px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04] overflow-hidden">
+                                    <div className="h-0.5 bg-gradient-to-r from-brand-red via-rose-500 to-amber-400" />
 
-                                    <div className="p-6 md:p-7">
-                                        {/* Price */}
-                                        <div className="mb-5">
-                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Starting from</p>
-                                            <div className="flex items-end gap-1">
-                                                <span className="text-4xl font-extrabold text-slate-900 tracking-tight">{property.price}</span>
-                                                {property.category === 'rent' && <span className="text-slate-400 font-medium pb-1">/mo</span>}
+                                    <div className="p-6 md:p-7 space-y-5">
+                                        <div>
+                                            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                                Starting from
+                                            </p>
+                                            <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0">
+                                                <span className="text-[2rem] md:text-4xl font-semibold tabular-nums tracking-tight text-slate-900">
+                                                    {property.price}
+                                                </span>
+                                                {property.category === 'rent' && (
+                                                    <span className="text-sm font-medium text-slate-400">/ month</span>
+                                                )}
+                                            </div>
+                                            <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                                                All-inclusive options may be available — confirm on enquiry
+                                            </p>
+                                        </div>
+
+                                        <div className="rounded-xl border border-slate-100 bg-slate-50/90 p-4 space-y-3 text-[13px]">
+                                            <div className="flex justify-between gap-4">
+                                                <span className="text-slate-500">Monthly rent</span>
+                                                <span className="font-semibold tabular-nums text-slate-900">{property.price}</span>
+                                            </div>
+                                            <div className="h-px bg-slate-200/80" aria-hidden />
+                                            <div className="flex justify-between gap-4">
+                                                <span className="text-slate-500">Maintenance</span>
+                                                <span className="font-semibold text-emerald-700">Included</span>
                                             </div>
                                         </div>
 
-                                        {/* Price breakdown */}
-                                        <div className="mb-5 p-4 bg-gradient-to-b from-slate-50 to-white rounded-2xl border border-slate-200/70 space-y-2.5 text-sm">
-                                            <div className="flex justify-between text-slate-600">
-                                                <span>Monthly Rent</span>
-                                                <span className="font-semibold text-slate-900">{property.price}</span>
-                                            </div>
-                                            <div className="flex justify-between text-slate-600">
-                                                <span>Maintenance</span>
-                                                <span className="font-semibold text-emerald-600">Included</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Rating row */}
-                                        <div className="flex items-center justify-between mb-5 p-3 bg-slate-50/70 rounded-2xl border border-slate-200/70">
-                                            <div className="flex items-center gap-2">
+                                        <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-white px-3.5 py-3">
+                                            <div className="flex min-w-0 items-center gap-2">
                                                 {(property.rating ?? 0) > 0 ? (
                                                     <>
-                                                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                                                        <span className="font-bold text-slate-900">{(property.rating ?? 0).toFixed(1)}</span>
-                                                        <span className="text-slate-400 text-sm">&middot; {reviewsLabel(property.reviews || 0)}</span>
+                                                        <Star className="h-4 w-4 shrink-0 text-amber-400 fill-amber-400" aria-hidden />
+                                                        <span className="font-semibold tabular-nums text-slate-900">
+                                                            {(property.rating ?? 0).toFixed(1)}
+                                                        </span>
+                                                        <span className="truncate text-sm text-slate-500">
+                                                            {reviewsLabel(property.reviews || 0)}
+                                                        </span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Star className="w-4 h-4 text-amber-300" />
-                                                        <span className="text-sm font-semibold text-slate-700">New Listing</span>
+                                                        <Star className="h-4 w-4 shrink-0 text-amber-200" aria-hidden />
+                                                        <span className="text-sm font-medium text-slate-600">New listing</span>
                                                     </>
                                                 )}
                                             </div>
-                                            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Verified</span>
+                                            <span className="shrink-0 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">
+                                                Verified
+                                            </span>
                                         </div>
 
-                                        {/* Posted Date */}
-                                        <div className="flex items-center justify-between mb-5 text-sm">
+                                        <div className="flex items-center justify-between gap-3 text-sm">
                                             <div className="flex items-center gap-2 text-slate-500">
-                                                <CalendarDays className="w-4 h-4 text-slate-300" />
-                                                <span className="font-medium">Posted on</span>
+                                                <CalendarDays className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+                                                <span>Posted on</span>
                                             </div>
-                                            <span className="font-bold text-slate-900">{property.postedDate || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                            <span className="font-semibold tabular-nums text-slate-900">
+                                                {property.postedDate ||
+                                                    new Date().toLocaleDateString('en-IN', {
+                                                        day: '2-digit',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    })}
+                                            </span>
                                         </div>
 
-                                        {/* CTA */}
-                                        <Button
-                                            onClick={handlePayNow}
-                                            className="w-full py-4 text-base font-extrabold rounded-2xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-lg shadow-brand-red/25 hover:shadow-brand-red/40 transition-all transform hover:scale-[1.01] active:scale-[0.99] border-0 text-white"
-                                        >
-                                            🔥 Secure This Room Now
-                                        </Button>
-                                        <p className="text-center text-xs text-slate-400 mt-3">Token ₹5,000 · No hidden charges · Instant confirmation</p>
-
-                                        <div className="mt-4 grid grid-cols-2 gap-3">
-                                            <button 
-                                                onClick={() => setLeadModal({
-                                                    isOpen: true,
-                                                    title: 'Book a Site Visit',
-                                                    subtitle: `Schedule a personal tour of ${displayTitle}. Our team will confirm the slot via WhatsApp.`,
-                                                    source: 'Website - Book Visit',
-                                                    actionLabel: 'Confirm Visit Slot'
-                                                })}
-                                                className="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all group"
+                                        <div className="pt-1">
+                                            <Button
+                                                onClick={handlePayNow}
+                                                className="w-full rounded-xl border-0 bg-brand-red py-3.5 text-[15px] font-semibold text-white shadow-md shadow-brand-red/20 transition hover:bg-brand-red/95 hover:shadow-lg hover:shadow-brand-red/30 active:scale-[0.99]"
                                             >
-                                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                                                    <CalendarDays className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-xs font-bold text-slate-700">Book Visit</span>
-                                            </button>
-                                            <button 
-                                                onClick={() => setLeadModal({
-                                                    isOpen: true,
-                                                    title: 'Request a Call Back',
-                                                    subtitle: `Have questions about ${displayTitle}? Our agent will call you within 15 minutes.`,
-                                                    source: 'Website - Call Back',
-                                                    actionLabel: 'Call Me ASAP'
-                                                })}
-                                                className="flex flex-col items-center justify-center p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all group"
-                                            >
-                                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                                                    <Phone className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-xs font-bold text-slate-700">Call Back</span>
-                                            </button>
+                                                Secure this room now
+                                            </Button>
+                                            <p className="mt-3 text-center text-[11px] leading-relaxed text-slate-500">
+                                                Token ₹5,000 · No hidden charges · Instant confirmation
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Talk to Agent */}
-                                <Link to="/contact-us" className="flex items-center justify-between bg-slate-900 rounded-3xl px-6 py-5 shadow-xl hover:bg-slate-800 transition-colors group">
-                                    <div>
-                                        <p className="font-bold text-white text-base">Talk to an Agent</p>
-                                        <p className="text-slate-400 text-sm mt-0.5">Get expert advice instantly</p>
-                                    </div>
-                                    <div className="w-11 h-11 bg-white rounded-2xl flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform shadow-md">
-                                        <ChevronRight className="w-5 h-5" />
-                                    </div>
-                                </Link>
+                                {/* Talk to Agent — opens lead form (full contact page linked below) */}
+                                <div className="space-y-2">
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setLeadModal({
+                                                isOpen: true,
+                                                title: 'Talk to an agent',
+                                                subtitle: `Questions about ${displayTitle || 'this property'}? Share your details and our team will reach out shortly.`,
+                                                source: 'Website - Property - Talk to Agent',
+                                                actionLabel: 'Request a callback',
+                                            })
+                                        }
+                                        className="flex w-full items-center justify-between rounded-2xl bg-slate-900 px-6 py-5 text-left shadow-xl transition-colors hover:bg-slate-800 group"
+                                    >
+                                        <div>
+                                            <p className="text-base font-bold text-white">Talk to an agent</p>
+                                            <p className="mt-0.5 text-sm text-slate-400">Get expert advice on this listing</p>
+                                        </div>
+                                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-slate-900 shadow-md transition-transform group-hover:scale-105">
+                                            <ChevronRight className="h-5 w-5" aria-hidden />
+                                        </div>
+                                    </button>
+                                    <Link
+                                        to="/contact-us"
+                                        className="block text-center text-xs font-medium text-slate-500 transition hover:text-brand-red"
+                                    >
+                                        All contact options →
+                                    </Link>
+                                </div>
 
                                 {/* Share / Wishlist */}
                                 <div className="grid grid-cols-2 gap-3">
@@ -683,7 +775,7 @@ export default function PropertyDetails() {
                     )}
                     <img
                         src={allImages[lightboxIndex]}
-                        alt={`Full view ${lightboxIndex + 1}`}
+                        alt={`${galleryAltBase} — full screen ${lightboxIndex + 1}`}
                         onClick={(e) => e.stopPropagation()}
                         className="max-w-[90vw] max-h-[88vh] object-contain rounded-2xl shadow-2xl select-none"
                     />
@@ -720,14 +812,27 @@ export default function PropertyDetails() {
 
             <LeadCaptureModal
                 isOpen={leadModal.isOpen}
-                onClose={() => setLeadModal(prev => ({ ...prev, isOpen: false }))}
+                onClose={() => setLeadModal((prev) => ({ ...prev, isOpen: false }))}
                 title={leadModal.title}
                 subtitle={leadModal.subtitle}
                 source={leadModal.source}
                 actionLabel={leadModal.actionLabel}
-                propertyTitle={displayTitle}
+                propertyTitle={displayTitle || property.title}
                 propertyLocation={property.location}
             />
-        </div>
+
+            <PropertyStickyActions
+                onBookVisit={() =>
+                    setLeadModal({
+                        isOpen: true,
+                        title: 'Book a visit',
+                        subtitle: `Schedule a time to see ${displayTitle || property.title} in ${property.location}.`,
+                        source: 'Website - Property - Book visit',
+                        actionLabel: 'Request visit',
+                    })
+                }
+            />
+            </div>
+        </Fragment>
     );
 }

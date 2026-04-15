@@ -10,6 +10,8 @@ import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw } from 'lucide
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
+import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
+import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
 
 const CATEGORY_KEYS = ['all', 'pg', 'rent', 'buy', 'plot'] as const;
 type CategoryKey = (typeof CATEGORY_KEYS)[number];
@@ -28,6 +30,8 @@ interface PropertiesProps {
     initialCity?: string;
     pageTitle?: string;
     pageSubtitle?: string;
+    /** Embed listing UI inside another page (no Helmet, Navbar, Footer). */
+    hideChrome?: boolean;
 }
 
 export default function Properties({
@@ -35,7 +39,8 @@ export default function Properties({
     initialTypeFilter = 'all',
     initialCity = 'all',
     pageTitle = 'Find Your Perfect Home',
-    pageSubtitle = 'Browse Professional & Verified Listings'
+    pageSubtitle = 'Browse Professional & Verified Listings',
+    hideChrome = false,
 }: PropertiesProps) {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -66,6 +71,12 @@ export default function Properties({
             if (maxPrice) params.max = maxPrice;
             if (sortBy !== 'rating_desc') params.sort = sortBy;
             if (searchQuery) params.q = searchQuery;
+
+            // Preserve PG marketing filters (deep links from /pg/:slug chips)
+            for (const key of ['wifi', 'food', 'ac', 'price'] as const) {
+                const v = searchParams.get(key);
+                if (v) params[key] = v;
+            }
 
             // Only update if something changed to avoid unnecessary history entries
             const currentParams = Object.fromEntries(searchParams.entries());
@@ -103,11 +114,22 @@ export default function Properties({
         };
     }, [location.key]);
 
+    const wifiOn = searchParams.get('wifi') === 'true';
+    const foodOn = searchParams.get('food') === 'true';
+    const acOn = searchParams.get('ac') === 'true';
+    const priceTier = searchParams.get('price');
+
     // 4. API Parameters (Derived from URL/State)
     const apiParams = useMemo(() => {
         const q = searchQuery.trim() || undefined;
-        const min_price = minPrice ? parseFloat(minPrice) : undefined;
-        const max_price = maxPrice ? parseFloat(maxPrice) : undefined;
+        let min_price = minPrice ? parseFloat(minPrice) : undefined;
+        let max_price = maxPrice ? parseFloat(maxPrice) : undefined;
+        if (!min_price && !max_price && priceTier === 'low') max_price = 12000;
+        if (!min_price && !max_price && priceTier === 'mid') {
+            min_price = 8000;
+            max_price = 16000;
+        }
+        if (!min_price && !max_price && priceTier === 'high') min_price = 14000;
         const city = locationFilter === 'all' ? undefined : locationFilter;
         const sort_by = sortBy;
 
@@ -117,7 +139,7 @@ export default function Properties({
             return { ...base, property_type: typeFilter === 'all' ? undefined : typeFilter };
         }
         return { ...base, category };
-    }, [category, searchQuery, typeFilter, minPrice, maxPrice, locationFilter, sortBy]);
+    }, [category, searchQuery, typeFilter, minPrice, maxPrice, locationFilter, sortBy, priceTier]);
 
     const PAGE_SIZE = 24;
     const {
@@ -131,7 +153,12 @@ export default function Properties({
         loadingMore,
     } = useProperties(apiParams, { infiniteScroll: true, pageSize: PAGE_SIZE });
 
-    const propertyList = Array.isArray(properties) ? properties : [];
+    const propertyListFiltered = useMemo(() => {
+        const list = Array.isArray(properties) ? properties : [];
+        const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
+        if (!wifiOn && !foodOn && !acOn) return list;
+        return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
+    }, [properties, wifiOn, foodOn, acOn]);
 
     // Infinite scroll observer
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
@@ -149,7 +176,7 @@ export default function Properties({
         return () => obs.disconnect();
     }, [sentinelEl, hasMore, loading, loadingMore, loadMore]);
 
-    const cities = ["Bangalore", "HSR Layout", "Electronic City", "Whitefield", "Koramangala", "Indiranagar", "BTM Layout", "Jayanagar", "JP Nagar", "Bommanahalli", "Sarjapur", "Marathahalli"];
+    const cities = PROPERTY_CITY_OPTIONS;
 
     const resetFilters = useCallback(() => {
         setMinPrice('');
@@ -161,32 +188,32 @@ export default function Properties({
         setSearchParams({}, { replace: true });
     }, [setSearchParams]);
 
-    return (
-        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-            <Helmet>
-                <title>{pageTitle} | MakeMyStay.ai</title>
-                <meta name="description" content={`Find ${totalCount || 'premium'} ${category} listings in ${locationFilter === 'all' ? 'Bangalore' : locationFilter}. Verified properties with expert support.`} />
-            </Helmet>
-
-            <Navbar />
-
-            <main id="main-content" className="pt-32 pb-20 flex-grow">
+    const mainContent = (
+            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-2 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header */}
-                    <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                        <div>
-                            <button
-                                type="button"
-                                onClick={goBack}
-                                className="group mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-brand-red hover:shadow-md"
-                            >
-                                <ArrowLeft className="h-3.5 w-3.5 shrink-0 transition group-hover:-translate-x-0.5" aria-hidden />
-                                Back
-                            </button>
-                            <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
-                            <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
+                    {!hideChrome && (
+                        <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                            <div>
+                                <button
+                                    type="button"
+                                    onClick={goBack}
+                                    className="group mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-brand-red hover:shadow-md"
+                                >
+                                    <ArrowLeft className="h-3.5 w-3.5 shrink-0 transition group-hover:-translate-x-0.5" aria-hidden />
+                                    Back
+                                </button>
+                                <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
+                                <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
+                    {hideChrome && (
+                        <div className="mb-6 border-b border-slate-200 pb-4">
+                            <h2 className="text-xl font-bold text-slate-900">Listings in {locationFilter === 'all' ? 'Bangalore' : locationFilter}</h2>
+                            <p className="text-slate-500 text-sm mt-1">{pageSubtitle}</p>
+                        </div>
+                    )}
 
                     {/* Unified Filter/Search Bar */}
                     <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 mb-8 sticky top-24 z-30 transition-all">
@@ -317,15 +344,20 @@ export default function Properties({
                     {!loading && !error && (
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-slate-500 text-xs md:text-sm font-medium">
-                                Showing <span className="text-slate-900 font-bold">{propertyList.length}</span> of <span className="text-slate-900 font-bold">{totalCount}</span> properties
+                                Showing{' '}
+                                <span className="text-slate-900 font-bold">{propertyListFiltered.length}</span> of{' '}
+                                <span className="text-slate-900 font-bold">{totalCount}</span> properties
                                 {locationFilter !== 'all' && ` in ${locationFilter}`}
+                                {(wifiOn || foodOn || acOn) && (
+                                    <span className="text-slate-400"> (WiFi/food/AC filters apply to loaded results — scroll for more)</span>
+                                )}
                             </p>
                             {loadingMore && <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>}
                         </div>
                     )}
 
                     {/* API Status Messages */}
-                    {loading && propertyList.length === 0 && (
+                    {loading && propertyListFiltered.length === 0 && (
                         <div className="py-20">
                             <LoadingSpinner size={48} message="Fetching verified listings..." />
                         </div>
@@ -337,8 +369,8 @@ export default function Properties({
 
                     {/* Property Grid */}
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-                        {propertyList.length > 0 ? (
-                            propertyList.map((prop) => <PropertyCard key={prop.id} property={prop} />)
+                        {propertyListFiltered.length > 0 ? (
+                            propertyListFiltered.map((prop) => <PropertyCard key={prop.id} property={prop} />)
                         ) : !loading && (
                             <div className="col-span-full py-20 px-6 text-center bg-white rounded-3xl border border-dashed border-slate-200">
                                 <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -373,6 +405,49 @@ export default function Properties({
                     )}
                 </div>
             </main>
+    );
+
+    if (hideChrome) {
+        return (
+            <div className="bg-slate-50 font-sans flex flex-col">
+                {mainContent}
+                <AnimatePresence>
+                    {wishlist.length > 0 && (
+                        <motion.div
+                            initial={{ y: 100 }}
+                            animate={{ y: 0 }}
+                            exit={{ y: 100 }}
+                            className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 lg:right-12 z-40 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-white/10 md:w-80"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-brand-red p-2 rounded-lg">
+                                        <Heart className="w-4 h-4 fill-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold leading-none">Wishlist Ready</p>
+                                        <p className="text-[10px] text-slate-400 mt-1">{wishlist.length} properties saved</p>
+                                    </div>
+                                </div>
+                                <Link to="/wishlist" className="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-brand-red hover:text-white transition-all">View</Link>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+            <Helmet>
+                <title>{pageTitle} | MakeMyStay.ai</title>
+                <meta name="description" content={`Find ${totalCount || 'premium'} ${category} listings in ${locationFilter === 'all' ? 'Bangalore' : locationFilter}. Verified properties with expert support.`} />
+            </Helmet>
+
+            <Navbar />
+
+            {mainContent}
 
             {/* Wishlist Floating Bar (Mobile optimized) */}
             <AnimatePresence>

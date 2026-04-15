@@ -19,8 +19,19 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
-const PGInBangalore = lazy(() => import('./pages/PGInBangalore'));
+const PGBangaloreHub = lazy(() => import('./pages/PGBangaloreHub'));
+const PgFeatureLandingPage = lazy(() => import('./pages/PgFeatureLandingPage'));
+const PgVsFlatBangalore = lazy(() => import('./pages/PgVsFlatBangalore'));
+const PGLocationPage = lazy(() => import('./pages/PGLocationPage'));
+const BlogIndex = lazy(() => import('./pages/BlogIndex'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
+
+/** Alias: /property/:slug → /properties/:slug (share-friendly path). */
+function PropertyAliasRedirect() {
+    const { slug } = useParams<{ slug: string }>();
+    return <Navigate to={`/properties/${slug}`} replace />;
+}
 
 /** Backward-compat: redirect /properties/id/102 → /properties/102 */
 function LegacyIdRedirect() {
@@ -78,8 +89,14 @@ function App() {
                             <Route path="/rent" element={<Properties key="rent" initialCategory="rent" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
                             <Route path="/rent/in/:city" element={<CityProperties category="rent" />} />
 
-                            <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
                             <Route path="/pg/in/:city" element={<CityProperties category="pg" />} />
+                            <Route path="/pg/bangalore" element={<PGBangaloreHub />} />
+                            <Route path="/pg-with-wifi" element={<PgFeatureLandingPage />} />
+                            <Route path="/pg-with-food" element={<PgFeatureLandingPage />} />
+                            <Route path="/pg-with-ac" element={<PgFeatureLandingPage />} />
+                            <Route path="/pg-vs-flat-bangalore" element={<PgVsFlatBangalore />} />
+                            <Route path="/pg/:location" element={<PGLocationPage />} />
+                            <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
 
                             <Route path="/plots" element={<Properties key="plots" initialCategory="plot" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home" />} />
                             <Route path="/plots/in/:city" element={<CityProperties category="plot" />} />
@@ -89,6 +106,7 @@ function App() {
                             <Route path="/schedule-demo" element={<ScheduleDemo />} />
                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
+                            <Route path="/property/:slug" element={<PropertyAliasRedirect />} />
                             <Route path="/properties/id/:id" element={<LegacyIdRedirect />} />
                             <Route path="/properties/:type/:slug" element={<LegacyTypeSlugRedirect />} />
                             <Route path="/properties/:slug" element={<PropertyDetails />} />
@@ -99,7 +117,10 @@ function App() {
                             <Route path="/quick-pay" element={<QuickPay />} />
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
-                            <Route path="/pg-in-bangalore" element={<PGInBangalore />} />
+                            <Route path="/pg-in-bangalore" element={<Navigate to="/pg/bangalore" replace />} />
+
+                            <Route path="/blog/:slug" element={<BlogPost />} />
+                            <Route path="/blog" element={<BlogIndex />} />
 
                             <Route path="*" element={<NotFound />} />
                         </Routes>
