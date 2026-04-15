@@ -54,6 +54,8 @@ function buildPgNarrative(name: string, loc: string, property: Property): string
 
     return `**${name}** is a **PG** stay in **${loc}**, positioned for renters who want bundled utilities, structured meals or kitchen access where applicable, and shorter commutes across Bangalore. ${priceBit}
 
+Located near major **IT hubs, tech parks, and business centers** in ${loc}, this property offers seamless access to leading corporate offices, public transport, and essential daily services.
+
 When you compare paying-guest options, look beyond headline rent: Wi‑Fi stability, meal timings, housekeeping cadence, laundry, and visitor rules. ${featBit} Use this page as a checklist, then ask the operator about night access, deposit, and notice period in writing.
 
 **${loc}** continues to attract students, exam-prep residents, and early-career professionals. Many searches combine intents like "PG near me", "coliving ${loc}", "single room PG Bangalore", and "food included PG" — this description is written to align with those queries using specific, verifiable language rather than generic filler.
@@ -75,6 +77,8 @@ function buildHomeNarrative(name: string, loc: string, property: Property): stri
         : 'Rent, maintenance, and inclusions should be confirmed on enquiry for an apples-to-apples comparison.';
 
     return `**${name}** offers a **${pt}** home for rent in **${loc}**, aimed at renters who want a readable story before scheduling visits. ${priceBit}
+
+This home is strategically **located near key IT corridors and tech parks** in ${loc}, ensuring a balanced lifestyle with minimal commute times to major offices and educational institutions nearby.
 
 Urban housing searches in Bangalore often combine phrases like "fully furnished ${pt} ${loc}", "family ${pt} near ORR", "no brokerage ${loc}", and "ready-to-move ${pt} Bangalore". This copy is composed to help both users and search engines understand configuration, furnishing level, and location intent without keyword stuffing.
 

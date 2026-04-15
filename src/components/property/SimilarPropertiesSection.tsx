@@ -32,17 +32,17 @@ export function SimilarPropertiesSection({ current }: SimilarPropertiesSectionPr
         <section className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8" aria-labelledby="similar-pg-heading">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 id="similar-pg-heading" className="text-2xl font-extrabold text-slate-900">
+                    <h2 id="similar-pg-heading" className="text-xl md:text-2xl font-extrabold text-slate-900">
                         {heading}
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">Verified listings — tap to compare</p>
+                    <p className="text-sm text-slate-500 mt-1">Verified listings — tap to compare and save</p>
                 </div>
                 {pgLoc && (
                     <Link
                         to={`/pg/${pgLoc.slug}`}
-                        className="text-sm font-semibold text-brand-red hover:underline"
+                        className="text-sm font-semibold text-brand-red hover:underline flex items-center gap-1"
                     >
-                        View all in {pgLoc.name} →
+                        View all in {pgLoc.name} <span className="text-lg">→</span>
                     </Link>
                 )}
             </div>

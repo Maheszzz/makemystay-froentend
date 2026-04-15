@@ -18,40 +18,43 @@ export function PropertyQuickAnswers({ property }: PropertyQuickAnswersProps) {
 
     return (
         <section
-            className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm"
+            className="rounded-3xl border border-slate-200/90 bg-white p-6 md:p-8 shadow-sm"
             aria-labelledby="property-quick-answers-heading"
         >
-            <h2 id="property-quick-answers-heading" className="text-lg font-bold text-slate-900">
-                Quick answers
-            </h2>
-            <ul className="mt-4 space-y-2.5 text-sm text-slate-700 list-none p-0">
+            <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-6 bg-brand-red rounded-full" />
+                <h2 id="property-quick-answers-heading" className="text-xl font-extrabold text-slate-900">
+                    Quick answers
+                </h2>
+            </div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm text-slate-700 list-none p-0">
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">Price</span>
-                    <span>{property.price || 'On request'}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">Price</strong>
+                    <span className="text-slate-700">{property.price || 'On request'}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">Location</span>
-                    <span>{property.location}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">Location</strong>
+                    <span className="text-slate-700">{property.location}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">Type</span>
-                    <span>{property.type}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">Type</strong>
+                    <span className="text-slate-700">{property.type}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">WiFi</span>
-                    <span>{wifi}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">WiFi</strong>
+                    <span className="text-slate-700">{wifi}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">Food</span>
-                    <span>{food}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">Food</strong>
+                    <span className="text-slate-700">{food}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">AC</span>
-                    <span>{ac}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">AC</strong>
+                    <span className="text-slate-700">{ac}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className="min-w-[5.5rem] font-semibold text-slate-900">Availability</span>
-                    <span>{avail}</span>
+                    <strong className="min-w-[5.5rem] text-slate-900">Availability</strong>
+                    <span className="text-slate-700 font-medium">{avail}</span>
                 </li>
             </ul>
         </section>
