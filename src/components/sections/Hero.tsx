@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronDown, CheckCircle } from 'lucide-react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
 
@@ -183,22 +184,33 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                 </div>
 
                 {/* --- Trust Indicators --- */}
-                <div className="hidden md:flex flex-wrap justify-center gap-x-6 gap-y-2 mt-2">
-                    {trustItems.map((item) => (
-                        <div key={item} className="flex items-center gap-1.5">
-                            <CheckCircle
-                                className="w-3.5 h-3.5 shrink-0"
-                                style={{ color: '#C5A021' }}
-                                strokeWidth={2.5}
-                            />
-                            <span
-                                className="text-white/80 text-xs font-medium tracking-wide"
-                                style={{ fontFamily: "'Montserrat', sans-serif" }}
-                            >
-                                {item}
-                            </span>
-                        </div>
-                    ))}
+                <div className="hidden md:flex flex-wrap justify-center gap-y-2 mt-4">
+                    <div className="flex items-center gap-x-6">
+                        {trustItems.map((item) => (
+                            <div key={item} className="flex items-center gap-1.5">
+                                <CheckCircle
+                                    className="w-3.5 h-3.5 shrink-0"
+                                    style={{ color: '#C5A021' }}
+                                    strokeWidth={2.5}
+                                />
+                                <span
+                                    className="text-white/80 text-xs font-medium tracking-wide"
+                                    style={{ fontFamily: "'Montserrat', sans-serif" }}
+                                >
+                                    {item}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="w-full flex justify-center mt-2.5">
+                        <Link 
+                            to="/pg/bangalore" 
+                            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-white/90 hover:bg-brand-red hover:border-brand-red transition-all duration-300"
+                        >
+                            <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse" />
+                            Explore Best PG in Bangalore →
+                        </Link>
+                    </div>
                 </div>
 
                 {/* ── Slide dot indicators — in flow, never overlaps ── */}

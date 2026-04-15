@@ -25,23 +25,23 @@ export function QuickAnswersBlock({ locationName, variant = 'light' }: QuickAnsw
             </h2>
             <ul className={`mt-4 space-y-2.5 ${valueCls} list-none p-0`}>
                 <li className="flex gap-2">
-                    <span className={labelCls}>Price</span>
-                    <span>₹6,000–₹18,000/mo (varies by sharing, AC, meals)</span>
+                    <strong className={labelCls}>Price</strong>
+                    <span>₹6,000–₹15,000/mo (varies by sharing, AC, meals)</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className={labelCls}>WiFi</span>
+                    <strong className={labelCls}>WiFi</strong>
                     <span>High-speed internet on most verified PGs in {locationName}</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className={labelCls}>Food</span>
+                    <strong className={labelCls}>Food</strong>
                     <span>2–3 meals often included; veg/non-veg depends on operator</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className={labelCls}>Security</span>
+                    <strong className={labelCls}>Security</strong>
                     <span>CCTV, biometric access &amp; warden support common in premium stays</span>
                 </li>
                 <li className="flex gap-2">
-                    <span className={labelCls}>Commute</span>
+                    <strong className={labelCls}>Commute</strong>
                     <span>
                         {locationName} — check each listing for distance to offices, metro &amp; bus routes
                     </span>

@@ -184,9 +184,9 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
 /** City hub: `/pg/bangalore` — primary “PG in Bangalore” landing. */
 export function pgBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Best PG in Bangalore (₹6k–₹18k) | WiFi, food & verified coliving',
+        title: 'Best PG in Bangalore (₹6k–₹15k) | verified & affordable coliving',
         description:
-            'Find affordable PG and coliving in Bangalore with WiFi, meals, and security. Browse verified listings by area, compare rent, and book visits on MakeMyStay.ai.',
+            'Find the best PG in Bangalore with WiFi, meals, and 24/7 security. Browse verified listings by location (Whitefield, BTM, Marathahalli), compare rent starting from ₹6000, and book directly.',
         path: '/pg/bangalore',
     };
 }
