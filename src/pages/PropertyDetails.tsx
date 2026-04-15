@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Check } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
@@ -30,6 +30,7 @@ import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
 import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
 import { PropertyStickyActions } from '@/components/property/PropertyStickyActions';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
+import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
 import {
     buildClientSeoAbout,
@@ -39,12 +40,18 @@ import {
 import { findPgLocationForArea } from '@/data/pgLocations';
 
 export default function PropertyDetails() {
-    // Route: /properties/:slug  (e.g. "102-slc-bhk-2" or bare "102")
     const { slug: slugParam } = useParams<{ slug: string }>();
+    const location = useLocation();
     const propertyId = parsePropertySlugParam(slugParam ?? '');
     const goBack = useSmartBack({ fallback: '/properties' });
     const { property, loading, error, refetch } = useProperty(propertyId);
     const { isWishlisted, toggleWishlist } = useWishlist();
+
+    // Redirection logic for legacy /properties/:slug URLs
+    if (location.pathname.startsWith('/properties/')) {
+        const newPath = location.pathname.replace('/properties/', '/pg/');
+        return <Navigate to={newPath} replace />;
+    }
 
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [aboutExpanded, setAboutExpanded] = useState(false);
@@ -80,7 +87,7 @@ export default function PropertyDetails() {
 
     const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
 
-    const detailPath = slugParam ? `/properties/${slugParam}` : '/properties';
+    const detailPath = slugParam ? `/pg/${slugParam}` : '/pg';
     const detailHelmet = useMemo(() => {
         if (!property) return null;
         return buildPageSEO(propertyDetailPageSeo(property, detailPath));
@@ -98,7 +105,7 @@ export default function PropertyDetails() {
 
     const handleShare = async () => {
         if (!property) return;
-        const productionUrl = `${SITE_URL}/properties/${slugParam}`;
+        const productionUrl = `${SITE_URL}/pg/${slugParam}`;
         const shareData = {
             title: displayTitle || property.title,
             text: `Check out this property: ${displayTitle || property.title} in ${property.location}`,
@@ -497,8 +504,12 @@ export default function PropertyDetails() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
                         {/* LEFT — Main Details */}
-                        <div className="lg:col-span-2 space-y-6">
+                        <div className="lg:col-span-2 space-y-12">
                             <PropertyQuickAnswers property={property} />
+                            
+                            <div className="pt-8 border-t border-slate-200">
+                                <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
+                            </div>
 
                             {/* About Section */}
                             <div className="relative rounded-3xl border border-slate-200/70 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.40)] overflow-hidden">

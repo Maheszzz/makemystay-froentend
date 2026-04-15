@@ -10,7 +10,7 @@ const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 export function WhatsAppWidget() {
     const { pathname } = useLocation();
     /** Avoid hover-expand + overlap with PropertyStickyActions (Call / Book visit). */
-    const isPropertyDetailPage = pathname.startsWith('/properties/');
+    const isPropertyDetailPage = pathname.startsWith('/properties/') || /^\/pg\/\d+/.test(pathname);
 
     const [isOpen, setIsOpen] = useState(false);
     const [showBounce, setShowBounce] = useState(false);

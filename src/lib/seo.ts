@@ -150,7 +150,8 @@ function ogImageFromProperty(property: Property): string | undefined {
 
 /** Meta + canonical for `/properties/:slug` detail pages. */
 export function propertyDetailPageSeo(property: Property, detailPath: string): PageSEOInput {
-    const path = detailPath.startsWith('/') ? detailPath : `/${detailPath}`;
+    // Canonical should prioritize /pg/ authority route
+    const path = detailPath.startsWith('/pg/') ? detailPath : `/pg${detailPath.startsWith('/') ? detailPath : `/${detailPath}`}`.replace('/properties/', '/pg/');
     const heading = buildPropertySeoHeading(property);
     const title = trimMetaTitle(heading);
     const longPlain = stripMarkdownLight(
@@ -191,31 +192,43 @@ export function pgBangaloreHubSeo(): PageSEOInput {
     };
 }
 
-const PG_FEATURE_PATHS: Record<string, 'wifi' | 'food' | 'ac'> = {
+const PG_FEATURE_PATHS: Record<string, 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'> = {
     '/pg-with-wifi': 'wifi',
     '/pg-with-food': 'food',
     '/pg-with-ac': 'ac',
+    '/pg-for-girls': 'girls',
+    '/pg-for-boys': 'boys',
+    '/pg-single-room': 'single',
 };
 
-export function pgFeaturePathToKind(pathname: string): 'wifi' | 'food' | 'ac' | undefined {
+export function pgFeaturePathToKind(pathname: string): 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single' | undefined {
     return PG_FEATURE_PATHS[pathname];
 }
 
-export function pgFeatureLandingSeo(feature: 'wifi' | 'food' | 'ac'): PageSEOInput {
+export function pgFeatureLandingSeo(feature: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'): PageSEOInput {
     const titles = {
         wifi: 'PG with WiFi in Bangalore | High-speed internet — verified listings',
         food: 'PG with food in Bangalore | Meals included — verified PG stays',
         ac: 'PG with AC in Bangalore | Cool rooms — verified listings',
+        girls: 'Girls PG in Bangalore | Safe & verified female accommodations',
+        boys: 'Boys PG in Bangalore | Affordable male coliving & PG stays',
+        single: 'Single Room PG in Bangalore | Private rooms with no sharing',
     };
     const desc = {
         wifi: 'Looking for PG with reliable WiFi in Bangalore? Explore verified paying guest stays with transparent pricing, filters for connectivity, and book online.',
         food: 'Find PG with meals in Bangalore — veg and non-veg plans vary by operator. Compare verified listings and enquire on MakeMyStay.ai.',
         ac: 'Discover air-conditioned PG rooms in Bangalore. Verified listings with clear amenities — compare rent and book a visit.',
+        girls: 'Find safe, verified ladies PG in Bangalore. CCTV, security, and meal inclusive stays for students and working women.',
+        boys: 'Search for boys PG in Bangalore. Managed stays with WiFi, food, and housekeeping for early career tech professionals.',
+        single: 'Browse private single occupancy PG rooms in Bangalore. No roommate stress — premium verified coliving options.',
     };
     const paths = {
         wifi: '/pg-with-wifi',
         food: '/pg-with-food',
         ac: '/pg-with-ac',
+        girls: '/pg-for-girls',
+        boys: '/pg-for-boys',
+        single: '/pg-single-room',
     };
     return {
         title: titles[feature],

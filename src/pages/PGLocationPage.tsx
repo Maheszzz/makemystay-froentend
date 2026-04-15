@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -14,9 +15,10 @@ import Properties from '@/pages/Properties';
 export default function PGLocationPage() {
     const { location: locationParam } = useParams<{ location: string }>();
     const [searchParams] = useSearchParams();
+    const [hasEmptyListings, setHasEmptyListings] = useState(false);
     const legacyTarget = resolveLegacyPgSlug(locationParam);
     if (legacyTarget) {
-        return <Navigate to={`/pg/${legacyTarget}`} replace />;
+        return <Navigate to={`/pg/${legacyTarget}`} replace />
     }
 
     const loc = getPgLocationBySlug(locationParam);
@@ -42,7 +44,7 @@ export default function PGLocationPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            <SEOHead {...helmet} />
+            <SEOHead {...helmet} noindex={helmet.noindex || hasEmptyListings} />
             <JsonLd data={combinedLd} id="pg-location-ld-json" />
 
             <Navbar />
@@ -87,6 +89,7 @@ export default function PGLocationPage() {
                         initialCity={name}
                         pageTitle={pageTitle}
                         pageSubtitle={pageSubtitle}
+                        onEmptyResultsChange={setHasEmptyListings}
                     />
                 </div>
             </main>

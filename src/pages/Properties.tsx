@@ -32,6 +32,7 @@ interface PropertiesProps {
     pageSubtitle?: string;
     /** Embed listing UI inside another page (no Helmet, Navbar, Footer). */
     hideChrome?: boolean;
+    onEmptyResultsChange?: (isEmpty: boolean) => void;
 }
 
 export default function Properties({
@@ -41,6 +42,7 @@ export default function Properties({
     pageTitle = 'Find Your Perfect Home',
     pageSubtitle = 'Browse Professional & Verified Listings',
     hideChrome = false,
+    onEmptyResultsChange,
 }: PropertiesProps) {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -160,6 +162,12 @@ export default function Properties({
         return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
     }, [properties, wifiOn, foodOn, acOn]);
 
+    const shouldNoindexEmptyResults = !loading && !error && propertyListFiltered.length === 0;
+
+    useEffect(() => {
+        onEmptyResultsChange?.(shouldNoindexEmptyResults);
+    }, [onEmptyResultsChange, shouldNoindexEmptyResults]);
+
     // Infinite scroll observer
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
     useEffect(() => {
@@ -193,6 +201,12 @@ export default function Properties({
 
     const mainContent = (
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
+                {/* SEO: Noindex if no results found to prevent thin content ranking */}
+                {shouldNoindexEmptyResults && (
+                    <Helmet>
+                        <meta name="robots" content="noindex, follow" />
+                    </Helmet>
+                )}
                 <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? '' : ''}`}>
                     {/* Header */}
                     {!hideChrome && (
@@ -472,6 +486,9 @@ export default function Properties({
             <Helmet>
                 <title>{pageTitle} | MakeMyStay.ai</title>
                 <meta name="description" content={`Find ${totalCount || 'premium'} ${category} listings in ${locationFilter === 'all' ? 'Bangalore' : locationFilter}. Verified properties with expert support.`} />
+                {shouldNoindexEmptyResults && (
+                    <meta name="robots" content="noindex, follow" />
+                )}
             </Helmet>
 
             <Navbar />

@@ -24,10 +24,11 @@ export function getPropertyDetailPath(property: Property): string {
     const id = String(property.id);
     const slugPart = property.slug?.trim() || titleToSlug(property.title || '');
     if (slugPart) {
-        return `/properties/${id}-${slugPart}`;
+        // High-authority semantic route: /pg/{id}-{slug}
+        return `/pg/${id}-${slugPart}`;
     }
-    // Bare-ID fallback (very rare — property has no title or slug)
-    return `/properties/${id}`;
+    // Bare-ID fallback
+    return `/pg/${id}`;
 }
 
 /**

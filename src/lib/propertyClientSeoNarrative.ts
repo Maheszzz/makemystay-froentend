@@ -172,11 +172,16 @@ export function buildPropertyPdpFaqs(property: Property): PropertyPdpFaq[] {
         },
     ];
     if (property.type === 'PG' || property.type === 'Hostel') {
-        items.splice(2, 0, {
-            question: `Does ${name} include WiFi, food, or housekeeping?`,
-            answer:
-                'PG listings often bundle WiFi, meals, and housekeeping — exact inclusions depend on the operator. Review amenity tags on this page and confirm meal timings and policies on enquiry.',
-        });
+        items.splice(2, 0, 
+            {
+                question: `Does ${name} in ${loc} include WiFi, food, or housekeeping?`,
+                answer: 'Professional PG listings usually bundle WiFi, meals, and housekeeping to simplify stays. Review the amenity tags on this listing and confirm the meal frequency (typically 2-3 per day) and WiFi speed on enquiry.',
+            },
+            {
+                question: `Is there a security deposit for this PG in ${loc}?`,
+                answer: `Most PGs in ${loc} require a 1 to 2 months security deposit along with a notice period (typically 30 days). Confirm the specific token amount and refund policies directly with the operator through MakeMyStay.`,
+            }
+        );
     }
-    return items.slice(0, 8);
+    return items.slice(0, 10);
 }

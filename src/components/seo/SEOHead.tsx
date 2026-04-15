@@ -23,7 +23,7 @@ export function SEOHead({
             <meta name="description" content={description} />
             {keywords ? <meta name="keywords" content={keywords} /> : null}
             <link rel="canonical" href={canonicalHref} />
-            {noindex && <meta name="robots" content="noindex, nofollow" />}
+            <meta name="robots" content={noindex ? "noindex, follow" : "max-image-preview:large"} />
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:type" content={ogType} />

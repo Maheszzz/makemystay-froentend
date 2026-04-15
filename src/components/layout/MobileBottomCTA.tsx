@@ -38,6 +38,7 @@ export function MobileBottomCTA() {
                 <a
                     href="tel:+918150099911"
                     aria-label="Call us"
+                    onClick={() => console.log('[TRACK] Mobile Bottom Call clicked')}
                     className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 h-10 rounded-xl transition-all active:scale-95"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
@@ -59,6 +60,7 @@ export function MobileBottomCTA() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp us"
+                    onClick={() => console.log('[TRACK] Mobile Bottom WhatsApp clicked')}
                     className="flex flex-col items-center justify-center gap-0.5 px-2 min-[400px]:px-4 sm:px-7 h-11 rounded-2xl active:scale-95 transition-all shrink-0"
                     style={{
                         background: 'linear-gradient(145deg, #25D366 0%, #128C7E 100%)',
@@ -87,6 +89,7 @@ export function MobileBottomCTA() {
                 <a
                     href="/contact-us"
                     aria-label="Enquire now"
+                    onClick={() => console.log('[TRACK] Mobile Bottom Enquire clicked')}
                     className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 h-10 rounded-xl transition-all active:scale-95"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                 >

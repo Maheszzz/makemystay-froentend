@@ -95,7 +95,7 @@ export function Footer() {
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Popular areas</p>
                                 <h2 className="mt-1.5 text-base font-bold text-white font-heading">Top PG locations</h2>
                                 <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">Area guides &amp; listings</p>
-                                <nav className="flex flex-wrap gap-1.5" aria-label="Popular PG areas">
+                                 <nav className="flex flex-wrap gap-1.5" aria-label="Popular PG areas">
                                     {PG_LOCATIONS.slice(0, 20).map((loc) => (
                                         <Link
                                             key={loc.slug}
@@ -106,9 +106,34 @@ export function Footer() {
                                         </Link>
                                     ))}
                                 </nav>
+                                
+                                <div className="mt-8">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">PG by Category</p>
+                                    <h2 className="mt-1.5 text-base font-bold text-white font-heading">Must-have features</h2>
+                                    <nav className="flex flex-wrap gap-1.5 mt-3" aria-label="PG feature categories">
+                                        {[
+                                            { label: 'PG with WiFi', path: '/pg-with-wifi' },
+                                            { label: 'PG with Food', path: '/pg-with-food' },
+                                            { label: 'PG with AC', path: '/pg-with-ac' },
+                                            { label: 'Girls PG', path: '/pg-for-girls' },
+                                            { label: 'Boys PG', path: '/pg-for-boys' },
+                                            { label: 'Single Room', path: '/pg-single-room' },
+                                            { label: 'PG Near Me', path: '/pg-near-me' },
+                                        ].map((feat) => (
+                                            <Link
+                                                key={feat.path}
+                                                to={feat.path}
+                                                className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs font-medium text-slate-300 transition hover:border-brand-red/35 hover:bg-brand-red/10 hover:text-white"
+                                            >
+                                                {feat.label}
+                                            </Link>
+                                        ))}
+                                    </nav>
+                                </div>
+
                                 <Link
                                     to="/pg"
-                                    className="mt-5 inline-block text-xs font-semibold text-brand-red hover:underline"
+                                    className="mt-6 inline-block text-xs font-semibold text-brand-red hover:underline"
                                 >
                                     View all PG listings →
                                 </Link>

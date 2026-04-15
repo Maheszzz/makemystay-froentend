@@ -288,14 +288,22 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     </div>
 
                     <div className="mt-auto flex items-stretch gap-2 pt-1 border-t border-slate-100">
-                        <span className="flex-1 flex items-center justify-center min-h-[44px] rounded-lg text-white text-[13px] font-semibold tracking-wide bg-brand-red shadow-sm shadow-brand-red/20 transition-all group-hover:bg-brand-red/95 group-hover:shadow-md group-hover:shadow-brand-red/25 active:scale-[0.99]">
+                        <span 
+                            onClick={(e) => {
+                                console.log('[TRACK] Book visit clicked', { id: property.id, title: property.title, from: location.pathname });
+                            }}
+                            className="flex-1 flex items-center justify-center min-h-[44px] rounded-lg text-white text-[13px] font-semibold tracking-wide bg-brand-red shadow-sm shadow-brand-red/20 transition-all group-hover:bg-brand-red/95 group-hover:shadow-md group-hover:shadow-brand-red/25 active:scale-[0.99] cursor-pointer"
+                        >
                             Book a visit
                         </span>
                         <a
                             href={waLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                console.log('[TRACK] WhatsApp chat clicked', { id: property.id, title: property.title, from: location.pathname });
+                            }}
                             className="inline-flex items-center justify-center gap-1.5 min-w-[44px] min-h-[44px] px-3 rounded-lg text-[13px] font-semibold transition-colors border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 active:scale-[0.99]"
                         >
                             <MessageCircle className="w-4 h-4 shrink-0 text-slate-500" aria-hidden />

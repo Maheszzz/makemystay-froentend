@@ -10,70 +10,76 @@ import { buildPageSEO, pgFeatureLandingSeo, pgFeaturePathToKind } from '@/lib/se
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/pages/Properties';
 
-function featureFaqs(kind: 'wifi' | 'food' | 'ac') {
+function featureFaqs(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single') {
     if (kind === 'wifi') {
         return [
-            {
-                question: 'Do PGs in Bangalore include WiFi?',
-                answer: 'Most professional PGs advertise high-speed WiFi. Confirm fair-usage limits and backup during power cuts on the listing or during your visit.',
-            },
-            {
-                question: 'Is WiFi speed enough for WFH?',
-                answer: 'Ask for typical Mbps and whether each room has LAN or only shared WiFi. Premium PGs near IT corridors often cater to WFH tenants.',
-            },
+            { question: 'Do PGs in Bangalore include WiFi?', answer: 'Most professional PGs advertise high-speed WiFi. Confirm fair-usage limits and backup during power cuts on the listing or during your visit.' },
+            { question: 'Is WiFi speed enough for WFH?', answer: 'Ask for typical Mbps and whether each room has LAN or only shared WiFi. Premium PGs near IT corridors often cater to WFH tenants.' },
         ];
     }
     if (kind === 'food') {
         return [
-            {
-                question: 'Is food included in PG rent in Bangalore?',
-                answer: 'Many PGs bundle 2–3 meals; others offer kitchen access or optional meal plans. Confirm veg/non-veg and timing before you pay a deposit.',
-            },
-            {
-                question: 'Can I get only breakfast or only dinner?',
-                answer: 'Operators vary — some offer flexible meal coupons or add-ons. Check the listing details or ask on enquiry.',
-            },
+            { question: 'Is food included in PG rent in Bangalore?', answer: 'Many PGs bundle 2–3 meals; others offer kitchen access or optional meal plans. Confirm veg/non-veg and timing before you pay a deposit.' },
+            { question: 'Can I get only breakfast or only dinner?', answer: 'Operators vary — some offer flexible meal coupons or add-ons. Check the listing details or ask on enquiry.' },
+        ];
+    }
+    if (kind === 'ac') {
+        return [
+            { question: 'Are AC rooms available in Bangalore PGs?', answer: 'Yes — many listings offer AC rooms, often at a premium versus non-AC. Verify inverter backup and maintenance inclusions.' },
+        ];
+    }
+    if (kind === 'girls') {
+        return [
+            { question: 'Is safety guaranteed in girls PGs in Bangalore?', answer: 'Most girls PGs feature 24/7 security, CCTV, and restricted entry. Verify the presence of a live-in warden and emergency protocols.' },
+            { question: 'Are there specific rules in ladies PGs?', answer: 'Common rules include visitor restrictions and gate timings. Review these on the property listing or during your enquiry.' },
+        ];
+    }
+    if (kind === 'boys') {
+        return [
+            { question: 'What facilities are standard in boys PGs?', answer: 'WiFi, housekeeping, and meal plans are standard. Shared lounges and bike parking are also common in major Bangalore tech clusters.' },
         ];
     }
     return [
-        {
-            question: 'Are AC rooms available in Bangalore PGs?',
-            answer: 'Yes — many listings offer AC rooms, often at a premium versus non-AC. Verify inverter backup and maintenance inclusions.',
-        },
-        {
-            question: 'Is AC rent higher than non-AC?',
-            answer: 'Typically yes. Compare total monthly cost including electricity caps before you decide.',
-        },
+        { question: 'What is the benefit of a single room PG?', answer: 'Single rooms offer zero roommate interference, private study/work space, and total privacy within a managed coliving setup.' },
     ];
 }
 
-function featureIntro(kind: 'wifi' | 'food' | 'ac'): { h1: string; lead: string; body: string } {
-    if (kind === 'wifi') {
-        return {
-            h1: 'PG with WiFi in Bangalore',
-            lead: 'High-speed internet is a must for students and professionals. Browse verified PG listings across Bangalore and filter for connectivity-friendly stays.',
-            body: 'Look beyond the word “WiFi” — ask about fair-usage policies, router placement, and whether meetings are workable during peak hours. Areas such as Whitefield, BTM, and HSR have dense PG supply, so you can compare multiple operators before you commit. Use the listings below with the WiFi filter applied for Bangalore.',
-        };
-    }
-    if (kind === 'food') {
-        return {
-            h1: 'PG with food in Bangalore',
-            lead: 'Meal-inclusive PGs save daily cooking time. Explore verified stays with food plans — veg and non-veg options vary by operator.',
-            body: 'Food quality and timing matter as much as rent. Check whether meals are thali-style or buffet, whether Sunday menus differ, and if late-night access exists for shift workers. The listings below are filtered for food-friendly PGs in Bangalore — always confirm details on the property page before booking.',
-        };
-    }
-    return {
-        h1: 'PG with AC in Bangalore',
-        lead: 'Beat Bangalore summers with air-conditioned rooms. Compare verified PGs that mention AC in amenities or features.',
-        body: 'AC rooms often command higher rent and may have separate electricity metering. Ask about inverter backup for AC during outages. Use the filtered listings below as a starting point, then read each property’s amenities and photos carefully.',
+function featureIntro(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'): { h1: string; lead: string; body: string } {
+    const titles = {
+        wifi: 'PG with WiFi in Bangalore',
+        food: 'PG with food in Bangalore',
+        ac: 'PG with AC in Bangalore',
+        girls: 'Girls PG in Bangalore',
+        boys: 'Boys PG in Bangalore',
+        single: 'Single Room PG in Bangalore',
     };
+    const leads = {
+        wifi: 'High-speed internet is a must for students and professionals. Browse verified PG listings across Bangalore and filter for connectivity-friendly stays.',
+        food: 'Meal-inclusive PGs save daily cooking time. Explore verified stays with food plans — veg and non-veg options vary by operator.',
+        ac: 'Beat Bangalore summers with air-conditioned rooms. Compare verified PGs that mention AC in amenities or features.',
+        girls: 'Find safe, secured, and comfortable female-only PG accommodations. Verified listings with CCTV and 24/7 security across Bangalore.',
+        boys: 'Explore managed male-only PG and coliving stays. High-speed WiFi, optional meals, and flexible terms for early-career professionals.',
+        single: 'Enjoy total privacy with single occupancy PG rooms. No more roommate stress — browse premium private rooms in Bangalore.',
+    };
+    const bodies = {
+        wifi: 'Look beyond the word “WiFi” — ask about fair-usage policies, router placement, and whether meetings are workable during peak hours.',
+        food: 'Food quality and timing matter as much as rent. Check whether meals are thali-style or buffet and if late-night access exists.',
+        ac: 'AC rooms often command higher rent and may have separate electricity metering. Ask about inverter backup for AC during outages.',
+        girls: 'Ladies PGs in areas like BTM, HSR, and Whitefield offer proximity to workplaces and safe transport links. Check for laundry and warden support.',
+        boys: 'Male coliving spaces prioritize convenience and community. Most listings include cleaning and maintenance in the headline rent.',
+        single: 'Single room PGs are the most requested category in 2026. They are ideal for WFH professionals and students needing focus.',
+    };
+    return { h1: titles[kind], lead: leads[kind], body: bodies[kind] };
 }
 
-function filtersReady(kind: 'wifi' | 'food' | 'ac', sp: URLSearchParams): boolean {
+function filtersReady(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single', sp: URLSearchParams): boolean {
     if (sp.get('cat') !== 'pg' || sp.get('city') !== 'Bangalore') return false;
     if (kind === 'wifi') return sp.get('wifi') === 'true';
     if (kind === 'food') return sp.get('food') === 'true';
-    return sp.get('ac') === 'true';
+    if (kind === 'ac') return sp.get('ac') === 'true';
+    if (kind === 'girls') return sp.get('gender') === 'Female';
+    if (kind === 'boys') return sp.get('gender') === 'Male';
+    return sp.get('beds') === '1' || !!sp.get('sharing')?.includes('Single');
 }
 
 export default function PgFeatureLandingPage() {
@@ -87,6 +93,9 @@ export default function PgFeatureLandingPage() {
         if (kind === 'wifi') params.wifi = 'true';
         if (kind === 'food') params.food = 'true';
         if (kind === 'ac') params.ac = 'true';
+        if (kind === 'girls') params.gender = 'Female';
+        if (kind === 'boys') params.gender = 'Male';
+        if (kind === 'single') params.beds = '1';
         setSearchParams(params, { replace: true });
     }, [kind, setSearchParams]);
 
@@ -101,7 +110,7 @@ export default function PgFeatureLandingPage() {
             <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
                 <Navbar />
                 <div className="flex-grow flex items-center justify-center pt-24 pb-32">
-                    <LoadingSpinner message="Loading filtered listings…" />
+                    <LoadingSpinner message="Applying filters for your search…" />
                 </div>
                 <Footer />
             </div>
@@ -112,7 +121,14 @@ export default function PgFeatureLandingPage() {
     const helmet = buildPageSEO(seo);
     const copy = featureIntro(kind);
     const faqs = featureFaqs(kind);
-    const paths = { wifi: '/pg-with-wifi', food: '/pg-with-food', ac: '/pg-with-ac' };
+    const paths = { 
+        wifi: '/pg-with-wifi', 
+        food: '/pg-with-food', 
+        ac: '/pg-with-ac',
+        girls: '/pg-for-girls',
+        boys: '/pg-for-boys',
+        single: '/pg-single-room'
+    };
     const crumbPath = paths[kind];
     const combinedLd = buildPgLocationCombinedGraph(faqs, [
         { name: 'Home', path: '/' },
