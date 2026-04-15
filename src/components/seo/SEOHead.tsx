@@ -14,12 +14,14 @@ export function SEOHead({
     canonicalHref,
     ogImage,
     noindex,
+    keywords,
     ogType = 'website',
 }: SEOHeadProps) {
     return (
         <Helmet>
             <title>{title}</title>
             <meta name="description" content={description} />
+            {keywords ? <meta name="keywords" content={keywords} /> : null}
             <link rel="canonical" href={canonicalHref} />
             {noindex && <meta name="robots" content="noindex, nofollow" />}
             <meta property="og:title" content={title} />

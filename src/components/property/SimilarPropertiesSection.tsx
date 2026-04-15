@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useProperties } from '@/hooks';
+import { useSimilarProperties } from '@/hooks';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import type { Property } from '@/types/api';
 import { findPgLocationForArea } from '@/data/pgLocations';
@@ -12,19 +12,21 @@ interface SimilarPropertiesSectionProps {
 export function SimilarPropertiesSection({ current }: SimilarPropertiesSectionProps) {
     const city = current.location?.trim() || undefined;
     const pgLoc = findPgLocationForArea(current.location);
+    const isPg = current.type?.toLowerCase() === 'pg';
 
-    const { properties, loading, error } = useProperties(
-        city ? { category: 'pg', city, limit: 24, skip: 0 } : { category: 'pg', limit: 24, skip: 0 },
-        { infiniteScroll: false, pageSize: 24 }
-    );
-
-    const similar = properties.filter((p) => p.id !== current.id).slice(0, 6);
+    const { properties: similar, loading, error } = useSimilarProperties(current.id, { limit: 6 });
 
     if (!loading && (error || similar.length === 0)) {
         return null;
     }
 
-    const heading = pgLoc ? `Similar PG in ${pgLoc.name}` : `More PG stays${city ? ` near ${city}` : ' in Bangalore'}`;
+    const heading = isPg
+        ? pgLoc
+            ? `Similar PG in ${pgLoc.name}`
+            : `More PG stays${city ? ` near ${city}` : ' in Bangalore'}`
+        : pgLoc
+          ? `Similar ${current.type} in ${pgLoc.name}`
+          : `More ${current.type} listings${city ? ` near ${city}` : ''}`;
 
     return (
         <section className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8" aria-labelledby="similar-pg-heading">

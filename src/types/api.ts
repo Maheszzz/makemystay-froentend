@@ -47,6 +47,8 @@ export interface RealtyProperty {
     listing_type: 'buy' | 'rent';
     is_available: boolean;
     description?: string; // Optional in DB response??
+    /** Long-form PDP copy (~500 words), server-generated when present */
+    seo_about?: string | null;
     features?: string[];
     images?: PropertyImage[];
     parking?: boolean;
@@ -55,6 +57,9 @@ export interface RealtyProperty {
     reviews?: Review[];
     average_rating?: number;
     review_count?: number;
+    /** When admin API adds optional marketing / inventory fields, map them through. */
+    listing_badge?: string;
+    units_remaining?: number | null;
 }
 
 export interface Review {
@@ -109,6 +114,8 @@ export interface Property {
     tag?: string;
     category: 'buy' | 'rent';
     description: string;
+    /** From GET /properties/:id — long SEO narrative when API provides it */
+    seo_about?: string;
     features?: string[];
     rating?: number;
     reviews?: number;
@@ -127,6 +134,10 @@ export interface Property {
     furnishing?: string;
     contact_phone?: string;
     is_available?: boolean;
+    /** Optional listing badge from admin/backend when supported (e.g. "New", "Verified"). */
+    listing_badge?: string;
+    /** Optional remaining units when backend provides it. */
+    units_remaining?: number | null;
 }
 
 // API Response Types

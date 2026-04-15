@@ -5,7 +5,6 @@ import {
     MapPin,
     MessageCircle,
     Star,
-    TrendingUp,
     Users,
     Utensils,
 } from 'lucide-react';
@@ -16,6 +15,7 @@ import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
 import type { Property } from '@/types/api';
 
 interface PropertyCardProps {
@@ -98,15 +98,15 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
     const propertyPath = getPropertyDetailPath(property);
 
-    // Deterministic social proof & scarcity (vary by id)
-    const idx = (Number(property.id) || 0) % 3;
-    const scarcityLabels = ['Limited Availability', 'High Demand', 'Most Viewed'];
-    const scarcityLabel = scarcityLabels[idx];
-    const roomsLeft = [2, 3, 1];
-    const rooms = roomsLeft[idx];
-
     const displayTitle = useMemo(() => formatPropertyTitle(property.title), [property.title]);
-    const waLink = `https://wa.me/918150099911?text=${encodeURIComponent(`Hi! I'm interested in ${displayTitle} at ${property.location}. Please share more details.`)}`;
+    const waLink = buildPropertyWhatsappUrl(displayTitle || property.title, property.location || '');
+    const secondaryBadge =
+        property.listing_badge?.trim() ||
+        (property.is_available === false ? 'Fully booked' : '');
+    const unitsLeft =
+        typeof property.units_remaining === 'number' && property.units_remaining > 0
+            ? property.units_remaining
+            : null;
 
     const from = `${location.pathname}${location.search}${location.hash}`;
 
@@ -142,14 +142,15 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         <Heart className={`w-4 h-4 transition-colors ${wishlisted ? 'fill-brand-red text-brand-red' : 'text-slate-500'}`} />
                     </button>
 
-                    <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1.5 pointer-events-none">
+                    <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1.5 pointer-events-none max-w-[85%]">
                         <span className="text-[10px] font-semibold tracking-[0.12em] uppercase leading-none px-2.5 py-1.5 rounded-md bg-white text-slate-800 shadow-sm border border-slate-200/80">
                             {property.category === 'buy' ? 'For Sale' : 'For Rent'}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-md text-white bg-slate-900/90 backdrop-blur-sm border border-white/10 shadow-sm">
-                            <TrendingUp className="w-3 h-3 shrink-0 opacity-90" aria-hidden />
-                            {scarcityLabel}
-                        </span>
+                        {secondaryBadge && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-md text-white bg-slate-900/90 backdrop-blur-sm border border-white/10 shadow-sm line-clamp-2">
+                                {secondaryBadge}
+                            </span>
+                        )}
                     </div>
                 </div>
 
@@ -255,9 +256,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                 <p className="text-[12px] text-slate-500 mt-1.5">per month</p>
                             )}
                         </div>
-                        <span className="inline-flex shrink-0 items-center self-start rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-600 border border-slate-200/90">
-                            {rooms} left
-                        </span>
+                        {unitsLeft != null && (
+                            <span className="inline-flex shrink-0 items-center self-start rounded-md bg-slate-100 px-2.5 py-1.5 text-[11px] font-medium uppercase tracking-wide text-slate-600 border border-slate-200/90">
+                                {unitsLeft} left
+                            </span>
+                        )}
                     </div>
 
                     <div className="flex flex-wrap content-start gap-1.5 mb-5 min-h-[5.5rem]">

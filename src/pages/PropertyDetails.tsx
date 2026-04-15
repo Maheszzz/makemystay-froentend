@@ -26,10 +26,16 @@ import logoImage from '@/assets/MakeMysStaylogo.svg';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
+import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
 import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
 import { PropertyStickyActions } from '@/components/property/PropertyStickyActions';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
+import {
+    buildClientSeoAbout,
+    buildPropertyPdpFaqs,
+    extractHeroLeadFromNarrative,
+} from '@/lib/propertyClientSeoNarrative';
 import { findPgLocationForArea } from '@/data/pgLocations';
 
 export default function PropertyDetails() {
@@ -41,6 +47,7 @@ export default function PropertyDetails() {
     const { isWishlisted, toggleWishlist } = useWishlist();
 
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
+    const [aboutExpanded, setAboutExpanded] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -68,6 +75,9 @@ export default function PropertyDetails() {
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
 
+    const isPG = property?.type === 'PG' || property?.type === 'Hostel';
+    const pgLoc = findPgLocationForArea(property?.location);
+
     const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
 
     const detailPath = slugParam ? `/properties/${slugParam}` : '/properties';
@@ -77,7 +87,7 @@ export default function PropertyDetails() {
     }, [property, detailPath]);
     const detailJsonLd = useMemo(() => {
         if (!property) return null;
-        return buildPropertyDetailGraph(property, detailPath);
+        return buildPropertyDetailGraph(property, detailPath, undefined, buildPropertyPdpFaqs(property));
     }, [property, detailPath]);
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -212,7 +222,6 @@ export default function PropertyDetails() {
     const heroImage = allImages[heroIdx] || null;
 
     // Build display features (non-array truthy `{}` must not reach .map)
-    const isPG = property.type === 'PG' || property.type === 'Hostel';
     let displayFeatures = Array.isArray(property.features) ? [...property.features] : [];
     if (isPG) {
         const standardAmenities = [
@@ -234,14 +243,28 @@ export default function PropertyDetails() {
         ? property.description
         : `Experience premium living at **${displayTitle}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
+    /** ~500-word SEO: API `seo_about` when present; else client generator (localhost-friendly). */
+    const longSeo =
+        property.seo_about && property.seo_about.trim().length > 80
+            ? property.seo_about.trim()
+            : buildClientSeoAbout(property);
+    const aboutNarrative = longSeo.length > 80 ? longSeo : desc;
+
+    const aboutWordCount = aboutNarrative.trim().split(/\s+/).filter((w) => w.length > 0).length;
+    const showAboutToggle = aboutWordCount > 200;
+
     const seoHeading = buildPropertySeoHeading(property);
-    const heroIntro = buildPropertyHeroIntro(property);
-    const pgLoc = findPgLocationForArea(property.location);
+    const heroLead =
+        extractHeroLeadFromNarrative(aboutNarrative, 520) || buildPropertyHeroIntro(property);
     const crumbLabel = (displayTitle || property.title).trim();
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
-        { name: 'PG', path: '/pg' },
-        ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
+        ...(isPG
+            ? [
+                  { name: 'PG', path: '/pg' },
+                  ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
+              ]
+            : [{ name: 'Listings', path: '/properties' }]),
         { name: crumbLabel.length > 56 ? `${crumbLabel.slice(0, 55)}…` : crumbLabel },
     ];
 
@@ -379,11 +402,17 @@ export default function PropertyDetails() {
                                         {Math.max(allImages.length, 1)} photos
                                     </span>
                                 </div>
-                                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-[1.65rem] font-extrabold text-white leading-snug tracking-tight break-words">
+                                <h1
+                                    className="text-lg sm:text-xl md:text-2xl lg:text-[1.65rem] font-extrabold text-white leading-snug tracking-tight break-words"
+                                    data-seo="pdp-h1"
+                                >
                                     {seoHeading}
                                 </h1>
-                                <p className="mt-2 text-white/80 text-sm sm:text-[15px] leading-relaxed max-w-3xl">
-                                    {heroIntro}
+                                <p
+                                    className="mt-2 text-white/80 text-sm sm:text-[15px] leading-relaxed max-w-3xl"
+                                    data-seo="pdp-hero-lead"
+                                >
+                                    {heroLead}
                                 </p>
                                 <p className="mt-1.5 text-white/80 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs sm:text-sm font-medium">
                                     <span className="inline-flex items-center gap-2 min-w-0">
@@ -502,22 +531,58 @@ export default function PropertyDetails() {
                                         </div>
                                     </div>
                                     <div className="rounded-2xl border border-white/70 bg-white/70 backdrop-blur-sm p-5 md:p-6 shadow-sm">
-                                        <div className="text-slate-700 leading-relaxed text-[15px] md:text-base space-y-3">
-                                        {desc.split('\n').map((line: string, i: number) => {
-                                            if (!line.trim()) return null;
-                                            const parts = line.split(/(\*\*.*?\*\*)/g);
-                                            return (
-                                                <p key={i}>
-                                                    {parts.map((part: string, j: number) => {
-                                                        if (part.startsWith('**') && part.endsWith('**')) {
-                                                            return <strong key={j} className="text-slate-900 font-semibold">{part.slice(2, -2)}</strong>;
-                                                        }
-                                                        return part;
-                                                    })}
-                                                </p>
-                                            );
-                                        })}
+                                        <div className="relative">
+                                            <div
+                                                data-seo="pdp-about"
+                                                className={`text-slate-700 leading-relaxed text-[15px] md:text-base space-y-4 ${
+                                                    !aboutExpanded && showAboutToggle
+                                                        ? 'max-h-[28rem] overflow-hidden'
+                                                        : ''
+                                                }`}
+                                            >
+                                                {aboutNarrative.split(/\n\n+/).map((block: string, bi: number) => {
+                                                    const trimmed = block.trim();
+                                                    if (!trimmed) return null;
+                                                    return (
+                                                        <div key={bi} className="space-y-3">
+                                                            {trimmed.split('\n').map((line: string, i: number) => {
+                                                                if (!line.trim()) return null;
+                                                                const parts = line.split(/(\*\*.*?\*\*)/g);
+                                                                return (
+                                                                    <p key={`${bi}-${i}`}>
+                                                                        {parts.map((part: string, j: number) => {
+                                                                            if (part.startsWith('**') && part.endsWith('**')) {
+                                                                                return (
+                                                                                    <strong key={j} className="text-slate-900 font-semibold">
+                                                                                        {part.slice(2, -2)}
+                                                                                    </strong>
+                                                                                );
+                                                                            }
+                                                                            return part;
+                                                                        })}
+                                                                    </p>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            {!aboutExpanded && showAboutToggle && (
+                                                <div
+                                                    className="pointer-events-none absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-white via-white/95 to-transparent rounded-b-2xl"
+                                                    aria-hidden
+                                                />
+                                            )}
                                         </div>
+                                        {showAboutToggle && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setAboutExpanded((e) => !e)}
+                                                className="mt-4 text-sm font-semibold text-brand-red hover:underline"
+                                            >
+                                                {aboutExpanded ? 'Show less' : `Read full description (${aboutWordCount} words)`}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -751,6 +816,14 @@ export default function PropertyDetails() {
 
                     </div>
                 </div>
+
+                {isPG && pgLoc && (
+                    <section className="border-t border-slate-200/80 bg-slate-50/80 py-10 md:py-12">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <PgLocalityHubTeaser name={pgLoc.name} slug={pgLoc.slug} />
+                        </div>
+                    </section>
+                )}
             </main>
 
             <Footer />

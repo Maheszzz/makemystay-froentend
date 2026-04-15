@@ -3,6 +3,7 @@ import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { stripMarkdownLight } from '@/lib/propertySeoUtils';
 import { buildPropertySeoHeading, trimMetaTitle } from '@/lib/propertyDetailCopy';
+import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 
 export interface PageSEOInput {
     title: string;
@@ -12,6 +13,8 @@ export interface PageSEOInput {
     canonicalUrl?: string;
     ogImage?: string;
     noindex?: boolean;
+    /** Comma-separated keywords for legacy crawlers / internal tools */
+    keywords?: string;
 }
 
 export interface HelmetSEOProps {
@@ -20,6 +23,7 @@ export interface HelmetSEOProps {
     canonicalHref: string;
     ogImage?: string;
     noindex?: boolean;
+    keywords?: string;
 }
 
 /**
@@ -49,6 +53,7 @@ export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
+        keywords: input.keywords,
     };
 }
 
@@ -148,15 +153,31 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
     const path = detailPath.startsWith('/') ? detailPath : `/${detailPath}`;
     const heading = buildPropertySeoHeading(property);
     const title = trimMetaTitle(heading);
-    const plain = stripMarkdownLight(property.description || '').slice(0, 160);
+    const longPlain = stripMarkdownLight(
+        property.seo_about || buildClientSeoAbout(property) || property.description || ''
+    )
+        .replace(/\s+/g, ' ')
+        .trim();
+    const plain = longPlain.slice(0, 160);
     const description =
         plain ||
         `${formatPropertyTitle(property.title)} — ${property.type} in ${property.location}. Enquire, book a visit, or pay a token on ${SITE_NAME}.`;
+    const keywords = [
+        formatPropertyTitle(property.title),
+        property.type,
+        property.location,
+        'Bangalore rent',
+        'PG coliving',
+        SITE_NAME,
+    ]
+        .filter(Boolean)
+        .join(', ');
     return {
         title,
         description,
         path,
         ogImage: ogImageFromProperty(property) ?? DEFAULT_OG_IMAGE,
+        keywords,
     };
 }
 

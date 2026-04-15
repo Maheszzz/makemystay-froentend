@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { propertyApi } from '@/lib/api';
-import type { Property, ApiError, PaginationParams } from '@/types/api';
+import type { Property, PropertyId, ApiError, PaginationParams } from '@/types/api';
 
 /** Stable key for filters (excludes pagination). */
 function filterKeyFromParams(params?: PaginationParams): string {
@@ -229,4 +229,51 @@ export function usePropertyBySlug(type: string | undefined, slug: string | undef
         error,
         refetch: fetchProperty,
     };
+}
+
+export interface UseSimilarPropertiesResult {
+    properties: Property[];
+    loading: boolean;
+    error: ApiError | null;
+    refetch: () => Promise<void>;
+}
+
+/**
+ * PDP similar listings — server-ranked (locality + neighbors + fallback); not the generic list API.
+ */
+export function useSimilarProperties(
+    propertyId: PropertyId | null | undefined,
+    options: { limit?: number } = {}
+): UseSimilarPropertiesResult {
+    const { limit = 6 } = options;
+    const [properties, setProperties] = useState<Property[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<ApiError | null>(null);
+
+    const refetch = useCallback(async () => {
+        if (propertyId === null || propertyId === undefined) {
+            setProperties([]);
+            setLoading(false);
+            setError(null);
+            return;
+        }
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await propertyApi.getSimilar(propertyId, { limit });
+            setProperties(res.items);
+        } catch (err) {
+            setError(err as ApiError);
+            setProperties([]);
+            console.error(`Error fetching similar properties for ${propertyId}:`, err);
+        } finally {
+            setLoading(false);
+        }
+    }, [propertyId, limit]);
+
+    useEffect(() => {
+        void refetch();
+    }, [refetch]);
+
+    return { properties, loading, error, refetch };
 }

@@ -1,5 +1,7 @@
 import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
+import { findPgLocationForArea } from '@/data/pgLocations';
+import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 import { parseInrOfferAmount, stripMarkdownLight } from '@/lib/propertySeoUtils';
 import { buildPropertyProductName } from '@/lib/propertyDetailCopy';
 
@@ -106,11 +108,19 @@ function absoluteImageUrl(url: string | undefined): string | undefined {
 
 /**
  * Product + Offer + BreadcrumbList for property detail pages (long-tail + rich results).
+ * Optional locality FAQs (e.g. PG area guide) are merged into @graph when provided.
  */
-export function buildPropertyDetailGraph(property: Property, detailPath: string) {
+export function buildPropertyDetailGraph(
+    property: Property,
+    detailPath: string,
+    localityFaqs?: FaqItem[],
+    pdpFaqs?: FaqItem[]
+) {
     const path = detailPath.startsWith('/') ? detailPath : `/${detailPath}`;
     const url = `${SITE_URL}${path}`;
-    const desc = stripMarkdownLight(property.description || '').slice(0, 5000);
+    const desc = stripMarkdownLight(
+        property.seo_about || buildClientSeoAbout(property) || property.description || ''
+    ).slice(0, 5000);
     const images: string[] = [];
     if (Array.isArray(property.images)) {
         for (const img of property.images) {
@@ -134,6 +144,9 @@ export function buildPropertyDetailGraph(property: Property, detailPath: string)
         brand: { '@type': 'Brand', name: SITE_NAME },
         url,
     };
+    if (property.type) {
+        product.category = property.type;
+    }
     if (images.length > 0) product.image = images.length === 1 ? images[0] : images;
 
     if (priceAmount !== undefined) {
@@ -155,17 +168,49 @@ export function buildPropertyDetailGraph(property: Property, detailPath: string)
         };
     }
 
+    const pgLoc = findPgLocationForArea(property.location);
+    const isPgHub =
+        (property.type || '').toUpperCase() === 'PG' || (property.type || '').toLowerCase() === 'hostel';
     const crumbs = buildBreadcrumbSchema([
         { name: 'Home', path: '/' },
-        { name: 'Listings', path: '/properties' },
-        { name: productName.slice(0, 80), path },
+        ...(isPgHub
+            ? [
+                  { name: 'PG', path: '/pg' },
+                  ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
+              ]
+            : [{ name: 'Listings', path: '/properties' }]),
+        { name: productName.slice(0, 78), path },
     ]);
+
+    const webPage: Record<string, unknown> = {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: productName,
+        description: (desc || `${productName} — ${property.type} in ${property.location}`).slice(0, 500),
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+        speakable: {
+            '@type': 'SpeakableSpecification',
+            cssSelector: ['[data-seo="pdp-h1"]', '[data-seo="pdp-hero-lead"]', '[data-seo="pdp-about"]'],
+        },
+    };
+    if (images.length > 0) {
+        webPage.primaryImageOfPage = { '@type': 'ImageObject', url: images[0] };
+    }
+
+    const mergedFaqs = [...(pdpFaqs ?? []), ...(localityFaqs ?? [])].slice(0, 10);
+
+    const graph: Record<string, unknown>[] = [
+        schemaNodeWithoutContext(product),
+        schemaNodeWithoutContext(webPage),
+        schemaNodeWithoutContext(crumbs as Record<string, unknown>),
+    ];
+    if (mergedFaqs.length > 0) {
+        graph.push(schemaNodeWithoutContext(buildFaqPageSchema(mergedFaqs) as Record<string, unknown>));
+    }
 
     return {
         '@context': 'https://schema.org',
-        '@graph': [
-            schemaNodeWithoutContext(product),
-            schemaNodeWithoutContext(crumbs as Record<string, unknown>),
-        ],
+        '@graph': graph,
     };
 }

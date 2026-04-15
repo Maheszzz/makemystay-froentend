@@ -99,6 +99,7 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     const featuresList: string[] = Array.isArray(item.features)
         ? item.features.filter((f): f is string => typeof f === 'string')
         : [];
+    const has = (needle: string) => featuresList.some((f) => f.toLowerCase().includes(needle));
 
     // Safely map listing_type (handle missing or case mismatch)
     const rawListingType = (item.listing_type || 'rent').toLowerCase();
@@ -134,6 +135,15 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         sharingOptions.push('Shared');
     }
 
+    const listingBadge =
+        typeof item.listing_badge === 'string' && item.listing_badge.trim()
+            ? item.listing_badge.trim()
+            : undefined;
+    const unitsRemaining =
+        typeof item.units_remaining === 'number' && Number.isFinite(item.units_remaining)
+            ? item.units_remaining
+            : null;
+
     return {
         id: item.id || Math.random().toString(), // Fallback ID
         slug: item.slug || '',
@@ -147,14 +157,14 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         parking: item.parking,
         lift: item.lift,
         area: item.area_sqft,
-        wifi: !isPlot, // Mocking these as they are new feature requests
-        housekeeping: !isPlot,
-        power_backup: !isPlot,
-        gym: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('gym'))) || item.property_type === 'Villa' || item.property_type === '4BHK'),
-        lounge: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('lounge'))) || item.property_type === 'PG' || item.property_type === 'Villa'),
-        cctv: true,
-        washing_machine: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('washing'))) || item.property_type === 'PG'),
-        geyser: !isPlot,
+        wifi: !isPlot && (has('wifi') || has('wi-fi') || has('internet')),
+        housekeeping: !isPlot && (has('housekeeping') || has('hk ') || has('cleaning')),
+        power_backup: !isPlot && (has('power') || has('backup')),
+        gym: !isPlot && (has('gym') || item.property_type === 'Villa' || item.property_type === '4BHK'),
+        lounge: !isPlot && (has('lounge') || item.property_type === 'PG' || item.property_type === 'Villa'),
+        cctv: !isPlot && (has('cctv') || has('camera') || has('security')),
+        washing_machine: !isPlot && (has('washing') || has('laundry')),
+        geyser: !isPlot && (has('geyser') || has('water heater')),
         image:
             primaryImage ||
             defaultImages[item.property_type] ||
@@ -164,9 +174,12 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         balcony: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
         attached_bathroom: !isPlot, // Standard for most listed properties
         images: dbImages,
-        tag: item.is_available ? 'Available' : 'Sold Out',
+        tag: item.is_available ? 'Available' : 'Fully booked',
+        listing_badge: listingBadge,
+        units_remaining: unitsRemaining,
         category: category,
         description: item.description || `A premium ${item.property_type} property in ${item.location}.`,
+        seo_about: typeof item.seo_about === 'string' && item.seo_about.trim() ? item.seo_about.trim() : undefined,
         sharing: sharingOptions,
         food: item.property_type === 'PG' || featuresList.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
         features: featuresList.length > 0 ? featuresList : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
@@ -232,6 +245,32 @@ export const propertyApi = {
                 items.push(mapRealtyToProperty(row as RealtyProperty));
             } catch (e) {
                 console.warn('[propertyApi.getAll] Skipping malformed property row:', e, row);
+            }
+        }
+        return { items, total };
+    },
+
+    /**
+     * PDP similar listings — server-ranked locality + fallback (see backend GET /properties/{id}/similar).
+     */
+    getSimilar: async (
+        id: number | string,
+        params: { limit?: number } = {}
+    ): Promise<{ items: Property[]; total: number }> => {
+        const queryParams = new URLSearchParams();
+        if (params.limit !== undefined) queryParams.append('limit', String(params.limit));
+        const qs = queryParams.toString();
+        const url = `${REALTY_PATH}/${id}/similar${qs ? `?${qs}` : ''}`;
+        const response = await api.get<unknown>(url, {
+            timeout: 15000,
+        });
+        const { rows, total } = normalizePropertyListResponse(response);
+        const items: Property[] = [];
+        for (const row of rows) {
+            try {
+                items.push(mapRealtyToProperty(row as RealtyProperty));
+            } catch (e) {
+                console.warn('[propertyApi.getSimilar] Skipping malformed property row:', e, row);
             }
         }
         return { items, total };

@@ -12,7 +12,7 @@ interface PropertyStickyActionsProps {
  */
 export function PropertyStickyActions({ onBookVisit }: PropertyStickyActionsProps) {
     return (
-        <div className="fixed z-[38] flex flex-col gap-2 right-3 sm:right-4 w-[min(100vw-1.5rem,11rem)] md:w-auto md:min-w-[10.5rem] bottom-[max(calc(env(safe-area-inset-bottom,0px)+5.75rem),5.75rem)] md:bottom-8 md:right-6">
+        <div className="fixed z-[38] flex flex-col gap-2 right-3 sm:right-4 w-[min(100vw-1.5rem,11rem)] md:w-auto md:min-w-[10.5rem] bottom-[max(calc(env(safe-area-inset-bottom,0px)+5.75rem),5.75rem)] md:bottom-[6.5rem] md:right-6">
             <a
                 href={TEL_HREF}
                 className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-slate-900/25 transition hover:bg-slate-800 md:min-h-[48px]"

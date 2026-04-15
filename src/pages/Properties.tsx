@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties, useSmartBack } from '@/hooks';
+import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
 import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -176,7 +176,10 @@ export default function Properties({
         return () => obs.disconnect();
     }, [sentinelEl, hasMore, loading, loadingMore, loadMore]);
 
-    const cities = PROPERTY_CITY_OPTIONS;
+    const { areas: localitiesFromApi } = useListingLocalityOptions(
+        initialCity !== 'all' ? initialCity : undefined
+    );
+    const cities = localitiesFromApi.length > 0 ? localitiesFromApi : PROPERTY_CITY_OPTIONS;
 
     const resetFilters = useCallback(() => {
         setMinPrice('');
@@ -189,8 +192,8 @@ export default function Properties({
     }, [setSearchParams]);
 
     const mainContent = (
-            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-2 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
+                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? '' : ''}`}>
                     {/* Header */}
                     {!hideChrome && (
                         <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -209,14 +212,31 @@ export default function Properties({
                         </div>
                     )}
                     {hideChrome && (
-                        <div className="mb-6 border-b border-slate-200 pb-4">
-                            <h2 className="text-xl font-bold text-slate-900">Listings in {locationFilter === 'all' ? 'Bangalore' : locationFilter}</h2>
-                            <p className="text-slate-500 text-sm mt-1">{pageSubtitle}</p>
+                        <div className="mb-8 rounded-3xl border border-slate-200/90 bg-gradient-to-br from-white via-slate-50/80 to-white p-6 md:p-8 shadow-[0_20px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04]">
+                            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
+                                <div className="min-w-0">
+                                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Live inventory</p>
+                                    <h2 className="mt-1 text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                                        Listings in {locationFilter === 'all' ? 'Bangalore' : locationFilter}
+                                    </h2>
+                                    <p className="text-slate-600 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">{pageSubtitle}</p>
+                                </div>
+                                {!loading && !error && (
+                                    <div className="shrink-0 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-center shadow-sm">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Results</p>
+                                        <p className="text-lg font-bold tabular-nums text-slate-900">
+                                            {propertyListFiltered.length}
+                                            <span className="text-slate-400 font-semibold"> / </span>
+                                            {totalCount}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
 
                     {/* Unified Filter/Search Bar */}
-                    <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 mb-8 sticky top-24 z-30 transition-all">
+                    <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-[0_8px_40px_-16px_rgba(15,23,42,0.1)] border border-slate-200/80 mb-8 sticky top-24 z-30 transition-all ring-1 ring-slate-900/[0.03]">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                             {/* Search Input - 5 cols */}
                             <div className="lg:col-span-5 relative">
@@ -341,7 +361,7 @@ export default function Properties({
                     </div>
 
                     {/* Results Count & Context */}
-                    {!loading && !error && (
+                    {!loading && !error && !hideChrome && (
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-slate-500 text-xs md:text-sm font-medium">
                                 Showing{' '}
@@ -353,6 +373,11 @@ export default function Properties({
                                 )}
                             </p>
                             {loadingMore && <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>}
+                        </div>
+                    )}
+                    {!loading && !error && hideChrome && loadingMore && (
+                        <div className="flex justify-end mb-4">
+                            <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>
                         </div>
                     )}
 
@@ -368,7 +393,11 @@ export default function Properties({
                     )}
 
                     {/* Property Grid */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+                    <div
+                        className={`grid gap-6 md:gap-8 ${
+                            hideChrome ? 'md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                        }`}
+                    >
                         {propertyListFiltered.length > 0 ? (
                             propertyListFiltered.map((prop) => <PropertyCard key={prop.id} property={prop} />)
                         ) : !loading && (
