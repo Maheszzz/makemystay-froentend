@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
 
 export default function Terms() {
     return (
@@ -12,7 +13,7 @@ export default function Terms() {
 
                     <div className="bg-white rounded-2xl p-5 md:p-12 shadow-sm prose prose-slate max-w-none text-slate-700">
                         <p>
-                            These Terms and Conditions govern the use of <a href="http://www.makemystay.ai" className="text-brand-red hover:underline">www.makemystay.ai</a>, operated by <strong>MakeMyStay Realty</strong>.
+                            These Terms and Conditions govern the use of <a href="http://www.makemystay.ai" className="text-brand-red hover:underline">www.makemystay.ai</a>, operated by <strong>{LEGAL_ENTITY_NAME}</strong>.
                         </p>
                         <p>By accessing or using our services, you agree to these Terms.</p>
 
@@ -79,7 +80,7 @@ export default function Terms() {
 
                         <h2 className="text-2xl font-bold text-slate-900 mb-4 mt-8">11. Contact Information</h2>
                         <p>
-                            MakeMyStay Realty<br />
+                            {LEGAL_ENTITY_NAME}<br />
                             Bengaluru, Karnataka, India<br />
                             Email: <a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a>
                         </p>

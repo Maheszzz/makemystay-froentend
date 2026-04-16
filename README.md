@@ -98,6 +98,10 @@ VITE_API_BASE_URL=http://localhost:8000/api/v1
 
 For local development, make sure the backend is running with `ENV=development`. If the backend is started in production mode, browser requests from `localhost` can be blocked by CORS even when the API itself is healthy.
 
+## SEO / Google Search Console
+
+After deploying changes to titles or meta, use Search Console **URL Inspection** and **Request indexing** for key URLs (home, `/pg`, `/rent`, sample locality and property pages). Expect **7–14+ days** for visible SERP updates. See [docs/seo-gsc.md](docs/seo-gsc.md) for a short checklist.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

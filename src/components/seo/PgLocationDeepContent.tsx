@@ -1,4 +1,5 @@
-import { Banknote, MapPin, Shield, Users, Utensils, Wifi } from 'lucide-react';
+import { Banknote, MapPin, Shield, Users, Utensils, Wifi, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface PgLocationDeepContentProps {
     name: string;
@@ -95,9 +96,17 @@ export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
                         <strong className="text-slate-800 font-semibold">₹6,000 and ₹18,000 per month</strong> depending
                         on occupancy, floor space, AC/non-AC, and how premium the property is. Use the filters on this page
                         to narrow by price, sort by rating, and read real photos before you visit. If you are new to the
-                        city, prioritise walkable access to metro or bus routes and clarify deposit and notice-period rules
+                        city, prioritise walkable access to metro or bus routes and clarify deposit and notice-period rules 
                         with the operator.
                     </p>
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2">
+                        <Link to="/pg/bangalore" className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-red hover:underline group">
+                            Explore full City Guide <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </Link>
+                        <Link to={`/pg-in-${name.toLowerCase().replace(/\s+/g, '-')}-under-10000`} className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 hover:text-brand-red decoration-slate-300 hover:decoration-brand-red underline underline-offset-4">
+                            Budget PGs in {name}
+                        </Link>
+                    </div>
                     <p>
                         MakeMyStay.ai focuses on <strong className="text-slate-800 font-semibold">verified listings</strong>{' '}
                         and clear information so you spend less time on broker calls and more time choosing the right room.

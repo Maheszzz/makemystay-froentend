@@ -4,7 +4,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Check } from 'lucide-react';
+import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, Check, MessageCircle } from 'lucide-react';
 import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -13,7 +13,7 @@ import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRou
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
-import { buildPageSEO, propertyDetailPageSeo } from '@/lib/seo';
+import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
 
 import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
@@ -31,6 +31,7 @@ import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
 import { PropertyStickyActions } from '@/components/property/PropertyStickyActions';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
+import { AeoSnippet } from '@/components/seo/AeoSnippet';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
 import {
     buildClientSeoAbout,
@@ -47,11 +48,6 @@ export default function PropertyDetails() {
     const { property, loading, error, refetch } = useProperty(propertyId);
     const { isWishlisted, toggleWishlist } = useWishlist();
 
-    // Redirection logic for legacy /properties/:slug URLs
-    if (location.pathname.startsWith('/properties/')) {
-        const newPath = location.pathname.replace('/properties/', '/pg/');
-        return <Navigate to={newPath} replace />;
-    }
 
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [aboutExpanded, setAboutExpanded] = useState(false);
@@ -81,7 +77,6 @@ export default function PropertyDetails() {
     });
 
     const wishlisted = property ? isWishlisted(String(property.id)) : false;
-
     const isPG = property?.type === 'PG' || property?.type === 'Hostel';
     const pgLoc = findPgLocationForArea(property?.location);
 
@@ -92,6 +87,11 @@ export default function PropertyDetails() {
         if (!property) return null;
         return buildPageSEO(propertyDetailPageSeo(property, canonicalDetailPath));
     }, [property, canonicalDetailPath]);
+    const interimHelmet = useMemo(
+        () => buildPageSEO(interimPropertyDetailSeo(slugParam, location.pathname)),
+        [slugParam, location.pathname]
+    );
+    const errorHelmet = useMemo(() => buildPageSEO(propertyErrorSeo(location.pathname)), [location.pathname]);
     const detailJsonLd = useMemo(() => {
         if (!property) return null;
         return buildPropertyDetailGraph(property, canonicalDetailPath, undefined, buildPropertyPdpFaqs(property));
@@ -185,6 +185,7 @@ export default function PropertyDetails() {
     if (loading) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+                <SEOHead {...interimHelmet} ogType="article" />
                 <Navbar />
                 <main className="flex-grow flex items-center justify-center">
                     <LoadingSpinner message="Loading property details..." />
@@ -197,6 +198,7 @@ export default function PropertyDetails() {
     if (error || !property) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+                <SEOHead {...errorHelmet} />
                 <Navbar />
                 <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4">
                     <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
@@ -412,6 +414,9 @@ export default function PropertyDetails() {
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/85 border border-white/15">
                                         {Math.max(allImages.length, 1)} photos
                                     </span>
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-200 border border-rose-500/30 animate-pulse">
+                                        🔥 High Demand
+                                    </span>
                                 </div>
                                 <h1
                                     className="text-lg sm:text-xl md:text-2xl lg:text-[1.65rem] font-extrabold text-white leading-snug tracking-tight break-words"
@@ -507,13 +512,9 @@ export default function PropertyDetails() {
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-10 items-start">
 
-                        {/* LEFT — Main Details */}
                         <div className="lg:col-span-2 space-y-12">
+                            <AeoSnippet property={property} />
                             <PropertyQuickAnswers property={property} />
-                            
-                            <div className="pt-8 border-t border-slate-200">
-                                <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
-                            </div>
 
                             {/* About Section */}
                             <div className="relative rounded-3xl border border-slate-200/70 shadow-[0_20px_70px_-45px_rgba(15,23,42,0.40)] overflow-hidden">
@@ -685,6 +686,10 @@ export default function PropertyDetails() {
                                     onReviewAdded={refetch}
                                 />
                             </div>
+
+                            <div className="pt-8 border-t border-slate-200">
+                                <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
+                            </div>
                         </div>
 
                         {/* RIGHT — Booking Card (sticky) */}
@@ -825,6 +830,22 @@ export default function PropertyDetails() {
                     </section>
                 )}
             </main>
+
+            {/* Sticky WhatsApp CTA (Conversion Signal) - Hidden on mobile as per user request */}
+            <div className="hidden md:block fixed bottom-8 right-6 z-[60]">
+                <a
+                    href={`https://wa.me/919999999999?text=Hi,%20I'm%20interested%20in%20${encodeURIComponent(displayTitle || property.title)}%20in%20${encodeURIComponent(property.location)}.%20Is%20it%20available?`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-500/30 hover:scale-110 transition-transform active:scale-95 group relative"
+                    aria-label="Chat on WhatsApp"
+                >
+                    <MessageCircle className="h-7 w-7 fill-white" />
+                    <span className="absolute right-full mr-3 whitespace-nowrap rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
+                        Chat on WhatsApp
+                    </span>
+                </a>
+            </div>
 
             <Footer />
 

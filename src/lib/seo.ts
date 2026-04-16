@@ -2,7 +2,6 @@ import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { stripMarkdownLight } from '@/lib/propertySeoUtils';
-import { trimMetaTitle } from '@/lib/propertyDetailCopy';
 import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 
 export interface PageSEOInput {
@@ -156,23 +155,22 @@ function normalizeLocationForSeo(location: string | undefined): string {
 
 function buildPropertyMetaTitle(property: Property): string {
     const name = formatPropertyTitle(property.title) || property.title || 'Property';
-    const type = (property.type || 'Property').trim();
     const location = normalizeLocationForSeo(property.location);
-    const isRent = property.category === 'rent';
-    const price = (property.price || '').trim();
-    const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
+    const typeLower = (property.type || '').toLowerCase();
+    const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
+    const isPG = property.category === 'pg' || isPgType;
+    const bhk = property.type || '1BHK';
 
-    const base = `${name} ${type} in ${location}`.replace(/\s+/g, ' ').trim();
-
-    if (isRent && hasPrice) {
-        return trimMetaTitle(`${base} (${price}/month) | Rent, Photos & Visit Booking`, 68);
+    if (isPG) {
+        // High-intent PG title: PG in {Location} for Rent
+        return `PG in ${location} for Rent | ${name}`;
     }
 
-    if (isRent) {
-        return trimMetaTitle(`${base} | Rent, Photos & Visit Booking`, 68);
-    }
-
-    return trimMetaTitle(`${base} | Photos, Details & Site Visit`, 68);
+    // Rental property title pattern: {BHK} Flat for Rent in {Location}
+    const rentPrefix = bhk.toLowerCase().includes('bhk') || bhk.toLowerCase().includes('rk') 
+        ? `${bhk} Flat` 
+        : 'Flat';
+    return `${rentPrefix} for Rent in ${location} | ${name}`;
 }
 
 function buildPropertyMetaDescription(property: Property): string {
@@ -202,10 +200,9 @@ function buildPropertyMetaDescription(property: Property): string {
     return `Explore ${name}, a ${type} in ${location}. View photos, locality details, amenities, pricing guidance, and schedule a site visit with ${SITE_NAME}.`;
 }
 
-/** Meta + canonical for `/properties/:slug` detail pages. */
+/** Meta + canonical for detail pages (handled via /pg/ or /rent/ routers). */
 export function propertyDetailPageSeo(property: Property, detailPath: string): PageSEOInput {
-    // Canonical should prioritize /pg/ authority route
-    const path = detailPath.startsWith('/pg/') ? detailPath : `/pg${detailPath.startsWith('/') ? detailPath : `/${detailPath}`}`.replace('/properties/', '/pg/');
+    const path = detailPath; // Use the verified path from getPropertyDetailPath
     const longPlain = stripMarkdownLight(
         property.seo_about || buildClientSeoAbout(property) || property.description || ''
     )
@@ -302,9 +299,77 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO. */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Best PG & verified rentals in Bangalore',
+        title: 'Affordable PG & verified rentals in Bangalore',
         description:
             'Find affordable PG and coliving spaces in Bangalore with WiFi, food, 24/7 security & premium amenities. Browse verified listings, compare rent, and book with MakeMyStay.ai.',
         path: '/',
+    };
+}
+
+/** Readable phrase from `/pg/:slug` param (strips leading numeric id if present). */
+export function humanizePropertySlugParam(slugParam: string | undefined): string {
+    if (!slugParam?.trim()) return 'Listing';
+    const s = slugParam.trim();
+    const rest = /^\d+-(.+)$/.test(s) ? s.replace(/^\d+-/, '') : s;
+    if (!rest) return 'Listing';
+    return rest
+        .split('-')
+        .filter(Boolean)
+        .map((w) => w.slice(0, 1).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+}
+
+/** Loading state on property PDP so the document does not keep the shell title. */
+export function interimPropertyDetailSeo(slugParam: string | undefined, pathname: string): PageSEOInput {
+    const label = humanizePropertySlugParam(slugParam);
+    return {
+        title: `${label} — property listing`,
+        description: `Photos, rent, amenities, and visit booking for this listing in Bangalore on ${SITE_NAME}.`,
+        path: canonicalPath(pathname.split('?')[0]),
+    };
+}
+
+/** Error / not-found PDP: noindex and distinct title from live listings. */
+export function propertyErrorSeo(pathname: string): PageSEOInput {
+    return {
+        title: 'Property not found',
+        description: `This listing may have moved or been removed. Browse verified PG and rentals on ${SITE_NAME}.`,
+        path: canonicalPath(pathname.split('?')[0]),
+        noindex: true,
+    };
+}
+
+export interface ListingsPageSeoInput {
+    pathname: string;
+    pageTitle: string;
+    pageSubtitle: string;
+    category: 'all' | 'pg' | 'rent' | 'buy' | 'plot';
+    /** `locationFilter` from listings UI (`all` or city name). */
+    cityLabel: string;
+    totalCount?: number;
+}
+
+/** Listings index routes (`/pg`, `/rent`, `/properties`, …): distinct title + description + canonical path. */
+export function listingsPageSeo(input: ListingsPageSeoInput): PageSEOInput {
+    const pathOnly = canonicalPath(input.pathname.split('?')[0]);
+    const city = input.cityLabel === 'all' ? 'Bangalore' : input.cityLabel;
+    const n = input.totalCount;
+    const countBit = typeof n === 'number' && n > 0 ? `${n.toLocaleString()} ` : '';
+    const categoryPhrase =
+        input.category === 'all'
+            ? 'PG, rent & sale'
+            : input.category === 'pg'
+              ? 'PG'
+              : input.category === 'rent'
+                ? 'rental'
+                : input.category === 'buy'
+                  ? 'sale'
+                  : 'plot & land';
+    const title = `${input.pageTitle} — ${city}`;
+    const description = `${input.pageSubtitle} Explore ${countBit}verified ${categoryPhrase} listings in ${city}. Transparent pricing and expert support on ${SITE_NAME}.`;
+    return {
+        title,
+        description,
+        path: pathOnly,
     };
 }

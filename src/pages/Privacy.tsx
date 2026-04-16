@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
 
 export default function Privacy() {
     return (
@@ -12,7 +13,7 @@ export default function Privacy() {
 
                     <div className="bg-white rounded-2xl p-5 md:p-12 shadow-sm prose prose-slate max-w-none text-slate-700">
                         <p>
-                            This Privacy Policy describes how <strong>MakeMyStay Realty, Bengaluru, India</strong> collects, uses, and protects information when you use <a href="http://www.makemystay.ai" className="text-brand-red hover:underline">www.makemystay.ai</a> and related services.
+                            This Privacy Policy describes how <strong>{LEGAL_ENTITY_NAME}, Bengaluru, India</strong> collects, uses, and protects information when you use <a href="http://www.makemystay.ai" className="text-brand-red hover:underline">www.makemystay.ai</a> and related services.
                         </p>
                         <p>By using our Platform, you agree to the practices described in this Policy.</p>
 
@@ -74,7 +75,7 @@ export default function Privacy() {
 
                         <h2 className="text-2xl font-bold text-slate-900 mb-4 mt-8">8. Contact Information</h2>
                         <p>
-                            MakeMyStay Realty<br />
+                            {LEGAL_ENTITY_NAME}<br />
                             Bengaluru, Karnataka, India<br />
                             Email: <a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a>
                         </p>

@@ -53,12 +53,29 @@ export function buildPropertySeoSlug(property: Pick<Property, 'title' | 'type' |
 export function getPropertyDetailPath(property: Property): string {
     const id = String(property.id);
     const slugPart = buildPropertySeoSlug(property);
-    if (slugPart) {
-        // High-authority semantic route: /pg/{id}-{slug}
-        return `/pg/${id}-${slugPart}`;
+    
+    const category = (property.category || '').toLowerCase();
+    const typeLower = (property.type || '').toLowerCase();
+    const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
+
+    // Audit Log: Detect data mismatches for internal cleanup
+    if (isPgType && category === 'rent') {
+        console.warn(`[SEO AUDIT] Category Mismatch: Property ID ${id} is type "${property.type}" but categorized as "rent". Correct prefixing applied.`, { id, title: property.title });
     }
-    // Bare-ID fallback
-    return `/pg/${id}`;
+
+    // Priority: PG/Hostel types always get /pg prefix
+    // Otherwise follow the category
+    let prefix = '/pg';
+    if (category === 'rent' && !isPgType) {
+        prefix = '/rent';
+    } else if (category === 'buy' || category === 'plot') {
+        prefix = '/property';
+    } else if (isPgType || category === 'pg') {
+        prefix = '/pg';
+    }
+    
+    const base = slugPart ? `${id}-${slugPart}` : id;
+    return `${prefix}/${base}`;
 }
 
 /**

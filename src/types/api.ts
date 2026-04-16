@@ -112,7 +112,7 @@ export interface Property {
     smart_home?: boolean;
     images?: string[];
     tag?: string;
-    category: 'buy' | 'rent';
+    category: 'pg' | 'rent' | 'buy' | 'plot';
     description: string;
     /** From GET /properties/:id — long SEO narrative when API provides it */
     seo_about?: string;

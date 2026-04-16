@@ -5,6 +5,7 @@ import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { PG_LOCATIONS } from '@/data/pgLocations';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
+import { BLOG_POSTS } from '@/data/blogPosts';
 
 export function Footer() {
     return (
@@ -138,6 +139,51 @@ export function Footer() {
                                     View all PG listings →
                                 </Link>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* SEO Linking Grid (100% SEO Blueprint) */}
+                <div className="mt-12 pt-10 border-t border-white/5 sm:block hidden">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">PG in Bangalore</p>
+                            <ul className="space-y-2 lg:space-y-3">
+                                <li><Link to="/pg-in-whitefield" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG in Whitefield</Link></li>
+                                <li><Link to="/pg-in-marathahalli" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG in Marathahalli</Link></li>
+                                <li><Link to="/pg-in-koramangala" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG in Koramangala</Link></li>
+                                <li><Link to="/pg-in-btm-layout" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG in BTM Layout</Link></li>
+                                <li><Link to="/pg-in-hsr-layout" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG in HSR Layout</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Rent in Bangalore</p>
+                            <ul className="space-y-2 lg:space-y-3">
+                                <li><Link to="/rent-in-whitefield" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Whitefield</Link></li>
+                                <li><Link to="/rent-in-marathahalli" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Marathahalli</Link></li>
+                                <li><Link to="/rent-in-btm-layout" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in BTM Layout</Link></li>
+                                <li><Link to="/flats-in-bangalore" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Bangalore</Link></li>
+                            </ul>
+                        </div>
+                        <div>
+                             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Popular Guides</p>
+                             <ul className="space-y-2 lg:space-y-3">
+                                {BLOG_POSTS.slice(0, 5).map(post => (
+                                    <li key={post.slug}>
+                                        <Link to={`/blog/${post.slug}`} className="text-[13px] text-slate-400 hover:text-white transition-colors line-clamp-1">{post.title}</Link>
+                                    </li>
+                                ))}
+                             </ul>
+                        </div>
+                        <div>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Category Search</p>
+                            <ul className="space-y-2 lg:space-y-3">
+                                <li><Link to="/pg-with-wifi" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG with WiFi</Link></li>
+                                <li><Link to="/pg-for-girls" className="text-[13px] text-slate-400 hover:text-white transition-colors">Girls PG in Bangalore</Link></li>
+                                <li><Link to="/pg-for-boys" className="text-[13px] text-slate-400 hover:text-white transition-colors">Boys PG in Bangalore</Link></li>
+                                <li><Link to="/pg-near-me" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG Near Me</Link></li>
+                                <li><Link to="/pg-single-room" className="text-[13px] text-slate-400 hover:text-white transition-colors">Private Single Rooms</Link></li>
+                            </ul>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
 
 export default function RefundPolicy() {
     return (
@@ -68,7 +69,7 @@ export default function RefundPolicy() {
 
                         <h2 className="text-2xl font-bold text-slate-900 mb-4 mt-8">7. Contact Information</h2>
                         <p>
-                            MakeMyStay Realty<br />
+                            {LEGAL_ENTITY_NAME}<br />
                             Bengaluru, Karnataka, India<br />
                             Email: <a href="mailto:connect@makemystay.ai" className="text-brand-red hover:underline">connect@makemystay.ai</a>
                         </p>

@@ -28,11 +28,8 @@ const BlogIndex = lazy(() => import('./pages/BlogIndex'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
 
-/** Alias: /property/:slug → /properties/:slug (share-friendly path). */
-function PropertyAliasRedirect() {
-    const { slug } = useParams<{ slug: string }>();
-    return <Navigate to={`/pg/${slug}`} replace />;
-}
+// Import location data for programmatic routing
+import locJson from './data/pg-locations.json';
 
 /** Backward-compat: redirect /properties/id/102 → /properties/102 */
 function LegacyIdRedirect() {
@@ -62,14 +59,36 @@ function PGRouter() {
     if (['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param)) return <PgFeatureLandingPage />;
     if (param === 'pg-vs-flat-bangalore') return <PgVsFlatBangalore />;
     
+    // Handle price-tier patterns in /pg/:slug if needed, 
+    // but we'll primarily use the static-style /pg-in-locality-under-price
+    
     const isProperty = /^\d+/.test(param);
     if (isProperty) return <PropertyDetails />;
     
     return <PGLocationPage />;
 }
 
+/** Component to extract params from /pg-in-:slug-under-:price */
+function PGPriceTierRouter() {
+    const { location, price } = useParams<{ location: string; price: string }>();
+    const baseSlug = location === 'btm-layout' ? 'btm' : (location || '');
+    return <PGLocationPage overrideSlug={baseSlug} overrideMaxPrice={price} />;
+}
 
-
+/**
+ * Smart Router for /rent/:slug
+ * - starts with digit → PropertyDetails
+ * - else → Properties (Locality filtering for rent)
+ */
+function RentRouter() {
+    const { slug } = useParams<{ slug: string }>();
+    const param = (slug || '').toLowerCase();
+    
+    const isProperty = /^\d+/.test(param);
+    if (isProperty) return <PropertyDetails />;
+    
+    return <Properties key="rent-filtered" initialCategory="rent" initialCity={slug} />;
+}
 
 /** Wrapper for City-specific SEO pages */
 function CityProperties({ category, title, subtitle }: { category: any, title?: string, subtitle?: string }) {
@@ -111,11 +130,12 @@ function App() {
 
                             <Route path="/rent" element={<Properties key="rent" initialCategory="rent" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
                             <Route path="/rent/in/:city" element={<CityProperties category="rent" />} />
+                            <Route path="/rent/:slug" element={<RentRouter />} />
 
-                            <Route path="/property/:slug" element={<PropertyAliasRedirect />} />
+                            <Route path="/property/:slug" element={<PropertyDetails />} />
                             <Route path="/properties/id/:id" element={<LegacyIdRedirect />} />
                             <Route path="/properties/:type/:slug" element={<LegacyTypeSlugRedirect />} />
-                            <Route path="/properties/:slug" element={<PropertyAliasRedirect />} />
+                            <Route path="/properties/:slug" element={<PropertyDetails />} />
                              <Route path="/pg-with-wifi" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-with-food" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-with-ac" element={<PgFeatureLandingPage />} />
@@ -142,6 +162,26 @@ function App() {
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
                             <Route path="/pg-in-bangalore" element={<Navigate to="/pg/bangalore" replace />} />
+
+                            {/* Programmatic Locality Hubs (Massive SEO Grid) */}
+                            {locJson.map((loc) => {
+                                const hubSlug = loc.slug === 'btm' ? 'btm-layout' : loc.slug;
+                                return (
+                                    <Route 
+                                        key={`pg-in-${loc.slug}`}
+                                        path={`/pg-in-${hubSlug}`} 
+                                        element={<PGLocationPage overrideSlug={loc.slug} />} 
+                                    />
+                                );
+                            })}
+                            
+                            {/* Hyper-Long-Tail Price Tiers (1000+ Pages potential) */}
+                            <Route path="/pg-in-:location-under-:price" element={<PGPriceTierRouter />} />
+
+                            <Route path="/rent-in-whitefield" element={<Properties key="rent-whitefield" initialCategory="rent" initialCity="Whitefield" pageTitle="Properties for Rent in Whitefield" />} />
+                            <Route path="/rent-in-marathahalli" element={<Properties key="rent-marathahalli" initialCategory="rent" initialCity="Marathahalli" pageTitle="Properties for Rent in Marathahalli" />} />
+                            <Route path="/rent-in-btm-layout" element={<Properties key="rent-btm" initialCategory="rent" initialCity="btm" pageTitle="Properties for Rent in BTM Layout" />} />
+                            <Route path="/flats-in-bangalore" element={<Properties key="flats-bangalore" initialCategory="rent" pageTitle="Flats for Rent in Bangalore" />} />
 
                             <Route path="/blog/:slug" element={<BlogPost />} />
                             <Route path="/blog" element={<BlogIndex />} />

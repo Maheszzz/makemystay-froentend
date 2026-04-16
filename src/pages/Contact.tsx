@@ -3,6 +3,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { contactApi } from '@/lib/api';
 import { AlertCircle, CheckCircle, Mail, MapPin, Phone, Send } from 'lucide-react';
 import { FormEvent, useState } from 'react';
+import locJson from '@/data/pg-locations.json';
 
 export default function Contact() {
     const [formData, setFormData] = useState({
@@ -198,23 +199,9 @@ export default function Contact() {
                                             <select id="location" value={formData.location} onChange={handleChange} required
                                                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border-2 border-transparent focus:border-brand-red focus:bg-white transition-all outline-none appearance-none cursor-pointer">
                                                 <option value="" disabled>Select Area</option>
-                                                <option value="Aecs layout">Aecs Layout</option>
-                                                <option value="Bellandur">Bellandur</option>
-                                                <option value="Bommasandra">Bommasandra</option>
-                                                <option value="Brookfield">Brookfield</option>
-                                                <option value="BTM">BTM</option>
-                                                <option value="Doddanekkundi">Doddanekkundi</option>
-                                                <option value="Hsr layout">HSR Layout</option>
-                                                <option value="Indiranagar">Indiranagar</option>
-                                                <option value="Kadubeesanahalli">Kadubeesanahalli</option>
-                                                <option value="Koramangala">Koramangala</option>
-                                                <option value="Kundalahalli">Kundalahalli</option>
-                                                <option value="Mahadevapura">Mahadevapura</option>
-                                                <option value="Marathahalli">Marathahalli</option>
-                                                <option value="Munnekollal">Munnekollal</option>
-                                                <option value="Sarjapur">Sarjapur</option>
-                                                <option value="Thubarahalli">Thubarahalli</option>
-                                                <option value="Whitefield">Whitefield</option>
+                                                {locJson.map(loc => (
+                                                    <option key={loc.slug} value={loc.name}>{loc.name}</option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div className="space-y-1.5">
@@ -251,7 +238,13 @@ export default function Contact() {
                                         {loading ? 'Submitting...' : 'Get My Growth Plan'}
                                         <Send className="w-4 h-4" />
                                     </button>
-                                    <p className="text-center text-xs text-slate-400">We'll respond within 4 hours. No spam, ever.</p>
+                                    <div className="flex flex-col items-center gap-2">
+                                        <p className="text-center text-xs text-slate-400 font-medium">Joined by 500+ happy tenants & owners this month</p>
+                                        <div className="flex items-center gap-1.5 justify-center">
+                                            {[1,2,3,4,5].map(i => <CheckCircle key={i} className="w-3.5 h-3.5 text-emerald-500" />)}
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Verified Growth Platform</span>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>

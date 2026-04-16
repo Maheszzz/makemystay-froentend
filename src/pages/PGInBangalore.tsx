@@ -1,6 +1,9 @@
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Helmet } from 'react-helmet-async';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { buildPageSEO, pgBangaloreHubSeo } from '@/lib/seo';
+import { SITE_NAME } from '@/lib/siteConfig';
 import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
 import { motion } from 'framer-motion';
 import { MapPin, Shield, Star, Wifi, Coffee, Zap } from 'lucide-react';
@@ -31,7 +34,7 @@ export default function PGInBangalore() {
         "name": "Are food and WiFi included in the PG rent?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Yes, most professional PGs on MakeMyStayRealty include 3 nutritious meals, high-speed WiFi, laundry services, and power backup as part of the monthly rent."
+          "text": `Yes, most professional PGs on ${SITE_NAME} include 3 nutritious meals, high-speed WiFi, laundry services, and power backup as part of the monthly rent.`
         }
       }
     ]
@@ -39,14 +42,8 @@ export default function PGInBangalore() {
 
   return (
     <div className="bg-white min-h-screen">
-      <Helmet>
-        <title>Best PG in Bangalore | Verified PGs starting ₹5000 | MakeMyStayRealty</title>
-        <meta name="description" content="Looking for the best PG in Bangalore? Discover verified, affordable PG accommodations for gents and ladies with food, WiFi, & security. Browse top listings now." />
-        <link rel="canonical" href="https://makemystay.ai/pg-in-bangalore" />
-        <script type="application/ld+json">
-          {JSON.stringify(schemaData)}
-        </script>
-      </Helmet>
+      <SEOHead {...buildPageSEO(pgBangaloreHubSeo())} />
+      <JsonLd id="pg-in-bangalore-faq" data={schemaData} />
 
       <Navbar />
 
@@ -59,7 +56,7 @@ export default function PGInBangalore() {
                 <Shield className="w-6 h-6" />
               </div>
               <p className="text-emerald-900 text-sm sm:text-base leading-relaxed">
-                <strong>Best PG in Bangalore:</strong> MakeMyStayRealty offers verified PG accommodations in Bangalore's prime hubs like <strong>Whitefield, Marathahalli, and HSR Layout</strong>. With rent ranging from <strong>₹5,000 to ₹15,000</strong>, our stays include 3 meals, high-speed WiFi, 24/7 security, and power backup.
+                <strong>Best PG in Bangalore:</strong> {SITE_NAME} offers verified PG accommodations in Bangalore's prime hubs like <strong>Whitefield, Marathahalli, and HSR Layout</strong>. With rent ranging from <strong>₹5,000 to ₹15,000</strong>, our stays include 3 meals, high-speed WiFi, 24/7 security, and power backup.
               </p>
             </div>
           </div>
@@ -76,7 +73,7 @@ export default function PGInBangalore() {
               Top-Rated PGs in Bangalore for Gents, Ladies & Unisex Stay
             </h1>
             <p className="text-lg text-slate-600 max-w-3xl">
-              Finding a home away from home shouldn't be hard. MakeMyStayRealty simplifies your search for the best Paying Guest (PG) in Bangalore with zero brokerage options and fully managed facilities.
+              Finding a home away from home shouldn't be hard. {SITE_NAME} simplifies your search for the best Paying Guest (PG) in Bangalore with zero brokerage options and fully managed facilities.
             </p>
           </motion.div>
 
@@ -107,7 +104,7 @@ export default function PGInBangalore() {
           {/* Rich SEO Content Section */}
           <div className="prose prose-slate max-w-none grid md:grid-cols-2 gap-12 mt-20">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Why Choose MakeMyStayRealty for your PG in Bangalore?</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Why choose {SITE_NAME} for your PG in Bangalore?</h2>
               <p className="text-slate-600 leading-relaxed mb-4">
                 We take the guesswork out of PG hunting. Unlike generic listing sites, every property on our platform undergoes a strict verification process. We check for hygiene, security, and the quality of amenities provided.
               </p>

@@ -32,7 +32,15 @@ const STATIC_PATHS = [
 
 const locJson = JSON.parse(readFileSync(join(root, 'src/data/pg-locations.json'), 'utf8'));
 
-const BLOG_SLUGS = ['how-to-choose-pg-in-bangalore', 'pg-rent-vs-flat-rent-bangalore'];
+const BLOG_SLUGS = [
+    'how-to-choose-pg-in-bangalore',
+    'pg-rent-vs-flat-rent-bangalore',
+    'best-pg-areas-bangalore-it-pros',
+    'pg-deposits-notice-period-guide',
+    'safety-guide-female-pg-bangalore',
+    'hidden-costs-renting-bangalore-pg-flats',
+    'top-it-parks-bangalore-guide-commuters'
+];
 
 function titleToSlug(title = '') {
     return title
@@ -64,7 +72,12 @@ function buildPropertySeoSlug(property) {
 function buildPropertyDetailPath(property) {
     const id = String(property.id || '').trim();
     const slug = buildPropertySeoSlug(property);
-    return slug ? `/pg/${id}-${slug}` : `/pg/${id}`;
+    const category = (property.category || '').toLowerCase();
+    const typeLower = (property.property_type || '').toLowerCase();
+    const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
+    
+    const prefix = (isPgType || category === 'pg') ? 'pg' : (category === 'rent' ? 'rent' : 'property');
+    return slug ? `/${prefix}/${id}-${slug}` : `/${prefix}/${id}`;
 }
 
 function resolveApiBase() {
@@ -117,7 +130,23 @@ for (const s of STATIC_PATHS) {
 
 for (const row of locJson) {
     body += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
+    
+    // Programmatic Hubs (v2 SEO)
+    const hubSlug = row.slug === 'btm' ? 'btm-layout' : row.slug;
+    body += urlEntry(`${BASE}/pg-in-${hubSlug}`, '0.92', 'daily');
+    
+    // Hyper-Long-Tail Price Tiers
+    body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-10000`, '0.88', 'weekly');
+    body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-15000`, '0.88', 'weekly');
+    
+    // Top intent hubs for rentals
+    const rentAreas = ['whitefield', 'marathahalli', 'btm', 'koramangala', 'hsr-layout', 'electronic-city', 'indiranagar', 'bellandur', 'hebbal', 'jp-nagar', 'bannerghatta-road', 'sarjapur-road'];
+    if (rentAreas.includes(row.slug)) {
+        body += urlEntry(`${BASE}/rent-in-${hubSlug}`, '0.90', 'daily');
+    }
 }
+
+body += urlEntry(`${BASE}/flats-in-bangalore`, '0.90', 'daily');
 
 for (const slug of BLOG_SLUGS) {
     body += urlEntry(`${BASE}/blog/${slug}`, '0.72', 'monthly');

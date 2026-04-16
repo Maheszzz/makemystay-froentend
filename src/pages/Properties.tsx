@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
+import { buildPageSEO, listingsPageSeo } from '@/lib/seo';
 
 const CATEGORY_KEYS = ['all', 'pg', 'rent', 'buy', 'plot'] as const;
 type CategoryKey = (typeof CATEGORY_KEYS)[number];
@@ -30,6 +31,8 @@ interface PropertiesProps {
     initialCity?: string;
     pageTitle?: string;
     pageSubtitle?: string;
+    initialMinPrice?: string;
+    initialMaxPrice?: string;
     /** Embed listing UI inside another page (no Helmet, Navbar, Footer). */
     hideChrome?: boolean;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
@@ -42,6 +45,8 @@ export default function Properties({
     pageTitle = 'Find Your Perfect Home',
     pageSubtitle = 'Browse Professional & Verified Listings',
     hideChrome = false,
+    initialMinPrice = '',
+    initialMaxPrice = '',
     onEmptyResultsChange,
 }: PropertiesProps) {
     const location = useLocation();
@@ -55,8 +60,8 @@ export default function Properties({
     );
     const [locationFilter, setLocationFilter] = useState(searchParams.get('city') || initialCity);
     const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || initialTypeFilter);
-    const [minPrice, setMinPrice] = useState(searchParams.get('min') || '');
-    const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || '');
+    const [minPrice, setMinPrice] = useState(searchParams.get('min') || initialMinPrice);
+    const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || initialMaxPrice);
     const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'rating_desc');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     
@@ -164,6 +169,28 @@ export default function Properties({
 
     const shouldNoindexEmptyResults = !loading && !error && propertyListFiltered.length === 0;
 
+    const listingsHelmet = useMemo(() => {
+        if (hideChrome) return null;
+        const page = listingsPageSeo({
+            pathname: location.pathname,
+            pageTitle,
+            pageSubtitle,
+            category,
+            cityLabel: locationFilter === 'all' ? 'all' : locationFilter,
+            totalCount: totalCount ?? undefined,
+        });
+        return buildPageSEO({ ...page, noindex: shouldNoindexEmptyResults });
+    }, [
+        hideChrome,
+        location.pathname,
+        pageTitle,
+        pageSubtitle,
+        category,
+        locationFilter,
+        totalCount,
+        shouldNoindexEmptyResults,
+    ]);
+
     useEffect(() => {
         onEmptyResultsChange?.(shouldNoindexEmptyResults);
     }, [onEmptyResultsChange, shouldNoindexEmptyResults]);
@@ -201,12 +228,6 @@ export default function Properties({
 
     const mainContent = (
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
-                {/* SEO: Noindex if no results found to prevent thin content ranking */}
-                {shouldNoindexEmptyResults && (
-                    <Helmet>
-                        <meta name="robots" content="noindex, follow" />
-                    </Helmet>
-                )}
                 <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? '' : ''}`}>
                     {/* Header */}
                     {!hideChrome && (
@@ -483,13 +504,7 @@ export default function Properties({
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-            <Helmet>
-                <title>{pageTitle} | MakeMyStay.ai</title>
-                <meta name="description" content={`Find ${totalCount || 'premium'} ${category} listings in ${locationFilter === 'all' ? 'Bangalore' : locationFilter}. Verified properties with expert support.`} />
-                {shouldNoindexEmptyResults && (
-                    <meta name="robots" content="noindex, follow" />
-                )}
-            </Helmet>
+            {listingsHelmet && <SEOHead {...listingsHelmet} />}
 
             <Navbar />
 
