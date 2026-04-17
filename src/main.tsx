@@ -4,10 +4,17 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 import './globals.css';
 
-createRoot(document.getElementById('root')!).render(
+const root = createRoot(document.getElementById('root')!);
+root.render(
     <StrictMode>
         <HelmetProvider>
             <App />
         </HelmetProvider>
     </StrictMode>,
 );
+
+// Signal to Prerender.io that the page is fully hydrated
+// (This ensures capture happens after Helmet/SEO tags are ready)
+if (typeof window !== 'undefined') {
+    (window as any).prerenderReady = true;
+}

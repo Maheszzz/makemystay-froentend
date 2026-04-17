@@ -159,9 +159,11 @@ export function Footer() {
                         <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Rent in Bangalore</p>
                             <ul className="space-y-2 lg:space-y-3">
-                                <li><Link to="/rent-in-whitefield" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Whitefield</Link></li>
-                                <li><Link to="/rent-in-marathahalli" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Marathahalli</Link></li>
-                                <li><Link to="/rent-in-btm-layout" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in BTM Layout</Link></li>
+                                <li><Link to="/rent/whitefield" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Whitefield</Link></li>
+                                <li><Link to="/rent/marathahalli" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Marathahalli</Link></li>
+                                <li><Link to="/rent/btm" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in BTM Layout</Link></li>
+                                <li><Link to="/rent/koramangala" className="text-[13px] text-slate-400 hover:text-white transition-colors">Rentals in Koramangala</Link></li>
+                                <li><Link to="/rent" className="text-[13px] text-slate-400 hover:text-white transition-colors">All rentals</Link></li>
                                 <li><Link to="/flats-in-bangalore" className="text-[13px] text-slate-400 hover:text-white transition-colors">Flats in Bangalore</Link></li>
                             </ul>
                         </div>

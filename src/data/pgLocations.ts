@@ -29,6 +29,8 @@ export function resolveLegacyPgSlug(raw: string | undefined): string | undefined
 /** Location names for property filter dropdown (includes Bangalore). */
 export const PROPERTY_CITY_OPTIONS: string[] = [
     'Bangalore',
+    'Hyderabad',
+    'Pune',
     ...[...new Set(PG_LOCATIONS.map((l) => l.name))].sort((a, b) => a.localeCompare(b)),
 ];
 

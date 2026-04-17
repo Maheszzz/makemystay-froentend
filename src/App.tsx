@@ -20,6 +20,11 @@ const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
 const PGBangaloreHub = lazy(() => import('./pages/PGBangaloreHub'));
+const PGHyderabadHub = lazy(() => import('./pages/PGHyderabadHub'));
+const PGPuneHub = lazy(() => import('./pages/PGPuneHub'));
+const RentBangaloreHub = lazy(() => import('./pages/RentBangaloreHub'));
+const RentHyderabadHub = lazy(() => import('./pages/RentHyderabadHub'));
+const RentPuneHub = lazy(() => import('./pages/RentPuneHub'));
 const PgFeatureLandingPage = lazy(() => import('./pages/PgFeatureLandingPage'));
 const PgVsFlatBangalore = lazy(() => import('./pages/PgVsFlatBangalore'));
 const PGLocationPage = lazy(() => import('./pages/PGLocationPage'));
@@ -30,6 +35,15 @@ const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ de
 
 // Import location data for programmatic routing
 import locJson from './data/pg-locations.json';
+import { canonicalRentPathForRentInSegment } from '@/lib/rentLegacyRedirects';
+
+/** 301-style in-app redirect; see `public/_redirects` for static hosts. */
+function RentInLegacyRedirect() {
+    const { legacyHub } = useParams<{ legacyHub: string }>();
+    const target = legacyHub ? canonicalRentPathForRentInSegment(legacyHub) : null;
+    if (!target) return <Navigate to="/rent" replace />;
+    return <Navigate to={target} replace />;
+}
 
 /** Backward-compat: redirect /properties/id/102 → /properties/102 */
 function LegacyIdRedirect() {
@@ -56,6 +70,8 @@ function PGRouter() {
     const param = (slug || '').toLowerCase();
     
     if (param === 'bangalore') return <PGBangaloreHub />;
+    if (param === 'hyderabad') return <PGHyderabadHub />;
+    if (param === 'pune') return <PGPuneHub />;
     if (['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param)) return <PgFeatureLandingPage />;
     if (param === 'pg-vs-flat-bangalore') return <PgVsFlatBangalore />;
     
@@ -83,11 +99,33 @@ function PGPriceTierRouter() {
 function RentRouter() {
     const { slug } = useParams<{ slug: string }>();
     const param = (slug || '').toLowerCase();
-    
+
     const isProperty = /^\d+/.test(param);
     if (isProperty) return <PropertyDetails />;
-    
-    return <Properties key="rent-filtered" initialCategory="rent" initialCity={slug} />;
+
+    if (param === 'bangalore') {
+        return (
+            <RentBangaloreHub key="rent-bangalore-hub" />
+        );
+    }
+    if (param === 'hyderabad') {
+        return (
+            <RentHyderabadHub key="rent-hyderabad-hub" />
+        );
+    }
+    if (param === 'pune') {
+        return (
+            <RentPuneHub key="rent-pune-hub" />
+        );
+    }
+
+    return (
+        <Properties
+            key={`rent-${slug ?? 'hub'}`}
+            initialCategory="rent"
+            initialCity={slug ?? 'all'}
+        />
+    );
 }
 
 /** Wrapper for City-specific SEO pages */
@@ -162,6 +200,8 @@ function App() {
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
                             <Route path="/pg-in-bangalore" element={<Navigate to="/pg/bangalore" replace />} />
+                            <Route path="/buy/bangalore" element={<Navigate to="/buy/in/bangalore" replace />} />
+                            <Route path="/plot/bangalore" element={<Navigate to="/plots/in/bangalore" replace />} />
 
                             {/* Programmatic Locality Hubs (Massive SEO Grid) */}
                             {locJson.map((loc) => {
@@ -178,9 +218,7 @@ function App() {
                             {/* Hyper-Long-Tail Price Tiers (1000+ Pages potential) */}
                             <Route path="/pg-in-:location-under-:price" element={<PGPriceTierRouter />} />
 
-                            <Route path="/rent-in-whitefield" element={<Properties key="rent-whitefield" initialCategory="rent" initialCity="Whitefield" pageTitle="Properties for Rent in Whitefield" />} />
-                            <Route path="/rent-in-marathahalli" element={<Properties key="rent-marathahalli" initialCategory="rent" initialCity="Marathahalli" pageTitle="Properties for Rent in Marathahalli" />} />
-                            <Route path="/rent-in-btm-layout" element={<Properties key="rent-btm" initialCategory="rent" initialCity="btm" pageTitle="Properties for Rent in BTM Layout" />} />
+                            <Route path="/rent-in-:legacyHub" element={<RentInLegacyRedirect />} />
                             <Route path="/flats-in-bangalore" element={<Properties key="flats-bangalore" initialCategory="rent" pageTitle="Flats for Rent in Bangalore" />} />
 
                             <Route path="/blog/:slug" element={<BlogPost />} />

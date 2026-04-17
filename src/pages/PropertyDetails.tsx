@@ -28,8 +28,8 @@ import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
 import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
-import { PropertyStickyActions } from '@/components/property/PropertyStickyActions';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
+import { SafetyPopup } from '@/components/modals/SafetyPopup';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { AeoSnippet } from '@/components/seo/AeoSnippet';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
@@ -50,6 +50,7 @@ export default function PropertyDetails() {
 
 
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
+    const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
     const [aboutExpanded, setAboutExpanded] = useState(false);
     const [copied, setCopied] = useState(false);
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
@@ -97,6 +98,25 @@ export default function PropertyDetails() {
         return buildPropertyDetailGraph(property, canonicalDetailPath, undefined, buildPropertyPdpFaqs(property));
     }, [property, canonicalDetailPath]);
 
+    /** Never show fabricated 4.6 / "27 Reviews" — only API-backed rating + review count or review list. */
+    const showListingRating = useMemo(() => {
+        if (!property) return false;
+        const r = property.average_rating ?? property.rating ?? 0;
+        if (r <= 0) return false;
+        const rc = property.review_count ?? property.reviews ?? 0;
+        const rl = property.reviews_list?.length ?? 0;
+        return rc > 0 || rl > 0;
+    }, [property]);
+
+    const ratingStarsValue = property ? property.average_rating ?? property.rating ?? 0 : 0;
+    const reviewLabelText = property
+        ? (property.review_count ?? property.reviews ?? 0) > 0
+            ? reviewsLabel(property.review_count ?? property.reviews ?? 0)
+            : property.reviews_list && property.reviews_list.length > 0
+              ? `${property.reviews_list.length} reviews`
+              : ''
+        : '';
+
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -129,7 +149,12 @@ export default function PropertyDetails() {
         setHeroIsPortrait(img.naturalHeight > img.naturalWidth);
     };
 
-    const handlePayNow = () => setShowServiceFeeModal(true);
+    const handlePayNow = () => setIsSafetyPopupOpen(true);
+
+    const handleSafetyConfirm = () => {
+        setIsSafetyPopupOpen(false);
+        setShowServiceFeeModal(true);
+    };
 
     const loadRazorpay = () => new Promise((resolve) => {
         const script = document.createElement("script");
@@ -304,13 +329,14 @@ export default function PropertyDetails() {
                         {/* Top actions */}
                         <div className="flex items-center justify-between gap-4 mb-3">
                             <button
+                                type="button"
                                 onClick={handleBack}
-                                className="inline-flex items-center gap-2 text-white/85 hover:text-white transition-colors"
+                                className="inline-flex items-center justify-center text-white/85 hover:text-white transition-colors"
+                                aria-label="Go back to previous page"
                             >
                                 <span className="w-10 h-10 rounded-full bg-white/10 border border-white/15 flex items-center justify-center">
-                                    <ArrowLeft className="w-5 h-5" />
+                                    <ArrowLeft className="w-5 h-5" aria-hidden />
                                 </span>
-                                <span className="text-sm font-semibold tracking-wide hidden sm:inline">Back</span>
                             </button>
 
                             <div className="flex items-center gap-2">
@@ -364,8 +390,10 @@ export default function PropertyDetails() {
                                             key={heroIdx}
                                             src={heroImage}
                                             alt={heroAlt}
+                                            width={1200}
+                                            height={800}
                                             onLoad={handleHeroImageLoad}
-                                            className="absolute inset-0 h-full w-full object-contain object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
+                                            className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.01]"
                                             loading="eager"
                                             decoding="async"
                                         />
@@ -449,13 +477,15 @@ export default function PropertyDetails() {
                                 </ul>
 
                                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3">
+                                    {showListingRating && (
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/10 border border-white/15 text-white text-sm">
-                                            <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300 shrink-0" />
-                                            <span className="font-extrabold">{property.rating && property.rating > 0 ? property.rating.toFixed(1) : '4.6'}</span>
-                                            <span className="text-white/65 text-xs font-semibold">({property.reviews && property.reviews > 5 ? reviewsLabel(property.reviews) : '27 Reviews'})</span>
+                                            <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300 shrink-0" aria-hidden />
+                                            <span className="font-extrabold">{ratingStarsValue.toFixed(1)}</span>
+                                            <span className="text-white/65 text-xs font-semibold">({reviewLabelText})</span>
                                         </div>
                                     </div>
+                                    )}
 
                                     <div className="flex flex-row items-baseline justify-between gap-3 sm:flex-col sm:items-end sm:text-right sm:ml-auto sm:justify-end border-t border-white/10 pt-3 sm:border-0 sm:pt-0">
                                         <span className="text-white/50 text-[10px] font-bold uppercase tracking-[0.15em]">Starting from</span>
@@ -492,9 +522,11 @@ export default function PropertyDetails() {
                                         >
                                             <img
                                                 src={url}
-                                                alt={`${galleryAltBase} — thumbnail ${idx + 1}`}
+                                                alt={`${galleryAltBase} — photo ${idx + 1}`}
+                                                width={400}
+                                                height={300}
                                                 className="h-full w-full object-cover"
-                                                loading="lazy"
+                                                loading={idx < 4 ? "eager" : "lazy"}
                                                 decoding="async"
                                             />
                                         </button>
@@ -730,20 +762,20 @@ export default function PropertyDetails() {
                                             </div>
                                         </div>
 
+                                        {showListingRating && (
                                         <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-white px-3.5 py-3">
                                             <div className="flex min-w-0 items-center gap-2">
                                                 <Star className="h-4 w-4 shrink-0 text-amber-400 fill-amber-400" aria-hidden />
                                                 <span className="font-semibold tabular-nums text-slate-900">
-                                                    {property.rating && property.rating > 0 ? property.rating.toFixed(1) : '4.6'}
+                                                    {ratingStarsValue.toFixed(1)}
                                                 </span>
-                                                <span className="truncate text-sm text-slate-500">
-                                                    {property.reviews && property.reviews > 5 ? reviewsLabel(property.reviews) : '27 Reviews'}
-                                                </span>
+                                                <span className="truncate text-sm text-slate-500">{reviewLabelText}</span>
                                             </div>
                                             <span className="shrink-0 rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">
                                                 Verified
                                             </span>
                                         </div>
+                                        )}
 
                                         <div className="flex items-center justify-between gap-3 text-sm">
                                             <div className="flex items-center gap-2 text-slate-500">
@@ -915,17 +947,12 @@ export default function PropertyDetails() {
                 propertyLocation={property.location}
             />
 
-            <PropertyStickyActions
-                onBookVisit={() =>
-                    setLeadModal({
-                        isOpen: true,
-                        title: 'Book a visit',
-                        subtitle: `Schedule a time to see ${displayTitle || property.title} in ${property.location}.`,
-                        source: 'Website - Property - Book visit',
-                        actionLabel: 'Request visit',
-                    })
-                }
+            <SafetyPopup 
+                isOpen={isSafetyPopupOpen} 
+                onClose={handleSafetyConfirm} 
             />
+
+            {/* PropertyStickyActions removed as per user request */}
             </div>
         </Fragment>
     );

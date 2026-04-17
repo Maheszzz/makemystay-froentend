@@ -7,7 +7,6 @@ import {
     Star,
     Users,
     Utensils,
-    Check,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -127,6 +126,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         <img
                             src={displayImage}
                             alt={`${displayTitle}${property.location ? ` in ${property.location}` : ''} — ${property.type || 'Property'} photo for ${property.category === 'buy' ? 'sale' : 'rent'} listing on MakeMyStay`}
+                            width={1200}
+                            height={800}
+                            decoding="async"
                             loading="lazy"
                             onError={(e) => {
                                 const target = e.currentTarget;
@@ -157,21 +159,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                             {property.category === 'buy' ? 'For Sale' : 'For Rent'}
                         </span>
-                        {(property as any).is_verified !== false && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-lg text-white bg-emerald-600/90 backdrop-blur-md border border-emerald-400/30 shadow-lg">
-                                <Check className="w-3 h-3" strokeWidth={3} />
-                                Verified
-                            </span>
-                        )}
                         {secondaryBadge && (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-lg text-white bg-slate-950/88 backdrop-blur-md border border-white/15 shadow-lg line-clamp-2">
                                 {secondaryBadge}
-                            </span>
-                        )}
-                        {hasRating && (property.rating ?? 0) >= 4.5 && (
-                            <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-lg text-white bg-amber-500/90 backdrop-blur-md border border-amber-400/30 shadow-lg">
-                                <Star className="w-3 h-3 fill-white" />
-                                High Rated
                             </span>
                         )}
                     </div>

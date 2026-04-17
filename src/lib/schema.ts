@@ -1,4 +1,4 @@
-import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { findPgLocationForArea } from '@/data/pgLocations';
 import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
@@ -70,6 +70,55 @@ export function buildWebSiteSchema() {
     };
 }
 
+/** Organization — brand entity for homepage @graph. */
+export function buildOrganizationSchema() {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: SITE_URL,
+        logo: `${SITE_URL}/logo.svg`,
+    };
+}
+
+/** LocalBusiness — Bangalore service area (aligns with footer contact). */
+export function buildLocalBusinessSchema() {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'LocalBusiness',
+        name: SITE_NAME,
+        url: SITE_URL,
+        image: DEFAULT_OG_IMAGE,
+        telephone: '+91-81500-99911',
+        email: 'connect@makemystay.ai',
+        address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'HSR Layout, Sector 4',
+            addressLocality: 'Bengaluru',
+            addressRegion: 'Karnataka',
+            postalCode: '560102',
+            addressCountry: 'IN',
+        },
+        areaServed: [
+            { '@type': 'City', name: 'Bengaluru' },
+            { '@type': 'City', name: 'Hyderabad' },
+            { '@type': 'City', name: 'Pune' }
+        ],
+    };
+}
+
+/** Organization + WebSite + LocalBusiness in one graph for the homepage. */
+export function buildHomeOrganizationLocalWebGraph() {
+    return {
+        '@context': 'https://schema.org',
+        '@graph': [
+            schemaNodeWithoutContext(buildOrganizationSchema() as Record<string, unknown>),
+            schemaNodeWithoutContext(buildWebSiteSchema() as Record<string, unknown>),
+            schemaNodeWithoutContext(buildLocalBusinessSchema() as Record<string, unknown>),
+        ],
+    };
+}
+
 /** Strip @context so nodes can live under a single @graph (recommended for rich results). */
 function schemaNodeWithoutContext(schema: Record<string, unknown>) {
     const { ['@context']: _, ...rest } = schema;
@@ -77,7 +126,7 @@ function schemaNodeWithoutContext(schema: Record<string, unknown>) {
 }
 
 /**
- * Single JSON-LD script: FAQPage + BreadcrumbList + RealEstateAgent (AEO + hierarchy).
+ * Single JSON-LD script: FAQPage + BreadcrumbList + RealEstateAgent (AEO + trust).
  */
 export function buildPgLocationCombinedGraph(
     faqs: FaqItem[],
@@ -166,6 +215,25 @@ export function buildPropertyDetailGraph(
             ratingValue: property.average_rating,
             reviewCount: property.review_count ?? property.reviews ?? 0,
         };
+    }
+
+    const reviewsList = property.reviews_list?.filter((r) => r && (r.rating > 0 || r.comment?.trim()));
+    if (reviewsList && reviewsList.length > 0) {
+        product.review = reviewsList.slice(0, 8).map((r) => {
+            const node: Record<string, unknown> = {
+                '@type': 'Review',
+                author: { '@type': 'Person', name: (r.user_name || 'Guest').trim() || 'Guest' },
+                reviewRating: {
+                    '@type': 'Rating',
+                    ratingValue: Math.min(5, Math.max(1, r.rating)),
+                    bestRating: 5,
+                },
+                datePublished: r.created_at,
+            };
+            const body = r.comment?.trim() ? stripMarkdownLight(r.comment).slice(0, 5000) : '';
+            if (body) node.reviewBody = body;
+            return node;
+        });
     }
 
     const pgLoc = findPgLocationForArea(property.location);

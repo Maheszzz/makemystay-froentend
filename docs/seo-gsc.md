@@ -14,3 +14,5 @@ After shipping changes to page titles, descriptions, or canonical URLs, validate
 **Expectations:** Search results and GSC title snippets often lag by **7–14+ days** after a recrawl; duplicates and soft issues can take multiple passes to clear.
 
 This app is a **Vite + React** SPA: titles are set via `react-helmet-async` after load; the root `index.html` provides a short, brand-aligned fallback for first paint and limited crawlers.
+
+For **prerender / bot HTML** (so crawlers receive full body content), see [seo-prerender.md](./seo-prerender.md).

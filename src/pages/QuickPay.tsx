@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
@@ -7,6 +7,7 @@ import { paymentApi } from '@/lib/api';
 import { Shield, Lock, CheckCircle2, CreditCard, Smartphone } from 'lucide-react';
 import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
+import { SafetyPopup } from '@/components/modals/SafetyPopup';
 export default function QuickPay() {
     const [amount, setAmount] = useState<string>('');
     const [name, setName] = useState('');
@@ -18,6 +19,16 @@ export default function QuickPay() {
     }>({
         isOpen: false, paymentId: '', amount: 0, receiptUrl: ''
     });
+    const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
+
+    useEffect(() => {
+        // Show safety popup on quick pay load if not shown in this session
+        const hasShownQuickPaySafety = sessionStorage.getItem('hasShownQuickPaySafety');
+        if (!hasShownQuickPaySafety) {
+            setIsSafetyPopupOpen(true);
+            sessionStorage.setItem('hasShownQuickPaySafety', 'true');
+        }
+    }, []);
 
     // Load Razorpay Script
     const loadRazorpay = () => {
@@ -379,6 +390,11 @@ export default function QuickPay() {
                 paymentId={successData.paymentId}
                 amount={successData.amount}
                 receiptUrl={successData.receiptUrl}
+            />
+
+            <SafetyPopup 
+                isOpen={isSafetyPopupOpen} 
+                onClose={() => setIsSafetyPopupOpen(false)} 
             />
         </div>
     );

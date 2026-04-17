@@ -1,0 +1,7 @@
+# Netlify: route HTML navigations through Prerender.io for crawlers/social preview.
+# Set secret PRERENDER_TOKEN in Netlify UI (Site settings → Environment variables).
+# See deploy/prerender-hosts.md
+
+[[edge_functions]]
+  path = "/*"
+  function = "prerender"

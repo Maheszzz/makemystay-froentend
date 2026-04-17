@@ -73,5 +73,15 @@
   { "slug": "ejipura", "name": "Ejipura" },
   { "slug": "koramangala-4th-block", "name": "Koramangala 4th Block" },
   { "slug": "koramangala-1st-block", "name": "Koramangala 1st Block" },
-  { "slug": "hebbal-kempapura", "name": "Hebbal Kempapura" }
+  { "slug": "hebbal-kempapura", "name": "Hebbal Kempapura" },
+  { "slug": "hitech-city", "name": "HiTech City" },
+  { "slug": "gachibowli", "name": "Gachibowli" },
+  { "slug": "kondapur", "name": "Kondapur" },
+  { "slug": "madhapur", "name": "Madhapur" },
+  { "slug": "kukatpally", "name": "Kukatpally" },
+  { "slug": "hinjewadi", "name": "Hinjewadi" },
+  { "slug": "kharadi", "name": "Kharadi" },
+  { "slug": "wakad", "name": "Wakad" },
+  { "slug": "viman-nagar", "name": "Viman Nagar" },
+  { "slug": "baner", "name": "Baner" }
 ]

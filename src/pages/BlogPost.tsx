@@ -33,10 +33,24 @@ export default function BlogPost() {
         mainEntityOfPage: canonical,
     };
 
+    const faqSchema = post.faqs && post.faqs.length > 0 ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: post.faqs.map(f => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: f.answer
+            }
+        }))
+    } : null;
+
     return (
         <div className="min-h-screen bg-white font-sans flex flex-col">
             <SEOHead {...helmet} ogType="article" />
-            <JsonLd data={articleSchema} />
+            <JsonLd data={articleSchema} id="blog-article-schema" />
+            {faqSchema && <JsonLd data={faqSchema} id="blog-faq-schema" />}
 
             <Navbar />
 
@@ -60,24 +74,57 @@ export default function BlogPost() {
                         ))}
                     </div>
 
-                    <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-2">
-                        <p className="font-semibold text-slate-900">Looking for a PG or rental?</p>
-                        <p>
-                            <Link to="/pg/bangalore" className="text-brand-red font-medium hover:underline">
-                                PG in Bangalore (city hub)
+                    {post.faqs && post.faqs.length > 0 && (
+                        <div className="mt-12 space-y-8">
+                            <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                            <div className="grid gap-6">
+                                {post.faqs.map((faq, i) => (
+                                    <div key={i} className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
+                                        <h3 className="font-bold text-slate-900 mb-2">{faq.question}</h3>
+                                        <p className="text-slate-600 text-sm leading-relaxed">{faq.answer}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-4">
+                        <div className="space-y-2">
+                            <p className="font-semibold text-slate-900">Looking for a PG or rental?</p>
+                            <p>
+                                <Link to="/pg/bangalore" className="text-brand-red font-medium hover:underline">
+                                    PG in Bangalore (city hub)
+                                </Link>
+                                {' · '}
+                                <Link to="/pg/btm" className="text-brand-red font-medium hover:underline">
+                                    PG in BTM
+                                </Link>
+                                {' · '}
+                                <Link to="/pg-vs-flat-bangalore" className="text-brand-red font-medium hover:underline">
+                                    PG vs flat guide
+                                </Link>
+                            </p>
+                            <Link to="/pg" className="inline-block text-sm text-slate-600 hover:text-brand-red font-medium hover:underline">
+                                Browse all PG listings →
                             </Link>
-                            {' · '}
-                            <Link to="/pg/btm" className="text-brand-red font-medium hover:underline">
-                                PG in BTM
-                            </Link>
-                            {' · '}
-                            <Link to="/pg-vs-flat-bangalore" className="text-brand-red font-medium hover:underline">
-                                PG vs flat guide
-                            </Link>
-                        </p>
-                        <Link to="/pg" className="inline-block text-sm text-slate-600 hover:text-brand-red font-medium hover:underline">
-                            Browse all PG listings →
-                        </Link>
+                        </div>
+                        {post.relatedRentHubs && post.relatedRentHubs.length > 0 && (
+                            <div className="pt-2 border-t border-slate-200/80">
+                                <p className="text-sm font-semibold text-slate-900 mb-2">Flats &amp; houses for rent by area</p>
+                                <ul className="flex flex-wrap gap-2">
+                                    {post.relatedRentHubs.map((hub) => (
+                                        <li key={hub.path}>
+                                            <Link
+                                                to={hub.path}
+                                                className="inline-flex rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-red/40 hover:text-brand-red transition-colors"
+                                            >
+                                                {hub.label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </article>
 

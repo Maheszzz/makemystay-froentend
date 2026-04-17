@@ -17,13 +17,17 @@ const STATIC_PATHS = [
     { path: '/properties', priority: '0.9', changefreq: 'daily' },
     { path: '/pg', priority: '0.95', changefreq: 'daily' },
     { path: '/pg/bangalore', priority: '0.96', changefreq: 'daily' },
+    { path: '/pg/hyderabad', priority: '0.94', changefreq: 'daily' },
+    { path: '/pg/pune', priority: '0.94', changefreq: 'daily' },
     { path: '/pg-with-wifi', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-with-food', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-with-ac', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-vs-flat-bangalore', priority: '0.8', changefreq: 'monthly' },
     { path: '/rent', priority: '0.85', changefreq: 'daily' },
-    { path: '/buy', priority: '0.85', changefreq: 'daily' },
-    { path: '/plots', priority: '0.8', changefreq: 'weekly' },
+    { path: '/rent/bangalore', priority: '0.93', changefreq: 'daily' },
+    { path: '/rent/hyderabad', priority: '0.92', changefreq: 'daily' },
+    { path: '/rent/pune', priority: '0.92', changefreq: 'daily' },
+    // /buy and /plots omitted while inventory is thin (pages use noindex); city hubs remain via loop where needed.
     { path: '/faq', priority: '0.75', changefreq: 'monthly' },
     { path: '/blog', priority: '0.8', changefreq: 'weekly' },
     { path: '/quick-pay', priority: '0.6', changefreq: 'monthly' },
@@ -38,8 +42,12 @@ const BLOG_SLUGS = [
     'best-pg-areas-bangalore-it-pros',
     'pg-deposits-notice-period-guide',
     'safety-guide-female-pg-bangalore',
-    'hidden-costs-renting-bangalore-pg-flats',
-    'top-it-parks-bangalore-guide-commuters'
+    'rental-agreement-bangalore',
+    'tenant-acquisition-24-hours',
+    'dynamic-pricing-coliving-revenue',
+    'bangalore-rental-laws-compliance',
+    'ai-vs-brokers-real-estate-future',
+    'emerging-rental-hotspots-bangalore-2027'
 ];
 
 function titleToSlug(title = '') {
@@ -139,10 +147,10 @@ for (const row of locJson) {
     body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-10000`, '0.88', 'weekly');
     body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-15000`, '0.88', 'weekly');
     
-    // Top intent hubs for rentals
+    // Top intent hubs for rentals — canonical `/rent/{slug}` (legacy `/rent-in-*` redirects in app + public/_redirects)
     const rentAreas = ['whitefield', 'marathahalli', 'btm', 'koramangala', 'hsr-layout', 'electronic-city', 'indiranagar', 'bellandur', 'hebbal', 'jp-nagar', 'bannerghatta-road', 'sarjapur-road'];
     if (rentAreas.includes(row.slug)) {
-        body += urlEntry(`${BASE}/rent-in-${hubSlug}`, '0.90', 'daily');
+        body += urlEntry(`${BASE}/rent/${row.slug}`, '0.90', 'daily');
     }
 }
 

@@ -241,6 +241,16 @@ export function pgBangaloreHubSeo(): PageSEOInput {
     };
 }
 
+/** City hub: `/rent/bangalore` — primary “flats & houses for rent in Bangalore” landing. */
+export function rentBangaloreHubSeo(): PageSEOInput {
+    return {
+        title: 'Flats & Houses for Rent in Bangalore — Zero Brokerage | verified rentals',
+        description:
+            'Browse verified flats and houses for rent in Bangalore with zero brokerage. Compare monthly rent across Koramangala, Whitefield, Bellandur, HSR & more — furnished and unfurnished options on MakeMyStay.ai.',
+        path: '/rent/bangalore',
+    };
+}
+
 const PG_FEATURE_PATHS: Record<string, 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'> = {
     '/pg-with-wifi': 'wifi',
     '/pg-with-food': 'food',
@@ -303,6 +313,16 @@ export function buildHomeSEO(): PageSEOInput {
         description:
             'Find affordable PG and coliving spaces in Bangalore with WiFi, food, 24/7 security & premium amenities. Browse verified listings, compare rent, and book with MakeMyStay.ai.',
         path: '/',
+    };
+}
+
+/** Meta for `/faq` (Help Center). */
+export function buildFaqPageSEO(): PageSEOInput {
+    return {
+        title: 'FAQ — PG, rentals, buying & plots',
+        description:
+            'Answers about MakeMyStay: PG and rental bookings, documents, deposits, payments, refunds, legal terms, and listing your property in Bangalore.',
+        path: '/faq',
     };
 }
 

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -13,6 +13,17 @@ import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
 import { buildPageSEO, listingsPageSeo } from '@/lib/seo';
+import { LISTINGS_CATEGORY_HUB, listingsLegacyCatRedirectPath } from '@/lib/listingsCategoryHubs';
+
+/** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
+const RENT_BANGALORE_AREA_CHIPS: { label: string; to: string }[] = [
+    { label: 'Koramangala', to: '/rent/koramangala' },
+    { label: 'Whitefield', to: '/rent/whitefield' },
+    { label: 'Bellandur', to: '/rent/bellandur' },
+    { label: 'Marathahalli', to: '/rent/marathahalli' },
+    { label: 'HSR Layout', to: '/rent/hsr-layout' },
+    { label: 'Electronic City', to: '/rent/electronic-city' },
+];
 
 const CATEGORY_KEYS = ['all', 'pg', 'rent', 'buy', 'plot'] as const;
 type CategoryKey = (typeof CATEGORY_KEYS)[number];
@@ -35,6 +46,8 @@ interface PropertiesProps {
     initialMaxPrice?: string;
     /** Embed listing UI inside another page (no Helmet, Navbar, Footer). */
     hideChrome?: boolean;
+    /** When set with `hideChrome`, show `/rent/bangalore` area chips (hub shell provides hero + SEO). */
+    embedRentHubUi?: boolean;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
 }
 
@@ -45,11 +58,13 @@ export default function Properties({
     pageTitle = 'Find Your Perfect Home',
     pageSubtitle = 'Browse Professional & Verified Listings',
     hideChrome = false,
+    embedRentHubUi = false,
     initialMinPrice = '',
     initialMaxPrice = '',
     onEmptyResultsChange,
 }: PropertiesProps) {
     const location = useLocation();
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const goBack = useSmartBack({ fallback: '/' });
     const { wishlist, clearWishlist } = useWishlist();
@@ -67,11 +82,14 @@ export default function Properties({
     
     const [showFilters, setShowFilters] = useState(false);
 
-    // 2. Sync URL with State (Debounced for inputs)
+    // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
     useEffect(() => {
         const timer = setTimeout(() => {
             const params: Record<string, string> = {};
-            if (category !== 'all') params.cat = category;
+            const onPropertiesIndex = location.pathname === '/properties';
+            if (onPropertiesIndex && category !== 'all') {
+                params.cat = category;
+            }
             if (locationFilter !== 'all') params.city = locationFilter;
             if (typeFilter !== 'all') params.type = typeFilter;
             if (minPrice) params.min = minPrice;
@@ -79,21 +97,30 @@ export default function Properties({
             if (sortBy !== 'rating_desc') params.sort = sortBy;
             if (searchQuery) params.q = searchQuery;
 
-            // Preserve PG marketing filters (deep links from /pg/:slug chips)
             for (const key of ['wifi', 'food', 'ac', 'price'] as const) {
                 const v = searchParams.get(key);
                 if (v) params[key] = v;
             }
 
-            // Only update if something changed to avoid unnecessary history entries
             const currentParams = Object.fromEntries(searchParams.entries());
             if (JSON.stringify(params) !== JSON.stringify(currentParams)) {
                 setSearchParams(params, { replace: true });
             }
-        }, 400); // 400ms debounce for all state changes to URL
+        }, 400);
 
         return () => clearTimeout(timer);
-    }, [category, locationFilter, typeFilter, minPrice, maxPrice, sortBy, searchQuery, setSearchParams, searchParams]);
+    }, [
+        category,
+        location.pathname,
+        locationFilter,
+        typeFilter,
+        minPrice,
+        maxPrice,
+        sortBy,
+        searchQuery,
+        setSearchParams,
+        searchParams,
+    ]);
 
     // Update state if category props change (from App.tsx routes)
     useEffect(() => {
@@ -168,6 +195,11 @@ export default function Properties({
     }, [properties, wifiOn, foodOn, acOn]);
 
     const shouldNoindexEmptyResults = !loading && !error && propertyListFiltered.length === 0;
+    const shouldNoindexThinCategory =
+        !loading &&
+        !error &&
+        typeof totalCount === 'number' &&
+        ((category === 'buy' && totalCount < 10) || (category === 'plot' && totalCount < 3));
 
     const listingsHelmet = useMemo(() => {
         if (hideChrome) return null;
@@ -179,7 +211,10 @@ export default function Properties({
             cityLabel: locationFilter === 'all' ? 'all' : locationFilter,
             totalCount: totalCount ?? undefined,
         });
-        return buildPageSEO({ ...page, noindex: shouldNoindexEmptyResults });
+        return buildPageSEO({
+            ...page,
+            noindex: shouldNoindexEmptyResults || shouldNoindexThinCategory,
+        });
     }, [
         hideChrome,
         location.pathname,
@@ -189,6 +224,7 @@ export default function Properties({
         locationFilter,
         totalCount,
         shouldNoindexEmptyResults,
+        shouldNoindexThinCategory,
     ]);
 
     useEffect(() => {
@@ -226,6 +262,33 @@ export default function Properties({
         setSearchParams({}, { replace: true });
     }, [setSearchParams]);
 
+    const handleCategoryTab = useCallback(
+        (cat: CategoryKey) => {
+            if (cat === 'all') {
+                if (location.pathname !== '/properties') {
+                    navigate('/properties');
+                } else {
+                    setCategory('all');
+                }
+                return;
+            }
+            navigate(LISTINGS_CATEGORY_HUB[cat]);
+        },
+        [location.pathname, navigate]
+    );
+
+    const redirectFromLegacyCat =
+        location.pathname === '/properties' ? listingsLegacyCatRedirectPath(searchParams.get('cat')) : null;
+
+    const showRentBangaloreHubBlocks =
+        initialCategory === 'rent' &&
+        String(initialCity ?? '').toLowerCase() === 'bangalore' &&
+        (!hideChrome || embedRentHubUi);
+
+    if (redirectFromLegacyCat) {
+        return <Navigate to={redirectFromLegacyCat} replace />;
+    }
+
     const mainContent = (
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
                 <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? '' : ''}`}>
@@ -243,6 +306,43 @@ export default function Properties({
                                 </button>
                                 <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
                                 <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
+                                {showRentBangaloreHubBlocks && (
+                                    <p className="mt-3 text-sm font-semibold text-slate-700">
+                                        Typical range in this hub: <span className="text-brand-red">₹15,000 – ₹50,000</span>
+                                        / month — filter below to narrow.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    {showRentBangaloreHubBlocks && (
+                        <div className="mb-8 rounded-2xl border border-slate-200/90 bg-white p-4 md:p-5 shadow-sm">
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">Browse by area</p>
+                            <div className="flex flex-wrap gap-2">
+                                {RENT_BANGALORE_AREA_CHIPS.map((c) => (
+                                    <Link
+                                        key={c.to}
+                                        to={c.to}
+                                        className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
+                                    >
+                                        {c.label}
+                                    </Link>
+                                ))}
+                            </div>
+                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-5 mb-3">By configuration</p>
+                            <div className="flex flex-wrap gap-2">
+                                <Link
+                                    to="/1bhk"
+                                    className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
+                                >
+                                    1 BHK for rent
+                                </Link>
+                                <Link
+                                    to="/2bhk"
+                                    className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
+                                >
+                                    2 BHK for rent
+                                </Link>
                             </div>
                         </div>
                     )}
@@ -291,7 +391,7 @@ export default function Properties({
                                     <button
                                         key={cat}
                                         type="button"
-                                        onClick={() => setCategory(cat)}
+                                        onClick={() => handleCategoryTab(cat)}
                                         className={`flex-1 px-4 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${category === cat ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         {CATEGORY_TAB_LABEL[cat]}

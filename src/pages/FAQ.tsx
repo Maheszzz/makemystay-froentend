@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { buildPageSEO, buildFaqPageSEO } from '@/lib/seo';
+import { buildFaqPageSchema } from '@/lib/schema';
 
 interface FAQItem {
     q: string;
     a: React.ReactNode;
+    /** Plain text for JSON-LD (same meaning as visible content). */
+    schemaAnswer: string;
 }
 
 interface FAQSection {
@@ -22,26 +28,36 @@ const faqData: FAQSection[] = [
             {
                 q: 'What is MakeMyStay?',
                 a: 'MakeMyStay is a real estate facilitation platform that helps users find PG accommodations, rental homes, properties for purchase, and plots with end-to-end assistance — from search to closure.',
+                schemaAnswer:
+                    'MakeMyStay is a real estate facilitation platform that helps users find PG accommodations, rental homes, properties for purchase, and plots with end-to-end assistance — from search to closure.',
             },
             {
                 q: 'How does MakeMyStay work?',
                 a: 'Users can browse listings, submit inquiries, schedule visits, receive negotiation and documentation guidance, and complete booking or registration with coordinated support.',
+                schemaAnswer:
+                    'Users can browse listings, submit inquiries, schedule visits, receive negotiation and documentation guidance, and complete booking or registration with coordinated support.',
             },
             {
                 q: 'What locations do you operate in?',
                 a: 'Service availability depends on active listings in specific cities. Please check the website for current coverage.',
+                schemaAnswer:
+                    'Service availability depends on active listings in specific cities. Please check the website for current coverage.',
             },
             {
                 q: 'Do I need to create an account?',
                 a: 'Creating an account allows you to save listings, track inquiries, and manage bookings. Browsing may be available without login.',
+                schemaAnswer:
+                    'Creating an account allows you to save listings, track inquiries, and manage bookings. Browsing may be available without login.',
             },
             {
                 q: 'What makes MakeMyStay different?',
                 a: 'We provide guided support throughout the property journey rather than just listing properties.',
+                schemaAnswer: 'We provide guided support throughout the property journey rather than just listing properties.',
             },
             {
                 q: 'Can NRIs use MakeMyStay?',
                 a: 'Yes. NRIs can request virtual tours, remote coordination, and documentation support.',
+                schemaAnswer: 'Yes. NRIs can request virtual tours, remote coordination, and documentation support.',
             },
         ],
     },
@@ -52,6 +68,8 @@ const faqData: FAQSection[] = [
             {
                 q: 'What types of PG and rental properties are available?',
                 a: 'We list male PG, female PG, co-living spaces, shared rooms, private rooms, apartments, villas, and independent houses.',
+                schemaAnswer:
+                    'We list male PG, female PG, co-living spaces, shared rooms, private rooms, apartments, villas, and independent houses.',
             },
             {
                 q: 'What documents are required for PG or rental booking?',
@@ -67,26 +85,35 @@ const faqData: FAQSection[] = [
                         <span className="block mt-2 text-slate-500 text-sm">Requirements may vary based on property.</span>
                     </span>
                 ),
+                schemaAnswer:
+                    'Typically required documents include: Government ID proof; address proof; passport-size photo; advance deposit. Requirements may vary based on property.',
             },
             {
                 q: 'Is there a security deposit?',
                 a: "Deposit amounts vary depending on the owner's policy and property type. Details are mentioned in the listing.",
+                schemaAnswer:
+                    "Deposit amounts vary depending on the owner's policy and property type. Details are mentioned in the listing.",
             },
             {
                 q: 'Can I visit the property before booking?',
                 a: 'Yes. You can request a site visit through the platform. Our team coordinates with the owner.',
+                schemaAnswer: 'Yes. You can request a site visit through the platform. Our team coordinates with the owner.',
             },
             {
                 q: 'Are meals and utilities included in PG?',
                 a: 'Inclusions such as food, Wi-Fi, electricity, and maintenance depend on the property and are mentioned in the listing.',
+                schemaAnswer:
+                    'Inclusions such as food, Wi-Fi, electricity, and maintenance depend on the property and are mentioned in the listing.',
             },
             {
                 q: 'Is there a lock-in period?',
                 a: 'Some rental agreements may include a lock-in period. Terms are defined in the rental agreement.',
+                schemaAnswer: 'Some rental agreements may include a lock-in period. Terms are defined in the rental agreement.',
             },
             {
                 q: 'Can I move in immediately?',
                 a: 'Move-in depends on property availability, agreement completion, and payment confirmation.',
+                schemaAnswer: 'Move-in depends on property availability, agreement completion, and payment confirmation.',
             },
         ],
     },
@@ -97,30 +124,40 @@ const faqData: FAQSection[] = [
             {
                 q: 'Do you assist with property purchase?',
                 a: 'Yes. We assist with residential apartments, houses, resale properties, and investment plots.',
+                schemaAnswer: 'Yes. We assist with residential apartments, houses, resale properties, and investment plots.',
             },
             {
                 q: 'Do you verify legal documents?',
                 a: 'We conduct basic listing verification. Buyers are responsible for independent legal due diligence before finalizing transactions.',
+                schemaAnswer:
+                    'We conduct basic listing verification. Buyers are responsible for independent legal due diligence before finalizing transactions.',
             },
             {
                 q: 'Do you assist with registration?',
                 a: 'Yes. We provide coordination and guidance support for sale agreements and registration processes.',
+                schemaAnswer: 'Yes. We provide coordination and guidance support for sale agreements and registration processes.',
             },
             {
                 q: 'Can I negotiate property prices?',
                 a: 'Yes. We assist in facilitating communication and negotiation between buyer and seller.',
+                schemaAnswer: 'Yes. We assist in facilitating communication and negotiation between buyer and seller.',
             },
             {
                 q: 'Do you help first-time buyers?',
                 a: 'Yes. We guide first-time buyers through the property selection and documentation process.',
+                schemaAnswer: 'Yes. We guide first-time buyers through the property selection and documentation process.',
             },
             {
                 q: 'Can you assist with home loans?',
                 a: "We may connect buyers with financial institutions if required. Loan approval depends on the bank's policies.",
+                schemaAnswer:
+                    "We may connect buyers with financial institutions if required. Loan approval depends on the bank's policies.",
             },
             {
                 q: 'Are plot approvals guaranteed?',
                 a: 'Approval status varies. Buyers must verify layout approval, zoning compliance, and legal clearances independently.',
+                schemaAnswer:
+                    'Approval status varies. Buyers must verify layout approval, zoning compliance, and legal clearances independently.',
             },
         ],
     },
@@ -131,14 +168,18 @@ const faqData: FAQSection[] = [
             {
                 q: 'How are payments made?',
                 a: 'Payments must be made only through official and authorized channels communicated by MakeMyStay.',
+                schemaAnswer: 'Payments must be made only through official and authorized channels communicated by MakeMyStay.',
             },
             {
                 q: 'Is brokerage or service fee applicable?',
                 a: 'Service fees, if applicable, are communicated transparently before confirmation.',
+                schemaAnswer: 'Service fees, if applicable, are communicated transparently before confirmation.',
             },
             {
                 q: 'What is the cancellation policy?',
                 a: 'Cancellation policies vary based on property type, booking stage, and agreement terms. Deductions, if any, are disclosed prior to confirmation.',
+                schemaAnswer:
+                    'Cancellation policies vary based on property type, booking stage, and agreement terms. Deductions, if any, are disclosed prior to confirmation.',
             },
             {
                 q: 'What is the refund policy?',
@@ -153,18 +194,25 @@ const faqData: FAQSection[] = [
                         <span className="block mt-2">Refunds, if applicable, are processed within the stated timeframe.</span>
                     </span>
                 ),
+                schemaAnswer:
+                    'Refund eligibility depends on cancellation timeline, agreement conditions, and processing fees. Refunds, if applicable, are processed within the stated timeframe.',
             },
             {
                 q: 'How long does refund processing take?',
                 a: 'Refund timelines depend on the payment method and agreement terms. Processing may take several working days.',
+                schemaAnswer:
+                    'Refund timelines depend on the payment method and agreement terms. Processing may take several working days.',
             },
             {
                 q: 'Are service charges refundable?',
                 a: 'Service or processing fees may be non-refundable unless otherwise stated.',
+                schemaAnswer: 'Service or processing fees may be non-refundable unless otherwise stated.',
             },
             {
                 q: 'Does MakeMyStay hold customer funds?',
                 a: 'Payments are typically handled as per agreement terms. We do not function as an escrow unless explicitly mentioned.',
+                schemaAnswer:
+                    'Payments are typically handled as per agreement terms. We do not function as an escrow unless explicitly mentioned.',
             },
         ],
     },
@@ -175,26 +223,36 @@ const faqData: FAQSection[] = [
             {
                 q: 'Is my personal data secure?',
                 a: 'Yes. We follow secure data handling practices. Information is used only for service-related communication.',
+                schemaAnswer:
+                    'Yes. We follow secure data handling practices. Information is used only for service-related communication.',
             },
             {
                 q: 'Does MakeMyStay guarantee property availability?',
                 a: 'Availability depends on real-time confirmation from owners. Users must confirm before making payments.',
+                schemaAnswer:
+                    'Availability depends on real-time confirmation from owners. Users must confirm before making payments.',
             },
             {
                 q: 'Does MakeMyStay guarantee investment returns?',
                 a: 'No. Property investments carry market risks. We do not guarantee returns.',
+                schemaAnswer: 'No. Property investments carry market risks. We do not guarantee returns.',
             },
             {
                 q: 'Who is responsible in case of disputes?',
                 a: 'MakeMyStay acts as a facilitation platform. Disputes are governed by agreements between the concerned parties.',
+                schemaAnswer:
+                    'MakeMyStay acts as a facilitation platform. Disputes are governed by agreements between the concerned parties.',
             },
             {
                 q: 'Are agreements legally binding?',
                 a: 'Yes. Rental and sale agreements are legally binding between the respective parties.',
+                schemaAnswer: 'Yes. Rental and sale agreements are legally binding between the respective parties.',
             },
             {
                 q: 'Can policies change?',
                 a: 'Yes. Policies and terms may be updated periodically. Users are encouraged to review them regularly.',
+                schemaAnswer:
+                    'Yes. Policies and terms may be updated periodically. Users are encouraged to review them regularly.',
             },
         ],
     },
@@ -205,6 +263,7 @@ const faqData: FAQSection[] = [
             {
                 q: 'How can I list my property?',
                 a: 'You can submit your property details through the listing section on the website.',
+                schemaAnswer: 'You can submit your property details through the listing section on the website.',
             },
             {
                 q: 'What documents are required for listing?',
@@ -219,26 +278,33 @@ const faqData: FAQSection[] = [
                         </ul>
                     </span>
                 ),
+                schemaAnswer:
+                    'Generally required: identity proof; ownership proof; property details; contact information.',
             },
             {
                 q: 'How long does listing approval take?',
                 a: 'Approval depends on document verification and review.',
+                schemaAnswer: 'Approval depends on document verification and review.',
             },
             {
                 q: 'Can I list multiple properties?',
                 a: 'Yes. Multiple listings are allowed after verification.',
+                schemaAnswer: 'Yes. Multiple listings are allowed after verification.',
             },
             {
                 q: 'Can I update or remove my listing?',
                 a: 'Yes. Owners can request updates or removal through support channels.',
+                schemaAnswer: 'Yes. Owners can request updates or removal through support channels.',
             },
             {
                 q: 'How will I receive inquiries?',
                 a: 'Inquiries are shared through registered contact details provided during listing.',
+                schemaAnswer: 'Inquiries are shared through registered contact details provided during listing.',
             },
             {
                 q: 'Can I set my own pricing?',
                 a: 'Yes. Pricing is determined by the property owner.',
+                schemaAnswer: 'Yes. Pricing is determined by the property owner.',
             },
         ],
     },
@@ -303,9 +369,19 @@ function FAQSectionBlock({ section }: { section: FAQSection }) {
 
 export default function FAQ() {
     const [activeSection, setActiveSection] = useState<string | null>(null);
+    const faqHelmet = useMemo(() => buildPageSEO(buildFaqPageSEO()), []);
+    const faqJsonLd = useMemo(
+        () =>
+            buildFaqPageSchema(
+                faqData.flatMap((s) => s.items.map((it) => ({ question: it.q, answer: it.schemaAnswer })))
+            ),
+        []
+    );
 
     return (
         <>
+            <SEOHead {...faqHelmet} />
+            <JsonLd data={faqJsonLd} id="faq-page-schema" />
             <Navbar />
             <main className="pt-24 pb-16 min-h-screen bg-slate-50">
                 {/* Hero */}
