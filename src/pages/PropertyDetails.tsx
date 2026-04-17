@@ -243,7 +243,16 @@ export default function PropertyDetails() {
     }
 
     if (location.pathname !== canonicalDetailPath) {
-        return <Navigate to={`${canonicalDetailPath}${location.search}${location.hash}`} replace />;
+        return (
+            <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
+                <SEOHead 
+                    {...interimHelmet} 
+                    prerenderStatus={301} 
+                    prerenderHeaders={{ Location: `${canonicalDetailPath}${location.search}${location.hash}` }}
+                />
+                <Navigate to={`${canonicalDetailPath}${location.search}${location.hash}`} replace />
+            </div>
+        );
     }
 
     // Build the images list

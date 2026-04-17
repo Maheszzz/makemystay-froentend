@@ -2,6 +2,8 @@ import { Helmet } from 'react-helmet-async';
 import type { HelmetSEOProps } from '@/lib/seo';
 
 interface SEOHeadProps extends HelmetSEOProps {
+    prerenderStatus?: number;
+    prerenderHeaders?: Record<string, string>;
     ogType?: 'website' | 'article';
 }
 
@@ -15,6 +17,8 @@ export function SEOHead({
     ogImage,
     noindex,
     keywords,
+    prerenderStatus,
+    prerenderHeaders,
     ogType = 'website',
 }: SEOHeadProps) {
     return (
@@ -33,6 +37,14 @@ export function SEOHead({
             <meta name="twitter:title" content={title} />
             <meta name="twitter:description" content={description} />
             {ogImage && <meta name="twitter:image" content={ogImage} />}
+            
+            {/* Prerender.io specific tags */}
+            {prerenderStatus && (
+                <meta name="prerender-status-code" content={prerenderStatus.toString()} />
+            )}
+            {prerenderHeaders && Object.entries(prerenderHeaders).map(([key, value]) => (
+                <meta key={key} name="prerender-header" content={`${key}: ${value}`} />
+            ))}
         </Helmet>
     );
 }
