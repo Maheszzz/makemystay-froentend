@@ -44,7 +44,7 @@ export interface RealtyProperty {
     double_price?: number;
     triple_price?: number;
     starting_price?: number;
-    listing_type: 'buy' | 'rent';
+    listing_type: 'buy' | 'rent' | 'sale' | string;
     is_available: boolean;
     description?: string; // Optional in DB response??
     /** Long-form PDP copy (~500 words), server-generated when present */
@@ -60,6 +60,8 @@ export interface RealtyProperty {
     /** When admin API adds optional marketing / inventory fields, map them through. */
     listing_badge?: string;
     units_remaining?: number | null;
+    /** UI tab from API (pg | rent | buy | plot); matches backend PropertyListItem.derive_category. */
+    category?: 'pg' | 'rent' | 'buy' | 'plot' | string;
 }
 
 export interface Review {

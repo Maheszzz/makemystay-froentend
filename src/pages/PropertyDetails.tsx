@@ -9,7 +9,7 @@ import { Link, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
-import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
+import { getPropertyDetailPath, isPropertyDetailCanonicalPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
@@ -242,7 +242,10 @@ export default function PropertyDetails() {
         );
     }
 
-    if (location.pathname !== canonicalDetailPath) {
+    if (
+        isPropertyDetailCanonicalPath(canonicalDetailPath) &&
+        location.pathname !== canonicalDetailPath
+    ) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
                 <SEOHead 

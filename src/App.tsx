@@ -68,19 +68,17 @@ function LegacyTypeSlugRedirect() {
 function PGRouter() {
     const { slug } = useParams<{ slug: string }>();
     const param = (slug || '').toLowerCase();
-    
+
+    if (/^(\d+)(-|$)/.test(param)) {
+        return <PropertyDetails />;
+    }
+
     if (param === 'bangalore') return <PGBangaloreHub />;
     if (param === 'hyderabad') return <PGHyderabadHub />;
     if (param === 'pune') return <PGPuneHub />;
     if (['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param)) return <PgFeatureLandingPage />;
     if (param === 'pg-vs-flat-bangalore') return <PgVsFlatBangalore />;
-    
-    // Handle price-tier patterns in /pg/:slug if needed, 
-    // but we'll primarily use the static-style /pg-in-locality-under-price
-    
-    const isProperty = /^\d+/.test(param);
-    if (isProperty) return <PropertyDetails />;
-    
+
     return <PGLocationPage />;
 }
 
@@ -100,8 +98,9 @@ function RentRouter() {
     const { slug } = useParams<{ slug: string }>();
     const param = (slug || '').toLowerCase();
 
-    const isProperty = /^\d+/.test(param);
-    if (isProperty) return <PropertyDetails />;
+    if (/^(\d+)(-|$)/.test(param)) {
+        return <PropertyDetails />;
+    }
 
     if (param === 'bangalore') {
         return (

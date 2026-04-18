@@ -1,6 +1,9 @@
-/** Canonical Bangalore hub paths — avoid `/properties?cat=*` duplicate URLs. */
+/**
+ * Category-tab targets from `/properties` (no `?cat=`).
+ * PG uses `/pg` (listings) so tab + cards stay on inventory; marketing hub stays at `/pg/bangalore`.
+ */
 export const LISTINGS_CATEGORY_HUB = {
-    pg: '/pg/bangalore',
+    pg: '/pg',
     rent: '/rent/bangalore',
     buy: '/buy/in/bangalore',
     plot: '/plots/in/bangalore',

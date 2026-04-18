@@ -14,6 +14,11 @@ import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
 import { buildPageSEO, listingsPageSeo } from '@/lib/seo';
 import { LISTINGS_CATEGORY_HUB, listingsLegacyCatRedirectPath } from '@/lib/listingsCategoryHubs';
+import {
+    computeRentPlotStatsFromListings,
+    formatInrRange,
+    formatSqftRange,
+} from '@/lib/listingInventoryStats';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
 const RENT_BANGALORE_AREA_CHIPS: { label: string; to: string }[] = [
@@ -48,6 +53,8 @@ interface PropertiesProps {
     hideChrome?: boolean;
     /** When set with `hideChrome`, show `/rent/bangalore` area chips (hub shell provides hero + SEO). */
     embedRentHubUi?: boolean;
+    /** Live min/max rent (INR) for embedded rent hub hero — updated from loaded listings. */
+    onRentHubInventoryRange?: (min: number | null, max: number | null) => void;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
 }
 
@@ -61,6 +68,7 @@ export default function Properties({
     embedRentHubUi = false,
     initialMinPrice = '',
     initialMaxPrice = '',
+    onRentHubInventoryRange,
     onEmptyResultsChange,
 }: PropertiesProps) {
     const location = useLocation();
@@ -194,6 +202,16 @@ export default function Properties({
         return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
     }, [properties, wifiOn, foodOn, acOn]);
 
+    const inventoryStats = useMemo(
+        () => computeRentPlotStatsFromListings(propertyListFiltered),
+        [propertyListFiltered]
+    );
+
+    useEffect(() => {
+        if (!embedRentHubUi || !onRentHubInventoryRange) return;
+        onRentHubInventoryRange(inventoryStats.rentMinInr, inventoryStats.rentMaxInr);
+    }, [embedRentHubUi, onRentHubInventoryRange, inventoryStats.rentMinInr, inventoryStats.rentMaxInr]);
+
     const shouldNoindexEmptyResults = !loading && !error && propertyListFiltered.length === 0;
     const shouldNoindexThinCategory =
         !loading &&
@@ -285,6 +303,16 @@ export default function Properties({
         String(initialCity ?? '').toLowerCase() === 'bangalore' &&
         (!hideChrome || embedRentHubUi);
 
+    const showPlotCityHubBlocks =
+        category === 'plot' && initialCity !== 'all' && !hideChrome;
+
+    const cityLabelDisplay = useMemo(() => {
+        if (locationFilter === 'all') return 'Bangalore';
+        const s = String(locationFilter).trim();
+        if (!s) return 'Bangalore';
+        return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    }, [locationFilter]);
+
     if (redirectFromLegacyCat) {
         return <Navigate to={redirectFromLegacyCat} replace />;
     }
@@ -308,8 +336,35 @@ export default function Properties({
                                 <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
                                 {showRentBangaloreHubBlocks && (
                                     <p className="mt-3 text-sm font-semibold text-slate-700">
-                                        Typical range in this hub: <span className="text-brand-red">₹15,000 – ₹50,000</span>
-                                        / month — filter below to narrow.
+                                        {inventoryStats.rentMinInr != null && inventoryStats.rentMaxInr != null ? (
+                                            <>
+                                                Typical range in this hub:{' '}
+                                                <span className="text-brand-red">
+                                                    {formatInrRange(inventoryStats.rentMinInr, inventoryStats.rentMaxInr)}
+                                                </span>{' '}
+                                                / month — filter below to narrow.
+                                            </>
+                                        ) : (
+                                            <>Rent varies by listing — see cards below. Use filters to narrow.</>
+                                        )}
+                                    </p>
+                                )}
+                                {showPlotCityHubBlocks && (
+                                    <p className="mt-3 text-sm font-semibold text-slate-700">
+                                        {inventoryStats.plotSqftMin != null && inventoryStats.plotSqftMax != null ? (
+                                            <>
+                                                Listed plot sizes in this hub:{' '}
+                                                <span className="text-brand-red">
+                                                    {formatSqftRange(
+                                                        inventoryStats.plotSqftMin,
+                                                        inventoryStats.plotSqftMax
+                                                    )}
+                                                </span>{' '}
+                                                — filter below to narrow.
+                                            </>
+                                        ) : (
+                                            <>Plot sizes vary by listing — see cards below.</>
+                                        )}
                                     </p>
                                 )}
                             </div>
@@ -352,7 +407,7 @@ export default function Properties({
                                 <div className="min-w-0">
                                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Live inventory</p>
                                     <h2 className="mt-1 text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-                                        Listings in {locationFilter === 'all' ? 'Bangalore' : locationFilter}
+                                        Listings in {cityLabelDisplay}
                                     </h2>
                                     <p className="text-slate-600 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">{pageSubtitle}</p>
                                 </div>
@@ -502,7 +557,7 @@ export default function Properties({
                                 Showing{' '}
                                 <span className="text-slate-900 font-bold">{propertyListFiltered.length}</span> of{' '}
                                 <span className="text-slate-900 font-bold">{totalCount}</span> properties
-                                {locationFilter !== 'all' && ` in ${locationFilter}`}
+                                {locationFilter !== 'all' && ` in ${cityLabelDisplay}`}
                                 {(wifiOn || foodOn || acOn) && (
                                     <span className="text-slate-400"> (WiFi/food/AC filters apply to loaded results — scroll for more)</span>
                                 )}
@@ -542,7 +597,7 @@ export default function Properties({
                                 </div>
                                 <h3 className="text-2xl font-bold text-slate-900 mb-2">No properties matched your search</h3>
                                 <p className="text-slate-500 max-w-md mx-auto text-sm mb-8">
-                                    We couldn't find anything for "{searchQuery || locationFilter}" with your current filters. Try relaxing your budget or looking in other areas.
+                                    {`We couldn't find anything for "${searchQuery.trim() || (locationFilter !== 'all' ? cityLabelDisplay : 'your criteria')}" with your current filters. Try relaxing your budget or looking in other areas.`}
                                 </p>
                                 <div className="flex flex-wrap items-center justify-center gap-3">
                                     <button onClick={resetFilters} className="px-6 py-3 bg-brand-red text-white font-bold rounded-xl shadow-lg shadow-brand-red/20 hover:scale-105 transition-all">

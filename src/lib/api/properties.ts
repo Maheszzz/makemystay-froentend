@@ -53,25 +53,52 @@ function normalizePropertyListResponse(response: unknown): { rows: unknown[]; to
     return { rows: [], total: 0 };
 }
 
+/** Align with backend PropertyListItem.derive_category — never reduce pg/plot to rent/buy only. */
+function deriveUiCategory(item: RealtyProperty): Property['category'] {
+    const raw = item.category;
+    if (typeof raw === 'string' && raw.trim()) {
+        const c = raw.trim().toLowerCase();
+        if (c === 'pg' || c === 'plot' || c === 'rent' || c === 'buy') {
+            return c as Property['category'];
+        }
+    }
+    const pt = (item.property_type || '').toLowerCase();
+    if (pt === 'pg') return 'pg';
+    if (pt === 'plot') return 'plot';
+    const lt = (item.listing_type ?? 'rent').toString().toLowerCase();
+    if (lt === 'buy' || lt === 'sale') return 'buy';
+    return 'rent';
+}
+
 /**
  * Maps the backend RealtyProperty to the frontend Property interface
  */
 function mapRealtyToProperty(item: RealtyProperty): Property {
-    // Determine price display — prefer starting_price from backend
+    const ptLower = (item.property_type || '').toLowerCase();
+    const rawLt = (item.listing_type ?? 'rent').toString().toLowerCase();
+    const isRentListing = rawLt === 'rent';
+    const isBuyListing = rawLt === 'buy' || rawLt === 'sale';
+
+    // Price: prefer starting_price; PG uses min(shared) prices even if listing_type casing differs.
     let priceDisplay = 'Price on Request';
-    if (item.starting_price) {
-        priceDisplay = `₹${item.starting_price.toLocaleString('en-IN')}`;
-    } else if (item.listing_type === 'rent') {
-        if (item.property_type === 'PG') {
-            const minPrice = Math.min(item.single_price || Infinity, item.double_price || Infinity, item.triple_price || Infinity);
-            priceDisplay = minPrice < Infinity ? `₹${minPrice.toLocaleString('en-IN')}` : 'Price on Request';
-        } else if (item.private_price) {
+    const sp = item.starting_price;
+    if (typeof sp === 'number' && sp > 0) {
+        priceDisplay = `₹${sp.toLocaleString('en-IN')}`;
+    } else if (ptLower === 'pg') {
+        const minPrice = Math.min(
+            item.single_price ?? Infinity,
+            item.double_price ?? Infinity,
+            item.triple_price ?? Infinity
+        );
+        if (minPrice < Infinity) {
+            priceDisplay = `₹${minPrice.toLocaleString('en-IN')}`;
+        } else if (item.private_price != null && item.private_price > 0) {
             priceDisplay = `₹${item.private_price.toLocaleString('en-IN')}`;
         }
-    } else if (item.listing_type === 'buy') {
-        if (item.private_price) {
-            priceDisplay = `₹${(item.private_price / 10000000).toFixed(2)} Cr`;
-        }
+    } else if (isRentListing && item.private_price != null && item.private_price > 0) {
+        priceDisplay = `₹${item.private_price.toLocaleString('en-IN')}`;
+    } else if (isBuyListing && item.private_price != null && item.private_price > 0) {
+        priceDisplay = `₹${(item.private_price / 10000000).toFixed(2)} Cr`;
     }
 
     // Determine default image based on type if none exists
@@ -101,9 +128,7 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         : [];
     const has = (needle: string) => featuresList.some((f) => f.toLowerCase().includes(needle));
 
-    // Safely map listing_type (handle missing or case mismatch)
-    const rawListingType = (item.listing_type || 'rent').toLowerCase();
-    const category = (rawListingType === 'sale' || rawListingType === 'buy') ? 'buy' : 'rent';
+    const category = deriveUiCategory(item);
 
     // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
     const rawImages = Array.isArray(item.images) ? item.images : [];

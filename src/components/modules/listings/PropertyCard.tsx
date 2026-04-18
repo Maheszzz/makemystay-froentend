@@ -22,6 +22,36 @@ interface PropertyCardProps {
     property: Property;
 }
 
+/** Shared “From ₹…” block — PG uses compact variant above meta row; others use default below. */
+function CardPriceFrom({ property, compact }: { property: Property; compact?: boolean }) {
+    const showPerMonth = property.category === 'rent' || property.category === 'pg';
+    return (
+        <div
+            className={
+                compact
+                    ? 'mb-3.5 w-full rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold'
+                    : 'min-w-0 flex-1 rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white pl-3 pr-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold'
+            }
+        >
+            <p
+                className={`text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-heading ${compact ? 'mb-0.5' : 'mb-1'}`}
+            >
+                From
+            </p>
+            <p
+                className={
+                    compact
+                        ? 'text-[1.5rem] sm:text-[1.65rem] font-bold tabular-nums tracking-tight leading-none font-heading text-brand-red'
+                        : 'text-[1.65rem] sm:text-[1.75rem] font-bold tabular-nums tracking-tight leading-none font-heading text-brand-red'
+                }
+            >
+                {property.price}
+            </p>
+            {showPerMonth && <p className="text-[11px] text-slate-500 mt-1 font-medium">per month</p>}
+        </div>
+    );
+}
+
 function getFallbackImageForType(type?: string): string {
     const t = (type || '').toLowerCase();
     if (t === 'pg' || t === 'hostel') {
@@ -73,8 +103,19 @@ export function PropertyCard({ property }: PropertyCardProps) {
     };
 
     const displayImage = getImage(property);
-    const isServiceOriented = property.type === 'PG' || property.type === 'Hostel';
-    const isPlot = property.type === 'Plot' || property.type?.toLowerCase() === 'plot';
+    const typeLower = (property.type || '').toLowerCase();
+    const isServiceOriented = typeLower === 'pg' || typeLower === 'hostel';
+    const isPlot = typeLower === 'plot';
+
+    const areaLabel = useMemo(() => {
+        if (typeof property.area === 'number' && property.area > 0) {
+            return `${property.area.toLocaleString('en-IN')} sq ft`;
+        }
+        if (property.sqft && property.sqft !== 'On Request') {
+            return `${property.sqft} sqft`;
+        }
+        return null;
+    }, [property.area, property.sqft]);
 
     // Build amenity pills
     const amenities: string[] = [];
@@ -119,7 +160,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             state={{ from }}
             className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-brand-red/35 focus-visible:ring-offset-2 rounded-[1.35rem]"
         >
-            <div className="bg-white rounded-[1.35rem] overflow-hidden transition-all duration-500 ease-out border border-slate-200/70 shadow-listing hover:shadow-listing-hover hover:border-slate-300/80 hover:-translate-y-1 h-full flex flex-col ring-1 ring-black/[0.02]">
+            <div className="bg-white rounded-[1.35rem] transition-all duration-500 ease-out border border-slate-200/70 shadow-listing hover:shadow-listing-hover hover:border-slate-300/80 hover:-translate-y-1 h-full flex flex-col ring-1 ring-black/[0.02]">
                 {/* Image — editorial frame + rating glass on photo */}
                 <div className="relative w-full h-[200px] sm:h-[224px] shrink-0 overflow-hidden bg-slate-200 rounded-t-[1.35rem]">
                     {displayImage ? (
@@ -157,7 +198,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     <div className="absolute top-3 left-3 z-10 flex flex-col items-start gap-1.5 pointer-events-none max-w-[82%]">
                         <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-[0.14em] uppercase leading-none px-2.5 py-1.5 rounded-lg bg-white/98 text-slate-900 shadow-md border border-slate-200/90 font-heading">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            {property.category === 'buy' ? 'For Sale' : 'For Rent'}
+                            {property.category === 'buy' ? 'For Sale' : property.category === 'plot' ? 'Plot' : 'For Rent'}
                         </span>
                         {secondaryBadge && (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold tracking-wide uppercase leading-tight px-2.5 py-1.5 rounded-lg text-white bg-slate-950/88 backdrop-blur-md border border-white/15 shadow-lg line-clamp-2">
@@ -213,6 +254,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         </span>
                     </div>
 
+                    {/* PG/Hostel: price above meta row — avoids grid clipping and matches scan order */}
+                    {isServiceOriented && <CardPriceFrom property={property} compact />}
+
                     <div className="flex flex-wrap items-center gap-2 text-slate-700 text-[11px] sm:text-[12px] mb-3.5 pb-3.5 border-b border-slate-100/90">
                         {isPlot ? (
                             <>
@@ -220,12 +264,12 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     <MapPin className="w-3.5 h-3.5 text-slate-400" aria-hidden />
                                     <span>Plot Land</span>
                                 </div>
-                                {property.sqft && property.sqft !== 'On Request' && (
+                                {areaLabel && (
                                     <>
                                         <span className="text-slate-300" aria-hidden>
                                             ·
                                         </span>
-                                        <span>{property.sqft} sqft</span>
+                                        <span>{areaLabel}</span>
                                     </>
                                 )}
                             </>
@@ -249,6 +293,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     <Utensils className="w-3.5 h-3.5 text-slate-400" aria-hidden />
                                     <span>{property.food ? 'Food included' : 'No food'}</span>
                                 </div>
+                                {areaLabel && (
+                                    <>
+                                        <span className="text-slate-300" aria-hidden>
+                                            ·
+                                        </span>
+                                        <span>{areaLabel}</span>
+                                    </>
+                                )}
                             </>
                         ) : (
                             <>
@@ -263,36 +315,28 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     <Bath className="w-3.5 h-3.5 text-slate-400" aria-hidden />
                                     <span>{property.baths} bath</span>
                                 </div>
-                                {property.sqft && property.sqft !== 'On Request' && (
+                                {areaLabel && (
                                     <>
                                         <span className="text-slate-300" aria-hidden>
                                             ·
                                         </span>
-                                        <span>{property.sqft} sqft</span>
+                                        <span>{areaLabel}</span>
                                     </>
                                 )}
                             </>
                         )}
                     </div>
 
-                    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:justify-between mb-3.5">
-                        <div className="min-w-0 flex-1 rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white pl-3 pr-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold">
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-heading mb-1">From</p>
-                            <p className="text-[1.65rem] sm:text-[1.75rem] font-bold tabular-nums tracking-tight leading-none font-heading">
-                                <span className="inline-block bg-gradient-to-br from-[#e6282f] via-brand-red to-[#b01018] bg-clip-text text-transparent">
-                                    {property.price}
+                    {(!isServiceOriented || unitsLeft != null) && (
+                        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:justify-between mb-3.5">
+                            {!isServiceOriented && <CardPriceFrom property={property} />}
+                            {unitsLeft != null && (
+                                <span className="inline-flex shrink-0 items-center justify-center self-start sm:self-stretch rounded-xl bg-amber-50/90 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-amber-900 border border-amber-200/80 font-heading">
+                                    {unitsLeft} left
                                 </span>
-                            </p>
-                            {property.category === 'rent' && (
-                                <p className="text-[11px] text-slate-500 mt-1 font-medium">per month</p>
                             )}
                         </div>
-                        {unitsLeft != null && (
-                            <span className="inline-flex shrink-0 items-center justify-center self-start sm:self-stretch rounded-xl bg-amber-50/90 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-amber-900 border border-amber-200/80 font-heading">
-                                {unitsLeft} left
-                            </span>
-                        )}
-                    </div>
+                    )}
 
                     <div className="flex flex-wrap content-start gap-1.5 mb-4 min-h-0">
                         {amenities.slice(0, 4).map((amenity) => {
@@ -320,10 +364,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
                     <div className="mt-auto flex items-stretch gap-2 pt-3 border-t border-slate-100/90">
                         <span
-                            onClick={() => {
-                                console.log('[TRACK] Book visit clicked', { id: property.id, title: property.title, from: location.pathname });
-                            }}
-                            className="flex-1 flex items-center justify-center min-h-[46px] rounded-xl text-white text-[13px] font-bold tracking-wide font-heading bg-gradient-to-b from-[#e92e35] via-brand-red to-[#b01018] shadow-[0_4px_14px_-2px_rgba(217,32,39,0.45)] transition-all group-hover:brightness-[1.03] group-hover:shadow-[0_8px_22px_-4px_rgba(217,32,39,0.5)] active:scale-[0.99] cursor-pointer ring-1 ring-white/10"
+                            role="presentation"
+                            className="flex-1 flex items-center justify-center min-h-[46px] rounded-xl text-white text-[13px] font-bold tracking-wide font-heading bg-gradient-to-b from-[#e92e35] via-brand-red to-[#b01018] shadow-[0_4px_14px_-2px_rgba(217,32,39,0.45)] transition-all group-hover:brightness-[1.03] group-hover:shadow-[0_8px_22px_-4px_rgba(217,32,39,0.5)] active:scale-[0.99] pointer-events-none ring-1 ring-white/10"
                         >
                             Book a visit
                         </span>
@@ -333,7 +375,6 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             rel="noopener noreferrer"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                console.log('[TRACK] WhatsApp chat clicked', { id: property.id, title: property.title, from: location.pathname });
                             }}
                             className="inline-flex items-center justify-center gap-1.5 min-w-[48px] min-h-[46px] px-3.5 rounded-xl text-[13px] font-bold font-heading transition-all border-2 border-slate-200/90 bg-white text-slate-800 hover:border-emerald-500/40 hover:bg-emerald-50/50 hover:text-emerald-900 active:scale-[0.99] shadow-sm"
                         >

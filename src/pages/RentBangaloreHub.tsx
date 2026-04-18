@@ -8,6 +8,8 @@ import { buildPageSEO, rentBangaloreHubSeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/pages/Properties';
 import { MapPin, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { formatInrRange } from '@/lib/listingInventoryStats';
 
 const HUB_FAQS = [
     {
@@ -37,6 +39,12 @@ const PAGE_SUBTITLE =
     'Verified rental homes and apartments across Bangalore. Compare monthly rent, book visits, and chat with zero broker bias.';
 
 export default function RentBangaloreHub() {
+    const [rentRange, setRentRange] = useState<{ min: number; max: number } | null>(null);
+    const onRentHubInventoryRange = useCallback((min: number | null, max: number | null) => {
+        if (min != null && max != null) setRentRange({ min, max });
+        else setRentRange(null);
+    }, []);
+
     const helmet = buildPageSEO(rentBangaloreHubSeo());
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
@@ -68,9 +76,15 @@ export default function RentBangaloreHub() {
                                 </p>
                                 <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
                                     {PAGE_TITLE}
-                                    <span className="block text-brand-red text-2xl md:text-3xl mt-2 font-extrabold opacity-90">
-                                        Typical range ₹15,000 – ₹50,000 / month
-                                    </span>
+                                    {rentRange ? (
+                                        <span className="block text-brand-red text-2xl md:text-3xl mt-2 font-extrabold opacity-90">
+                                            Typical range {formatInrRange(rentRange.min, rentRange.max)} / month
+                                        </span>
+                                    ) : (
+                                        <span className="block text-slate-500 text-lg md:text-xl mt-2 font-semibold">
+                                            Rent varies by area — browse live listings below.
+                                        </span>
+                                    )}
                                 </h1>
                                 <p className="mt-5 text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl font-medium">
                                     {PAGE_SUBTITLE}
@@ -98,6 +112,7 @@ export default function RentBangaloreHub() {
                         initialCity="bangalore"
                         pageTitle={PAGE_TITLE}
                         pageSubtitle={PAGE_SUBTITLE}
+                        onRentHubInventoryRange={onRentHubInventoryRange}
                     />
                 </div>
 

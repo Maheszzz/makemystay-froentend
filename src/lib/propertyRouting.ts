@@ -86,3 +86,8 @@ export function parsePropertySlugParam(param: string): string {
     const match = param.match(/^(\d+)/);
     return match ? match[1] : param;
 }
+
+/** True when path looks like a property PDP (`/pg/96-foo`, `/rent/79-bar`, `/properties/12-baz`), not a city hub (`/pg/bangalore`). */
+export function isPropertyDetailCanonicalPath(path: string): boolean {
+    return /^\/(pg|rent|property|properties)\/(\d+)(-|$)/.test(path);
+}
