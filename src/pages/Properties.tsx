@@ -24,6 +24,7 @@ import {
     formatInrRange,
     formatSqftRange,
 } from '@/lib/listingInventoryStats';
+import type { Property } from '@/types/api';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
 const RENT_BANGALORE_AREA_CHIPS: { label: string; to: string }[] = [
@@ -65,6 +66,8 @@ interface PropertiesProps {
     /** Live min/max plot sqft for embedded plot hub hero. */
     onPlotHubInventoryRange?: (min: number | null, max: number | null) => void;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
+    /** Hub shells (e.g. PG city page) can mirror visible inventory into ItemList JSON-LD — max 100 items. */
+    onDisplayedListingsForSeo?: (list: Property[]) => void;
 }
 
 export default function Properties({
@@ -81,6 +84,7 @@ export default function Properties({
     onRentHubInventoryRange,
     onPlotHubInventoryRange,
     onEmptyResultsChange,
+    onDisplayedListingsForSeo,
 }: PropertiesProps) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -309,6 +313,12 @@ export default function Properties({
     useEffect(() => {
         onEmptyResultsChange?.(shouldNoindexEmptyResults);
     }, [onEmptyResultsChange, shouldNoindexEmptyResults]);
+
+    useEffect(() => {
+        if (!onDisplayedListingsForSeo) return;
+        if (loading && propertyListOrdered.length === 0) return;
+        onDisplayedListingsForSeo(propertyListOrdered.slice(0, 100));
+    }, [onDisplayedListingsForSeo, loading, propertyListOrdered]);
 
     // Infinite scroll observer
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);

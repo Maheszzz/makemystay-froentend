@@ -1,5 +1,6 @@
-import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
+import { DEFAULT_OG_IMAGE, LEGAL_ENTITY_NAME, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { findPgLocationForArea } from '@/data/pgLocations';
 import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 import { parseInrOfferAmount, stripMarkdownLight } from '@/lib/propertySeoUtils';
@@ -70,14 +71,23 @@ export function buildWebSiteSchema() {
     };
 }
 
-/** Organization — brand entity for homepage @graph. */
+/** Organization — brand entity for homepage @graph (SEO audit: sameAs + legal name). */
 export function buildOrganizationSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: SITE_NAME,
+        name: LEGAL_ENTITY_NAME,
+        alternateName: SITE_NAME,
         url: SITE_URL,
         logo: `${SITE_URL}/logo.svg`,
+        description:
+            'Verified PGs, 1BHK and 2BHK rentals in Bangalore with transparent pricing, real photos and no brokerage.',
+        sameAs: [
+            'https://www.facebook.com/p/Make-My-Stay-ai-61569413385115/',
+            'https://www.linkedin.com/company/makemystay-ai',
+            'https://www.instagram.com/makemystay.ai/',
+            'https://g.page/makemystay-ai',
+        ],
     };
 }
 
@@ -85,8 +95,9 @@ export function buildOrganizationSchema() {
 export function buildLocalBusinessSchema() {
     return {
         '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
-        name: SITE_NAME,
+        '@type': ['LocalBusiness', 'RealEstateAgent'],
+        name: LEGAL_ENTITY_NAME,
+        alternateName: SITE_NAME,
         url: SITE_URL,
         image: DEFAULT_OG_IMAGE,
         telephone: '+91-81500-99911',
@@ -141,6 +152,44 @@ export function buildPgLocationCombinedGraph(
             schemaNodeWithoutContext(buildRealEstateAgentSchema(areaName) as Record<string, unknown>),
         ],
     };
+}
+
+const HUB_ITEMLIST_SCHEMA_MAX = 100;
+
+/**
+ * ItemList JSON-LD for PG (or other) hub shells — listing URLs match canonical PDP paths from `getPropertyDetailPath`.
+ * Returns null when there are no items (avoid empty ItemList in the DOM).
+ */
+export function buildPgHubItemListSchema(
+    properties: Property[],
+    opts: { name: string; description?: string }
+): Record<string, unknown> | null {
+    const list = properties.slice(0, HUB_ITEMLIST_SCHEMA_MAX);
+    if (list.length === 0) return null;
+    const itemListElement = list.map((p, index) => {
+        const path = getPropertyDetailPath(p);
+        const absPath = path.startsWith('/') ? path : `/${path}`;
+        const label = (p.title || `${p.type || 'Listing'} in ${p.location || ''}`).trim();
+        return {
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+                '@type': 'Product',
+                name: label || `Listing ${p.id}`,
+                url: `${SITE_URL}${absPath}`,
+                sku: String(p.id),
+            },
+        };
+    });
+    const node: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: opts.name,
+        numberOfItems: list.length,
+        itemListElement,
+    };
+    if (opts.description?.trim()) node.description = opts.description.trim();
+    return node;
 }
 
 export function stringifySchema(data: unknown): string {

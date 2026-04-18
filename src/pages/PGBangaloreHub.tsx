@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -8,7 +9,8 @@ import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { PG_LOCATIONS } from '@/data/pgLocations';
 import { buildPageSEO, pgBangaloreHubSeo } from '@/lib/seo';
-import { buildPgLocationCombinedGraph } from '@/lib/schema';
+import { buildPgHubItemListSchema, buildPgLocationCombinedGraph } from '@/lib/schema';
+import type { Property } from '@/types/api';
 import Properties from '@/pages/Properties';
 import { MapPin, ChevronRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
@@ -40,12 +42,36 @@ export default function PGBangaloreHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
+    const [hubListingsForSeo, setHubListingsForSeo] = useState<Property[]>([]);
+    const onDisplayedListingsForSeo = useCallback((list: Property[]) => {
+        setHubListingsForSeo((prev) => {
+            if (
+                prev.length === list.length &&
+                prev.every((p, i) => p.id === list[i]?.id)
+            ) {
+                return prev;
+            }
+            return list;
+        });
+    }, []);
+
+    const itemListLd = useMemo(
+        () =>
+            buildPgHubItemListSchema(hubListingsForSeo, {
+                name: 'PG listings in Bangalore',
+                description:
+                    'Verified paying guest stays in Bengaluru — same URLs as on-page listing cards.',
+            }),
+        [hubListingsForSeo]
+    );
+
     const topSlugs = PG_LOCATIONS.slice(0, 16);
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="pg-bangalore-hub-ld-json" />
+            {itemListLd ? <JsonLd data={itemListLd} id="pg-bangalore-itemlist-ld-json" /> : null}
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-20 pb-16">
@@ -98,6 +124,7 @@ export default function PGBangaloreHub() {
                         initialCity="Bangalore"
                         pageTitle="Listings in Bangalore"
                         pageSubtitle="Verified paying guest stays — filter by budget, WiFi, food, AC, and more."
+                        onDisplayedListingsForSeo={onDisplayedListingsForSeo}
                     />
                 </div>
 

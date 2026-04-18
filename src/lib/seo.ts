@@ -234,9 +234,9 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
 /** City hub: `/pg/bangalore` — primary “PG in Bangalore” landing. */
 export function pgBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Best PG in Bangalore (₹6k–₹15k) | verified & affordable coliving',
+        title: 'Best PG in Bangalore from ₹6,000 — verified & no brokerage',
         description:
-            'Find the best PG in Bangalore with WiFi, meals, and 24/7 security. Browse verified listings by location (Whitefield, BTM, Marathahalli), compare rent starting from ₹6000, and book directly.',
+            'Browse verified PGs in Bangalore from ₹6,000/month. Filter by locality, food, AC, sharing. Real photos, transparent pricing, no brokerage on MakeMyStay.ai.',
         path: '/pg/bangalore',
     };
 }
@@ -326,13 +326,33 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
     };
 }
 
-/** Homepage title/description for high-conversion SEO. */
+/** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Affordable PG & verified rentals in Bangalore',
+        title: 'Verified PG, 1BHK & 2BHK flats on rent in Bangalore',
         description:
-            'Find affordable PG and coliving spaces in Bangalore with WiFi, food, 24/7 security & premium amenities. Browse verified listings, compare rent, and book with MakeMyStay.ai.',
+            'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage. Book a visit in 60 seconds on MakeMyStay.ai.',
         path: '/',
+    };
+}
+
+/** `/about` — trust & E-E-A-T (audit). */
+export function buildAboutPageSEO(): PageSEOInput {
+    return {
+        title: 'About MakeMyStay — verified rentals & PG in Bangalore',
+        description:
+            'MakeMyStay.ai helps you find verified PGs and rentals in Bangalore without brokers. Learn about our mission and how we keep listings trustworthy.',
+        path: '/about',
+    };
+}
+
+/** `/how-we-verify` — verification story (audit). */
+export function buildHowWeVerifyPageSEO(): PageSEOInput {
+    return {
+        title: 'How MakeMyStay verifies every property',
+        description:
+            'Our verification process — photo audit, on-site checks, ID and rent benchmarking — so you can shortlist PGs and flats with confidence on MakeMyStay.ai.',
+        path: '/how-we-verify',
     };
 }
 

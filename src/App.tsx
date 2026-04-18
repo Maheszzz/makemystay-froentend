@@ -19,6 +19,8 @@ const Wishlist = lazy(() => import('./pages/Wishlist'));
 const ScheduleDemo = lazy(() => import('./pages/ScheduleDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const FAQ = lazy(() => import('./pages/FAQ'));
+const About = lazy(() => import('./pages/About'));
+const HowWeVerify = lazy(() => import('./pages/HowWeVerify'));
 const PGBangaloreHub = lazy(() => import('./pages/PGBangaloreHub'));
 const PGHyderabadHub = lazy(() => import('./pages/PGHyderabadHub'));
 const PGPuneHub = lazy(() => import('./pages/PGPuneHub'));
@@ -202,6 +204,8 @@ function App() {
                             <Route path="/quick-pay" element={<QuickPay />} />
                             <Route path="/wishlist" element={<Wishlist />} />
                             <Route path="/faq" element={<FAQ />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/how-we-verify" element={<HowWeVerify />} />
                             <Route path="/pg-in-bangalore" element={<Navigate to="/pg/bangalore" replace />} />
                             <Route path="/buy/bangalore" element={<Navigate to="/buy/in/bangalore" replace />} />
                             <Route path="/plot/bangalore" element={<Navigate to="/plots/in/bangalore" replace />} />

@@ -29,6 +29,8 @@ const STATIC_PATHS = [
     { path: '/rent/pune', priority: '0.92', changefreq: 'daily' },
     // /buy and /plots omitted while inventory is thin (pages use noindex); city hubs remain via loop where needed.
     { path: '/faq', priority: '0.75', changefreq: 'monthly' },
+    { path: '/about', priority: '0.78', changefreq: 'monthly' },
+    { path: '/how-we-verify', priority: '0.8', changefreq: 'monthly' },
     { path: '/blog', priority: '0.8', changefreq: 'weekly' },
     { path: '/quick-pay', priority: '0.6', changefreq: 'monthly' },
     { path: '/schedule-demo', priority: '0.7', changefreq: 'monthly' },

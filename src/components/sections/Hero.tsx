@@ -134,29 +134,41 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                         </span>
                     </div>
 
-                    {/* Main Headline */}
-                    <div className="relative mb-2 md:mb-5">
+                    {/* One SEO H1 (audit): keyword-rich; carousel line is decorative copy only */}
+                    <div className="relative mb-2 md:mb-3 max-w-4xl mx-auto">
                         <div
                             className="absolute -inset-12 pointer-events-none rounded-full"
                             style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.10) 0%, transparent 70%)', filter: 'blur(30px)' }}
                         />
                         <h1
-                            className="text-white leading-[1.08] tracking-tight relative"
+                            className="text-white leading-snug tracking-tight relative font-semibold px-1"
                             style={{
                                 fontFamily: "'Cormorant Garamond', serif",
-                                fontWeight: 300,
-                                fontSize: 'clamp(42px, 7.5vw, 96px)',
+                                fontWeight: 500,
+                                fontSize: 'clamp(1.25rem, 3.8vw, 2.35rem)',
                                 textShadow: '0 2px 24px rgba(0,0,0,0.35)',
                             }}
                         >
-                            {slide.headline}{' '}
-                            <em style={{ fontStyle: 'italic', fontWeight: 400 }}>{slide.headlineItalic}</em>
+                            Verified PG &amp; flats on rent in Bangalore
                         </h1>
                     </div>
 
-                    {/* Sub-headline */}
-                    <h2
-                        className="mb-1.5 md:mb-4 font-light tracking-wide"
+                    {/* Rotating hero line (not an extra H1) */}
+                    <p
+                        className="text-white leading-[1.08] tracking-tight relative mb-1 md:mb-2 max-w-4xl mx-auto"
+                        style={{
+                            fontFamily: "'Cormorant Garamond', serif",
+                            fontWeight: 300,
+                            fontSize: 'clamp(28px, 6vw, 80px)',
+                            textShadow: '0 2px 24px rgba(0,0,0,0.35)',
+                        }}
+                    >
+                        {slide.headline}{' '}
+                        <em style={{ fontStyle: 'italic', fontWeight: 400 }}>{slide.headlineItalic}</em>
+                    </p>
+
+                    <p
+                        className="mb-1.5 md:mb-4 font-light tracking-wide max-w-3xl mx-auto"
                         style={{
                             fontFamily: "'Cormorant Garamond', serif",
                             color: '#FFFFFF',
@@ -165,7 +177,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                         }}
                     >
                         {slide.subheadline}
-                    </h2>
+                    </p>
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
