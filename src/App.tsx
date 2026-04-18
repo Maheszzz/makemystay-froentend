@@ -25,6 +25,8 @@ const PGPuneHub = lazy(() => import('./pages/PGPuneHub'));
 const RentBangaloreHub = lazy(() => import('./pages/RentBangaloreHub'));
 const RentHyderabadHub = lazy(() => import('./pages/RentHyderabadHub'));
 const RentPuneHub = lazy(() => import('./pages/RentPuneHub'));
+const BuyBangaloreHub = lazy(() => import('./pages/BuyBangaloreHub'));
+const PlotBangaloreHub = lazy(() => import('./pages/PlotBangaloreHub'));
 const PgFeatureLandingPage = lazy(() => import('./pages/PgFeatureLandingPage'));
 const PgVsFlatBangalore = lazy(() => import('./pages/PgVsFlatBangalore'));
 const PGLocationPage = lazy(() => import('./pages/PGLocationPage'));
@@ -184,9 +186,11 @@ function App() {
                              <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
 
                              <Route path="/plots" element={<Properties key="plots" initialCategory="plot" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home" />} />
+                             <Route path="/plots/in/bangalore" element={<PlotBangaloreHub key="plot-bangalore-hub" />} />
                              <Route path="/plots/in/:city" element={<CityProperties category="plot" />} />
 
                              <Route path="/buy" element={<Properties key="buy" initialCategory="buy" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy" />} />
+                             <Route path="/buy/in/bangalore" element={<BuyBangaloreHub key="buy-bangalore-hub" />} />
                              <Route path="/buy/in/:city" element={<CityProperties category="buy" />} />
                              <Route path="/schedule-demo" element={<ScheduleDemo />} />
                              <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />

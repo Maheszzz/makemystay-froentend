@@ -251,6 +251,26 @@ export function rentBangaloreHubSeo(): PageSEOInput {
     };
 }
 
+/** City hub: `/buy/in/bangalore` — primary “buy in Bangalore” landing. */
+export function buyBangaloreHubSeo(): PageSEOInput {
+    return {
+        title: 'Buy Property in Bangalore — Verified Flats & Homes for Sale | MakeMyStay',
+        description:
+            'Explore verified apartments, 2BHK/3BHK flats, and homes for sale in Bangalore. Compare prices, book site visits, and shortlist with zero broker bias.',
+        path: '/buy/in/bangalore',
+    };
+}
+
+/** City hub: `/plots/in/bangalore` — primary “plots in Bangalore” landing. */
+export function plotBangaloreHubSeo(): PageSEOInput {
+    return {
+        title: 'Plots & Land for Sale in Bangalore — Verified Listings | MakeMyStay',
+        description:
+            'Browse verified residential plots and land parcels in Bangalore. Compare sizes, locations, and pricing with transparent listings and zero broker bias.',
+        path: '/plots/in/bangalore',
+    };
+}
+
 const PG_FEATURE_PATHS: Record<string, 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'> = {
     '/pg-with-wifi': 'wifi',
     '/pg-with-food': 'food',

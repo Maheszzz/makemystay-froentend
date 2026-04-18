@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -13,7 +13,12 @@ import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
 import { buildPageSEO, listingsPageSeo } from '@/lib/seo';
-import { LISTINGS_CATEGORY_HUB, listingsLegacyCatRedirectPath } from '@/lib/listingsCategoryHubs';
+import {
+    listingsHubTabNavigateUrl,
+    listingsLegacyCatRedirectPath,
+    normalizeCitySlug,
+    pathnameToActiveListingsTab,
+} from '@/lib/listingsCategoryHubs';
 import {
     computeRentPlotStatsFromListings,
     formatInrRange,
@@ -53,8 +58,12 @@ interface PropertiesProps {
     hideChrome?: boolean;
     /** When set with `hideChrome`, show `/rent/bangalore` area chips (hub shell provides hero + SEO). */
     embedRentHubUi?: boolean;
+    /** When set with `hideChrome`, plot hub shell can read live sqft span from loaded plot listings. */
+    embedPlotHubUi?: boolean;
     /** Live min/max rent (INR) for embedded rent hub hero — updated from loaded listings. */
     onRentHubInventoryRange?: (min: number | null, max: number | null) => void;
+    /** Live min/max plot sqft for embedded plot hub hero. */
+    onPlotHubInventoryRange?: (min: number | null, max: number | null) => void;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
 }
 
@@ -66,16 +75,19 @@ export default function Properties({
     pageSubtitle = 'Browse Professional & Verified Listings',
     hideChrome = false,
     embedRentHubUi = false,
+    embedPlotHubUi = false,
     initialMinPrice = '',
     initialMaxPrice = '',
     onRentHubInventoryRange,
+    onPlotHubInventoryRange,
     onEmptyResultsChange,
 }: PropertiesProps) {
     const location = useLocation();
     const navigate = useNavigate();
+    const routeParams = useParams<{ city?: string }>();
     const [searchParams, setSearchParams] = useSearchParams();
     const goBack = useSmartBack({ fallback: '/' });
-    const { wishlist, clearWishlist } = useWishlist();
+    const { wishlist } = useWishlist();
 
     // 1. Initialize state from URL or Props
     const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(
@@ -156,10 +168,41 @@ export default function Properties({
         };
     }, [location.key]);
 
+    /** City slug for tab navigation: URL param wins, then initial hub city, then search query city, then filter. */
+    const citySlugForTabs = useMemo(() => {
+        const fromRoute = normalizeCitySlug(routeParams.city);
+        if (fromRoute) return fromRoute;
+        const fromQuery = normalizeCitySlug(searchParams.get('city'));
+        if (fromQuery) return fromQuery;
+        const init = normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined);
+        if (init) return init;
+        return normalizeCitySlug(locationFilter !== 'all' ? locationFilter : undefined);
+    }, [routeParams.city, searchParams, initialCity, locationFilter]);
+
+    /** Tab highlight follows URL so back/forward and deep links stay correct. */
+    const activeTabKey = useMemo((): CategoryKey => {
+        const implied = pathnameToActiveListingsTab(location.pathname);
+        if (implied !== null) return implied;
+        return category;
+    }, [location.pathname, category]);
+
+    useEffect(() => {
+        const implied = pathnameToActiveListingsTab(location.pathname);
+        if (implied !== null && implied !== category) {
+            setCategory(implied);
+        }
+    }, [location.pathname, category]);
+
     const wifiOn = searchParams.get('wifi') === 'true';
     const foodOn = searchParams.get('food') === 'true';
     const acOn = searchParams.get('ac') === 'true';
     const priceTier = searchParams.get('price');
+
+    /** City sent to API — normalized slug; never mixed into `search` (text query stays in `q` only). */
+    const apiCity = useMemo(() => {
+        if (locationFilter === 'all') return undefined;
+        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase();
+    }, [locationFilter]);
 
     // 4. API Parameters (Derived from URL/State)
     const apiParams = useMemo(() => {
@@ -172,16 +215,15 @@ export default function Properties({
             max_price = 16000;
         }
         if (!min_price && !max_price && priceTier === 'high') min_price = 14000;
-        const city = locationFilter === 'all' ? undefined : locationFilter;
         const sort_by = sortBy;
 
-        const base = { search: q, min_price, max_price, city, sort_by };
+        const base = { search: q, min_price, max_price, city: apiCity, sort_by };
 
         if (category === 'all') {
             return { ...base, property_type: typeFilter === 'all' ? undefined : typeFilter };
         }
         return { ...base, category };
-    }, [category, searchQuery, typeFilter, minPrice, maxPrice, locationFilter, sortBy, priceTier]);
+    }, [category, searchQuery, typeFilter, minPrice, maxPrice, apiCity, sortBy, priceTier]);
 
     const PAGE_SIZE = 24;
     const {
@@ -202,6 +244,20 @@ export default function Properties({
         return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
     }, [properties, wifiOn, foodOn, acOn]);
 
+    /** Client-side tie-break when API order is weak: highest rating (then review count) first. */
+    const propertyListOrdered = useMemo(() => {
+        const list = [...propertyListFiltered];
+        if (sortBy !== 'rating_desc') return list;
+        return list.sort((a, b) => {
+            const ra = (a.rating ?? a.average_rating ?? 0) || 0;
+            const rb = (b.rating ?? b.average_rating ?? 0) || 0;
+            if (rb !== ra) return rb - ra;
+            const ca = (a.reviews ?? a.review_count ?? 0) || 0;
+            const cb = (b.reviews ?? b.review_count ?? 0) || 0;
+            return cb - ca;
+        });
+    }, [propertyListFiltered, sortBy]);
+
     const inventoryStats = useMemo(
         () => computeRentPlotStatsFromListings(propertyListFiltered),
         [propertyListFiltered]
@@ -212,7 +268,12 @@ export default function Properties({
         onRentHubInventoryRange(inventoryStats.rentMinInr, inventoryStats.rentMaxInr);
     }, [embedRentHubUi, onRentHubInventoryRange, inventoryStats.rentMinInr, inventoryStats.rentMaxInr]);
 
-    const shouldNoindexEmptyResults = !loading && !error && propertyListFiltered.length === 0;
+    useEffect(() => {
+        if (!embedPlotHubUi || !onPlotHubInventoryRange) return;
+        onPlotHubInventoryRange(inventoryStats.plotSqftMin, inventoryStats.plotSqftMax);
+    }, [embedPlotHubUi, onPlotHubInventoryRange, inventoryStats.plotSqftMin, inventoryStats.plotSqftMax]);
+
+    const shouldNoindexEmptyResults = !loading && !error && propertyListOrdered.length === 0;
     const shouldNoindexThinCategory =
         !loading &&
         !error &&
@@ -282,17 +343,9 @@ export default function Properties({
 
     const handleCategoryTab = useCallback(
         (cat: CategoryKey) => {
-            if (cat === 'all') {
-                if (location.pathname !== '/properties') {
-                    navigate('/properties');
-                } else {
-                    setCategory('all');
-                }
-                return;
-            }
-            navigate(LISTINGS_CATEGORY_HUB[cat]);
+            navigate(listingsHubTabNavigateUrl(cat, citySlugForTabs, searchQuery.trim()));
         },
-        [location.pathname, navigate]
+        [navigate, citySlugForTabs, searchQuery]
     );
 
     const redirectFromLegacyCat =
@@ -312,6 +365,13 @@ export default function Properties({
         if (!s) return 'Bangalore';
         return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
     }, [locationFilter]);
+
+    const emptyResultsSummary = useMemo(() => {
+        const q = searchQuery.trim();
+        if (q) return `text search "${q}"`;
+        if (locationFilter !== 'all') return `city / filters for ${cityLabelDisplay}`;
+        return 'your criteria';
+    }, [searchQuery, locationFilter, cityLabelDisplay]);
 
     if (redirectFromLegacyCat) {
         return <Navigate to={redirectFromLegacyCat} replace />;
@@ -415,7 +475,7 @@ export default function Properties({
                                     <div className="shrink-0 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-center shadow-sm">
                                         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Results</p>
                                         <p className="text-lg font-bold tabular-nums text-slate-900">
-                                            {propertyListFiltered.length}
+                                            {propertyListOrdered.length}
                                             <span className="text-slate-400 font-semibold"> / </span>
                                             {totalCount}
                                         </p>
@@ -447,7 +507,8 @@ export default function Properties({
                                         key={cat}
                                         type="button"
                                         onClick={() => handleCategoryTab(cat)}
-                                        className={`flex-1 px-4 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${category === cat ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                        aria-current={activeTabKey === cat ? 'page' : undefined}
+                                        className={`flex-1 px-4 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTabKey === cat ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                     >
                                         {CATEGORY_TAB_LABEL[cat]}
                                     </button>
@@ -555,7 +616,7 @@ export default function Properties({
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-slate-500 text-xs md:text-sm font-medium">
                                 Showing{' '}
-                                <span className="text-slate-900 font-bold">{propertyListFiltered.length}</span> of{' '}
+                                <span className="text-slate-900 font-bold">{propertyListOrdered.length}</span> of{' '}
                                 <span className="text-slate-900 font-bold">{totalCount}</span> properties
                                 {locationFilter !== 'all' && ` in ${cityLabelDisplay}`}
                                 {(wifiOn || foodOn || acOn) && (
@@ -572,7 +633,7 @@ export default function Properties({
                     )}
 
                     {/* API Status Messages */}
-                    {loading && propertyListFiltered.length === 0 && (
+                    {loading && propertyListOrdered.length === 0 && (
                         <div className="py-20">
                             <LoadingSpinner size={48} message="Fetching verified listings..." />
                         </div>
@@ -588,8 +649,8 @@ export default function Properties({
                             hideChrome ? 'md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
                         }`}
                     >
-                        {propertyListFiltered.length > 0 ? (
-                            propertyListFiltered.map((prop) => <PropertyCard key={prop.id} property={prop} />)
+                        {propertyListOrdered.length > 0 ? (
+                            propertyListOrdered.map((prop) => <PropertyCard key={prop.id} property={prop} />)
                         ) : !loading && (
                             <div className="col-span-full py-20 px-6 text-center bg-white rounded-3xl border border-dashed border-slate-200">
                                 <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -597,7 +658,7 @@ export default function Properties({
                                 </div>
                                 <h3 className="text-2xl font-bold text-slate-900 mb-2">No properties matched your search</h3>
                                 <p className="text-slate-500 max-w-md mx-auto text-sm mb-8">
-                                    {`We couldn't find anything for "${searchQuery.trim() || (locationFilter !== 'all' ? cityLabelDisplay : 'your criteria')}" with your current filters. Try relaxing your budget or looking in other areas.`}
+                                    {`We couldn't find anything matching ${emptyResultsSummary}. Try relaxing your budget or looking in other areas.`}
                                 </p>
                                 <div className="flex flex-wrap items-center justify-center gap-3">
                                     <button onClick={resetFilters} className="px-6 py-3 bg-brand-red text-white font-bold rounded-xl shadow-lg shadow-brand-red/20 hover:scale-105 transition-all">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Hero } from '@/components/sections/Hero';
@@ -18,23 +18,17 @@ import { buildPageSEO, buildHomeSEO } from '@/lib/seo';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
 import { SafetyPopup } from '@/components/modals/SafetyPopup';
+import { homeHeroSearchUrl, type ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
 
-const HOME_CATEGORIES = new Set(['pg', 'rent', 'buy', 'plot', 'all']);
+const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
 export default function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
-
-    // Match /properties default: "All" (mixed PG + BHK + …). Do not default to rent — that hid PG on the home grid.
-    const rawCategory = searchParams.get('category');
-    const category: 'pg' | 'rent' | 'buy' | 'plot' | 'all' =
-        rawCategory && HOME_CATEGORIES.has(rawCategory)
-            ? (rawCategory as 'pg' | 'rent' | 'buy' | 'plot' | 'all')
-            : 'all';
+    const navigate = useNavigate();
     const searchQuery = searchParams.get('q') || '';
     const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
 
     useEffect(() => {
-        // Show safety popup on home load if not shown in this session
         const hasShownHomeSafety = sessionStorage.getItem('hasShownHomeSafety');
         if (!hasShownHomeSafety) {
             setIsSafetyPopupOpen(true);
@@ -42,17 +36,35 @@ export default function Home() {
         }
     }, []);
 
-    // Copy URLSearchParams — mutating `prev` and returning it can skip updates in react-router.
-    const setCategory = (newCategory: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => {
-        setSearchParams(
-            (prev) => {
-                const next = new URLSearchParams(prev);
-                next.set('category', newCategory);
-                return next;
-            },
-            { replace: true }
-        );
-    };
+    // Legacy `/?category=pg` (etc.) → canonical SEO URL; `?category=all` → strip param only.
+    useEffect(() => {
+        const cat = searchParams.get('category');
+        if (!cat) return;
+        const q = searchParams.get('q') || '';
+        if (!LEGACY_HOME_CATEGORY.has(cat as ListingsCategoryKey)) {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    next.delete('category');
+                    return next;
+                },
+                { replace: true }
+            );
+            return;
+        }
+        if (cat === 'all') {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    next.delete('category');
+                    return next;
+                },
+                { replace: true }
+            );
+            return;
+        }
+        navigate(homeHeroSearchUrl(cat as ListingsCategoryKey, q), { replace: true });
+    }, [searchParams, navigate, setSearchParams]);
 
     const setSearchQuery = (newQuery: string) => {
         setSearchParams(
@@ -81,17 +93,15 @@ export default function Home() {
             <main id="main-content" className="min-h-screen bg-white">
                 <section id="home">
                     <Hero
-                        category={category}
-                        setCategory={setCategory}
+                        category="all"
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
+                        listingsNavigate={(tab, q) => navigate(homeHeroSearchUrl(tab, q))}
                     />
                 </section>
 
-                {/* Property Listings */}
-                <PropertyGrid category={category} searchQuery={searchQuery} />
+                <PropertyGrid category="all" searchQuery={searchQuery} />
 
-                {/* Services / What We Offer */}
                 <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">
                         <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Our Services</h2>
@@ -100,7 +110,6 @@ export default function Home() {
                     <ServicesGrid />
                 </section>
 
-                {/* Investment Calculator */}
                 <InvestmentCalculator />
 
                 <About />

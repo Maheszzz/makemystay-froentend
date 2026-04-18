@@ -46,12 +46,14 @@ const FADE_DURATION = 1500;
 
 interface HeroProps {
     category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
-    setCategory: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
+    setCategory?: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
+    /** Homepage: navigate to SEO listing URLs from hero tabs / search. */
+    listingsNavigate?: (tab: 'pg' | 'rent' | 'buy' | 'plot' | 'all', query: string) => void;
 }
 
-export function Hero({ category, setCategory, searchQuery, setSearchQuery }: HeroProps) {
+export function Hero({ category, setCategory, searchQuery, setSearchQuery, listingsNavigate }: HeroProps) {
     const [current, setCurrent] = useState(0);
     const [contentVisible, setContentVisible] = useState(true);
 
@@ -180,8 +182,20 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery }: Her
                             setCategory={setCategory}
                             searchQuery={searchQuery}
                             setSearchQuery={setSearchQuery}
+                            listingsNavigate={listingsNavigate}
                         />
                     </div>
+                </div>
+
+                {/* Explore PG — visible on small screens (desktop copy lives in trust row below) */}
+                <div className="flex md:hidden justify-center w-full max-w-3xl mt-3 mb-1 px-2">
+                    <Link
+                        to="/pg/bangalore"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-white/90 hover:bg-brand-red hover:border-brand-red transition-all duration-300 text-center max-w-[min(100%,22rem)]"
+                    >
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse shrink-0" />
+                        Explore Best PG in Bangalore →
+                    </Link>
                 </div>
 
                 {/* --- Trust + CTA + carousel + scroll hint — one centered column (no absolute overlap) --- */}

@@ -20,6 +20,7 @@ export $(grep -v '^#' "$ENV_FILE" | xargs)
 # DEFAULTS
 # -----------------------------
 DEPLOY_USER=${DEPLOY_USER:-ubuntu}
+DEPLOY_GROUP=${DEPLOY_GROUP:-$DEPLOY_USER}
 PEM_KEY=${PEM_KEY:-"$HOME/.ssh/mmsr_deploy_key.pem"}
 # Sync built static assets only (nginx root). Set DEPLOY_SOURCE=. to rsync the whole repo (legacy).
 DEPLOY_SOURCE=${DEPLOY_SOURCE:-dist}
@@ -81,7 +82,7 @@ echo "📤 Syncing files (${DEPLOY_SOURCE}/ → $DEPLOY_PATH)..."
 if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
   echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
   ssh -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" \
-    "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_USER '$DEPLOY_PATH'"
+    "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
 fi
 
 RSYNC_FROM="./"

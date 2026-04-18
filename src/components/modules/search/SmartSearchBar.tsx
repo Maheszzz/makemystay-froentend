@@ -7,17 +7,43 @@ export interface SmartSearchBarProps {
     setCategory?: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
+    /**
+     * When set (homepage hero), tab clicks and search submit navigate to SEO listing URLs
+     * instead of mutating local `?category=` on `/`.
+     */
+    listingsNavigate?: (tab: 'pg' | 'rent' | 'buy' | 'plot' | 'all', query: string) => void;
 }
 
 import { useState, useRef, useEffect } from 'react';
 import { propertyApi } from '@/lib/api';
 
-export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQuery }: SmartSearchBarProps) {
+function mergeCommittedQuery(searchQuery: string | undefined, pendingInput: string): string {
+    const parts = (searchQuery || '').split(',').map((s) => s.trim()).filter(Boolean);
+    const t = pendingInput.trim();
+    if (t && !parts.includes(t)) parts.push(t);
+    return parts.join(',');
+}
+
+export function SmartSearchBar({
+    category,
+    setCategory,
+    searchQuery,
+    setSearchQuery,
+    listingsNavigate,
+}: SmartSearchBarProps) {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const suggestionRef = useRef<HTMLDivElement>(null);
     const [inputValue, setInputValue] = useState('');
+    const [activeTab, setActiveTab] = useState<'pg' | 'rent' | 'buy' | 'plot' | 'all'>(category ?? 'all');
+
+    useEffect(() => {
+        if (listingsNavigate) return;
+        setActiveTab(category ?? 'all');
+    }, [category, listingsNavigate]);
+
+    const effectiveCategory = listingsNavigate ? activeTab : (category ?? 'all');
 
     // Dynamic suggestions with debounce
     useEffect(() => {
@@ -81,8 +107,16 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                     <button
                         key={tab.id}
                         type="button"
-                        onClick={() => setCategory?.(tab.id as 'buy' | 'rent' | 'plot' | 'pg' | 'all')}
-                        className={`flex-1 sm:flex-none py-2 px-2.5 sm:px-4 md:px-6 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${category === tab.id
+                        onClick={() => {
+                            const id = tab.id as 'buy' | 'rent' | 'plot' | 'pg' | 'all';
+                            if (listingsNavigate) {
+                                setActiveTab(id);
+                                listingsNavigate(id, (searchQuery || '').trim());
+                            } else {
+                                setCategory?.(id);
+                            }
+                        }}
+                        className={`flex-1 sm:flex-none py-2 px-2.5 sm:px-4 md:px-6 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${effectiveCategory === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
                             }`}
@@ -129,11 +163,19 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                             }
                             if (e.key === 'Enter') {
                                 if (inputValue.trim()) {
-                                    const parts = (searchQuery || '').split(',').filter(Boolean);
-                                    if (!parts.includes(inputValue.trim())) {
-                                        setSearchQuery?.([...parts, inputValue.trim()].join(','));
+                                    const merged = mergeCommittedQuery(searchQuery, inputValue);
+                                    if (listingsNavigate) {
+                                        listingsNavigate(effectiveCategory, merged);
+                                    } else {
+                                        const parts = (searchQuery || '').split(',').filter(Boolean);
+                                        if (!parts.includes(inputValue.trim())) {
+                                            setSearchQuery?.([...parts, inputValue.trim()].join(','));
+                                        }
                                     }
                                     setInputValue('');
+                                    setShowSuggestions(false);
+                                } else if (listingsNavigate) {
+                                    listingsNavigate(effectiveCategory, (searchQuery || '').trim());
                                     setShowSuggestions(false);
                                 }
                             }
@@ -161,6 +203,16 @@ export function SmartSearchBar({ category, setCategory, searchQuery, setSearchQu
                 <button
                     aria-label="Search"
                     onClick={() => {
+                        const merged = mergeCommittedQuery(searchQuery, inputValue);
+                        if (listingsNavigate) {
+                            listingsNavigate(effectiveCategory, merged);
+                            setInputValue('');
+                            setShowSuggestions(false);
+                            if (merged !== (searchQuery || '').trim()) {
+                                setSearchQuery?.(merged);
+                            }
+                            return;
+                        }
                         if (inputValue.trim()) {
                             const parts = (searchQuery || '').split(',').filter(Boolean);
                             if (!parts.includes(inputValue.trim())) {
