@@ -260,7 +260,7 @@ export const propertyApi = {
 
         const response = await api.get<any>(REALTY_PATH, {
             params: queryParams,
-            timeout: 15000,
+            timeout: 45000,
         });
 
         const { rows, total } = normalizePropertyListResponse(response);
@@ -287,7 +287,7 @@ export const propertyApi = {
         const qs = queryParams.toString();
         const url = `${REALTY_PATH}/${id}/similar${qs ? `?${qs}` : ''}`;
         const response = await api.get<unknown>(url, {
-            timeout: 15000,
+            timeout: 45000,
         });
         const { rows, total } = normalizePropertyListResponse(response);
         const items: Property[] = [];

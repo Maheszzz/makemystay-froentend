@@ -13,7 +13,7 @@ export function useListingLocalityOptions(seedArea?: string) {
         let cancelled = false;
         (async () => {
             try {
-                const res = await propertyApi.getAll({ category: 'pg', limit: 500, skip: 0 });
+                const res = await propertyApi.getAll({ category: 'pg', limit: 100, skip: 0 });
                 const rows = Array.isArray(res.items) ? res.items : [];
                 const set = new Set<string>();
                 for (const p of rows) {

@@ -60,7 +60,7 @@ const apiClient: AxiosInstance = axios.create({
     },
     // Payment + DB calls can take a moment on cold start.
     // Keep this long enough to avoid classifying slow backend as "no response".
-    timeout: 30000, // 30 seconds
+    timeout: 45000, // 45 seconds to account for backend DB connection retries
 });
 
 // Request interceptor for adding auth tokens if needed in the future
