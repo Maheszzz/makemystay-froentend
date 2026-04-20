@@ -67,12 +67,15 @@ export function useProperties(
                 });
 
                 if (isMounted) {
-                    // Belt-and-suspenders: never trust response shape
-                    const safeResponse = response ?? { items: [], total: 0 };
-                    const list = Array.isArray(safeResponse.items) ? safeResponse.items : [];
-                    const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
-                        ? safeResponse.total
+                    // Hardened: Support both bare array and { items, total } format
+                    const list = Array.isArray(response) 
+                        ? response 
+                        : (response && Array.isArray(response.items) ? response.items : []);
+                    
+                    const total = (!Array.isArray(response) && typeof response?.total === 'number')
+                        ? response.total
                         : list.length;
+
                     setProperties(list);
                     setTotalCount(total);
                     setHasMore(list.length < total);
@@ -110,11 +113,15 @@ export function useProperties(
                 limit: pageSize,
             });
 
-            const safeResponse = response ?? { items: [], total: 0 };
-            const pageItems = Array.isArray(safeResponse.items) ? safeResponse.items : [];
-            const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
-                ? safeResponse.total
+            // Hardened: Support both bare array and { items, total } format
+            const pageItems = Array.isArray(response) 
+                ? response 
+                : (response && Array.isArray(response.items) ? response.items : []);
+            
+            const total = (!Array.isArray(response) && typeof response?.total === 'number')
+                ? response.total
                 : properties.length + pageItems.length;
+
             setProperties(prev => [...prev, ...pageItems]);
             setPage(nextPage);
             setHasMore((properties.length + pageItems.length) < total);
@@ -136,11 +143,15 @@ export function useProperties(
                 skip: 0,
                 limit: pageSize,
             });
-            const safeResponse = response ?? { items: [], total: 0 };
-            const list = Array.isArray(safeResponse.items) ? safeResponse.items : [];
-            const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
-                ? safeResponse.total
+            // Hardened: Support both bare array and { items, total } format
+            const list = Array.isArray(response) 
+                ? response 
+                : (response && Array.isArray(response.items) ? response.items : []);
+            
+            const total = (!Array.isArray(response) && typeof response?.total === 'number')
+                ? response.total
                 : list.length;
+
             setProperties(list);
             setTotalCount(total);
             setHasMore(list.length < total);
@@ -283,8 +294,15 @@ export function useSimilarProperties(
         setError(null);
         try {
             const res = await propertyApi.getSimilar(propertyId, { limit });
-            setProperties(Array.isArray(res?.items) ? res.items : []);
-        } catch (err) {
+            // Hardened: Support both bare array and { items, total } format
+            if (Array.isArray(res)) {
+                setProperties(res);
+            } else if (res && Array.isArray(res.items)) {
+                setProperties(res.items);
+            } else {
+                setProperties([]);
+            }
+        } catch (err: any) {
             setError(err as ApiError);
             setProperties([]);
             console.error(`Error fetching similar properties for ${propertyId}:`, err);
