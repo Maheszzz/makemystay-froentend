@@ -101,7 +101,7 @@ export default function Properties({
     const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || initialTypeFilter);
     const [minPrice, setMinPrice] = useState(searchParams.get('min') || initialMinPrice);
     const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || initialMaxPrice);
-    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'rating_desc');
+    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'review_count_desc');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     
     const [showFilters, setShowFilters] = useState(false);
@@ -118,7 +118,7 @@ export default function Properties({
             if (typeFilter !== 'all') params.type = typeFilter;
             if (minPrice) params.min = minPrice;
             if (maxPrice) params.max = maxPrice;
-            if (sortBy !== 'rating_desc') params.sort = sortBy;
+            if (sortBy !== 'review_count_desc') params.sort = sortBy;
             if (searchQuery) params.q = searchQuery;
 
             for (const key of ['wifi', 'food', 'ac', 'price'] as const) {
@@ -248,9 +248,16 @@ export default function Properties({
         return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
     }, [properties, wifiOn, foodOn, acOn]);
 
-    /** Client-side tie-break when API order is weak: highest rating (then review count) first. */
+    /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
         const list = [...propertyListFiltered];
+        if (sortBy === 'review_count_desc') {
+            return list.sort((a, b) => {
+                const ca = (a.reviews ?? a.review_count ?? 0) || 0;
+                const cb = (b.reviews ?? b.review_count ?? 0) || 0;
+                return cb - ca;
+            });
+        }
         if (sortBy !== 'rating_desc') return list;
         return list.sort((a, b) => {
             const ra = (a.rating ?? a.average_rating ?? 0) || 0;
@@ -345,7 +352,7 @@ export default function Properties({
         setMinPrice('');
         setMaxPrice('');
         setLocationFilter('all');
-        setSortBy('rating_desc');
+        setSortBy('review_count_desc');
         setSearchQuery('');
         setTypeFilter('all');
         setSearchParams({}, { replace: true });
@@ -562,6 +569,7 @@ export default function Properties({
                                                     className="w-full appearance-none px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium focus:ring-2 focus:ring-brand-red/10 outline-none pr-10"
                                                 >
                                                     <option value="rating_desc">Best Rated</option>
+                                                    <option value="review_count_desc">Top Reviewed</option>
                                                     <option value="price_asc">Price: Low to High</option>
                                                     <option value="price_desc">Price: High to Low</option>
                                                     <option value="newest">Newest First</option>

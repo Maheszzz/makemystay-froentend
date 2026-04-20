@@ -15,7 +15,10 @@ interface PropertyGridProps {
 
 export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const params = useMemo((): PaginationParams => {
-        const p: PaginationParams = { limit: 20 };
+        const p: PaginationParams = { 
+            limit: 20,
+            sort_by: 'review_count_desc'
+        };
         // Align with backend tab semantics: pg | rent | buy | plot ("all" = no category filter).
         if (category !== 'all') {
             p.category = category;
@@ -30,8 +33,18 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     const { properties, loading, error } = useProperties(params);
 
     const safeProperties = Array.isArray(properties) ? properties : [];
+    
+    // Client-side sort fallback for 'review_count_desc' (matching Properties.tsx logic)
+    const sortedProperties = useMemo(() => {
+        return [...safeProperties].sort((a, b) => {
+            const ca = (a.reviews ?? a.review_count ?? 0) || 0;
+            const cb = (b.reviews ?? b.review_count ?? 0) || 0;
+            return cb - ca;
+        });
+    }, [safeProperties]);
+
     // Filter for the home page (limit to 4)
-    const filteredProperties = safeProperties.slice(0, 4);
+    const filteredProperties = sortedProperties.slice(0, 4);
 
     const viewAllByCategory: Record<PropertyGridProps['category'], string> = {
         all: '/properties',
