@@ -22,29 +22,15 @@ interface PropertyCardProps {
     property: Property;
 }
 
-/** Shared “From ₹…” block — PG uses compact variant above meta row; others use default below. */
-function CardPriceFrom({ property, compact }: { property: Property; compact?: boolean }) {
+/** Shared “From ₹…” block — same layout for PG, rent, and sale cards (below specs row). */
+function CardPriceFrom({ property }: { property: Property }) {
     const showPerMonth = property.category === 'rent' || property.category === 'pg';
     return (
-        <div
-            className={
-                compact
-                    ? 'mb-3.5 w-full rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white px-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold'
-                    : 'min-w-0 flex-1 rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white pl-3 pr-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold'
-            }
-        >
-            <p
-                className={`text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-heading ${compact ? 'mb-0.5' : 'mb-1'}`}
-            >
+        <div className="min-w-0 flex-1 rounded-xl border border-slate-200/90 bg-gradient-to-br from-slate-50/95 to-white pl-3 pr-3 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] border-l-[3px] border-l-brand-gold">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 font-heading mb-1">
                 From
             </p>
-            <p
-                className={
-                    compact
-                        ? 'text-[1.5rem] sm:text-[1.65rem] font-bold tabular-nums tracking-tight leading-none font-heading text-brand-red'
-                        : 'text-[1.65rem] sm:text-[1.75rem] font-bold tabular-nums tracking-tight leading-none font-heading text-brand-red'
-                }
-            >
+            <p className="text-[1.65rem] sm:text-[1.75rem] font-bold tabular-nums tracking-tight leading-none font-heading text-brand-red">
                 {property.price}
             </p>
             {showPerMonth && <p className="text-[11px] text-slate-500 mt-1 font-medium">per month</p>}
@@ -134,8 +120,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
     if (property.lounge && !isServiceOriented) amenities.push('Lounge');
     if (property.cctv) amenities.push('Security');
     if (property.geyser) amenities.push('Geyser');
-    if (isPlot && Array.isArray(property.features) && property.features.length > 0) {
-        amenities.push(...property.features);
+    if (isPlot && Array.isArray(property.features)) {
+        amenities.push(...property.features.filter((f): f is string => typeof f === 'string'));
     }
 
     const propertyPath = getPropertyDetailPath(property);
@@ -207,8 +193,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         )}
                     </div>
 
-                    {/* Rating + type — on-image glass strip */}
-                    <div className="absolute bottom-0 left-0 right-0 z-10 p-3 flex items-end justify-between gap-2 pointer-events-none">
+                    {/* Rating + type — on-image glass strip (badges aligned to bottom edge) */}
+                    <div className="absolute bottom-0 left-0 right-0 z-10 p-3 pb-2.5 flex items-end justify-between gap-2 pointer-events-none">
                         <div
                             className={`flex items-center gap-1.5 min-w-0 rounded-full pl-2 pr-2.5 py-1.5 border shadow-sm ${
                                 hasRating
@@ -230,7 +216,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             )}
                         </div>
                         {property.type && (
-                            <span className="shrink-0 rounded-full bg-brand-gold/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-md border border-white/25 font-heading">
+                            <span className="shrink-0 self-end rounded-full bg-brand-gold/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-white shadow-md border border-white/25 font-heading leading-none">
                                 {property.type}
                             </span>
                         )}
@@ -238,7 +224,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 </div>
 
                 <div className="flex flex-col flex-1 min-h-0 px-4 pt-4 pb-4 sm:px-5 sm:pb-5">
-                    <h3 className="font-heading text-[15px] sm:text-[17px] font-bold text-slate-900 tracking-tight group-hover:text-brand-red transition-colors duration-300 leading-snug line-clamp-2 min-h-[2.5rem]">
+                    <h3 className="font-heading text-[15px] sm:text-[17px] font-bold text-slate-900 tracking-tight leading-snug line-clamp-2 min-h-[2.5rem] no-underline transition-colors duration-300 group-hover:underline group-hover:decoration-brand-red/40 group-hover:underline-offset-[3px]">
                         {displayTitle}
                     </h3>
 
@@ -254,10 +240,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         </span>
                     </div>
 
-                    {/* PG/Hostel: price above meta row — avoids grid clipping and matches scan order */}
-                    {isServiceOriented && <CardPriceFrom property={property} compact />}
-
-                    <div className="flex flex-wrap items-center gap-2 text-slate-700 text-[11px] sm:text-[12px] mb-3.5 pb-3.5 border-b border-slate-100/90">
+                    <div className="flex flex-wrap items-start content-start gap-2 text-slate-700 text-[11px] sm:text-[12px] mb-3.5 pb-3.5 border-b border-slate-100/90 min-h-[3.25rem]">
                         {isPlot ? (
                             <>
                                 <div className="flex items-center gap-1">
@@ -280,7 +263,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     <span>
                                         {(() => {
                                             const parts = (Array.isArray(property.sharing) ? property.sharing : []).filter(
-                                                (s) => s === 'Single' || s === 'Double'
+                                                (p) => typeof p === 'string' && p.trim().length > 0
                                             );
                                             return parts.length > 0 ? `${parts.join('/')} sharing` : 'Shared room';
                                         })()}
@@ -327,19 +310,17 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         )}
                     </div>
 
-                    {(!isServiceOriented || unitsLeft != null) && (
-                        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:justify-between mb-3.5">
-                            {!isServiceOriented && <CardPriceFrom property={property} />}
-                            {unitsLeft != null && (
-                                <span className="inline-flex shrink-0 items-center justify-center self-start sm:self-stretch rounded-xl bg-amber-50/90 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-amber-900 border border-amber-200/80 font-heading">
-                                    {unitsLeft} left
-                                </span>
-                            )}
-                        </div>
-                    )}
+                    <div className="flex flex-col gap-2.5 sm:flex-row sm:items-stretch sm:justify-between mb-3.5">
+                        <CardPriceFrom property={property} />
+                        {unitsLeft != null && (
+                            <span className="inline-flex shrink-0 items-center justify-center self-start sm:self-stretch rounded-xl bg-amber-50/90 px-3 py-2 text-[11px] font-bold uppercase tracking-wide text-amber-900 border border-amber-200/80 font-heading">
+                                {unitsLeft} left
+                            </span>
+                        )}
+                    </div>
 
                     <div className="flex flex-wrap content-start gap-1.5 mb-4 min-h-0">
-                        {amenities.slice(0, 4).map((amenity) => {
+                        {Array.isArray(amenities) && amenities.slice(0, 4).map((amenity) => {
                             const icon = amenityIconMap[amenity.toLowerCase()];
                             return (
                                 <span

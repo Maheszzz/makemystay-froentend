@@ -240,7 +240,7 @@ export function SmartSearchBar({
                         </div>
                     ) : (
                         <>
-                            {filteredSuggestions.length > 0 ? (
+                            {Array.isArray(filteredSuggestions) && filteredSuggestions.length > 0 ? (
                                 filteredSuggestions.map((suggestion, index) => (
                                     <button
                                         key={index}

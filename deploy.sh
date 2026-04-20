@@ -47,6 +47,7 @@ fi
 # FLAGS
 # -----------------------------
 RSYNC_FLAGS="-avz --delete"
+SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=60"
 
 if [[ "$DRY_RUN" == true ]]; then
   echo "🧪 DRY RUN MODE"
@@ -81,7 +82,7 @@ echo "📤 Syncing files (${DEPLOY_SOURCE}/ → $DEPLOY_PATH)..."
 
 if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
   echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
-  ssh -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" \
+  ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" \
     "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
 fi
 
@@ -91,7 +92,7 @@ if [[ "$DEPLOY_SOURCE" != "." ]]; then
 fi
 
 rsync $RSYNC_FLAGS \
-  -e "ssh -i $PEM_KEY" \
+  -e "ssh $SSH_OPTS -i $PEM_KEY" \
   --exclude '.git' \
   --exclude 'node_modules' \
   "$RSYNC_FROM" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
@@ -101,7 +102,7 @@ rsync $RSYNC_FLAGS \
 # -----------------------------
 echo "⚙️ Running remote commands..."
 
-ssh -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" << EOF
+ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" << EOF
   set -e
 
   cd $DEPLOY_PATH

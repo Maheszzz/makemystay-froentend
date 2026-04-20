@@ -145,7 +145,7 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
 
             {/* Reviews List */}
             <div className="space-y-6">
-                {reviews.length === 0 ? (
+                {(!Array.isArray(reviews) || reviews.length === 0) ? (
                     <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200">
                         <Star className="w-12 h-12 text-slate-200 mx-auto mb-4" />
                         <p className="text-slate-400 font-medium">No reviews yet. Be the first to review!</p>

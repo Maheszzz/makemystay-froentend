@@ -84,8 +84,11 @@ apiClient.interceptors.response.use(
         
         // If it's a standardized successful response, unwrap and return just the data
         if (data && typeof data === 'object' && 'success' in data && data.success === true) {
-            // Update the response data to be the unwrapped payload
-            response.data = data.data;
+            // Update the response data to be the unwrapped payload.
+            // Guard against null/undefined data.data — coerce to {} so downstream
+            // `.items`, `.map()` etc. get `undefined` instead of crashing on `null`.
+            // We use truthy check `data.data` because `null` and `undefined` are both falsy.
+            response.data = (data.data && typeof data.data === 'object') ? data.data : {};
             return response;
         }
         
@@ -145,12 +148,31 @@ apiClient.interceptors.response.use(
     }
 );
 
-// Generic API request wrapper with type safety
 export async function apiRequest<T>(
     config: AxiosRequestConfig
 ): Promise<T> {
-    const response = await apiClient.request<T>(config);
-    return response.data;
+    try {
+        const response = await apiClient.request<T>(config);
+        // Explicit safety: if we got a response but it's not JSON (e.g. an HTML error page from Nginx),
+        // coerce to an empty object to avoid "undefined is not a function" or ".map is not a function" downstream.
+        const result = response.data;
+        if (result && typeof result === 'object') {
+            return result as T;
+        }
+
+        // Capture edge case for debugging: if we got a 200/2XX but no object body
+        if (response.status >= 200 && response.status < 300) {
+            console.warn(`[apiRequest] Response for ${config.url} returned non-object data:`, typeof result, result);
+        }
+
+        // Fallback for unexpected data types
+        return {} as T;
+    } catch (error) {
+        // Interceptor already logs and transforms most errors into ApiError objects.
+        // This catch block handles any catastrophic failures that bypassed the interceptor.
+        console.error(`[apiRequest] Critical failure for ${config.url}:`, error);
+        return {} as T;
+    }
 }
 
 // Convenience methods

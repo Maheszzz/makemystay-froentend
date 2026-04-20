@@ -67,14 +67,24 @@ export function useProperties(
                 });
 
                 if (isMounted) {
-                    const list = Array.isArray(response.items) ? response.items : [];
+                    // Belt-and-suspenders: never trust response shape
+                    const safeResponse = response ?? { items: [], total: 0 };
+                    const list = Array.isArray(safeResponse.items) ? safeResponse.items : [];
+                    const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
+                        ? safeResponse.total
+                        : list.length;
                     setProperties(list);
-                    setTotalCount(response.total);
-                    setHasMore(list.length < response.total);
+                    setTotalCount(total);
+                    setHasMore(list.length < total);
                 }
-            } catch (err) {
+            } catch (err: unknown) {
                 if (isMounted) {
-                    setError(err as ApiError);
+                    // Coerce any thrown value into a clean ApiError
+                    const apiErr: ApiError = (
+                        err && typeof err === 'object' && 'message' in err
+                    ) ? (err as ApiError)
+                      : { message: 'Failed to load properties', status: 0, detail: String(err) };
+                    setError(apiErr);
                 }
             } finally {
                 if (isMounted) {
@@ -100,11 +110,15 @@ export function useProperties(
                 limit: pageSize,
             });
 
-            const pageItems = Array.isArray(response.items) ? response.items : [];
+            const safeResponse = response ?? { items: [], total: 0 };
+            const pageItems = Array.isArray(safeResponse.items) ? safeResponse.items : [];
+            const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
+                ? safeResponse.total
+                : properties.length + pageItems.length;
             setProperties(prev => [...prev, ...pageItems]);
             setPage(nextPage);
-            setHasMore((properties.length + pageItems.length) < response.total);
-            setTotalCount(response.total);
+            setHasMore((properties.length + pageItems.length) < total);
+            setTotalCount(total);
         } catch (err) {
             console.error('Failed to load more properties:', err);
         } finally {
@@ -122,12 +136,20 @@ export function useProperties(
                 skip: 0,
                 limit: pageSize,
             });
-            const list = Array.isArray(response.items) ? response.items : [];
+            const safeResponse = response ?? { items: [], total: 0 };
+            const list = Array.isArray(safeResponse.items) ? safeResponse.items : [];
+            const total = typeof safeResponse.total === 'number' && Number.isFinite(safeResponse.total)
+                ? safeResponse.total
+                : list.length;
             setProperties(list);
-            setTotalCount(response.total);
-            setHasMore(list.length < response.total);
-        } catch (err) {
-            setError(err as ApiError);
+            setTotalCount(total);
+            setHasMore(list.length < total);
+        } catch (err: unknown) {
+            const apiErr: ApiError = (
+                err && typeof err === 'object' && 'message' in err
+            ) ? (err as ApiError)
+              : { message: 'Failed to load properties', status: 0, detail: String(err) };
+            setError(apiErr);
         } finally {
             setLoading(false);
         }
@@ -261,7 +283,7 @@ export function useSimilarProperties(
         setError(null);
         try {
             const res = await propertyApi.getSimilar(propertyId, { limit });
-            setProperties(res.items);
+            setProperties(Array.isArray(res?.items) ? res.items : []);
         } catch (err) {
             setError(err as ApiError);
             setProperties([]);

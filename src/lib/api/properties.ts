@@ -24,32 +24,50 @@ const PLACEHOLDER_VILLA =
  * or alternate keys — always coerce to an array so `.map` never runs on a non-array.
  */
 function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
+    // 1. Array-first handling: if it's already a bare array, return it directly.
     if (Array.isArray(response)) {
         return { rows: response, total: response.length };
     }
+
+    // 2. Object handling: look for results in common keys or nested under .data
     if (response && typeof response === 'object') {
         const r = response as Record<string, unknown>;
+        
+        // Comprehensive list of keys used across different backend versions / middleware
         let raw: unknown =
             r.items ??
-            (Array.isArray(r.data) ? r.data : undefined) ??
             r.properties ??
-            r.results;
+            r.results ??
+            r.listings ??
+            r.data;
 
+        // If 'raw' is not an array yet, it might be nested (e.g., { success: true, data: { items: [...] } })
         let nested: Record<string, unknown> | undefined;
-        if (raw === undefined && r.data && typeof r.data === 'object' && !Array.isArray(r.data)) {
+        if (!Array.isArray(raw) && r.data && typeof r.data === 'object' && r.data !== null) {
             nested = r.data as Record<string, unknown>;
-            raw = nested.items ?? nested.properties ?? nested.results;
+            raw = nested.items ?? nested.properties ?? nested.results ?? nested.listings;
         }
 
+        // Final coercion: if we found an array, use it; otherwise, default to empty.
+        // This is the CRITICAL guard against ".map is not a function".
         const rows = Array.isArray(raw) ? raw : [];
-        let totalRaw = r.total ?? r.count;
-        if (totalRaw === undefined && nested) {
-            totalRaw = nested.total ?? nested.count;
-        }
+        
+        // Total count resolution from all possible keys
+        const totalRaw = 
+            (typeof r.total === 'number' ? r.total : undefined) ??
+            (typeof r.count === 'number' ? r.count : undefined) ??
+            (typeof r.total_count === 'number' ? r.total_count : undefined) ??
+            (nested && typeof nested.total === 'number' ? nested.total : undefined) ??
+            (nested && typeof nested.count === 'number' ? nested.count : undefined) ??
+            (nested && typeof nested.total_count === 'number' ? nested.total_count : undefined);
+
         const total =
             typeof totalRaw === 'number' && Number.isFinite(totalRaw) ? totalRaw : rows.length;
+
         return { rows, total };
     }
+
+    // 3. Fallback for non-object/non-array responses (e.g. string or null)
     return { rows: [], total: 0 };
 }
 
@@ -123,29 +141,47 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
     if (item.property_type?.toLowerCase() === 'plot') { beds = 0; baths = 0; }
 
     const isPlot = item.property_type?.toLowerCase() === 'plot';
-    const featuresList: string[] = Array.isArray(item.features)
-        ? item.features.filter((f): f is string => typeof f === 'string')
-        : [];
+    // Guard against malformed features
+    const featuresList: string[] = [];
+    if (Array.isArray(item.features)) {
+        for (const f of item.features) {
+            if (typeof f === 'string' && f.trim()) {
+                featuresList.push(f.trim());
+            } else if (f != null) {
+                featuresList.push(String(f));
+            }
+        }
+    }
     const has = (needle: string) => featuresList.some((f) => f.toLowerCase().includes(needle));
 
     const category = deriveUiCategory(item);
 
     // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
     const rawImages = Array.isArray(item.images) ? item.images : [];
-    const sortedImages = [...rawImages].sort((a, b) => {
-        const ao = typeof a === 'object' && a && 'sort_order' in a ? (a as PropertyImage).sort_order ?? 0 : 0;
-        const bo = typeof b === 'object' && b && 'sort_order' in b ? (b as PropertyImage).sort_order ?? 0 : 0;
+    const sortedImages = [...rawImages].sort((a: any, b: any) => {
+        const ao = a && typeof a === 'object' && 'sort_order' in a ? a.sort_order ?? 0 : 0;
+        const bo = b && typeof b === 'object' && 'sort_order' in b ? b.sort_order ?? 0 : 0;
         return ao - bo;
     });
+
     const imageUrlFromEntry = (img: string | PropertyImage): string | undefined => {
+        if (!img) return undefined;
         if (typeof img === 'string') return img.trim() || undefined;
         const u = img?.image_url;
         return typeof u === 'string' && u.trim() ? u : undefined;
     };
-    const dbImages = sortedImages.map(imageUrlFromEntry).filter((x): x is string => Boolean(x));
+
+    let dbImages: string[] = [];
+    try {
+        dbImages = sortedImages.map(imageUrlFromEntry).filter((x): x is string => Boolean(x));
+    } catch (err) {
+        console.warn('[mapRealtyToProperty] Failed to map images array:', err, sortedImages);
+    }
+    
+    // Explicit primary image lookup with fallback to first image in array
     const primaryEntry = sortedImages.find(
         (img): img is PropertyImage =>
-            typeof img === 'object' && img != null && 'is_primary' in img && (img as PropertyImage).is_primary === true
+            img && typeof img === 'object' && 'is_primary' in img && (img as PropertyImage).is_primary === true
     );
     const primaryImage = imageUrlFromEntry(primaryEntry ?? sortedImages[0]) ?? dbImages[0];
 
@@ -212,7 +248,7 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         reviews: item.review_count || 0,
         average_rating: item.average_rating,
         review_count: item.review_count,
-        reviews_list: item.reviews,
+        reviews_list: Array.isArray(item.reviews) ? item.reviews : [],
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,
@@ -244,35 +280,40 @@ export const propertyApi = {
         city?: string;
         sort_by?: string;
     } = {}): Promise<{ items: Property[]; total: number }> => {
-        const queryParams = new URLSearchParams();
-        if (params.skip !== undefined) queryParams.append('skip', params.skip.toString());
-        if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
-        if (params.category) queryParams.append('category', params.category);
-        if (params.property_type) queryParams.append('property_type', params.property_type);
-        if (params.listing_type) queryParams.append('listing_type', params.listing_type);
-        if (params.is_available !== undefined) queryParams.append('is_available', params.is_available.toString());
-        if (params.search) queryParams.append('search', params.search);
-        if (params.exclude_property_type) queryParams.append('exclude_property_type', params.exclude_property_type);
-        if (params.min_price !== undefined) queryParams.append('min_price', params.min_price.toString());
-        if (params.max_price !== undefined) queryParams.append('max_price', params.max_price.toString());
-        if (params.city) queryParams.append('city', params.city);
-        if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+        try {
+            const queryParams = new URLSearchParams();
+            if (params.skip !== undefined) queryParams.append('skip', params.skip.toString());
+            if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+            if (params.category) queryParams.append('category', params.category);
+            if (params.property_type) queryParams.append('property_type', params.property_type);
+            if (params.listing_type) queryParams.append('listing_type', params.listing_type);
+            if (params.is_available !== undefined) queryParams.append('is_available', params.is_available.toString());
+            if (params.search) queryParams.append('search', params.search);
+            if (params.exclude_property_type) queryParams.append('exclude_property_type', params.exclude_property_type);
+            if (params.min_price !== undefined) queryParams.append('min_price', params.min_price.toString());
+            if (params.max_price !== undefined) queryParams.append('max_price', params.max_price.toString());
+            if (params.city) queryParams.append('city', params.city);
+            if (params.sort_by) queryParams.append('sort_by', params.sort_by);
 
-        const response = await api.get<any>(REALTY_PATH, {
-            params: queryParams,
-            timeout: 45000,
-        });
+            const response = await api.get<any>(REALTY_PATH, {
+                params: queryParams,
+                timeout: 45000,
+            });
 
-        const { rows, total } = normalizePropertyListResponse(response);
-        const items: Property[] = [];
-        for (const row of rows) {
-            try {
-                items.push(mapRealtyToProperty(row as RealtyProperty));
-            } catch (e) {
-                console.warn('[propertyApi.getAll] Skipping malformed property row:', e, row);
+            const { rows, total } = normalizePropertyListResponse(response ?? {});
+            const items: Property[] = [];
+            for (const row of rows) {
+                try {
+                    items.push(mapRealtyToProperty(row as RealtyProperty));
+                } catch (e) {
+                    console.warn('[propertyApi.getAll] Skipping malformed property row:', e, row);
+                }
             }
+            return { items, total };
+        } catch (e) {
+            console.error('[propertyApi.getAll] Unexpected failure; returning empty list:', e);
+            return { items: [], total: 0 };
         }
-        return { items, total };
     },
 
     /**
@@ -361,9 +402,21 @@ export const propertyApi = {
      */
     getSuggestions: async (query: string): Promise<string[]> => {
         if (!query || query.length < 1) return [];
-        return await api.get<string[]>(`${REALTY_PATH}/suggestions`, {
-            params: { q: query }
-        });
+        try {
+            const res = await api.get<any>(`${REALTY_PATH}/suggestions`, {
+                params: { q: query }
+            });
+            // Handle { items: [...] } or { data: [...] } if API format changes
+            if (Array.isArray(res)) return res;
+            if (res && typeof res === 'object') {
+                const arr = res.items ?? res.data ?? res.suggestions;
+                if (Array.isArray(arr)) return arr;
+            }
+            return [];
+        } catch (err) {
+            console.warn('[propertyApi.getSuggestions] Failed:', err);
+            return [];
+        }
     }
 };
 
