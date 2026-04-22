@@ -58,7 +58,7 @@ fi
 # INFO
 # -----------------------------
 echo "🚀 Deploying to $ENV"
-echo "Host: $DEPLOY_HOST"
+echo "Hosts: $DEPLOY_HOST"
 echo "Path: $DEPLOY_PATH"
 
 # -----------------------------
@@ -78,42 +78,56 @@ if [[ "$DEPLOY_SOURCE" != "." && ! -d "$DEPLOY_SOURCE" ]]; then
   exit 1
 fi
 
-echo "📤 Syncing files (${DEPLOY_SOURCE}/ → $DEPLOY_PATH)..."
-
-if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
-  echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
-  ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" \
-    "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
-fi
-
 RSYNC_FROM="./"
 if [[ "$DEPLOY_SOURCE" != "." ]]; then
   RSYNC_FROM="${DEPLOY_SOURCE}/"
 fi
 
-rsync $RSYNC_FLAGS \
-  -e "ssh $SSH_OPTS -i $PEM_KEY" \
-  --exclude '.git' \
-  --exclude 'node_modules' \
-  "$RSYNC_FROM" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
+# Split hosts by comma
+IFS=',' read -ra HOSTS <<< "$DEPLOY_HOST"
 
-# -----------------------------
-# REMOTE EXECUTION
-# -----------------------------
-echo "⚙️ Running remote commands..."
+for HOST in "${HOSTS[@]}"; do
+  HOST=$(echo "$HOST" | xargs) # trim whitespace
+  
+  echo "🔍 Checking SSH connectivity to $HOST..."
+  if ! ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=no -i "$PEM_KEY" "$DEPLOY_USER@$HOST" exit 2>/dev/null; then
+    echo "⚠️  Skipping unreachable host: $HOST"
+    continue
+  fi
 
-ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$DEPLOY_HOST" << EOF
-  set -e
+  echo "📤 Syncing files to $HOST (${RSYNC_FROM} → $DEPLOY_PATH)..."
 
-  cd $DEPLOY_PATH
+  if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
+    echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
+    ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" \
+      "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
+  fi
 
-  echo "📦 Installing dependencies..."
-  # npm ci --production
+  rsync $RSYNC_FLAGS \
+    -e "ssh $SSH_OPTS -i $PEM_KEY" \
+    --exclude '.git' \
+    --exclude 'node_modules' \
+    "$RSYNC_FROM" "$DEPLOY_USER@$HOST:$DEPLOY_PATH"
 
-  echo "🔁 Restarting app..."
-  # pm2 reload app || pm2 start ecosystem.config.js
+  # -----------------------------
+  # REMOTE EXECUTION
+  # -----------------------------
+  echo "⚙️ Running remote commands on $HOST..."
 
-  echo "✅ Server updated"
+  ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" << EOF
+    set -e
+
+    cd $DEPLOY_PATH
+
+    echo "📦 Installing dependencies..."
+    # npm ci --production
+
+    echo "🔁 Restarting app..."
+    # pm2 reload app || pm2 start ecosystem.config.js
+
+    echo "✅ Server updated"
 EOF
+
+done
 
 echo "🎉 Deployment SUCCESS"
