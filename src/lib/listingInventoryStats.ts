@@ -37,6 +37,7 @@ export function computeRentPlotStatsFromListings(list: Property[]): InventoryRen
     const rents: number[] = [];
     const plotSq: number[] = [];
     for (const p of list) {
+        if (!p) continue; // Safety guard
         if (p.category === 'rent') {
             const n = parseMonthlyRentInr(p.price);
             if (n != null) rents.push(n);

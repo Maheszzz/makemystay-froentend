@@ -242,31 +242,46 @@ export default function Properties({
     } = useProperties(apiParams, { infiniteScroll: true, pageSize: PAGE_SIZE });
 
     const propertyListFiltered = useMemo(() => {
-        const list = Array.isArray(properties) ? properties : [];
-        const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
-        if (!wifiOn && !foodOn && !acOn) return list;
-        return list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
+        try {
+            const rawList = Array.isArray(properties) ? properties : [];
+            const list = rawList.filter(p => !!p); // Always strip nulls/undefined
+            
+            const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
+            if (!wifiOn && !foodOn && !acOn) return list;
+            
+            return list.filter((p) => {
+                return propertyMatchesPgFeatureFilters(p, flags);
+            });
+        } catch (e) {
+            console.error('[Properties] Filtering crash:', e);
+            return [];
+        }
     }, [properties, wifiOn, foodOn, acOn]);
 
     /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
-        const list = [...propertyListFiltered];
-        if (sortBy === 'review_count_desc') {
+        try {
+            const list = [...propertyListFiltered];
+            if (sortBy === 'review_count_desc') {
+                return list.sort((a, b) => {
+                    const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
+                    const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
+                    return cb - ca;
+                });
+            }
+            if (sortBy !== 'rating_desc') return list;
             return list.sort((a, b) => {
-                const ca = (a.reviews ?? a.review_count ?? 0) || 0;
-                const cb = (b.reviews ?? b.review_count ?? 0) || 0;
+                const ra = (a?.rating ?? a?.average_rating ?? 0) || 0;
+                const rb = (b?.rating ?? b?.average_rating ?? 0) || 0;
+                if (rb !== ra) return rb - ra;
+                const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
+                const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
                 return cb - ca;
             });
+        } catch (e) {
+            console.error('[Properties] Sorting crash:', e);
+            return propertyListFiltered;
         }
-        if (sortBy !== 'rating_desc') return list;
-        return list.sort((a, b) => {
-            const ra = (a.rating ?? a.average_rating ?? 0) || 0;
-            const rb = (b.rating ?? b.average_rating ?? 0) || 0;
-            if (rb !== ra) return rb - ra;
-            const ca = (a.reviews ?? a.review_count ?? 0) || 0;
-            const cb = (b.reviews ?? b.review_count ?? 0) || 0;
-            return cb - ca;
-        });
     }, [propertyListFiltered, sortBy]);
 
     const inventoryStats = useMemo(
@@ -668,7 +683,10 @@ export default function Properties({
                         }`}
                     >
                         {propertyListOrdered.length > 0 ? (
-                            propertyListOrdered.map((prop) => <PropertyCard key={prop.id} property={prop} />)
+                            propertyListOrdered.map((prop) => {
+                                if (!prop || !prop.id) return null;
+                                return <PropertyCard key={prop.id} property={prop} />;
+                            })
                         ) : !loading && (
                             <div className="col-span-full py-20 px-6 text-center bg-white rounded-3xl border border-dashed border-slate-200">
                                 <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
