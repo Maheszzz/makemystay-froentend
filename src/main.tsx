@@ -2,14 +2,17 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import './globals.css';
 
 const root = createRoot(document.getElementById('root')!);
 root.render(
     <StrictMode>
-        <HelmetProvider>
-            <App />
-        </HelmetProvider>
+        <ErrorBoundary>
+            <HelmetProvider>
+                <App />
+            </HelmetProvider>
+        </ErrorBoundary>
     </StrictMode>,
 );
 
