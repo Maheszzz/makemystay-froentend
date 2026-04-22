@@ -169,7 +169,7 @@ function App() {
                             <Route path="/properties" element={<Properties key="all" />} />
                             <Route path="/properties/in/:city" element={<CityProperties category="all" />} />
 
-                            <Route path="/rent" element={<Properties key="rent" initialCategory="rent" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
+                            <Route path="/rent" element={<Properties key="rent" initialCategory="rent" initialCity="Bangalore" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />
                             <Route path="/rent/in/:city" element={<CityProperties category="rent" />} />
                             <Route path="/rent/:slug" element={<RentRouter />} />
 
@@ -185,18 +185,18 @@ function App() {
                              <Route path="/pg-single-room" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-near-me" element={<PgNearMe />} />
                              <Route path="/pg/:slug" element={<PGRouter />} />
-                             <Route path="/pg" element={<Properties key="pg" initialCategory="pg" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
+                             <Route path="/pg" element={<Properties key="pg" initialCategory="pg" initialCity="Bangalore" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />} />
 
-                             <Route path="/plots" element={<Properties key="plots" initialCategory="plot" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home" />} />
+                             <Route path="/plots" element={<Properties key="plots" initialCategory="plot" initialCity="Bangalore" pageTitle="Plots & Land for Sale" pageSubtitle="Find plots and land to build your dream home in Bangalore" />} />
                              <Route path="/plots/in/bangalore" element={<PlotBangaloreHub key="plot-bangalore-hub" />} />
                              <Route path="/plots/in/:city" element={<CityProperties category="plot" />} />
 
-                             <Route path="/buy" element={<Properties key="buy" initialCategory="buy" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy" />} />
+                             <Route path="/buy" element={<Properties key="buy" initialCategory="buy" initialCity="Bangalore" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy in Bangalore" />} />
                              <Route path="/buy/in/bangalore" element={<BuyBangaloreHub key="buy-bangalore-hub" />} />
                              <Route path="/buy/in/:city" element={<CityProperties category="buy" />} />
                              <Route path="/schedule-demo" element={<ScheduleDemo />} />
-                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
-                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
+                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" initialCity="Bangalore" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
+                             <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" initialCity="Bangalore" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
                             <Route path="/services/:serviceId" element={<ServiceDetail />} />
                             <Route path="/terms" element={<Terms />} />
                             <Route path="/privacy" element={<Privacy />} />
