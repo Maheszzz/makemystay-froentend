@@ -238,6 +238,7 @@ export function pgBangaloreHubSeo(): PageSEOInput {
         description:
             'Browse verified PGs in Bangalore from ₹6,000/month. Filter by locality, food, AC, sharing. Real photos, transparent pricing, no brokerage on MakeMyStay.ai.',
         path: '/pg/bangalore',
+        canonicalUrl: 'https://makemystay.ai/pg/bangalore',
     };
 }
 
