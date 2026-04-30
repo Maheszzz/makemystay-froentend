@@ -9,13 +9,167 @@ export interface BlogPost {
     title: string;
     description: string;
     publishedAt: string; // ISO date
+    updatedAt?: string; // ISO date
+    authorName?: string;
+    authorType?: 'Person' | 'Organization';
     readTimeMin: number;
     body: string[];
     relatedRentHubs?: BlogRentHubLink[];
     faqs?: { question: string; answer: string }[];
+    imageUrl?: string;
+    category?: string;
 }
 
 export const BLOG_POSTS: BlogPost[] = [
+    {
+        slug: 'pg-in-bangalore-guide',
+        title: 'PG in Bangalore 2025: Complete Guide to Rent, Areas & What to Look For',
+        description:
+            'Complete 2025 guide to PG in Bangalore: area-wise prices, amenities checklist, deposit norms, and booking tips for professionals and students.',
+        publishedAt: '2026-04-29',
+        updatedAt: '2026-04-29',
+        authorName: 'MakeMyStay Team',
+        authorType: 'Organization',
+        readTimeMin: 12,
+        category: 'Guides',
+        imageUrl: '/images/blog/pg-living.png',
+        body: [
+            "Finding a PG in Bangalore does not have to be stressful. This guide covers average rent by area, what to check before booking, and how to avoid common mistakes.",
+            'A PG (Paying Guest) in Bangalore is a shared accommodation where you rent a furnished room with meals, WiFi, and basic amenities on a monthly basis. PGs are popular for IT professionals, students, and new joiners because they usually need less upfront commitment.',
+            '2025 price benchmark: shared rooms usually fall in ₹6,000 to ₹15,000, while private rooms often range between ₹15,000 and ₹25,000 depending on area and inclusions.',
+            'Area snapshot: Koramangala and Indiranagar are premium, HSR and Whitefield sit in the mid-to-premium band, while Electronic City, Marathahalli, and BTM provide stronger budget-to-value options.',
+            'For IT professionals, top picks remain Whitefield, Electronic City, Bellandur/Marathahalli, and Manyata corridor. For students, Koramangala and Jayanagar are frequent choices due to college proximity.',
+            "A reliable PG should include high-speed WiFi, 24/7 security, power backup, meals, housekeeping, laundry support, and clean washrooms. Always verify these onsite instead of relying only on listing text.",
+            "Security deposits in Bangalore PGs are commonly 1 to 2 months' rent. Always verify notice period, lock-in, and refund conditions in writing before paying any token or advance.",
+            'Before booking, visit in person, test WiFi speed, inspect food quality and hygiene, check reviews, and ensure there are no hidden electricity or maintenance charges.',
+            'If you are comparing PG vs flat: PG works better for short-to-medium term stays and lower operational hassle; flats can be better for privacy and long-term plans.',
+            'Browse verified options with transparent pricing and zero brokerage at /pg/bangalore.',
+        ],
+        faqs: [
+            {
+                question: 'What is the average PG rent in Bangalore?',
+                answer: 'In 2025, average PG rent is typically ₹8,000 to ₹15,000 for shared rooms and ₹15,000 to ₹25,000 for private rooms, varying by locality and amenities.',
+            },
+            {
+                question: 'Which is the cheapest PG area in Bangalore?',
+                answer: 'Electronic City, BTM Layout, Marathahalli, and KR Puram usually offer the lowest entry prices, often starting around ₹4,500 to ₹6,000 for shared occupancy.',
+            },
+            {
+                question: 'Are PGs safe for girls in Bangalore?',
+                answer: 'Yes, many verified ladies PGs include CCTV, biometric access, wardens, and controlled entry. Prefer verified operators and inspect safety setup in person.',
+            },
+            {
+                question: 'Can I get a PG in Bangalore without a broker?',
+                answer: 'Yes. Platforms like MakeMyStay list zero-brokerage PG options from owners and managed operators with transparent pricing.',
+            },
+            {
+                question: 'How should I pay PG rent in Bangalore?',
+                answer: 'Most PGs accept UPI and bank transfer. Always collect receipts for rent and deposits for records and tax claims where applicable.',
+            },
+        ],
+        relatedRentHubs: [
+            { label: 'PG in Bangalore', path: '/pg/bangalore' },
+            { label: 'PG in Whitefield', path: '/pg/whitefield' },
+            { label: 'PG in Electronic City', path: '/pg/electronic-city' },
+        ],
+    },
+    {
+        slug: 'pg-near-whitefield-bangalore',
+        title: 'Best PG Near Whitefield Bangalore 2025: Area Guide, Prices & Top Options',
+        description:
+            'Whitefield PG guide for 2025 with locality-wise rent bands, commute factors, and selection checklist for IT professionals.',
+        publishedAt: '2026-04-29',
+        updatedAt: '2026-04-29',
+        authorName: 'MakeMyStay Team',
+        authorType: 'Organization',
+        readTimeMin: 9,
+        category: 'Area Guide',
+        imageUrl: '/images/blog/tech-park.png',
+        body: [
+            'Whitefield is one of Bangalore’s biggest IT hubs. Staying nearby can save meaningful daily commute time for teams working around ITPL, Prestige Tech Park, and adjacent office clusters.',
+            'Core benefits of choosing a PG near Whitefield include commute reduction, broad inventory of managed stays, and generally better value than central premium localities.',
+            'Typical 2025 pricing: Whitefield main (shared ₹7,500 to ₹12,000), Marathahalli (shared ₹6,000 to ₹10,000), Kundalahalli (shared ₹8,000 to ₹13,000), Brookefield (shared ₹7,000 to ₹11,000), and Kadugodi at the lower end.',
+            'When comparing options, prioritize office distance, metro access, power backup, reliable food quality, and room cooling needs (AC often matters in peak summer).',
+            'If your office is inside Whitefield belt, living locally usually beats long ORR commutes from farther neighborhoods.',
+            'For practical shortlisting, first filter by area and budget, then inspect listing photos, amenity inclusions, and recent reviews before booking visits.',
+            'Browse verified options near Whitefield with zero brokerage at /pg/bangalore?area=whitefield and /pg/bangalore.',
+        ],
+        faqs: [
+            {
+                question: 'What is the cheapest PG near Whitefield Bangalore?',
+                answer: 'Budget options near Whitefield often start around ₹5,500 to ₹7,000 in Kadugodi and Hoodi; Marathahalli options are usually slightly higher depending on amenities.',
+            },
+            {
+                question: 'Is it safe to live in a PG near Whitefield?',
+                answer: 'Whitefield is generally well-developed, but safety varies by property. Choose PGs with CCTV, secure entry, and robust operator management.',
+            },
+            {
+                question: 'How far is Whitefield from Koramangala?',
+                answer: 'Typically around 20 to 25 km, and travel time can vary widely with traffic. Staying near your office often gives better quality of life.',
+            },
+            {
+                question: 'Which is better for PG: Whitefield or Marathahalli?',
+                answer: 'Whitefield is ideal for ITPL-area offices and premium inventory. Marathahalli is often cheaper and can work better for ORR-linked commutes.',
+            },
+        ],
+        relatedRentHubs: [
+            { label: 'PG in Bangalore', path: '/pg/bangalore' },
+            { label: 'PG in Whitefield', path: '/pg/whitefield' },
+            { label: 'Rent in Whitefield', path: '/rent/whitefield' },
+        ],
+    },
+    {
+        slug: 'pg-checklist-new-joiners-bangalore',
+        title: 'Moving to Bangalore for Work? Your Complete PG Checklist (2025)',
+        description:
+            'Step-by-step PG checklist for Bangalore new joiners: budgeting, visits, contracts, red flags, and move-in documentation.',
+        publishedAt: '2026-04-29',
+        updatedAt: '2026-04-29',
+        authorName: 'MakeMyStay Team',
+        authorType: 'Organization',
+        readTimeMin: 11,
+        category: 'Checklist',
+        imageUrl: '/images/blog/pg-living.png',
+        body: [
+            'If you are relocating to Bangalore for work, your first housing decision is usually a PG. This checklist helps you shortlist safely and move in faster.',
+            'Start with office location and commute map. Staying within roughly 5 km of office can significantly reduce daily travel stress.',
+            "Set a realistic budget based on your in-hand salary and include hidden components: electricity, laundry, internet add-ons, and one-time deposit.",
+            'Choose occupancy based on lifestyle: triple sharing for lowest cost, double sharing for balance, and single room for privacy at higher rent.',
+            'During PG visit, inspect room basics (ventilation, storage, outlets), bathroom hygiene, WiFi speed, backup power, CCTV presence, and food quality/timings.',
+            "Ask direct questions: exact monthly charges, notice period, lock-in clause, deposit refund timeline, guest policy, and maintenance escalation process.",
+            'Avoid red flags such as upfront payment without visit, no written agreement, unclear utility billing, and refusal to issue deposit receipts.',
+            'Keep required documents ready: ID proof, photos, office proof/offer letter, emergency contact, and confirm police verification process with operator.',
+            'A practical mid-range monthly cost benchmark for Bangalore PGs can cluster near ₹10,000 to ₹11,000 including utilities and basic support services.',
+            'Explore verified zero-brokerage options near your workplace at /pg/bangalore.',
+        ],
+        faqs: [
+            {
+                question: 'How quickly can I find a PG in Bangalore?',
+                answer: 'With verified listing platforms, many people shortlist and visit within a day and can move in within a week depending on room availability.',
+            },
+            {
+                question: 'Can I negotiate PG rent in Bangalore?',
+                answer: 'Often yes, especially for longer commitments. In many cases, a 5 to 10 percent negotiation is possible.',
+            },
+            {
+                question: 'What if I leave before lock-in period ends?',
+                answer: 'Most operators apply penalties or deposit deductions. Review lock-in and notice clauses before paying any advance.',
+            },
+            {
+                question: 'Should I book before arriving in Bangalore?',
+                answer: 'Prefer short temporary stay first and finalize PG after in-person visits. Avoid paying full deposit without physical verification.',
+            },
+            {
+                question: 'Can PG rent qualify for tax benefit?',
+                answer: 'Depending on your salary structure and tax eligibility, rent receipts can support claims such as Section 80GG. Verify with a tax advisor.',
+            },
+        ],
+        relatedRentHubs: [
+            { label: 'PG in Bangalore', path: '/pg/bangalore' },
+            { label: 'PG in HSR Layout', path: '/pg/hsr-layout' },
+            { label: 'PG in Marathahalli', path: '/pg/marathahalli' },
+        ],
+    },
     {
         slug: 'how-to-choose-pg-in-bangalore',
         title: 'How to Choose a PG in Bangalore (2026 checklist)',
@@ -23,6 +177,8 @@ export const BLOG_POSTS: BlogPost[] = [
             'Room types, food plans, deposits, and commute — a practical checklist before you book a paying guest in Bangalore.',
         publishedAt: '2026-01-10',
         readTimeMin: 8,
+        category: 'Checklist',
+        imageUrl: '/images/blog/pg-living.png',
         body: [
             'Bangalore remains one of India’s busiest markets for PG (paying guest) accommodation, especially around tech corridors and metro-connected neighbourhoods.',
             'Start with non‑negotiables: daily commute time, meal preferences (veg/non‑veg), WiFi quality for WFH, and security (CCTV, biometric access, warden availability).',
@@ -82,6 +238,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'Avoid deposit disputes: learn the "market standard" for PG tokens, maintenance deductions, and exit formalities.',
         publishedAt: '2026-04-12',
         readTimeMin: 7,
+        category: 'Legal',
+        imageUrl: '/images/blog/agreement.png',
         body: [
             'One of the biggest friction points in Bangalore rentals is the security deposit. In professional PGs, the standard is 1–2 months of rent.',
             '**Token Amount**: Usually ₹2,000–₹5,000 to "block" a room. Confirm if this is refundable if you change your mind within 24 hours.',
@@ -97,6 +255,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'What to look for in a secure ladies PG: from biometric entry to area safety and warden support.',
         publishedAt: '2026-04-14',
         readTimeMin: 9,
+        category: 'Safety',
+        imageUrl: '/images/blog/safety.png',
         body: [
             'Safety is the #1 priority for female renters in Bangalore. Professional ladies PGs now offer security features that mirror premium apartment complexes.',
             '**Technical Security**: Look for properties with 24/7 CCTV in corridors/common areas and biometric or keycard entry to prevent unauthorized access.',
@@ -116,6 +276,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'Everything you need to know about 11-month rental agreements, security deposits, and registration rules in Bangalore.',
         publishedAt: '2026-04-16',
         readTimeMin: 12,
+        category: 'Legal',
+        imageUrl: '/images/blog/agreement.png',
         body: [
             'Renting a property in Bangalore requires a formal rental agreement. While the 11-month lease is standard to avoid the complexities of the Registration Act, understanding the clauses is vital.',
             '**Security Deposit**: Traditionally, Bangalore landlords asked for 10 months of rent as a deposit. In 2026, most managed rentals (like those on MakeMyStay) and modern apartments have shifted toward a more reasonable 3–5 month standard.',
@@ -154,6 +316,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'Stop bleeding money on empty rooms. Learn the secret framework used by top operators to find and qualify tenants instantly.',
         publishedAt: '2026-04-18',
         readTimeMin: 9,
+        category: 'Business',
+        imageUrl: '/images/blog/tech-park.png',
         body: [
             'Every day a room stays empty in Bangalore, you lose ₹500–₹1,000 in revenue. Professional operators don’t wait for leads; they "generate" demand.',
             '**Multi-Channel Blitz**: Listing only on one portal is a recipe for slow growth. Use a mix of Facebook groups, WhatsApp communities, and AI-driven platforms like MakeMyStay to cast a wide net.',
@@ -189,6 +353,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'Learn how to maximize your RevPAR (Revenue Per Available Room) using data-driven pricing strategies.',
         publishedAt: '2026-04-25',
         readTimeMin: 11,
+        category: 'Business',
+        imageUrl: '/images/blog/tech-park.png',
         body: [
             'Fixed pricing is a relic of the past. If you’re charging the same rent in June (peak season) as you are in December, you’re leaving money on the table.',
             '**Market Intelligence**: Monitor competitor prices in your micro-locality weekly. If every PG in Bellandur has hiked prices by 10%, your "old" rates are subsidizing your tenants.',
@@ -224,6 +390,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'A comprehensive guide to police verification, trade licenses, and tax obligations for property owners.',
         publishedAt: '2026-05-02',
         readTimeMin: 14,
+        category: 'Legal',
+        imageUrl: '/images/blog/agreement.png',
         body: [
             'Running a PG or rental business in Bangalore involves more than just collecting rent. Legal compliance is key to long-term sustainability.',
             '**Police Verification**: In 2026, Bangalore police have made digital tenant verification mandatory. Failure to submit tenant details via the official portal can lead to heavy fines.',
@@ -259,6 +427,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'The brokerage model is dying. Discover how AI-native engines are providing better talent at 90% lower costs.',
         publishedAt: '2026-05-09',
         readTimeMin: 10,
+        category: 'Technology',
+        imageUrl: '/images/blog/ai.png',
         body: [
             'The traditional broker acts as a "gatekeeper" of information. In the age of AI, information is free and accessible. The value has shifted to "experience".',
             '**Eliminating Bias**: AI doesn’t have favorites. It shows tenants what matches their needs perfectly, leading to higher satisfaction and lower churn.',
@@ -294,6 +464,8 @@ export const BLOG_POSTS: BlogPost[] = [
         description: 'Where should you invest next? A deep dive into upcoming metro corridors and peripheral tech hubs.',
         publishedAt: '2026-05-16',
         readTimeMin: 13,
+        category: 'Market',
+        imageUrl: '/images/blog/hero.png',
         body: [
             'The Bangalore rental map is expanding. With the Metro Blue Line (Airport line) nearing completion, traditional hubs are seeing competition from new areas.',
             '**The North Bangalore Surge**: Areas like Bagalur and Thanisandra are no longer "too far". They are the new frontier for high-end coliving projects catering to the airport tech cluster.',

@@ -1,4 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Clock, Calendar, ChevronLeft, Share2, Bookmark, ArrowRight, CheckCircle } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -6,6 +8,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { BLOG_POSTS, getBlogPost } from '@/data/blogPosts';
 import { buildPageSEO } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
+import { buildBreadcrumbSchema } from '@/lib/schema';
 
 export default function BlogPost() {
     const { slug } = useParams<{ slug: string }>();
@@ -28,7 +31,12 @@ export default function BlogPost() {
         headline: post.title,
         description: post.description,
         datePublished: post.publishedAt,
-        author: { '@type': 'Organization', name: 'MakeMyStay.ai' },
+        dateModified: post.updatedAt ?? post.publishedAt,
+        author: {
+            '@type': post.authorType ?? 'Organization',
+            name: post.authorName ?? 'MakeMyStay.ai',
+        },
+        image: post.imageUrl ? `${SITE_URL}${post.imageUrl}` : undefined,
         publisher: { '@type': 'Organization', name: 'MakeMyStay.ai' },
         mainEntityOfPage: canonical,
     };
@@ -46,99 +54,197 @@ export default function BlogPost() {
         }))
     } : null;
 
+    const breadcrumbSchema = buildBreadcrumbSchema([
+        { name: 'Home', path: '/' },
+        { name: 'Blog', path: '/blog' },
+        { name: post.title, path: `/blog/${post.slug}` },
+    ]);
+
+    const relatedPosts = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+
     return (
         <div className="min-h-screen bg-white font-sans flex flex-col">
             <SEOHead {...helmet} ogType="article" />
             <JsonLd data={articleSchema} id="blog-article-schema" />
+            <JsonLd data={breadcrumbSchema} id="blog-breadcrumb-schema" />
             {faqSchema && <JsonLd data={faqSchema} id="blog-faq-schema" />}
 
             <Navbar />
 
-            <main id="main-content" className="flex-grow pt-28 pb-16">
-                <article className="max-w-3xl mx-auto px-4 sm:px-6">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">
-                        <Link to="/" className="hover:text-brand-red">
-                            Home
-                        </Link>{' '}
-                        / Blog
-                    </p>
-                    <h1 className="mt-3 text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">{post.title}</h1>
-                    <p className="mt-2 text-sm text-slate-500">
-                        {post.publishedAt} · {post.readTimeMin} min read
-                    </p>
-                    <p className="mt-6 text-lg text-slate-600 leading-relaxed">{post.description}</p>
+            <main id="main-content" className="flex-grow pt-24 pb-24">
+                {/* Progress Bar */}
+                <motion.div 
+                    className="fixed top-[64px] md:top-[80px] left-0 h-1 bg-brand-red z-50 origin-left"
+                    initial={{ scaleX: 0 }}
+                    style={{ scaleX: 0 }} // This would normally be handled by scroll progress
+                />
 
-                    <div className="mt-10 space-y-5 text-slate-700 leading-relaxed">
-                        {post.body.map((para, i) => (
-                            <p key={i}>{para}</p>
-                        ))}
+                <article className="max-w-4xl mx-auto px-4 sm:px-6">
+                    {/* Header Metadata */}
+                    <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <Link to="/blog" className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-brand-red transition-colors group">
+                            <ChevronLeft className="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" />
+                            Back to Insights
+                        </Link>
+                        <div className="flex items-center gap-4">
+                            <button className="p-2 rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all">
+                                <Share2 className="w-4 h-4" />
+                            </button>
+                            <button className="p-2 rounded-full bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all">
+                                <Bookmark className="w-4 h-4" />
+                            </button>
+                        </div>
                     </div>
 
+                    <header className="mb-12">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest mb-6 shadow-sm">
+                            {post.category || 'Guides'}
+                        </span>
+                        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-8">
+                            {post.title}
+                        </h1>
+                        <div className="flex flex-wrap items-center gap-6 text-slate-500 text-sm">
+                            <div className="flex items-center">
+                                <div className="w-10 h-10 rounded-full bg-brand-red/10 flex items-center justify-center text-brand-red font-bold mr-3 border border-brand-red/20">
+                                    MS
+                                </div>
+                                <div>
+                                    <p className="text-slate-900 font-bold leading-none mb-1">{post.authorName || 'MakeMyStay Team'}</p>
+                                    <p className="text-xs uppercase tracking-wider">{post.authorType || 'Editorial'}</p>
+                                </div>
+                            </div>
+                            <div className="hidden sm:block w-px h-8 bg-slate-200" />
+                            <div className="flex items-center">
+                                <Calendar className="w-4 h-4 mr-2" />
+                                {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                            </div>
+                            <div className="flex items-center">
+                                <Clock className="w-4 h-4 mr-2" />
+                                {post.readTimeMin} min read
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Featured Image */}
+                    {post.imageUrl && (
+                        <motion.div 
+                            className="mb-16 relative rounded-[2.5rem] overflow-hidden shadow-2xl"
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <img 
+                                src={post.imageUrl} 
+                                alt={post.title} 
+                                className="w-full h-full object-cover aspect-[21/9]"
+                            />
+                        </motion.div>
+                    )}
+
+                    {/* Article Body */}
+                    <div className="prose prose-lg prose-slate max-w-none">
+                        <p className="text-xl text-slate-600 leading-relaxed font-medium italic mb-10 border-l-4 border-brand-red pl-8 py-2">
+                            {post.description}
+                        </p>
+                        
+                        <div className="space-y-6 text-slate-700 text-lg leading-relaxed">
+                            {post.body.map((para, i) => (
+                                <p key={i} className="mb-4">{para}</p>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* FAQs */}
                     {post.faqs && post.faqs.length > 0 && (
-                        <div className="mt-12 space-y-8">
-                            <h2 className="text-2xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                        <div className="mt-20 pt-16 border-t border-slate-100">
+                            <h2 className="text-3xl font-bold text-slate-900 mb-10 flex items-center">
+                                <CheckCircle className="w-8 h-8 text-brand-red mr-3" />
+                                Common Questions
+                            </h2>
                             <div className="grid gap-6">
                                 {post.faqs.map((faq, i) => (
-                                    <div key={i} className="rounded-2xl border border-slate-100 bg-slate-50/50 p-6">
-                                        <h3 className="font-bold text-slate-900 mb-2">{faq.question}</h3>
-                                        <p className="text-slate-600 text-sm leading-relaxed">{faq.answer}</p>
-                                    </div>
+                                    <motion.div 
+                                        key={i} 
+                                        className="rounded-3xl border border-slate-100 bg-slate-50 p-8 hover:bg-white hover:shadow-xl hover:border-transparent transition-all duration-300"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                    >
+                                        <h3 className="text-lg font-bold text-slate-900 mb-3">{faq.question}</h3>
+                                        <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
+                                    </motion.div>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6 space-y-4">
-                        <div className="space-y-2">
-                            <p className="font-semibold text-slate-900">Looking for a PG or rental?</p>
-                            <p>
-                                <Link to="/pg/bangalore" className="text-brand-red font-medium hover:underline">
-                                    PG in Bangalore (city hub)
+                    {/* Call to Action */}
+                    <div className="mt-20 p-10 rounded-[2.5rem] bg-slate-900 relative overflow-hidden text-center">
+                        <div className="absolute inset-0 bg-diagonal-grid opacity-10" />
+                        <div className="relative z-10">
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">Looking for your next home?</h3>
+                            <p className="text-slate-400 mb-8 max-w-xl mx-auto">Skip the broker hassle. Browse 100% verified PGs and rentals in Bangalore's top tech hubs.</p>
+                            <div className="flex flex-wrap justify-center gap-4">
+                                <Link to="/pg/bangalore" className="px-8 py-3.5 bg-brand-red text-white font-bold rounded-2xl shadow-glow hover:shadow-[0_0_25px_rgba(217,32,39,0.5)] transition-all">
+                                    Browse PGs
                                 </Link>
-                                {' · '}
-                                <Link to="/pg/btm" className="text-brand-red font-medium hover:underline">
-                                    PG in BTM
+                                <Link to="/contact-us" className="px-8 py-3.5 bg-white/10 text-white font-bold rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+                                    Talk to Expert
                                 </Link>
-                                {' · '}
-                                <Link to="/pg-vs-flat-bangalore" className="text-brand-red font-medium hover:underline">
-                                    PG vs flat guide
-                                </Link>
-                            </p>
-                            <Link to="/pg" className="inline-block text-sm text-slate-600 hover:text-brand-red font-medium hover:underline">
-                                Browse all PG listings →
-                            </Link>
-                        </div>
-                        {post.relatedRentHubs && post.relatedRentHubs.length > 0 && (
-                            <div className="pt-2 border-t border-slate-200/80">
-                                <p className="text-sm font-semibold text-slate-900 mb-2">Flats &amp; houses for rent by area</p>
-                                <ul className="flex flex-wrap gap-2">
-                                    {post.relatedRentHubs.map((hub) => (
-                                        <li key={hub.path}>
-                                            <Link
-                                                to={hub.path}
-                                                className="inline-flex rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand-red/40 hover:text-brand-red transition-colors"
-                                            >
-                                                {hub.label}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
                             </div>
-                        )}
+                        </div>
                     </div>
+
+                    {/* Related Hubs */}
+                    {post.relatedRentHubs && post.relatedRentHubs.length > 0 && (
+                        <div className="mt-16 flex flex-wrap gap-3">
+                            <span className="text-sm font-bold text-slate-400 uppercase tracking-widest w-full mb-2">Related Areas:</span>
+                            {post.relatedRentHubs.map((hub) => (
+                                <Link
+                                    key={hub.path}
+                                    to={hub.path}
+                                    className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-brand-red hover:text-white transition-all"
+                                >
+                                    {hub.label}
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </article>
 
-                <section className="max-w-3xl mx-auto px-4 sm:px-6 mt-16">
-                    <h2 className="text-lg font-bold text-slate-900">More articles</h2>
-                    <ul className="mt-4 space-y-3">
-                        {BLOG_POSTS.filter((p) => p.slug !== post.slug).map((p) => (
-                            <li key={p.slug}>
-                                <Link to={`/blog/${p.slug}`} className="text-brand-red font-medium hover:underline">
+                {/* More Articles Section */}
+                <section className="max-w-7xl mx-auto px-4 sm:px-6 mt-32">
+                    <div className="flex items-center justify-between mb-10">
+                        <h2 className="text-3xl font-bold text-slate-900">Recommended <span className="text-brand-red">Stories</span></h2>
+                        <Link to="/blog" className="text-slate-900 font-bold hover:text-brand-red transition-colors flex items-center">
+                            View All <ArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {relatedPosts.map((p) => (
+                            <Link 
+                                key={p.slug} 
+                                to={`/blog/${p.slug}`} 
+                                className="group block overflow-hidden"
+                            >
+                                <div className="aspect-[16/10] rounded-3xl overflow-hidden mb-4 shadow-sm border border-slate-100">
+                                    <img 
+                                        src={p.imageUrl || "/images/blog/pg-living.png"} 
+                                        alt={p.title} 
+                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    />
+                                </div>
+                                <h3 className="font-bold text-slate-900 group-hover:text-brand-red transition-colors line-clamp-2 leading-tight">
                                     {p.title}
-                                </Link>
-                            </li>
+                                </h3>
+                                <div className="flex items-center gap-3 mt-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                                    <span>{p.category || 'Guides'}</span>
+                                    <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                    <span>{p.readTimeMin} min read</span>
+                                </div>
+                            </Link>
                         ))}
-                    </ul>
+                    </div>
                 </section>
             </main>
 

@@ -1,4 +1,4 @@
-import { DEFAULT_OG_IMAGE, LEGAL_ENTITY_NAME, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { findPgLocationForArea } from '@/data/pgLocations';
@@ -76,17 +76,15 @@ export function buildOrganizationSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: LEGAL_ENTITY_NAME,
-        alternateName: SITE_NAME,
+        name: 'MakeMyStay',
+        alternateName: 'MakeMyStay Realty',
         url: SITE_URL,
         logo: `${SITE_URL}/logo.svg`,
         description:
-            'Verified PGs, 1BHK and 2BHK rentals in Bangalore with transparent pricing, real photos and no brokerage.',
+            'Find verified PGs, 1BHK and 2BHK homes in Bangalore with transparent pricing, real photos, and zero brokerage. AI-powered property discovery platform.',
         sameAs: [
-            'https://www.facebook.com/p/Make-My-Stay-ai-61569413385115/',
-            'https://www.linkedin.com/company/makemystay-ai',
-            'https://www.instagram.com/makemystay.ai/',
-            'https://g.page/makemystay-ai',
+            'https://www.instagram.com/makemystay',
+            'https://www.linkedin.com/company/makemystay',
         ],
     };
 }
@@ -96,24 +94,36 @@ export function buildLocalBusinessSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': ['LocalBusiness', 'RealEstateAgent'],
-        name: LEGAL_ENTITY_NAME,
-        alternateName: SITE_NAME,
+        name: 'MakeMyStay',
+        alternateName: 'MakeMyStay Realty',
         url: SITE_URL,
+        logo: `${SITE_URL}/logo.svg`,
         image: DEFAULT_OG_IMAGE,
-        telephone: '+91-81500-99911',
-        email: 'connect@makemystay.ai',
+        description:
+            'Find verified PGs, 1BHK and 2BHK homes in Bangalore with transparent pricing, real photos, and zero brokerage. AI-powered property discovery platform.',
         address: {
             '@type': 'PostalAddress',
-            streetAddress: 'HSR Layout, Sector 4',
-            addressLocality: 'Bengaluru',
+            addressLocality: 'Bangalore',
             addressRegion: 'Karnataka',
-            postalCode: '560102',
             addressCountry: 'IN',
         },
         areaServed: [
-            { '@type': 'City', name: 'Bengaluru' },
-            { '@type': 'City', name: 'Hyderabad' },
-            { '@type': 'City', name: 'Pune' }
+            'Koramangala',
+            'Whitefield',
+            'HSR Layout',
+            'Indiranagar',
+            'Electronic City',
+            'Marathahalli',
+            'BTM Layout',
+            'Manyata Tech Park',
+            'Bellandur',
+            'Sarjapur Road',
+            'Bangalore',
+        ],
+        priceRange: '₹6000 - ₹25000',
+        sameAs: [
+            'https://www.instagram.com/makemystay',
+            'https://www.linkedin.com/company/makemystay',
         ],
     };
 }
@@ -174,10 +184,15 @@ export function buildPgHubItemListSchema(
             '@type': 'ListItem',
             position: index + 1,
             item: {
-                '@type': 'Product',
+                '@type': 'Accommodation',
                 name: label || `Listing ${p.id}`,
                 url: `${SITE_URL}${absPath}`,
-                sku: String(p.id),
+                address: {
+                    '@type': 'PostalAddress',
+                    addressLocality: p.location || 'Bangalore',
+                    addressRegion: 'Karnataka',
+                    addressCountry: 'IN',
+                },
             },
         };
     });
@@ -235,12 +250,16 @@ export function buildPropertyDetailGraph(
     const productName = buildPropertyProductName(property);
 
     const product: Record<string, unknown> = {
-        '@type': 'Product',
+        '@type': 'Accommodation',
         name: productName,
         description: desc || `${productName} — ${property.type} in ${property.location}`,
-        sku: String(property.id),
-        brand: { '@type': 'Brand', name: SITE_NAME },
         url,
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: property.location || 'Bangalore',
+            addressRegion: 'Karnataka',
+            addressCountry: 'IN',
+        },
     };
     if (property.type) {
         product.category = property.type;

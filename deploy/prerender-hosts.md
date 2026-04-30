@@ -41,20 +41,29 @@ When the marketing site is served from **Ubuntu + nginx** on EC2, the active vho
 
    If multiple `location /` blocks exist (e.g. HTTP vs HTTPS `server`), grep each vhost or open the file in `sudo nano` / `sudo vim` and note which `server { }` serves **HTTPS** for `makemystay.ai` — prerender and SPA `try_files` must apply there.
 
-3. **Merge** into `makemystay_all` (prefer manual edit or a small diff, not blind regex):
+3. **Create token snippet** on server (secret, not in git):
+
+   ```bash
+   sudo install -d -m 755 /etc/nginx/snippets
+   sudo cp /path/to/repo/deploy/prerender_token.conf.example /etc/nginx/snippets/prerender_token.conf
+   sudo sed -i 's/REPLACE_WITH_PRERENDER_IO_TOKEN/<REAL_PRERENDER_TOKEN>/' /etc/nginx/snippets/prerender_token.conf
+   sudo chmod 600 /etc/nginx/snippets/prerender_token.conf
+   ```
+
+4. **Merge** into `makemystay_all` (prefer manual edit or a small diff, not blind regex):
    - Copy **`map` … `map $http_x_prerender`** from [`nginx_frontend_and_api.conf`](../nginx_frontend_and_api.conf) lines 15–38 into the **`http`** block (before the first `server {`).
-   - In the **`server_name makemystay.ai`** (or equivalent) block, align **`location /`** with lines 58–67: `if ($prerender = 1) { rewrite … break; proxy_set_header X-Prerender-Token …; proxy_pass https://service.prerender.io; }` then `try_files $uri $uri/ /index.html;` (use the same token value as in Prerender.io dashboard / reference file).
+   - In the **`server_name makemystay.ai`** (or equivalent) block, align **`location /`** with lines 58–67: load token from `/etc/nginx/snippets/prerender_token.conf`, then `if ($prerender = 1) { rewrite … break; proxy_set_header X-Prerender-Token $prerender_token; proxy_pass https://service.prerender.io; }`, then `try_files $uri $uri/ /index.html;`.
    - Add **`location = /properties`** exactly as lines 95–101: four `if ($arg_cat = …) { return 301 …; }` lines, then **`try_files $uri $uri/ /index.html;`** for requests **without** `cat` (bare `/properties`).
 
-4. **Do not** end `location = /properties` with `return 301 /properties;` — that **redirects `/properties` to itself** when `cat` is absent and breaks the SPA.
+5. **Do not** end `location = /properties` with `return 301 /properties;` — that **redirects `/properties` to itself** when `cat` is absent and breaks the SPA.
 
-5. **Test and reload**:
+6. **Test and reload**:
 
    ```bash
    sudo nginx -t && sudo systemctl reload nginx
    ```
 
-6. **Verify** with [verify-checklist.md](./verify-checklist.md) (prerender curl, legacy `Location`, noindex, sitemap).
+7. **Verify** with [verify-checklist.md](./verify-checklist.md) (prerender curl, legacy `Location`, noindex, sitemap).
 
 ### Homepage JSON-LD count
 

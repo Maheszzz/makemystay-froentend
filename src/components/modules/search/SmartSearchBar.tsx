@@ -94,9 +94,9 @@ export function SmartSearchBar({
     };
 
     return (
-        <div className="bg-black/40 backdrop-blur-xl rounded-2xl md:rounded-[2rem] shadow-2xl p-2.5 md:p-6 max-w-3xl w-full relative border border-white/10">
+        <div className="bg-black/40 backdrop-blur-xl rounded-2xl md:rounded-[2rem] shadow-2xl p-2 md:p-6 max-w-3xl w-full relative border border-white/10">
             {/* BUY / RENT / PLOT Toggle */}
-            <div className="flex w-full max-w-[380px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-3 md:mb-5 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar flex-wrap sm:flex-nowrap justify-center items-stretch">
+            <div className="flex w-full overflow-x-auto sm:overflow-visible max-w-[380px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-5 bg-white/5 rounded-full p-1 border border-white/10 hide-scrollbar flex-nowrap justify-start sm:justify-center items-stretch">
                 {[
                     { id: 'all', label: 'ALL' },
                     { id: 'pg', label: 'PG' },
@@ -116,7 +116,7 @@ export function SmartSearchBar({
                                 setCategory?.(id);
                             }
                         }}
-                        className={`flex-1 sm:flex-none py-2 px-2.5 sm:px-4 md:px-6 rounded-full text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[40px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${effectiveCategory === tab.id
+                        className={`shrink-0 min-w-[60px] sm:min-w-0 sm:flex-none py-1.5 px-2 sm:px-4 md:px-6 rounded-full text-[9px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[36px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${effectiveCategory === tab.id
                             ? 'bg-brand-gold text-white shadow-md'
                             : 'bg-transparent text-white/60 hover:text-brand-gold'
                             }`}
@@ -127,10 +127,10 @@ export function SmartSearchBar({
             </div>
 
             {/* Search Input Area */}
-            <div className="relative flex items-stretch bg-white/5 border border-white/10 rounded-full group focus-within:ring-2 focus-within:ring-brand-gold/50 focus-within:border-brand-gold/50 transition-all min-h-[48px] md:min-h-[52px] pl-10 md:pl-12 pr-24 md:pr-28">
-                <MapPin className="absolute left-3 md:left-4 top-1/2 z-[1] -translate-y-1/2 w-5 h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300 pointer-events-none" />
+            <div className="relative flex items-stretch bg-white/5 border border-white/10 rounded-2xl md:rounded-full group focus-within:ring-2 focus-within:ring-brand-gold/50 focus-within:border-brand-gold/50 transition-all min-h-[46px] md:min-h-[52px] pl-9 md:pl-12 pr-20 md:pr-28">
+                <MapPin className="absolute left-2.5 md:left-4 top-1/2 z-[1] -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-white/50 group-focus-within:text-brand-gold transition-colors duration-300 pointer-events-none" />
 
-                <div className="flex flex-1 min-w-0 min-h-[48px] md:min-h-[52px] flex-wrap items-center content-center gap-2 py-1.5 md:py-2">
+                <div className="flex flex-1 min-w-0 min-h-[46px] md:min-h-[52px] flex-wrap items-center content-center gap-1.5 py-1 md:py-2">
                     {/* Selected Locations (Chips) */}
                     {(searchQuery || '').split(',').filter(Boolean).map((loc, idx) => (
                         <div key={idx} className="flex items-center gap-1 bg-white/10 text-white text-[11px] md:text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full shrink-0">
@@ -180,8 +180,8 @@ export function SmartSearchBar({
                                 }
                             }
                         }}
-                        placeholder={(searchQuery || '').trim() ? "" : "Search multiple locations..."}
-                        className="flex-1 min-w-[80px] min-h-0 self-center bg-transparent text-white placeholder:text-white/60 outline-none text-sm leading-normal"
+                        placeholder={(searchQuery || '').trim() ? "" : "Search locations..."}
+                        className="flex-1 min-w-[80px] min-h-0 self-center bg-transparent text-white placeholder:text-white/60 outline-none text-[13px] md:text-sm leading-normal"
                     />
                 </div>
 
@@ -222,7 +222,7 @@ export function SmartSearchBar({
                             setShowSuggestions(false);
                         }
                     }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 bg-brand-gold hover:bg-brand-gold/90 rounded-xl md:rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                     <Search className="w-4 h-4 md:w-5 md:h-5 text-white pointer-events-none" />
                 </button>
             </div>

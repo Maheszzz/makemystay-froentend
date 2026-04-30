@@ -29,8 +29,8 @@ export function SimilarPropertiesSection({ current }: SimilarPropertiesSectionPr
           : `More ${current.type} listings${city ? ` near ${city}` : ''}`;
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-6 md:p-8" aria-labelledby="similar-pg-heading">
-            <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <section className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-5 sm:p-6 md:p-8" aria-labelledby="similar-pg-heading">
+            <div className="mb-4 md:mb-5 flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h2 id="similar-pg-heading" className="text-xl md:text-2xl font-extrabold text-slate-900">
                         {heading}
@@ -52,7 +52,7 @@ export function SimilarPropertiesSection({ current }: SimilarPropertiesSectionPr
                     <LoadingSpinner size={40} message="Loading similar listings…" />
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
                     {similar.map((p) => (
                         <PropertyCard key={p.id} property={p} />
                     ))}

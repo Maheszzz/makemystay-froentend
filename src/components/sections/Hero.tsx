@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, CheckCircle } from 'lucide-react';
+import { ChevronDown, CheckCircle, ShieldCheck, Clock3, BadgeCheck } from 'lucide-react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
 
 const slides = [
@@ -41,6 +41,13 @@ const trustItems = [
     'Dedicated Support',
 ];
 
+const trustStats = [
+    { value: '1,200+', label: 'verified listings', icon: BadgeCheck },
+    { value: '4.7★', label: 'avg tenant rating', icon: ShieldCheck },
+    { value: 'Zero', label: 'brokerage fee', icon: CheckCircle },
+    { value: '48hr', label: 'booking guarantee', icon: Clock3 },
+];
+
 const SLIDE_INTERVAL = 4500;
 const FADE_DURATION = 1500;
 
@@ -56,6 +63,7 @@ interface HeroProps {
 export function Hero({ category, setCategory, searchQuery, setSearchQuery, listingsNavigate }: HeroProps) {
     const [current, setCurrent] = useState(0);
     const [contentVisible, setContentVisible] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
 
     // Preload images
     useEffect(() => {
@@ -66,24 +74,32 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
     }, []);
 
     useEffect(() => {
+        const updateViewport = () => setIsMobile(window.innerWidth < 768);
+        updateViewport();
+        window.addEventListener('resize', updateViewport);
+        return () => window.removeEventListener('resize', updateViewport);
+    }, []);
+
+    useEffect(() => {
         const timer = setInterval(() => {
             setContentVisible(false);
             setTimeout(() => {
                 setCurrent(prev => (prev + 1) % slides.length);
                 setContentVisible(true);
             }, FADE_DURATION);
-        }, SLIDE_INTERVAL);
+        }, isMobile ? 6500 : SLIDE_INTERVAL);
         return () => clearInterval(timer);
-    }, []);
+    }, [isMobile]);
 
     const slide = slides[current];
 
     return (
-        <section
-            id="home"
-            className="relative w-full h-[45svh] md:h-screen min-h-[300px] md:min-h-[600px] overflow-hidden"
-            style={{ zIndex: 20 }}
-        >
+        <>
+            <section
+                id="home"
+                className="relative w-full h-[62svh] sm:h-[68svh] md:h-screen min-h-[420px] md:min-h-[600px] overflow-hidden"
+                style={{ zIndex: 20 }}
+            >
             {/* ── Background Image Layers (crossfade) ── */}
             {slides.map((s, idx) => (
                 <div
@@ -107,8 +123,8 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
 
             {/* ── Single centered column: fading text + static search bar ── */}
             <div
-                className="absolute inset-0 flex flex-col items-center justify-center px-5 sm:px-8"
-                style={{ zIndex: 30, paddingTop: '64px' }}
+                className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-8 pt-[86px] md:pt-[132px]"
+                style={{ zIndex: 30 }}
             >
                 {/* --- Fading content block --- */}
                 <div
@@ -118,6 +134,13 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                         transition: `opacity ${FADE_DURATION}ms ease-in-out`,
                     }}
                 >
+                    <div className="inline-flex items-center gap-1.5 mb-2 md:mb-4 rounded-full bg-emerald-400/15 border border-emerald-300/30 px-2.5 py-1 max-[430px]:px-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                        <span className="text-[9px] md:text-xs font-semibold text-white/90">
+                            1,200+ verified listings in Bangalore
+                        </span>
+                    </div>
+
                     {/* Eyebrow */}
                     <div className="mb-2 md:mb-6 hidden md:block">
                         <span
@@ -135,7 +158,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                     </div>
 
                     {/* One SEO H1 (audit): keyword-rich; carousel line is decorative copy only */}
-                    <div className="relative mb-2 md:mb-3 max-w-4xl mx-auto">
+                    <div className="relative mb-1.5 md:mb-3 max-w-4xl mx-auto">
                         <div
                             className="absolute -inset-12 pointer-events-none rounded-full"
                             style={{ background: 'radial-gradient(ellipse, rgba(197,160,33,0.10) 0%, transparent 70%)', filter: 'blur(30px)' }}
@@ -145,43 +168,53 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                             style={{
                                 fontFamily: "'Cormorant Garamond', serif",
                                 fontWeight: 500,
-                                fontSize: 'clamp(1.25rem, 3.8vw, 2.35rem)',
+                                fontSize: 'clamp(1.08rem, 3.6vw, 2.35rem)',
                                 textShadow: '0 2px 24px rgba(0,0,0,0.35)',
                             }}
                         >
-                            Verified PG &amp; flats on rent in Bangalore
+                            Find your perfect PG near your office
                         </h1>
                     </div>
 
-                    {/* Rotating hero line (not an extra H1) */}
-                    <p
-                        className="text-white leading-[1.08] tracking-tight relative mb-1 md:mb-2 max-w-4xl mx-auto"
-                        style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            fontWeight: 300,
-                            fontSize: 'clamp(28px, 6vw, 80px)',
-                            textShadow: '0 2px 24px rgba(0,0,0,0.35)',
-                        }}
-                    >
-                        {slide.headline}{' '}
-                        <em style={{ fontStyle: 'italic', fontWeight: 400 }}>{slide.headlineItalic}</em>
-                    </p>
+                    {!isMobile ? (
+                        <>
+                            <p
+                                className="text-white leading-[1.12] tracking-tight relative mb-1 md:mb-2 max-w-4xl mx-auto"
+                                style={{
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    fontWeight: 300,
+                                    fontSize: 'clamp(22px, 7.2vw, 80px)',
+                                    textShadow: '0 2px 24px rgba(0,0,0,0.35)',
+                                }}
+                            >
+                                {slide.headline}{' '}
+                                <em style={{ fontStyle: 'italic', fontWeight: 400 }}>{slide.headlineItalic}</em>
+                            </p>
 
-                    <p
-                        className="mb-1.5 md:mb-4 font-light tracking-wide max-w-3xl mx-auto"
-                        style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            color: '#FFFFFF',
-                            fontSize: 'clamp(12px, 2.3vw, 28px)',
-                            textShadow: '0 2px 16px rgba(0,0,0,0.6)',
-                        }}
-                    >
-                        {slide.subheadline}
+                            <p
+                                className="mb-1.5 md:mb-2 font-light tracking-wide max-w-3xl mx-auto"
+                                style={{
+                                    fontFamily: "'Cormorant Garamond', serif",
+                                    color: '#FFFFFF',
+                                    fontSize: 'clamp(12px, 2.3vw, 28px)',
+                                    textShadow: '0 2px 16px rgba(0,0,0,0.6)',
+                                }}
+                            >
+                                {slide.subheadline}
+                            </p>
+                        </>
+                    ) : (
+                        <p className="text-white/90 text-[11px] leading-relaxed font-medium max-w-[19rem] mx-auto">
+                            Verified stays with transparent pricing in Bangalore's top locations.
+                        </p>
+                    )}
+                    <p className="text-white/80 text-[10px] sm:text-xs md:text-sm font-medium tracking-wide">
+                        Transparent pricing • Real photos • Zero brokerage
                     </p>
                 </div>
 
                 {/* --- Static search bar — never fades --- */}
-                <div className="w-full max-w-3xl mt-4 md:mt-10 mb-2 md:mb-3">
+                <div className="w-full max-w-3xl mt-3 md:mt-10 mb-2 md:mb-3">
                     {/* Subtle glow ring behind search */}
                     <div
                         className="relative"
@@ -200,10 +233,10 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                 </div>
 
                 {/* Explore PG — visible on small screens (desktop copy lives in trust row below) */}
-                <div className="flex md:hidden justify-center w-full max-w-3xl mt-3 mb-1 px-2">
+                <div className="flex md:hidden justify-center w-full max-w-3xl mt-2.5 mb-1 px-2">
                     <Link
                         to="/pg/bangalore"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-bold text-white/90 hover:bg-brand-red hover:border-brand-red transition-all duration-300 text-center max-w-[min(100%,22rem)]"
+                        className="inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] font-bold text-white/95 hover:bg-brand-red hover:border-brand-red transition-all duration-300 text-center max-w-[min(100%,20rem)]"
                     >
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse shrink-0" />
                         Explore Best PG in Bangalore →
@@ -278,6 +311,29 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                     </div>
                 </div>
             </div>
-        </section>
+            </section>
+
+            <div className="relative z-20 bg-slate-950 border-y border-white/10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-5">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-5">
+                        {trustStats.map((stat) => {
+                            const Icon = stat.icon;
+                            return (
+                                <div
+                                    key={stat.label}
+                                    className="rounded-xl border border-white/10 bg-slate-900 px-2.5 py-2 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                                >
+                                    <div className="flex items-center justify-center gap-1.5 text-white mb-1">
+                                        <Icon className="w-3.5 h-3.5 text-brand-gold" aria-hidden />
+                                        <span className="text-[1.15rem] leading-none sm:text-lg font-bold tracking-tight">{stat.value}</span>
+                                    </div>
+                                    <p className="text-[10px] sm:text-xs text-white/75 leading-tight">{stat.label}</p>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }

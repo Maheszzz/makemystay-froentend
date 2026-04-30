@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BadgeCheck, IndianRupee, ShieldCheck } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
 import { useProperties } from '@/hooks';
@@ -81,17 +81,23 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
     }
 
     return (
-        <section className="py-10 md:py-20 bg-slate-50 pb-20 md:pb-20">
+        <section className="py-10 md:py-20 bg-gradient-to-b from-stone-50 via-[#faf9f7] to-stone-100/50 pb-20 md:pb-20">
             {/* Section Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 md:mb-12 gap-4">
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1 md:mb-2">
-                            Explore Our{' '}
-                            <span className="text-brand-red">Premium</span>{' '}Spaces
+                        <h2 className="text-2xl md:text-3xl font-semibold text-stone-900 mb-1 md:mb-2 tracking-tight">
+                            Featured PGs near you
                         </h2>
-                        <p className="text-slate-500 text-sm md:text-base">Thoughtfully designed for urban professionals</p>
+                        <p className="text-stone-500 text-sm md:text-base">Verified listings with real photos and transparent pricing</p>
                     </div>
+                    <Link
+                        to={viewAllPath}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-700 hover:text-brand-red transition-colors"
+                    >
+                        View all
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
                 </div>
             </div>
 
@@ -115,10 +121,36 @@ export function PropertyGrid({ category, searchQuery }: PropertyGridProps) {
             </div>
 
             <div className="mt-8 md:mt-12 flex justify-center px-4">
-                <Link to={viewAllPath} className="flex items-center gap-2 px-8 py-4 bg-white border border-slate-200 text-slate-900 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm hover:shadow-md group w-full md:w-auto justify-center">
+                <Link to={viewAllPath} className="flex items-center gap-2 px-8 py-4 bg-white/95 border border-stone-300/80 text-stone-900 font-semibold rounded-xl hover:bg-stone-50 hover:border-stone-400/70 transition-all shadow-sm hover:shadow-md group w-full md:w-auto justify-center">
                     View All Properties
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 md:mt-14">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                    <div className="rounded-2xl border border-stone-200 bg-white/95 p-4">
+                        <div className="flex items-center gap-2 text-stone-900 mb-1.5">
+                            <BadgeCheck className="w-4 h-4 text-emerald-600" aria-hidden />
+                            <p className="text-sm font-medium">Verified listings</p>
+                        </div>
+                        <p className="text-xs text-stone-600">Every PG is physically inspected by our team.</p>
+                    </div>
+                    <div className="rounded-2xl border border-stone-200 bg-white/95 p-4">
+                        <div className="flex items-center gap-2 text-stone-900 mb-1.5">
+                            <IndianRupee className="w-4 h-4 text-brand-gold" aria-hidden />
+                            <p className="text-sm font-medium">Zero brokerage</p>
+                        </div>
+                        <p className="text-xs text-stone-600">No hidden fees or middlemen during booking.</p>
+                    </div>
+                    <div className="rounded-2xl border border-stone-200 bg-white/95 p-4">
+                        <div className="flex items-center gap-2 text-stone-900 mb-1.5">
+                            <ShieldCheck className="w-4 h-4 text-blue-600" aria-hidden />
+                            <p className="text-sm font-medium">Real reviews</p>
+                        </div>
+                        <p className="text-xs text-stone-600">Only verified tenants can rate listed properties.</p>
+                    </div>
+                </div>
             </div>
         </section>
     );

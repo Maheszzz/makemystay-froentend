@@ -21,8 +21,6 @@ import {
 } from '@/lib/listingsCategoryHubs';
 import {
     computeRentPlotStatsFromListings,
-    formatInrRange,
-    formatSqftRange,
 } from '@/lib/listingInventoryStats';
 import type { Property } from '@/types/api';
 
@@ -233,6 +231,7 @@ export default function Properties({
     const {
         properties,
         totalCount,
+        propertyCounts,
         loading,
         error,
         refetch,
@@ -409,385 +408,395 @@ export default function Properties({
         return <Navigate to={redirectFromLegacyCat} replace />;
     }
 
-    const mainContent = (
-            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-32 pb-20 flex-grow'}>
-                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? '' : ''}`}>
-                    {/* Header */}
-                    {!hideChrome && (
-                        <div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                            <div>
+    return (
+        <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
+            {listingsHelmet && <SEOHead {...listingsHelmet} />}
+            <Navbar />
+
+            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-20 pb-20 flex-grow'}>
+                {/* 1. Hero Section (Only if not hidden) */}
+                {!hideChrome && (
+                    <section className="relative py-16 md:py-24 bg-brand-charcoal overflow-hidden mb-12">
+                        <div className="absolute inset-0 z-0">
+                            <img 
+                                src="/images/blog/hero.png" 
+                                alt="" 
+                                className="w-full h-full object-cover opacity-20 scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal via-brand-charcoal/60 to-transparent" />
+                        </div>
+                        
+                        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6 }}
+                            >
                                 <button
                                     type="button"
                                     onClick={goBack}
-                                    className="group mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-300 hover:text-brand-red hover:shadow-md"
+                                    className="group mb-8 inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-xs font-bold text-white/70 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
                                 >
-                                    <ArrowLeft className="h-3.5 w-3.5 shrink-0 transition group-hover:-translate-x-0.5" aria-hidden />
-                                    Back
+                                    <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-1" />
+                                    Back to Home
                                 </button>
-                                <h1 className="text-2xl md:text-4xl font-bold text-slate-900 mb-1">{pageTitle}</h1>
-                                <p className="text-slate-500 text-sm md:text-lg">{pageSubtitle}</p>
-                                {showRentBangaloreHubBlocks && (
-                                    <p className="mt-3 text-sm font-semibold text-slate-700">
-                                        {inventoryStats.rentMinInr != null && inventoryStats.rentMaxInr != null ? (
-                                            <>
-                                                Typical range in this hub:{' '}
-                                                <span className="text-brand-red">
-                                                    {formatInrRange(inventoryStats.rentMinInr, inventoryStats.rentMaxInr)}
-                                                </span>{' '}
-                                                / month — filter below to narrow.
-                                            </>
-                                        ) : (
-                                            <>Rent varies by listing — see cards below. Use filters to narrow.</>
-                                        )}
-                                    </p>
-                                )}
-                                {showPlotCityHubBlocks && (
-                                    <p className="mt-3 text-sm font-semibold text-slate-700">
-                                        {inventoryStats.plotSqftMin != null && inventoryStats.plotSqftMax != null ? (
-                                            <>
-                                                Listed plot sizes in this hub:{' '}
-                                                <span className="text-brand-red">
-                                                    {formatSqftRange(
-                                                        inventoryStats.plotSqftMin,
-                                                        inventoryStats.plotSqftMax
-                                                    )}
-                                                </span>{' '}
-                                                — filter below to narrow.
-                                            </>
-                                        ) : (
-                                            <>Plot sizes vary by listing — see cards below.</>
-                                        )}
-                                    </p>
-                                )}
-                            </div>
+                                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight mb-4">
+                                    {pageTitle}
+                                </h1>
+                                <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">
+                                    {pageSubtitle}
+                                </p>
+                            </motion.div>
                         </div>
-                    )}
-                    {showRentBangaloreHubBlocks && (
-                        <div className="mb-8 rounded-2xl border border-slate-200/90 bg-white p-4 md:p-5 shadow-sm">
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">Browse by area</p>
-                            <div className="flex flex-wrap gap-2">
-                                {RENT_BANGALORE_AREA_CHIPS.map((c) => (
-                                    <Link
-                                        key={c.to}
-                                        to={c.to}
-                                        className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
-                                    >
-                                        {c.label}
-                                    </Link>
-                                ))}
-                            </div>
-                            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-5 mb-3">By configuration</p>
-                            <div className="flex flex-wrap gap-2">
-                                <Link
-                                    to="/1bhk"
-                                    className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
-                                >
-                                    1 BHK for rent
-                                </Link>
-                                <Link
-                                    to="/2bhk"
-                                    className="inline-flex rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:bg-brand-red/5 hover:text-brand-red transition-colors"
-                                >
-                                    2 BHK for rent
-                                </Link>
-                            </div>
-                        </div>
-                    )}
-                    {hideChrome && (
-                        <div className="mb-8 rounded-3xl border border-slate-200/90 bg-gradient-to-br from-white via-slate-50/80 to-white p-6 md:p-8 shadow-[0_20px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.04]">
-                            <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-6">
-                                <div className="min-w-0">
-                                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Live inventory</p>
-                                    <h2 className="mt-1 text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
-                                        Listings in {cityLabelDisplay}
-                                    </h2>
-                                    <p className="text-slate-600 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">{pageSubtitle}</p>
+                    </section>
+                )}
+
+                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-8' : '-mt-20 md:-mt-24 relative z-20'}`}>
+                    
+                    {/* 2. Floating Filter Bar */}
+                    <div className="bg-white/95 backdrop-blur-xl p-3 md:p-5 rounded-[2rem] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.2)] border border-slate-200/60 mb-10 sticky top-24 z-30 transition-all ring-1 ring-slate-900/[0.02]">
+                        <div className="flex flex-col lg:flex-row gap-3 md:gap-4 items-stretch">
+                            
+                            {/* Search and Category Tabs Wrapper */}
+                            <div className="flex-grow flex flex-col md:flex-row gap-3">
+                                {/* Search Input */}
+                                <div className="relative md:w-1/3 lg:w-1/4">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search area..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all text-sm font-medium"
+                                    />
                                 </div>
-                                {!loading && !error && (
-                                    <div className="shrink-0 rounded-2xl border border-slate-200/80 bg-white px-4 py-3 text-center shadow-sm">
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Results</p>
-                                        <p className="text-lg font-bold tabular-nums text-slate-900">
-                                            {propertyListOrdered.length}
-                                            <span className="text-slate-400 font-semibold"> / </span>
-                                            {totalCount}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
 
-                    {/* Unified Filter/Search Bar */}
-                    <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-[0_8px_40px_-16px_rgba(15,23,42,0.1)] border border-slate-200/80 mb-8 sticky top-24 z-30 transition-all ring-1 ring-slate-900/[0.03]">
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                            {/* Search Input - 5 cols */}
-                            <div className="lg:col-span-5 relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    type="text"
-                                    placeholder="Search name, area, or landmark..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-brand-red/20 focus:bg-white transition-all text-sm shadow-inner"
-                                />
-                            </div>
-
-                            {/* Category Tabs - 5 cols */}
-                            <div className="lg:col-span-5 flex items-center p-1 bg-slate-100 rounded-xl overflow-x-auto no-scrollbar">
-                                {CATEGORY_KEYS.map((cat) => (
-                                    <button
-                                        key={cat}
-                                        type="button"
-                                        onClick={() => handleCategoryTab(cat)}
-                                        aria-current={activeTabKey === cat ? 'page' : undefined}
-                                        className={`flex-1 px-4 py-2 rounded-lg text-[10px] md:text-xs font-bold transition-all whitespace-nowrap ${activeTabKey === cat ? 'bg-white text-brand-red shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        {CATEGORY_TAB_LABEL[cat]}
-                                    </button>
-                                ))}
+                                {/* Category Pills */}
+                                <div className="flex-grow flex items-center p-1.5 bg-slate-100/80 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth">
+                                    {CATEGORY_KEYS.map((cat) => {
+                                        const count = propertyCounts?.[cat];
+                                        const isActive = activeTabKey === cat;
+                                        return (
+                                            <button
+                                                key={cat}
+                                                type="button"
+                                                onClick={() => handleCategoryTab(cat)}
+                                                className={`flex-1 min-w-[70px] md:min-w-[90px] px-3 py-2.5 rounded-xl text-[11px] md:text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                                    isActive 
+                                                        ? 'bg-white text-brand-red shadow-md scale-[1.02]' 
+                                                        : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
+                                                }`}
+                                            >
+                                                <span>{CATEGORY_TAB_LABEL[cat]}</span>
+                                                {count !== undefined && (
+                                                    <span className={`px-1.5 py-0.5 rounded-md text-[9px] tabular-nums ${
+                                                        isActive ? 'bg-brand-red/10 text-brand-red' : 'bg-slate-200 text-slate-500'
+                                                    }`}>
+                                                        {count}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
-                            {/* Actions - 2 cols */}
-                            <div className="lg:col-span-2 flex items-center gap-2">
+                            {/* Filter and Refetch Actions */}
+                            <div className="flex items-center gap-2 shrink-0">
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className={`flex-1 h-full min-h-[44px] rounded-xl border font-bold text-[11px] transition-all flex items-center justify-center gap-2 ${showFilters ? 'bg-brand-red border-brand-red text-white' : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-white'}`}
+                                    className={`flex-1 lg:w-32 py-3.5 rounded-2xl border font-bold text-[11px] md:text-xs transition-all flex items-center justify-center gap-2 ${
+                                        showFilters 
+                                            ? 'bg-brand-red border-brand-red text-white shadow-glow' 
+                                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:shadow-sm'
+                                    }`}
                                 >
                                     <Filter className="w-3.5 h-3.5" />
-                                    Filters
+                                    More Filters
                                 </button>
-                                <div className="relative group">
-                                    <button onClick={refetch} className="p-3 rounded-xl bg-slate-100 text-slate-400 hover:text-brand-red hover:bg-slate-200 transition-all">
-                                        <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                                    </button>
-                                </div>
+                                <button 
+                                    onClick={refetch} 
+                                    className="p-3.5 rounded-2xl bg-slate-50 text-slate-400 hover:text-brand-red hover:bg-white hover:shadow-sm border border-slate-100 transition-all"
+                                    aria-label="Refresh results"
+                                >
+                                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                                </button>
                             </div>
                         </div>
 
-                        {/* Collapsible Advanced Filters */}
+                        {/* Expandable Advanced Filters */}
                         <AnimatePresence>
                             {showFilters && (
                                 <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
+                                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                    animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
+                                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="pt-6 mt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {/* Sort By */}
+                                    <div className="pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        {/* Sort Options */}
                                         <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Sort By</label>
+                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Sort Preference</label>
                                             <div className="relative">
                                                 <select
                                                     value={sortBy}
                                                     onChange={(e) => setSortBy(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium focus:ring-2 focus:ring-brand-red/10 outline-none pr-10"
+                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
                                                 >
-                                                    <option value="rating_desc">Best Rated</option>
-                                                    <option value="review_count_desc">Top Reviewed</option>
-                                                    <option value="price_asc">Price: Low to High</option>
-                                                    <option value="price_desc">Price: High to Low</option>
-                                                    <option value="newest">Newest First</option>
+                                                    <option value="review_count_desc">Popularity</option>
+                                                    <option value="rating_desc">Top Rated</option>
+                                                    <option value="price_asc">Lowest Price</option>
+                                                    <option value="price_desc">Highest Price</option>
+                                                    <option value="newest">Recently Added</option>
                                                 </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
+                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                             </div>
                                         </div>
 
-                                        {/* Budget */}
+                                        {/* Price Range */}
                                         <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Budget Range (₹)</label>
+                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Monthly Budget (₹)</label>
                                             <div className="flex items-center gap-2">
-                                                <input type="number" placeholder="Min" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-100 text-xs focus:ring-2 focus:ring-brand-red/10 outline-none" />
-                                                <span className="text-slate-300">to</span>
-                                                <input type="number" placeholder="Max" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} className="w-full px-3 py-2 rounded-lg bg-slate-50 border border-slate-100 text-xs focus:ring-2 focus:ring-brand-red/10 outline-none" />
+                                                <input 
+                                                    type="number" 
+                                                    placeholder="Min" 
+                                                    value={minPrice} 
+                                                    onChange={(e) => setMinPrice(e.target.value)} 
+                                                    className="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold focus:bg-white focus:ring-4 focus:ring-brand-red/5 outline-none transition-all" 
+                                                />
+                                                <span className="text-slate-300 font-bold">/</span>
+                                                <input 
+                                                    type="number" 
+                                                    placeholder="Max" 
+                                                    value={maxPrice} 
+                                                    onChange={(e) => setMaxPrice(e.target.value)} 
+                                                    className="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold focus:bg-white focus:ring-4 focus:ring-brand-red/5 outline-none transition-all" 
+                                                />
                                             </div>
                                         </div>
 
-                                        {/* City */}
+                                        {/* Locality Selection */}
                                         <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400">City / Area</label>
+                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">City / Area</label>
                                             <div className="relative">
                                                 <select
                                                     value={locationFilter}
                                                     onChange={(e) => setLocationFilter(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium focus:ring-2 focus:ring-brand-red/10 outline-none pr-10"
+                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
                                                 >
-                                                    <option value="all">Anywhere in Bangalore</option>
+                                                    <option value="all">Entire Bangalore</option>
                                                     {cities.map(c => <option key={c} value={c}>{c}</option>)}
                                                 </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
+                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                             </div>
                                         </div>
 
-                                        {/* Type */}
+                                        {/* Specific Type */}
                                         <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-bold text-slate-400">Configuration</label>
+                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Home Type</label>
                                             <div className="relative">
                                                 <select
                                                     value={typeFilter}
                                                     onChange={(e) => setTypeFilter(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-100 text-xs font-medium focus:ring-2 focus:ring-brand-red/10 outline-none pr-10"
+                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
                                                 >
-                                                    <option value="all">Any Configuration</option>
-                                                    <option value="1RK">1 RK</option>
+                                                    <option value="all">All Types</option>
+                                                    <option value="1RK">Studio (1 RK)</option>
                                                     <option value="1BHK">1 BHK</option>
                                                     <option value="2BHK">2 BHK</option>
                                                     <option value="3BHK">3 BHK</option>
-                                                    <option value="Villa">Villa / Independent</option>
+                                                    <option value="Villa">Villa / Row House</option>
                                                 </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
+                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                             </div>
                                         </div>
+                                    </div>
+                                    
+                                    <div className="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
+                                        <button 
+                                            onClick={resetFilters}
+                                            className="text-[11px] font-bold text-slate-400 hover:text-brand-red transition-colors uppercase tracking-widest"
+                                        >
+                                            Clear all filters
+                                        </button>
+                                        <button 
+                                            onClick={() => setShowFilters(false)}
+                                            className="px-6 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-xl hover:bg-brand-charcoal transition-all uppercase tracking-widest"
+                                        >
+                                            Show Results
+                                        </button>
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                     </div>
 
-                    {/* Results Count & Context */}
-                    {!loading && !error && !hideChrome && (
-                        <div className="flex items-center justify-between mb-6">
-                            <p className="text-slate-500 text-xs md:text-sm font-medium">
-                                Showing{' '}
-                                <span className="text-slate-900 font-bold">{propertyListOrdered.length}</span> of{' '}
-                                <span className="text-slate-900 font-bold">{totalCount}</span> properties
-                                {locationFilter !== 'all' && ` in ${cityLabelDisplay}`}
-                                {(wifiOn || foodOn || acOn) && (
-                                    <span className="text-slate-400"> (WiFi/food/AC filters apply to loaded results — scroll for more)</span>
+                    {/* 3. Area Chips (Hub context) */}
+                    {showRentBangaloreHubBlocks && (
+                        <div className="mb-10 p-1 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex items-center overflow-hidden">
+                            <div className="hidden md:flex items-center px-4 py-2 border-r border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 shrink-0">
+                                Popular Areas
+                            </div>
+                            <div className="flex flex-nowrap gap-2 overflow-x-auto no-scrollbar py-2 px-3">
+                                {RENT_BANGALORE_AREA_CHIPS.map((c) => (
+                                    <Link
+                                        key={c.to}
+                                        to={c.to}
+                                        className="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-600 hover:bg-brand-red hover:text-white hover:border-brand-red transition-all"
+                                    >
+                                        {c.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 4. Results Header */}
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h2 className="text-2xl font-bold text-slate-900">
+                                    {loading ? 'Searching...' : `Available Properties`}
+                                </h2>
+                                {!loading && (
+                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-xs font-bold tabular-nums">
+                                        {totalCount}
+                                    </span>
                                 )}
+                            </div>
+                            <p className="text-slate-500 text-sm font-medium">
+                                {loading 
+                                    ? 'Curating verified listings for you...' 
+                                    : `Verified ${category !== 'all' ? CATEGORY_TAB_LABEL[category] : 'Home'} listings in ${cityLabelDisplay}`}
                             </p>
-                            {loadingMore && <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>}
                         </div>
-                    )}
-                    {!loading && !error && hideChrome && loadingMore && (
-                        <div className="flex justify-end mb-4">
-                            <p className="text-[10px] font-black text-brand-red animate-pulse uppercase tracking-widest">Loading more listings...</p>
-                        </div>
-                    )}
-
-                    {/* API Status Messages */}
-                    {loading && propertyListOrdered.length === 0 && (
-                        <div className="py-20">
-                            <LoadingSpinner size={48} message="Fetching verified listings..." />
-                        </div>
-                    )}
-
-                    {error && (
-                        <ErrorMessage message={error.message} detail={error.detail} onRetry={refetch} />
-                    )}
-
-                    {/* Property Grid */}
-                    <div
-                        className={`grid gap-6 md:gap-8 ${
-                            hideChrome ? 'md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                        }`}
-                    >
-                        {propertyListOrdered.length > 0 ? (
-                            propertyListOrdered.map((prop) => {
-                                if (!prop || !prop.id) return null;
-                                return <PropertyCard key={prop.id} property={prop} />;
-                            })
-                        ) : !loading && (
-                            <div className="col-span-full py-20 px-6 text-center bg-white rounded-3xl border border-dashed border-slate-200">
-                                <div className="bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Search className="w-8 h-8 text-slate-300" />
-                                </div>
-                                <h3 className="text-2xl font-bold text-slate-900 mb-2">No properties matched your search</h3>
-                                <p className="text-slate-500 max-w-md mx-auto text-sm mb-8">
-                                    {`We couldn't find anything matching ${emptyResultsSummary}. Try relaxing your budget or looking in other areas.`}
-                                </p>
-                                <div className="flex flex-wrap items-center justify-center gap-3">
-                                    <button onClick={resetFilters} className="px-6 py-3 bg-brand-red text-white font-bold rounded-xl shadow-lg shadow-brand-red/20 hover:scale-105 transition-all">
-                                        Reset All Filters
-                                    </button>
-                                    <button onClick={() => setLocationFilter('all')} className="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all">
-                                        Search Entire Bangalore
-                                    </button>
-                                </div>
+                        
+                        {loadingMore && (
+                            <div className="flex items-center gap-2 text-brand-red">
+                                <RefreshCw className="w-3 h-3 animate-spin" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Updating listings...</span>
                             </div>
                         )}
                     </div>
 
-                    {/* Load More sentinel */}
-                    {hasMore && (
-                        <div className="mt-12 flex flex-col items-center">
-                            <div ref={setSentinelEl} className="h-10 w-full" aria-hidden />
-                            {!loadingMore && (
-                                <button onClick={() => void loadMore()} className="px-8 py-3 rounded-2xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-brand-red hover:text-brand-red transition-all shadow-sm">
-                                    Discover More Listings
-                                </button>
+                    {/* 5. Main Content Grid */}
+                    {loading && propertyListOrdered.length === 0 ? (
+                        <div className="py-32 text-center">
+                            <LoadingSpinner size={48} message="Fetching verified listings..." />
+                        </div>
+                    ) : error ? (
+                        <div className="py-20">
+                            <ErrorMessage message={error.message} detail={error.detail} onRetry={refetch} />
+                        </div>
+                    ) : (
+                        <div className="space-y-12">
+                            {/* Grid */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className={`grid gap-6 md:gap-8 ${
+                                    hideChrome ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                                }`}
+                            >
+                                {propertyListOrdered.length > 0 ? (
+                                    propertyListOrdered.map((prop, idx) => {
+                                        if (!prop || !prop.id) return null;
+                                        return (
+                                            <motion.div
+                                                key={prop.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: Math.min(idx * 0.05, 0.4), duration: 0.5 }}
+                                            >
+                                                <PropertyCard property={prop} />
+                                            </motion.div>
+                                        );
+                                    })
+                                ) : (
+                                    <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
+                                        <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 ring-8 ring-slate-100/50">
+                                            <Search className="w-10 h-10 text-slate-300" />
+                                        </div>
+                                        <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No results found</h3>
+                                        <p className="text-slate-500 max-w-md mx-auto text-lg mb-10 leading-relaxed font-medium">
+                                            {`We couldn't find any listings matching ${emptyResultsSummary}.`}
+                                        </p>
+                                        <div className="flex flex-wrap items-center justify-center gap-4">
+                                            <button 
+                                                onClick={resetFilters} 
+                                                className="px-8 py-4 bg-brand-red text-white font-bold rounded-2xl shadow-glow hover:scale-[1.03] active:scale-[0.98] transition-all"
+                                            >
+                                                Reset All Filters
+                                            </button>
+                                            <button 
+                                                onClick={() => setLocationFilter('all')} 
+                                                className="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all"
+                                            >
+                                                Explore Entire City
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </motion.div>
+
+                            {/* Load More Trigger */}
+                            {hasMore && (
+                                <div className="pt-8 pb-12 flex flex-col items-center">
+                                    <div ref={setSentinelEl} className="h-10 w-full mb-8" aria-hidden />
+                                    <button 
+                                        onClick={() => void loadMore()} 
+                                        disabled={loadingMore}
+                                        className="group relative px-10 py-4 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-900 hover:border-brand-red transition-all shadow-sm overflow-hidden"
+                                    >
+                                        <span className="relative z-10 flex items-center gap-2">
+                                            {loadingMore ? 'Loading...' : 'Discover More Properties'}
+                                            {!loadingMore && <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />}
+                                        </span>
+                                    </button>
+                                </div>
                             )}
                         </div>
                     )}
                 </div>
             </main>
-    );
 
-    if (hideChrome) {
-        return (
-            <div className="bg-slate-50 font-sans flex flex-col">
-                {mainContent}
-                <AnimatePresence>
-                    {wishlist.length > 0 && (
-                        <motion.div
-                            initial={{ y: 100 }}
-                            animate={{ y: 0 }}
-                            exit={{ y: 100 }}
-                            className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 lg:right-12 z-40 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-white/10 md:w-80"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="bg-brand-red p-2 rounded-lg">
-                                        <Heart className="w-4 h-4 fill-white" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold leading-none">Wishlist Ready</p>
-                                        <p className="text-[10px] text-slate-400 mt-1">{wishlist.length} properties saved</p>
-                                    </div>
-                                </div>
-                                <Link to="/wishlist" className="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-brand-red hover:text-white transition-all">View</Link>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
-        );
-    }
+            <Footer />
 
-    return (
-        <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-            {listingsHelmet && <SEOHead {...listingsHelmet} />}
-
-            <Navbar />
-
-            {mainContent}
-
-            {/* Wishlist Floating Bar (Mobile optimized) */}
+            {/* Floating Wishlist Button (Mobile focused) */}
             <AnimatePresence>
                 {wishlist.length > 0 && (
                     <motion.div
-                        initial={{ y: 100 }}
-                        animate={{ y: 0 }}
-                        exit={{ y: 100 }}
-                        className="fixed bottom-24 left-4 right-4 md:left-auto md:right-8 lg:right-12 z-40 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-white/10 md:w-80"
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm"
                     >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-brand-red p-2 rounded-lg">
-                                    <Heart className="w-4 h-4 fill-white" />
+                        <Link 
+                            to="/wishlist"
+                            className="flex items-center justify-between p-4 bg-brand-charcoal text-white rounded-2xl shadow-2xl border border-white/10 backdrop-blur-md group"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="relative">
+                                    <div className="bg-brand-red p-2.5 rounded-xl shadow-glow group-hover:scale-110 transition-transform">
+                                        <Heart className="w-5 h-5 fill-white" />
+                                    </div>
+                                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-brand-red text-[10px] font-black rounded-full flex items-center justify-center shadow-md">
+                                        {wishlist.length}
+                                    </span>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold leading-none">Wishlist Ready</p>
-                                    <p className="text-[10px] text-slate-400 mt-1">{wishlist.length} properties saved</p>
+                                    <p className="text-sm font-bold">Your Selection</p>
+                                    <p className="text-[11px] text-slate-400">View saved properties</p>
                                 </div>
                             </div>
-                            <Link to="/wishlist" className="bg-white text-slate-900 px-4 py-1.5 rounded-lg text-[10px] font-bold hover:bg-brand-red hover:text-white transition-all">View</Link>
-                        </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl text-xs font-bold group-hover:bg-brand-red transition-colors">
+                                View Wishlist
+                                <ArrowRight className="w-3 h-3" />
+                            </div>
+                        </Link>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <Footer />
         </div>
     );
 }

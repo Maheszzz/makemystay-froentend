@@ -77,7 +77,7 @@ export function Navbar() {
 
     return (
         <>
-            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-3 md:py-4 border-b border-brand-gray' : 'bg-transparent py-4 md:py-6'
+            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-4 border-b border-brand-gray' : 'bg-transparent py-3 md:py-6'
                 }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] md:justify-normal md:items-center md:gap-3 lg:gap-4">
@@ -116,6 +116,16 @@ export function Navbar() {
                         </div>
 
                         <div className="flex items-center justify-end shrink-0 gap-2">
+                            <Link
+                                to="/pg/bangalore"
+                                className={`md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors ${
+                                    showScrolledStyle
+                                        ? 'bg-slate-900 text-white border-slate-900'
+                                        : 'bg-white/10 text-white border-white/20 backdrop-blur-sm'
+                                }`}
+                            >
+                                List PG
+                            </Link>
                             <Link to="/contact-us" className="hidden md:block">
                                 <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
                             </Link>

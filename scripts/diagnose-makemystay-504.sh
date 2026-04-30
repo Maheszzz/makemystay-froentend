@@ -32,6 +32,13 @@ run_origin() {
   echo "=== nginx -t ==="
   sudo nginx -t
   echo ""
+  echo "=== prerender token snippet ==="
+  if sudo test -s /etc/nginx/snippets/prerender_token.conf; then
+    echo "present: /etc/nginx/snippets/prerender_token.conf"
+  else
+    echo "missing/empty: /etc/nginx/snippets/prerender_token.conf"
+  fi
+  echo ""
   echo "=== nginx error.log (last 80) ==="
   sudo tail -n 80 /var/log/nginx/error.log 2>&1 || true
   echo ""

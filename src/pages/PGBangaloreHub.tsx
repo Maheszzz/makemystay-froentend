@@ -17,19 +17,35 @@ import { MapPin, ChevronRight, ShieldCheck, CheckCircle2 } from 'lucide-react';
 const HUB_FAQS = [
     {
         question: 'What is the average PG rent in Bangalore?',
-        answer: 'PG rent in Bangalore typically ranges from ₹6,000 for shared rooms to ₹18,000+ for premium single occupancy near IT corridors, depending on meals, WiFi, AC, and security.',
+        answer: 'The average PG rent in Bangalore in 2025 ranges from ₹6,000 to ₹15,000 per month for shared rooms and ₹15,000 to ₹25,000 for private rooms. Premium areas like Koramangala and Indiranagar cost ₹10,000 to ₹20,000, while budget-friendly areas like Electronic City and Marathahalli start from ₹5,000 to ₹8,000 per month. Rent depends on location, amenities (food, WiFi, AC), and room type (single, double, or triple sharing).',
     },
     {
-        question: 'Which areas have the most PG options in Bangalore?',
-        answer: 'High-demand micro-markets include Whitefield, Marathahalli, BTM, HSR Layout, Koramangala, and Electronic City — each with different commute profiles and price bands.',
+        question: 'Which areas in Bangalore have the best PGs for IT professionals?',
+        answer: 'The best areas for PGs for IT professionals in Bangalore are: Whitefield (near ITPL, Prestige Tech Park), Electronic City (near Infosys, Wipro), Marathahalli and Bellandur (near RMZ Ecoworld, Embassy Tech Village), Manyata Tech Park area (near many MNC offices), and HSR Layout (convenient access to the Outer Ring Road tech corridor). MakeMyStay lists verified PGs in all these areas with transparent pricing and real photos.',
     },
     {
-        question: 'Is WiFi and food usually included in PG rent?',
-        answer: 'Most professional PGs advertise high-speed WiFi. Food may be 2–3 meals per day or optional add-ons — confirm veg/non-veg and timings on each listing.',
+        question: 'How much security deposit is required for a PG in Bangalore?',
+        answer: "Most PGs in Bangalore charge a security deposit of 1 to 2 months' rent. Under the Karnataka Rent Control Act, the maximum allowable deposit for residential property is 10 months' rent, but PGs typically charge much less - usually ₹5,000 to ₹20,000. Some managed co-living spaces like those listed on MakeMyStay offer zero or minimal deposit options.",
     },
     {
-        question: 'How do I book a PG safely in Bangalore?',
-        answer: 'Use verified listings with real photos, compare total monthly cost including deposit, and book visits or pay tokens only through trusted channels such as MakeMyStay.ai.',
+        question: 'What amenities should I look for in a good PG in Bangalore?',
+        answer: 'A good PG in Bangalore should include: high-speed WiFi (minimum 50 Mbps), 24/7 security and CCTV, power backup for electricity outages, meals (breakfast and dinner at minimum), laundry service or washing machine, clean attached or shared washrooms, housekeeping, and a furnished room with bed, wardrobe, and study table. Premium PGs also offer AC rooms, gym access, and Netflix or entertainment subscriptions.',
+    },
+    {
+        question: 'What is the difference between a PG and co-living space in Bangalore?',
+        answer: 'A PG (Paying Guest) is traditional shared accommodation with basic facilities like a room, meals, and WiFi. A co-living space is a professionally managed, fully furnished living arrangement that includes all utilities, meals, housekeeping, community events, and flexible lease terms - usually with an app for service requests. Co-living spaces cost ₹8,000 to ₹20,000/month but offer a more hassle-free experience. MakeMyStay lists both options with verified listings and transparent pricing.',
+    },
+    {
+        question: 'Are there good PGs for girls and women in Bangalore?',
+        answer: 'Yes, Bangalore has many verified ladies PGs with strong safety features including 24/7 security, biometric entry, CCTV, in-house warden, and no late-night curfews. Popular areas for ladies PGs include Koramangala, HSR Layout, Marathahalli, Whitefield, and Indiranagar. MakeMyStay lists women-only verified PGs across all these neighbourhoods.',
+    },
+    {
+        question: 'How do I find a verified PG in Bangalore without a broker?',
+        answer: 'To find a verified PG in Bangalore without a broker: (1) Use platforms like MakeMyStay that list zero-brokerage verified PGs with real photos and transparent pricing. (2) Filter by your workplace area, budget, and amenities. (3) Schedule a visit directly through the platform. (4) Check reviews from previous tenants. (5) Confirm the agreement terms before paying any deposit. MakeMyStay verifies all listings to ensure no hidden charges.',
+    },
+    {
+        question: 'What is the cheapest PG available in Bangalore?',
+        answer: 'The cheapest PGs in Bangalore start from ₹4,000 to ₹6,000 per month for shared rooms in outer areas like Electronic City Phase 2, Bannerghatta Road, KR Puram, and Hosur Road. These budget PGs typically include basic amenities - a bed, WiFi, and shared bathroom - but may not include meals. For slightly better quality at ₹7,000 to ₹9,000, areas like BTM Layout, Marathahalli, and Hebbal offer good value.',
     },
 ];
 

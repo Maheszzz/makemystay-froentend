@@ -18,6 +18,7 @@ export interface UsePropertiesOptions {
 export interface UsePropertiesResult {
     properties: Property[];
     totalCount: number;
+    propertyCounts?: Record<string, number>;
     shownCount: number;
     loading: boolean;
     loadingMore: boolean;
@@ -40,6 +41,7 @@ export function useProperties(
 
     const [properties, setProperties] = useState<Property[]>([]);
     const [totalCount, setTotalCount] = useState<number>(0);
+    const [propertyCounts, setPropertyCounts] = useState<Record<string, number> | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const [error, setError] = useState<ApiError | null>(null);
@@ -64,10 +66,10 @@ export function useProperties(
                     ...params,
                     skip: 0,
                     limit: pageSize,
-                });
+                }) as any;
 
                 if (isMounted) {
-                    // Hardened: Support both bare array and { items, total } format
+                    // Hardened: Support both bare array and { items, total, property_counts } format
                     const list = Array.isArray(response) 
                         ? response 
                         : (response && Array.isArray(response.items) ? response.items : []);
@@ -76,8 +78,13 @@ export function useProperties(
                         ? response.total
                         : list.length;
 
+                    const counts = (!Array.isArray(response) && response?.property_counts)
+                        ? response.property_counts
+                        : undefined;
+
                     setProperties(list);
                     setTotalCount(total);
+                    setPropertyCounts(counts);
                     setHasMore(list.length < total);
                 }
             } catch (err: unknown) {
@@ -111,7 +118,7 @@ export function useProperties(
                 ...params,
                 skip: (nextPage - 1) * pageSize,
                 limit: pageSize,
-            });
+            }) as any;
 
             // Hardened: Support both bare array and { items, total } format
             const pageItems = Array.isArray(response) 
@@ -126,6 +133,10 @@ export function useProperties(
             setPage(nextPage);
             setHasMore((properties.length + pageItems.length) < total);
             setTotalCount(total);
+            
+            if (!Array.isArray(response) && response?.property_counts) {
+                setPropertyCounts(response.property_counts);
+            }
         } catch (err) {
             console.error('Failed to load more properties:', err);
         } finally {
@@ -142,7 +153,7 @@ export function useProperties(
                 ...params,
                 skip: 0,
                 limit: pageSize,
-            });
+            }) as any;
             // Hardened: Support both bare array and { items, total } format
             const list = Array.isArray(response) 
                 ? response 
@@ -152,8 +163,13 @@ export function useProperties(
                 ? response.total
                 : list.length;
 
+            const counts = (!Array.isArray(response) && response?.property_counts)
+                ? response.property_counts
+                : undefined;
+
             setProperties(list);
             setTotalCount(total);
+            setPropertyCounts(counts);
             setHasMore(list.length < total);
         } catch (err: unknown) {
             const apiErr: ApiError = (
@@ -169,6 +185,7 @@ export function useProperties(
     return {
         properties,
         totalCount,
+        propertyCounts,
         shownCount: properties.length,
         loading,
         loadingMore,
