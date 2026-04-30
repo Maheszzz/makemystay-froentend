@@ -10,6 +10,7 @@ import { useProperty, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath, isPropertyDetailCanonicalPath, parsePropertySlugParam } from '@/lib/propertyRouting';
+import { getOptimizedImageUrl } from '@/lib/utils/images';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
@@ -338,9 +339,10 @@ export default function PropertyDetails() {
                     <div className="absolute inset-0 z-0">
                         {heroImage && (
                             <img 
-                                src={heroImage} 
+                                src={getOptimizedImageUrl(heroImage, 'hero')} 
                                 alt="" 
                                 className="w-full h-full object-cover opacity-40 scale-105 blur-[2px] transition-all duration-[2000ms] group-hover:scale-100 group-hover:blur-0"
+                                aria-hidden="true"
                             />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent" />
@@ -384,10 +386,11 @@ export default function PropertyDetails() {
                                     <div className={`relative ${heroIsPortrait ? 'aspect-[3/4] max-w-md mx-auto' : 'aspect-[16/9]'}`}>
                                         <img
                                             key={heroIdx}
-                                            src={heroImage || ''}
+                                            src={getOptimizedImageUrl(heroImage || '', 'large')}
                                             alt={heroAlt}
                                             className="w-full h-full object-cover transition-transform duration-[1000ms] group-hover/hero:scale-110"
                                             onLoad={handleHeroImageLoad}
+                                            fetchpriority="high"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                                         
@@ -428,8 +431,9 @@ export default function PropertyDetails() {
                                                 key={idx}
                                                 onClick={() => setHeroIdx(idx)}
                                                 className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${heroIdx === idx ? 'border-brand-red scale-105 shadow-glow' : 'border-white/10 opacity-50 hover:opacity-100'}`}
+                                                aria-label={`View photo ${idx + 1}`}
                                             >
-                                                <img src={url} className="w-full h-full object-cover" alt="" />
+                                                <img src={getOptimizedImageUrl(url, 'thumbnail')} className="w-full h-full object-cover" alt="" loading="lazy" />
                                             </button>
                                         ))}
                                     </div>
@@ -581,9 +585,10 @@ export default function PropertyDetails() {
                                                 className="aspect-square rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-sm border border-slate-100 hover:scale-[1.02] transition-all duration-500"
                                             >
                                                 <img
-                                                    src={url}
-                                                    alt=""
+                                                    src={getOptimizedImageUrl(url, 'thumbnail')}
+                                                    alt={`${displayTitle} - photo ${idx + 1}`}
                                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    loading="lazy"
                                                 />
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                     <Maximize2 className="w-8 h-8 text-white scale-75 group-hover:scale-100 transition-transform" />

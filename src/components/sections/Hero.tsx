@@ -3,31 +3,32 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, CheckCircle, ShieldCheck, Clock3, BadgeCheck } from 'lucide-react';
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
+import { getOptimizedImageUrl } from '@/lib/utils/images';
 
 const slides = [
     {
-        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&q=90&w=1920',
+        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9',
         eyebrow: 'PROFESSIONAL • TRUSTED • SEAMLESS',
         headline: 'Premium Living.',
         headlineItalic: 'Simplified.',
         subheadline: 'Verified stays for students & professionals.',
     },
     {
-        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=90&w=1920',
+        image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2',
         eyebrow: 'CURATED • AFFORDABLE • SECURE',
         headline: 'Live Closer',
         headlineItalic: 'to Work.',
         subheadline: 'Smart stays near Bangalore tech parks.',
     },
     {
-        image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=90&w=1920',
+        image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
         eyebrow: 'SMART • MODERN • HASSLE-FREE',
         headline: 'Where Comfort',
         headlineItalic: 'Meets Convenience.',
         subheadline: 'Curated homes in prime Bangalore locations.',
     },
     {
-        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=90&w=1920',
+        image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750',
         eyebrow: 'TRUSTED • VERIFIED • SEAMLESS',
         headline: 'Move In',
         headlineItalic: 'This Week.',
@@ -65,13 +66,22 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
     const [contentVisible, setContentVisible] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
-    // Preload images
+    // Smart Image Loading
+    const [imgWidth, setImgWidth] = useState<'hero' | 'hero_mobile'>('hero');
+
     useEffect(() => {
-        slides.forEach((slide) => {
+        const width = window.innerWidth;
+        setImgWidth(width < 768 ? 'hero_mobile' : 'hero');
+
+        // Preload next slide after a delay
+        const nextIdx = (current + 1) % slides.length;
+        const timer = setTimeout(() => {
             const img = new Image();
-            img.src = slide.image;
-        });
-    }, []);
+            img.src = getOptimizedImageUrl(slides[nextIdx].image, width < 768 ? 'hero_mobile' : 'hero');
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [current]);
 
     useEffect(() => {
         const updateViewport = () => setIsMobile(window.innerWidth < 768);
@@ -106,7 +116,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                     key={idx}
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                     style={{
-                        backgroundImage: `url(${s.image})`,
+                        backgroundImage: `url(${getOptimizedImageUrl(s.image, imgWidth)})`,
                         opacity: idx === current ? 1 : 0,
                         transition: `opacity ${FADE_DURATION}ms ease-in-out`,
                         zIndex: 0,

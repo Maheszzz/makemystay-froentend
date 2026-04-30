@@ -19,6 +19,7 @@ import { amenityIconMap } from '@/lib/amenityIcons';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
+import { getOptimizedImageUrl } from '@/lib/utils/images';
 import type { Property } from '@/types/api';
 
 interface PropertyCardProps {
@@ -99,6 +100,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
             to={propertyPath}
             state={{ from: `${location.pathname}${location.search}` }}
             className="block h-full group outline-none"
+            aria-label={`View details for ${displayTitle} in ${property.location}`}
         >
             <div className="bg-white rounded-[2.5rem] transition-all duration-500 ease-out border border-slate-200/80 shadow-[0_18px_46px_-24px_rgba(15,23,42,0.2)] hover:shadow-[0_44px_90px_-26px_rgba(15,23,42,0.28)] hover:-translate-y-2 h-full flex flex-col overflow-hidden ring-1 ring-slate-900/[0.03]">
                 
@@ -106,9 +108,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 <div className="relative w-full h-[240px] shrink-0 overflow-hidden bg-slate-100">
                     {displayImage ? (
                         <img
-                            src={displayImage}
+                            src={getOptimizedImageUrl(displayImage, 'medium')}
                             alt={displayTitle}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            loading="lazy"
+                            decoding="async"
                         />
                     ) : (
                         <div className="w-full h-full bg-slate-900 flex items-center justify-center">
@@ -123,6 +127,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                         type="button"
                         onClick={handleHeartClick}
                         className="absolute top-5 right-5 z-10 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-xl border border-white"
+                        aria-label={wishlisted ? `Remove ${displayTitle} from wishlist` : `Add ${displayTitle} to wishlist`}
                     >
                         <Heart className={`w-[20px] h-[20px] transition-colors ${wishlisted ? 'fill-brand-red text-brand-red' : 'text-slate-400'}`} />
                     </button>
@@ -288,7 +293,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                     window.open(waLink, '_blank', 'noopener,noreferrer');
                                 }}
                                 className="w-[52px] h-[52px] bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all duration-300 border border-emerald-200 shadow-[0_8px_20px_-12px_rgba(16,185,129,0.5)] flex items-center justify-center group/wa shrink-0"
-                                aria-label="Chat on WhatsApp"
+                                aria-label={`Contact about ${displayTitle} on WhatsApp`}
                             >
                                 <MessageCircle className="w-5 h-5 transition-transform duration-300 group-hover/wa:scale-110 group-hover/wa:rotate-6" />
                             </button>
