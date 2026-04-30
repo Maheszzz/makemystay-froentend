@@ -411,7 +411,7 @@ export default function Properties({
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
             {listingsHelmet && <SEOHead {...listingsHelmet} />}
-            <Navbar />
+            {!hideChrome && <Navbar />}
 
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-20 pb-20 flex-grow'}>
                 {/* 1. Hero Section (Only if not hidden) */}
@@ -451,10 +451,10 @@ export default function Properties({
                     </section>
                 )}
 
-                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-8' : '-mt-20 md:-mt-24 relative z-20'}`}>
+                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-0 md:mt-2' : '-mt-20 md:-mt-24 relative z-20'}`}>
                     
                     {/* 2. Floating Filter Bar */}
-                    <div className="bg-white/95 backdrop-blur-xl p-3 md:p-5 rounded-[2rem] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.2)] border border-slate-200/60 mb-10 sticky top-24 z-30 transition-all ring-1 ring-slate-900/[0.02]">
+                    <div className={`bg-white/95 backdrop-blur-xl p-3 md:p-5 rounded-[2rem] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.2)] border border-slate-200/60 mb-16 transition-all ring-1 ring-slate-900/[0.02] ${hideChrome ? 'relative z-10' : 'sticky top-24 z-30'}`}>
                         <div className="flex flex-col lg:flex-row gap-3 md:gap-4 items-stretch">
                             
                             {/* Search and Category Tabs Wrapper */}
@@ -652,7 +652,7 @@ export default function Properties({
                     )}
 
                     {/* 4. Results Header */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <h2 className="text-2xl font-bold text-slate-900">
@@ -760,7 +760,7 @@ export default function Properties({
                 </div>
             </main>
 
-            <Footer />
+            {!hideChrome && <Footer />}
 
             {/* Floating Wishlist Button (Mobile focused) */}
             <AnimatePresence>

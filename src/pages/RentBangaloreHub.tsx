@@ -104,7 +104,7 @@ export default function RentBangaloreHub() {
                     </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 md:mt-6">
                     <Properties
                         hideChrome
                         embedRentHubUi

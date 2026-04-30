@@ -9,6 +9,7 @@ import {
     Users,
     Utensils,
     Zap,
+    ShieldCheck,
 } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -71,9 +72,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
             return `${property.area.toLocaleString('en-IN')} sq ft`;
         }
         if (property.sqft && property.sqft !== 'On Request') {
-            return `${property.sqft} sqft`;
+            return property.sqft.toLowerCase().includes('sqft') ? property.sqft : `${property.sqft} sqft`;
         }
-        return null;
+        return 'On Request';
     }, [property.area, property.sqft]);
 
     const amenities: string[] = [];
@@ -159,22 +160,22 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
                 {/* 2. Content Section */}
                 <div className="flex flex-col flex-1 p-6 sm:p-7 bg-gradient-to-b from-white via-white to-slate-50/40">
-                    <div className="mb-4 min-h-[88px]">
-                        <h3 className="text-xl font-extrabold text-slate-900 leading-snug line-clamp-2 min-h-[56px] mb-2 group-hover:text-brand-red transition-colors duration-300">
+                    <div className="mb-4">
+                        <h3 className="text-lg font-extrabold text-slate-900 leading-snug line-clamp-2 mb-2 group-hover:text-brand-red transition-colors duration-300">
                             {displayTitle}
                         </h3>
-                        <div className="flex items-center gap-2 text-slate-500 text-sm font-medium min-h-[20px]">
+                        <div className="flex items-center gap-2 text-slate-500 text-sm font-medium">
                             <MapPin className="w-4 h-4 shrink-0 text-brand-red/70" />
                             <span className="truncate">{property.location}</span>
                         </div>
                     </div>
 
                     {/* Property Specs Row */}
-                    <div className="grid grid-cols-2 gap-x-4 py-4 border-t border-b border-slate-100 mb-6 min-h-[76px] items-center">
+                    <div className="grid grid-cols-2 gap-x-4 py-4 border-t border-b border-slate-100 mb-4 items-center">
                         {isPlot ? (
                             <div className="col-span-2 flex items-center gap-2 text-slate-700">
-                                <Zap className="w-4 h-4 text-slate-400" />
-                                <span className="text-xs font-bold uppercase tracking-wider">{areaLabel || 'Plot Area'}</span>
+                                <Zap className="w-4 h-4 text-brand-red/60" />
+                                <span className="text-xs font-bold uppercase tracking-wider">Plot Area: <span className="text-slate-500">{areaLabel}</span></span>
                             </div>
                         ) : isServiceOriented ? (
                             <>
@@ -214,19 +215,26 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     </div>
 
                     {/* Amenities Checklist */}
-                    <div className="grid grid-cols-2 gap-2.5 mb-8 min-h-[88px] content-start">
-                        {amenities.slice(0, 4).map((amenity) => {
-                            const icon = amenityIconMap[amenity.toLowerCase()];
-                            return (
-                                <div 
-                                    key={amenity}
-                                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white text-[10px] font-bold text-slate-700 border border-slate-200/80 transition-colors hover:border-brand-red/20 hover:bg-brand-red/[0.03]"
-                                >
-                                    <span className="text-brand-red/70 shrink-0">{icon}</span>
-                                    <span className="truncate">{amenity}</span>
-                                </div>
-                            );
-                        })}
+                    <div className="grid grid-cols-2 gap-2.5 mb-6 content-start">
+                        {amenities.length > 0 ? (
+                            amenities.slice(0, 4).map((amenity) => {
+                                const icon = amenityIconMap[amenity.toLowerCase()];
+                                return (
+                                    <div 
+                                        key={amenity}
+                                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white text-[10px] font-bold text-slate-700 border border-slate-200/80 transition-colors hover:border-brand-red/20 hover:bg-brand-red/[0.03]"
+                                    >
+                                        <span className="text-brand-red/70 shrink-0">{icon}</span>
+                                        <span className="truncate">{amenity}</span>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="col-span-2 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200/60 text-slate-500">
+                                <ShieldCheck className="w-4 h-4 text-brand-red/40" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Verified Listing</span>
+                            </div>
+                        )}
                         {amenities.length > 4 && (
                             <div className="flex items-center justify-center px-3 py-2 rounded-xl bg-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                 +{amenities.length - 4} More
@@ -236,7 +244,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
                     {/* Pricing and Actions */}
                     <div className="mt-auto pt-4 border-t border-slate-50/50">
-                        <div className="flex items-end justify-between mb-6 min-h-[56px]">
+                        <div className="flex items-end justify-between mb-4">
                             <div>
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
                                     {isServiceOriented ? 'Monthly Rent' : 'Property Price'}

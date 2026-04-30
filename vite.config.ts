@@ -17,6 +17,11 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false,
             },
+            '/api/v1/search': {
+                target: 'https://dev.makemystay.in',
+                changeOrigin: true,
+                secure: true,
+            },
         },
     },
     resolve: {
