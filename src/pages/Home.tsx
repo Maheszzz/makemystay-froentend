@@ -93,10 +93,17 @@ export default function Home() {
             <main id="main-content" className="min-h-screen bg-white pb-24 md:pb-0">
                 <section id="home">
                     <Hero
-                        category="all"
+                        category="pg"
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
-                        listingsNavigate={(tab, q) => navigate(homeHeroSearchUrl(tab, q))}
+                        listingsNavigate={(tab, q) => {
+                            if (tab === 'commercial') {
+                                const qt = q.trim();
+                                navigate(qt ? `/properties?q=${encodeURIComponent(qt)}` : '/properties');
+                                return;
+                            }
+                            navigate(homeHeroSearchUrl(tab, q));
+                        }}
                     />
                 </section>
 

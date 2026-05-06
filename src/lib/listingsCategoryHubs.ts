@@ -7,6 +7,9 @@ export type ListingsCategoryKey = 'all' | 'pg' | 'rent' | 'buy' | 'plot';
 
 export type ListingsHubTab = 'pg' | 'rent' | 'buy' | 'plot';
 
+/** Homepage hero search tabs (no legacy `all`; commercial → `/properties`). */
+export type HomeHeroNavigateTab = ListingsHubTab | 'commercial';
+
 /** Normalized slug for URLs (undefined = no city / all-India listing index). */
 export function normalizeCitySlug(city: string | undefined | null): string | undefined {
     if (city == null || typeof city !== 'string') return undefined;

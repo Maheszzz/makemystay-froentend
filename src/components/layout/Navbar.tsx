@@ -74,41 +74,42 @@ export function Navbar() {
 
     const isHomePage = location.pathname === '/';
     const showScrolledStyle = isScrolled || !isHomePage;
+    const navLinkDesktop = `font-medium whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.9375rem]' : 'text-sm'}`;
 
     return (
         <>
-            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-4 border-b border-brand-gray' : 'bg-transparent py-3 md:py-6'
+            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-4 border-b border-slate-200' : 'bg-white py-3 md:py-6 border-b border-slate-100'
                 }`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] md:justify-normal md:items-center md:gap-3 lg:gap-4">
                         <div className="flex items-center space-x-2 shrink-0">
-                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-md bg-white" />
-                            <Link to="/" aria-label="MakeMyStay Home" className={`text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors ${showScrolledStyle ? 'text-brand-charcoal' : 'text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]'}`}>
+                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-sm bg-white" />
+                            <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors text-slate-900">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
                         </div>
 
-                        <div className="hidden md:flex items-center justify-center gap-x-4 lg:gap-x-6 xl:gap-x-7 min-w-0 mx-1">
+                        <div className={`hidden md:flex items-center justify-center min-w-0 mx-1 ${isHomePage && !showScrolledStyle ? 'gap-x-3 lg:gap-x-5 xl:gap-x-6' : 'gap-x-4 lg:gap-x-6 xl:gap-x-7'}`}>
                             {navigationLinks.map((item) => (
                                 <a
                                     key={item}
                                     href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
                                     onClick={(e) => handleNavClick(item, e)}
-                                    className={`text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
+                                    className={navLinkDesktop}
                                 >
                                     {item}
                                 </a>
                             ))}
-                            <Link to="/blog" className={`text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
+                            <Link to="/blog" className={navLinkDesktop}>
                                 Blog
                             </Link>
-                            <Link to="/quick-pay" className={`text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}>
+                            <Link to="/quick-pay" className={navLinkDesktop}>
                                 Quick Pay
                             </Link>
 
                             <Link
                                 to="/schedule-demo"
-                                className={`flex items-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors cursor-pointer hover:text-brand-red ${showScrolledStyle ? 'text-slate-600' : 'text-slate-200'}`}
+                                className={`flex items-center gap-1.5 ${navLinkDesktop}`}
                             >
                                 <Video className="w-4 h-4 shrink-0" />
                                 Schedule a Demo
@@ -119,22 +120,17 @@ export function Navbar() {
                             <Link
                                 to="/pg/bangalore"
                                 aria-label="List your PG in Bangalore"
-                                className={`md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors ${
-                                    showScrolledStyle
-                                        ? 'bg-slate-900 text-white border-slate-900'
-                                        : 'bg-white/10 text-white border-white/20 backdrop-blur-sm'
-                                }`}
+                                className={`md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors bg-brand-red text-white border-brand-red hover:bg-red-600`}
                             >
                                 List PG
                             </Link>
                             <Link to="/contact-us" className="hidden md:block">
-                                <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-glow">Contact Us</Button>
+                                <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-sm hover:shadow-md transition-shadow">Contact Us</Button>
                             </Link>
                             <button
                                 aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center ${showScrolledStyle ? 'text-slate-900 hover:bg-slate-100' : 'text-white hover:bg-white/10'
-                                    }`}
+                                className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-800 hover:bg-slate-100`}
                             >
                                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                             </button>
