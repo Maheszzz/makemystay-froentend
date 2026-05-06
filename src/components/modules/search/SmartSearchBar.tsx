@@ -1,9 +1,9 @@
 "use client";
 
-import { Search, MapPin, X, ChevronDown } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
 import { propertyApi } from '@/lib/api';
 import type { HomeHeroNavigateTab } from '@/lib/listingsCategoryHubs';
+import { ChevronDown, MapPin, Search, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export interface SmartSearchBarProps {
     category?: 'pg' | 'rent' | 'buy' | 'plot' | 'all';

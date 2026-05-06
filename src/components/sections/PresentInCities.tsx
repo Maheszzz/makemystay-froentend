@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { ArrowRight, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface CityData {
     name: string;
@@ -27,7 +27,7 @@ const cities: CityData[] = [
         name: 'Hyderabad',
         image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=85&auto=format&fit=crop',
         areas: ['HITEC City', 'Gachibowli', 'Kondapur'],
-        count: 'Waitlist',
+        count: 'Coming Soon',
         countLabel: 'open now',
         status: 'soon',
         accentColor: '#60a5fa',
@@ -36,7 +36,7 @@ const cities: CityData[] = [
         name: 'Pune',
         image: 'https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=600&q=85&auto=format&fit=crop',
         areas: ['Hinjewadi', 'Kharadi', 'Baner'],
-        count: 'Waitlist',
+        count: 'Coming Soon',
         countLabel: 'open now',
         status: 'soon',
         accentColor: '#4ade80',
