@@ -1,24 +1,25 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { Hero } from '@/components/sections/Hero';
-import { ServicesGrid } from '@/components/modules/services/ServicesGrid';
-import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
+import { Navbar } from '@/components/layout/Navbar';
+import { SafetyPopup } from '@/components/modals/SafetyPopup';
 import { InvestmentCalculator } from '@/components/modules/calculator/InvestmentCalculator';
+import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
+import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
+import { ServicesGrid } from '@/components/modules/services/ServicesGrid';
 import { About } from '@/components/sections/About';
-import { Problem } from '@/components/sections/Problem';
-import { Solution } from '@/components/sections/Solution';
+import { CaseStudy } from '@/components/sections/CaseStudy';
 import { Comparison } from '@/components/sections/Comparison';
 import { CTA } from '@/components/sections/CTA';
-import { CaseStudy } from '@/components/sections/CaseStudy';
-import { SEOHead } from '@/components/seo/SEOHead';
+import { Hero } from '@/components/sections/Hero';
+import { Problem } from '@/components/sections/Problem';
+import { Solution } from '@/components/sections/Solution';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { buildPageSEO, buildHomeSEO } from '@/lib/seo';
-import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
-import { SafetyPopup } from '@/components/modals/SafetyPopup';
 import { homeHeroSearchUrl, type ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
+import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
+import { buildHomeSEO, buildPageSEO } from '@/lib/seo';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
@@ -27,6 +28,14 @@ export default function Home() {
     const navigate = useNavigate();
     const searchQuery = searchParams.get('q') || '';
     const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
+    const [heroFilters, setHeroFilters] = useState<HeroSearchFilters>({
+        city: 'bangalore',
+        property_type: '',
+        min_price: undefined,
+        max_price: undefined,
+        amenity: '',
+        gender: '',
+    });
 
     useEffect(() => {
         const hasShownHomeSafety = sessionStorage.getItem('hasShownHomeSafety');
@@ -96,6 +105,8 @@ export default function Home() {
                         category="pg"
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
+                        filters={heroFilters}
+                        setFilters={setHeroFilters}
                         listingsNavigate={(tab, q) => {
                             if (tab === 'commercial') {
                                 const qt = q.trim();
@@ -107,7 +118,7 @@ export default function Home() {
                     />
                 </section>
 
-                <PropertyGrid category="all" searchQuery={searchQuery} />
+                <PropertyGrid category="all" searchQuery={searchQuery} cardVariant="project" filters={heroFilters} />
 
                 <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">

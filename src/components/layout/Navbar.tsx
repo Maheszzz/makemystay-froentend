@@ -1,18 +1,122 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard, Video, BookOpen } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard, Video, BookOpen, MapPin, ChevronDown, Check } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import logoImage from '@/assets/MakeMysStaylogo.svg';
+
+const NAV_CITIES = [
+    { slug: 'bangalore', label: 'Bangalore' },
+    { slug: 'pune', label: 'Pune' },
+    { slug: 'hyderabad', label: 'Hyderabad' },
+] as const;
+
+type NavCitySlug = typeof NAV_CITIES[number]['slug'];
+
+interface CityDropdownProps {
+    selectedCity: NavCitySlug;
+    onSelect: (slug: NavCitySlug) => void;
+}
+
+function CityDropdown({ selectedCity, onSelect }: CityDropdownProps) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement | null>(null);
+    const currentLabel = NAV_CITIES.find((c) => c.slug === selectedCity)?.label ?? 'Bangalore';
+
+    useEffect(() => {
+        if (!open) return;
+        const handleClickOutside = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEsc);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEsc);
+        };
+    }, [open]);
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded={open}
+                onClick={() => setOpen((v) => !v)}
+                className="hidden md:inline-flex min-w-[132px] items-center justify-between gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:shadow transition-all"
+            >
+                <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-brand-red shrink-0" />
+                    {currentLabel}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+            </button>
+
+            {open && (
+                <div
+                    role="listbox"
+                    aria-label="Select city"
+                    className="absolute left-0 top-full mt-2 w-44 rounded-xl border border-slate-200 bg-white shadow-xl p-1 z-50"
+                >
+                    {NAV_CITIES.map((c) => {
+                        const active = c.slug === selectedCity;
+                        return (
+                            <button
+                                key={c.slug}
+                                type="button"
+                                role="option"
+                                aria-selected={active}
+                                onClick={() => {
+                                    onSelect(c.slug);
+                                    setOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                                    active
+                                        ? 'bg-slate-900 text-white'
+                                        : 'text-slate-700 hover:bg-slate-50'
+                                }`}
+                            >
+                                <span className="flex items-center gap-2">
+                                    <MapPin className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                                    {c.label}
+                                </span>
+                                {active && <Check className="w-4 h-4" />}
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
+
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [selectedCity, setSelectedCity] = useState<NavCitySlug>('bangalore');
     const location = useLocation();
     const navigate = useNavigate();
     useAuth();
+
+    const handleCitySelect = (slug: NavCitySlug) => {
+        setSelectedCity(slug);
+        navigate(`/pg/${slug}`);
+    };
+
+    useEffect(() => {
+        const parts = location.pathname.toLowerCase().split('/').filter(Boolean);
+        if (parts[0] === 'pg' && parts[1] && NAV_CITIES.some((c) => c.slug === parts[1] as NavCitySlug)) {
+            setSelectedCity(parts[1] as NavCitySlug);
+        }
+    }, [location.pathname]);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -74,23 +178,26 @@ export function Navbar() {
 
     const isHomePage = location.pathname === '/';
     const showScrolledStyle = isScrolled || !isHomePage;
-    const navLinkDesktop = `font-medium whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.9375rem]' : 'text-sm'}`;
+    const navLinkDesktop = `font-semibold whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.93rem]' : 'text-sm'}`;
+    const importantNavItems = navigationLinks.filter((item) => ['Home', 'Services', 'About Us'].includes(item));
 
     return (
         <>
-            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-4 border-b border-slate-200' : 'bg-white py-3 md:py-6 border-b border-slate-100'
+            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-3.5 border-b border-slate-200' : 'bg-white py-3 md:py-4.5 border-b border-slate-100'
                 }`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between md:grid md:grid-cols-[auto_1fr_auto] md:justify-normal md:items-center md:gap-3 lg:gap-4">
-                        <div className="flex items-center space-x-2 shrink-0">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+                    <div className="flex items-center justify-between md:grid md:grid-cols-[auto_auto_1fr_auto] md:items-center md:gap-4 lg:gap-8">
+                        <div className="flex items-center gap-2 shrink-0">
                             <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-sm bg-white" />
-                            <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-2xl font-bold tracking-tight font-heading transition-colors text-slate-900">
+                            <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
                         </div>
 
-                        <div className={`hidden md:flex items-center justify-center min-w-0 mx-1 ${isHomePage && !showScrolledStyle ? 'gap-x-3 lg:gap-x-5 xl:gap-x-6' : 'gap-x-4 lg:gap-x-6 xl:gap-x-7'}`}>
-                            {navigationLinks.map((item) => (
+                        <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} />
+
+                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isHomePage && !showScrolledStyle ? 'gap-x-5 lg:gap-x-7' : 'gap-x-6 lg:gap-x-8'}`}>
+                            {importantNavItems.map((item) => (
                                 <a
                                     key={item}
                                     href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
@@ -100,13 +207,9 @@ export function Navbar() {
                                     {item}
                                 </a>
                             ))}
-                            <Link to="/blog" className={navLinkDesktop}>
-                                Blog
-                            </Link>
                             <Link to="/quick-pay" className={navLinkDesktop}>
                                 Quick Pay
                             </Link>
-
                             <Link
                                 to="/schedule-demo"
                                 className={`flex items-center gap-1.5 ${navLinkDesktop}`}
@@ -116,7 +219,7 @@ export function Navbar() {
                             </Link>
                         </div>
 
-                        <div className="flex items-center justify-end shrink-0 gap-2">
+                        <div className="flex items-center justify-end justify-self-end shrink-0 gap-2">
                             <Link
                                 to="/pg/bangalore"
                                 aria-label="List your PG in Bangalore"

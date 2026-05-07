@@ -1,4 +1,5 @@
 import { SmartSearchBar } from '@/components/modules/search/SmartSearchBar';
+import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import type { HomeHeroNavigateTab } from '@/lib/listingsCategoryHubs';
 import { BadgeCheck, CheckCircle, Clock3, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
@@ -14,15 +15,24 @@ const trustStats = [
     { value: '48hr', label: 'Booking Guarantee', icon: Clock3 },
 ];
 
+const heroHighlights = [
+    'Prime Locations',
+    'All Inclusive',
+    'Flexible Stays',
+    'Safe & Secure',
+];
+
 interface HeroProps {
     category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
     setCategory?: (category: 'pg' | 'rent' | 'buy' | 'plot' | 'all') => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     listingsNavigate?: (tab: HomeHeroNavigateTab, query: string) => void;
+    filters?: HeroSearchFilters;
+    setFilters?: (next: HeroSearchFilters) => void;
 }
 
-export function Hero({ category, setCategory, searchQuery, setSearchQuery, listingsNavigate }: HeroProps) {
+export function Hero({ category, setCategory, searchQuery, setSearchQuery, listingsNavigate, filters, setFilters }: HeroProps) {
     const [imgError, setImgError] = useState(false);
 
     return (
@@ -45,62 +55,64 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                         {/* Mobile solid overlay */}
                         <div className="absolute inset-0 bg-slate-50/95 lg:hidden" />
                         {/* Desktop smooth gradient fade */}
-                        <div
+                        <div 
                             className="hidden lg:block absolute inset-0"
                             style={{
                                 background: 'linear-gradient(to right, rgba(248,250,252,1) 0%, rgba(248,250,252,1) 45%, rgba(248,250,252,0) 75%)'
-                            }}
+                            }} 
                         />
                     </div>
                 )}
 
                 {/* Content Container Aligned with Navbar */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-12 lg:py-24">
-                    <div className="max-w-xl xl:max-w-2xl w-full">
-                        {/* Live badge */}
-                        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 bg-brand-red/10 border border-brand-red/20">
-                            <span className="relative flex h-2 w-2 shrink-0">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-70" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-red" />
-                            </span>
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-slate-800">
-                                <span className="text-brand-red">1,200+</span> Verified · Bangalore
-                            </span>
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 w-full py-12 lg:py-24">
+                    <div className="max-w-[34rem] xl:max-w-2xl w-full">
+                            {/* Headline */}
+                            <h1
+                                className="font-black text-slate-900 leading-[1.06] tracking-tight mb-5"
+                                style={{
+                                    fontFamily: "'Montserrat', sans-serif",
+                                    fontSize: 'clamp(2.4rem, 4.6vw, 4rem)',
+                                }}
+                            >
+                                Find your perfect<br />
+                                <span className="text-brand-red">co-living</span> space
+                            </h1>
+
+                            {/* Subtitle */}
+                            <p className="text-slate-600 mb-6 text-base sm:text-lg max-w-md font-medium leading-relaxed"
+                               style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                                Premium spaces in prime locations.<br />
+                                Flexible stays. All-inclusive living.
+                            </p>
+
+                            <div className="mb-8 flex flex-wrap gap-2">
+                                {heroHighlights.map((label) => (
+                                    <span
+                                        key={label}
+                                        className="inline-flex items-center rounded-lg border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-semibold text-slate-700"
+                                    >
+                                        {label}
+                                    </span>
+                                ))}
+                            </div>
+
+                            {/* Search bar */}
+                            <div className="mb-12 w-full">
+                                <SmartSearchBar
+                                    category={category}
+                                    setCategory={setCategory}
+                                    searchQuery={searchQuery}
+                                    setSearchQuery={setSearchQuery}
+                                    listingsNavigate={listingsNavigate}
+                                    filters={filters}
+                                    setFilters={setFilters}
+                                />
+                            </div>
+
+                            {/* Present In Cities component */}
+                            <PresentInCities hideSectionLabel={false} />
                         </div>
-
-                        {/* Headline */}
-                        <h1
-                            className="mb-6 font-extrabold text-[#0F172A] leading-[0.96] tracking-tight"
-                            style={{
-                                fontFamily: "'Plus Jakarta Sans', 'Satoshi', 'Clash Display', sans-serif",
-                                fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-                                textShadow: '0 2px 10px rgba(15, 23, 42, 0.12)',
-                            }}
-                        >
-                            Smart PG stays,<br />
-                            <span className="text-[#EF4444]">near where you work.</span>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className="text-slate-600 mb-10 text-base sm:text-lg max-w-md font-medium leading-relaxed"
-                            style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                            Verified stays. Real photos. Trusted living.
-                        </p>
-
-                        {/* Search bar */}
-                        <div className="mb-12 w-full">
-                            <SmartSearchBar
-                                category={category}
-                                setCategory={setCategory}
-                                searchQuery={searchQuery}
-                                setSearchQuery={setSearchQuery}
-                                listingsNavigate={listingsNavigate}
-                            />
-                        </div>
-
-                        {/* Present In Cities component */}
-                        <PresentInCities hideSectionLabel={false} />
-                    </div>
                 </div>
             </section>
 

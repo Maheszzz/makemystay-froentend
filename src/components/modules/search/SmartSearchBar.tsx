@@ -14,6 +14,17 @@ export interface SmartSearchBarProps {
      * Homepage hero: underline tabs incl. Commercial; navigate to hubs or `/properties`.
      */
     listingsNavigate?: (tab: HomeHeroNavigateTab, query: string) => void;
+    filters?: HeroSearchFilters;
+    setFilters?: (next: HeroSearchFilters) => void;
+}
+
+export interface HeroSearchFilters {
+    city: 'bangalore' | 'pune' | 'hyderabad';
+    property_type: '' | 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK';
+    min_price?: number;
+    max_price?: number;
+    amenity: '' | 'wifi' | 'food' | 'ac' | 'parking';
+    gender: '' | 'male' | 'female' | 'unisex';
 }
 
 function mergeCommittedQuery(searchQuery: string | undefined, pendingInput: string): string {
@@ -45,6 +56,8 @@ export function SmartSearchBar({
     searchQuery,
     setSearchQuery,
     listingsNavigate,
+    filters,
+    setFilters,
 }: SmartSearchBarProps) {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
@@ -111,7 +124,17 @@ export function SmartSearchBar({
         setShowSuggestions(false);
     };
 
-    const FILTER_CHIPS = ['Budget', 'Room type', 'Amenities', 'Gender preference'] as const;
+    const activeFilters: HeroSearchFilters = filters ?? {
+        city: 'bangalore',
+        property_type: '',
+        min_price: undefined,
+        max_price: undefined,
+        amenity: '',
+        gender: '',
+    };
+    const updateFilters = (patch: Partial<HeroSearchFilters>) => {
+        setFilters?.({ ...activeFilters, ...patch });
+    };
 
     const mergedForSubmit = mergeCommittedQuery(searchQuery, inputValue);
 
@@ -145,7 +168,7 @@ export function SmartSearchBar({
             }
         >
             {hubMode ? (
-                <div className="mb-4 md:mb-5 overflow-x-auto hide-scrollbar flex gap-1 sm:gap-3 border-b border-slate-100 pb-px -mx-0.5 px-0.5">
+                <div className="mb-4 md:mb-5 overflow-x-auto hide-scrollbar flex gap-1.5 sm:gap-3 border-b border-slate-100 pb-px -mx-0.5 px-0.5">
                     {HUB_TAB_CONFIG.map((tab) => (
                         <button
                             key={tab.id}
@@ -154,7 +177,7 @@ export function SmartSearchBar({
                                 setActiveHubTab(tab.id);
                                 listingsNavigate?.(tab.id, (searchQuery || '').trim());
                             }}
-                            className={`shrink-0 pb-2.5 px-1 sm:px-2 text-[10px] sm:text-xs font-semibold tracking-wide transition-colors border-b-[3px] -mb-[2px] ${
+                            className={`shrink-0 pb-2.5 px-1.5 sm:px-2 text-[11px] sm:text-xs font-semibold tracking-wide transition-colors border-b-[3px] -mb-[2px] ${
                                 effectiveHubTab === tab.id
                                     ? 'text-slate-900 border-brand-red'
                                     : 'text-slate-500 border-transparent hover:text-slate-800'
@@ -193,13 +216,16 @@ export function SmartSearchBar({
                     <div className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 min-h-[44px] md:min-h-[48px]">
                         <MapPin className="w-4 h-4 shrink-0 text-slate-400" aria-hidden />
                         <select
-                            disabled
                             aria-label="City (Bangalore)"
-                            title="Bangalore"
-                            className="flex-1 min-w-0 cursor-default bg-transparent text-slate-900 text-sm font-medium outline-none appearance-none"
+                            title="City"
+                            value={activeFilters.city}
+                            onChange={(e) => updateFilters({ city: e.target.value as HeroSearchFilters['city'] })}
+                            className="flex-1 min-w-0 bg-transparent text-slate-900 text-sm font-medium outline-none appearance-none"
                             style={{ fontFamily: "'Montserrat', sans-serif" }}
                         >
                             <option value="bangalore">Bangalore</option>
+                            <option value="pune">Pune</option>
+                            <option value="hyderabad">Hyderabad</option>
                         </select>
                         <ChevronDown className="w-4 h-4 shrink-0 text-slate-400 pointer-events-none" aria-hidden />
                     </div>
@@ -290,7 +316,7 @@ export function SmartSearchBar({
                     type="button"
                     aria-label="Search listings"
                     onClick={onSearchClick}
-                    className="inline-flex shrink-0 items-center justify-center gap-2 px-6 py-2.5 min-h-[46px] md:min-h-[52px] rounded-xl md:rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold tracking-wide shadow-sm transition-all duration-300 hover:shadow-md"
+                    className="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 px-6 py-2.5 min-h-[46px] md:min-h-[52px] rounded-xl md:rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold tracking-wide shadow-sm transition-all duration-300 hover:shadow-md"
                     style={{ fontFamily: "'Montserrat', sans-serif" }}
                 >
                     <Search className="w-4 h-4 md:w-5 md:h-5 pointer-events-none opacity-95" aria-hidden />
@@ -299,27 +325,78 @@ export function SmartSearchBar({
             </div>
 
             {hubMode && (
-                <div
-                    className="mt-4 md:mt-5 flex flex-wrap gap-2.5"
-                    role="group"
-                    aria-label="Additional filters, coming soon"
-                >
-                    {FILTER_CHIPS.map((label) => (
-                        <button
-                            key={label}
-                            type="button"
-                            aria-disabled="true"
-                            aria-label={`${label} filter, coming soon`}
-                            onClick={(e) => {
-                                e.preventDefault();
+                <div className="mt-4 md:mt-5 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2.5" role="group" aria-label="Additional filters">
+                    <div className="relative w-full lg:w-auto">
+                        <select
+                            aria-label="Budget"
+                            value={
+                                activeFilters.min_price === undefined && activeFilters.max_price === undefined
+                                    ? 'any'
+                                    : `${activeFilters.min_price ?? 0}-${activeFilters.max_price ?? 0}`
+                            }
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === 'any') updateFilters({ min_price: undefined, max_price: undefined });
+                                else if (val === '0-10000') updateFilters({ min_price: undefined, max_price: 10000 });
+                                else if (val === '10000-15000') updateFilters({ min_price: 10000, max_price: 15000 });
+                                else if (val === '15000-25000') updateFilters({ min_price: 15000, max_price: 25000 });
+                                else if (val === '25000-0') updateFilters({ min_price: 25000, max_price: undefined });
                             }}
-                            className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] sm:text-[11px] font-medium text-slate-500 cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30 focus-visible:ring-offset-2"
-                            style={{ fontFamily: "'Montserrat', sans-serif" }}
+                            className="w-full lg:w-auto appearance-none rounded-full border border-slate-200 bg-slate-50 px-4 pr-9 py-2 text-[13px] sm:text-[13px] lg:text-[11px] font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30"
                         >
-                            {label}
-                            <ChevronDown className="w-3 h-3 shrink-0 text-slate-400" aria-hidden />
-                        </button>
-                    ))}
+                            <option value="any">Budget</option>
+                            <option value="0-10000">Below ₹10k</option>
+                            <option value="10000-15000">₹10k - ₹15k</option>
+                            <option value="15000-25000">₹15k - ₹25k</option>
+                            <option value="25000-0">₹25k+</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    </div>
+                    <div className="relative w-full lg:w-auto">
+                        <select
+                            aria-label="Room type"
+                            value={activeFilters.property_type || 'any'}
+                            onChange={(e) => updateFilters({ property_type: e.target.value === 'any' ? '' : (e.target.value as HeroSearchFilters['property_type']) })}
+                            className="w-full lg:w-auto appearance-none rounded-full border border-slate-200 bg-slate-50 px-4 pr-9 py-2 text-[13px] sm:text-[13px] lg:text-[11px] font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30"
+                        >
+                            <option value="any">Room type</option>
+                            <option value="PG">PG</option>
+                            <option value="1RK">1RK</option>
+                            <option value="1BHK">1BHK</option>
+                            <option value="2BHK">2BHK</option>
+                            <option value="3BHK">3BHK</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    </div>
+                    <div className="relative w-full lg:w-auto">
+                        <select
+                            aria-label="Amenities"
+                            value={activeFilters.amenity || 'any'}
+                            onChange={(e) => updateFilters({ amenity: e.target.value === 'any' ? '' : (e.target.value as HeroSearchFilters['amenity']) })}
+                            className="w-full lg:w-auto appearance-none rounded-full border border-slate-200 bg-slate-50 px-4 pr-9 py-2 text-[13px] sm:text-[13px] lg:text-[11px] font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30"
+                        >
+                            <option value="any">Amenities</option>
+                            <option value="wifi">WiFi</option>
+                            <option value="food">Food included</option>
+                            <option value="ac">AC rooms</option>
+                            <option value="parking">Parking</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    </div>
+                    <div className="relative w-full lg:w-auto">
+                        <select
+                            aria-label="Gender preference"
+                            value={activeFilters.gender || 'any'}
+                            onChange={(e) => updateFilters({ gender: e.target.value === 'any' ? '' : (e.target.value as HeroSearchFilters['gender']) })}
+                            className="w-full lg:w-auto appearance-none rounded-full border border-slate-200 bg-slate-50 px-4 pr-9 py-2 text-[13px] sm:text-[13px] lg:text-[11px] font-medium text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-red/30"
+                        >
+                            <option value="any">Gender preference</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="unisex">Unisex</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                    </div>
                 </div>
             )}
 
