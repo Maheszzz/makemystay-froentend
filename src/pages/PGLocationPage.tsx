@@ -6,6 +6,7 @@ import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalitySeoContent } from '@/components/seo/PgLocalitySeoContent';
+import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildPgLocationFaqs } from '@/lib/pgLocalityFaqs';
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
@@ -77,6 +78,17 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
                                     Verified accommodations in <strong className="text-slate-700">{name}</strong> — transparent pricing,
                                     instant shortlist, and secure online booking.
                                 </p>
+                                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-3 text-sm text-slate-700 max-w-2xl">
+                                    <p className="font-semibold text-slate-900">Quick facts</p>
+                                    <p className="mt-1">
+                                        <span className="font-medium">Best for:</span> students, working professionals, families on
+                                        budget.
+                                    </p>
+                                    <p className="mt-1">
+                                        <span className="font-medium">Typical rent band:</span> ₹6,000–₹18,000/mo for shared PG;
+                                        private rooms often higher.
+                                    </p>
+                                </div>
                             </div>
                             <Link
                                 to="/pg/bangalore"
@@ -111,6 +123,8 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
 
                     {/* Comparison Table */}
                     <LocationComparisonTable currentLocation={name} />
+
+                    <RelatedSearchesBlock currentSlug={slug} localityName={name} variant="pg" />
 
                     {/* Nearby Localities */}
                     <section className="pt-6 border-t border-slate-200/60">

@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Conversion / payment flows — thin pages, not primary landing content
+Disallow: /quick-pay
+
+# Crawl hygiene: listing filters use canonical + `noindex` rules in-app; do not blanket-disallow
+# `/pg/` or `/rent/` query variants or Google will miss valid inventory depth (`?page=` is allowed when clean).
+
 Sitemap: https://makemystay.ai/sitemap.xml

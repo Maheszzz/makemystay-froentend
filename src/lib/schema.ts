@@ -1,4 +1,5 @@
-import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
+import { BRAND_CONTACT, BRAND_EXTENDED, BRAND_SAME_AS } from '@/lib/brandEntity';
+import { DEFAULT_OG_IMAGE, LEGAL_ENTITY_NAME, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { findPgLocationForArea } from '@/data/pgLocations';
@@ -80,12 +81,8 @@ export function buildOrganizationSchema() {
         alternateName: 'MakeMyStay Realty',
         url: SITE_URL,
         logo: `${SITE_URL}/logo.svg`,
-        description:
-            'Find verified PGs, 1BHK and 2BHK homes in Bangalore with transparent pricing, real photos, and zero brokerage. AI-powered property discovery platform.',
-        sameAs: [
-            'https://www.instagram.com/makemystay',
-            'https://www.linkedin.com/company/makemystay',
-        ],
+        description: BRAND_EXTENDED,
+        sameAs: [...BRAND_SAME_AS],
     };
 }
 
@@ -99,11 +96,14 @@ export function buildLocalBusinessSchema() {
         url: SITE_URL,
         logo: `${SITE_URL}/logo.svg`,
         image: DEFAULT_OG_IMAGE,
-        description:
-            'Find verified PGs, 1BHK and 2BHK homes in Bangalore with transparent pricing, real photos, and zero brokerage. AI-powered property discovery platform.',
+        description: BRAND_EXTENDED,
+        email: BRAND_CONTACT.email,
+        telephone: BRAND_CONTACT.telephone,
         address: {
             '@type': 'PostalAddress',
+            streetAddress: 'HSR Layout, Sector 4',
             addressLocality: 'Bangalore',
+            postalCode: '560102',
             addressRegion: 'Karnataka',
             addressCountry: 'IN',
         },
@@ -121,10 +121,7 @@ export function buildLocalBusinessSchema() {
             'Bangalore',
         ],
         priceRange: '₹6000 - ₹25000',
-        sameAs: [
-            'https://www.instagram.com/makemystay',
-            'https://www.linkedin.com/company/makemystay',
-        ],
+        sameAs: [...BRAND_SAME_AS],
     };
 }
 
@@ -250,7 +247,7 @@ export function buildPropertyDetailGraph(
     const productName = buildPropertyProductName(property);
 
     const product: Record<string, unknown> = {
-        '@type': 'Accommodation',
+        '@type': ['Accommodation', 'Residence'],
         name: productName,
         description: desc || `${productName} — ${property.type} in ${property.location}`,
         url,
@@ -277,11 +274,15 @@ export function buildPropertyDetailGraph(
         };
     }
 
-    if (property.average_rating != null && (property.review_count ?? property.reviews)) {
+    const reviewCount = property.review_count ?? property.reviews ?? 0;
+    const avgRating = property.average_rating ?? property.rating;
+    if (avgRating != null && avgRating > 0 && reviewCount > 0) {
         product.aggregateRating = {
             '@type': 'AggregateRating',
-            ratingValue: property.average_rating,
-            reviewCount: property.review_count ?? property.reviews ?? 0,
+            ratingValue: Math.min(5, Math.max(1, Number(avgRating))),
+            reviewCount,
+            bestRating: 5,
+            worstRating: 1,
         };
     }
 
@@ -291,10 +292,12 @@ export function buildPropertyDetailGraph(
             const node: Record<string, unknown> = {
                 '@type': 'Review',
                 author: { '@type': 'Person', name: (r.user_name || 'Guest').trim() || 'Guest' },
+                publisher: { '@type': 'Organization', name: LEGAL_ENTITY_NAME, url: SITE_URL },
                 reviewRating: {
                     '@type': 'Rating',
                     ratingValue: Math.min(5, Math.max(1, r.rating)),
                     bestRating: 5,
+                    worstRating: 1,
                 },
                 datePublished: r.created_at,
             };

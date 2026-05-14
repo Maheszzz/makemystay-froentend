@@ -343,6 +343,8 @@ export default function PropertyDetails() {
                                 alt="" 
                                 className="w-full h-full object-cover opacity-40 scale-105 blur-[2px] transition-all duration-[2000ms] group-hover:scale-100 group-hover:blur-0"
                                 aria-hidden="true"
+                                loading="lazy"
+                                decoding="async"
                             />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent" />
@@ -390,7 +392,8 @@ export default function PropertyDetails() {
                                             alt={heroAlt}
                                             className="w-full h-full object-cover transition-transform duration-[1000ms] group-hover/hero:scale-110"
                                             onLoad={handleHeroImageLoad}
-                                            fetchpriority="high"
+                                            fetchPriority="high"
+                                            decoding="async"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                                         
@@ -433,7 +436,7 @@ export default function PropertyDetails() {
                                                 className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${heroIdx === idx ? 'border-brand-red scale-105 shadow-glow' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                                                 aria-label={`View photo ${idx + 1}`}
                                             >
-                                                <img src={getOptimizedImageUrl(url, 'thumbnail')} className="w-full h-full object-cover" alt="" loading="lazy" />
+                                                <img src={getOptimizedImageUrl(url, 'thumbnail')} className="w-full h-full object-cover" alt="" loading="lazy" decoding="async" />
                                             </button>
                                         ))}
                                     </div>
@@ -589,6 +592,7 @@ export default function PropertyDetails() {
                                                     alt={`${displayTitle} - photo ${idx + 1}`}
                                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                     loading="lazy"
+                                                    decoding="async"
                                                 />
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                     <Maximize2 className="w-8 h-8 text-white scale-75 group-hover:scale-100 transition-transform" />
@@ -762,6 +766,7 @@ export default function PropertyDetails() {
                         alt=""
                         onClick={(e) => e.stopPropagation()}
                         className="max-w-[90vw] max-h-[88vh] object-contain rounded-2xl shadow-2xl select-none"
+                        decoding="async"
                     />
                 </div>
             )}

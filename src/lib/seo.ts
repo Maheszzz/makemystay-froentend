@@ -69,11 +69,14 @@ const PG_LISTING_QUERY_KEYS = new Set([
     'food',
     'ac',
     'price',
+    'gender',
+    'page',
 ]);
 
 export function pgListingQueryIsClean(searchParams: URLSearchParams): boolean {
     for (const k of searchParams.keys()) {
         if (!PG_LISTING_QUERY_KEYS.has(k)) return false;
+        if (k === 'page' && !isValidListingPageParam(searchParams.get('page'))) return false;
     }
     return true;
 }
@@ -105,9 +108,14 @@ export function pgLocationSeoWithQuery(
     const food = searchParams.get('food') === 'true';
     const ac = searchParams.get('ac') === 'true';
     const price = searchParams.get('price');
+    const genderRaw = searchParams.get('gender');
+    const gender = genderRaw?.trim().toLowerCase();
 
-    let title = `Best PG in ${locationName} (₹6k–₹18k) | WiFi, food & security`;
+    let title = `Verified PG in ${locationName} | Zero brokerage · ₹6k–₹18k`;
     const tags: string[] = [];
+    if (gender === 'male' || gender === 'female') {
+        tags.push(gender === 'male' ? 'boys PG' : 'girls PG');
+    }
     if (wifi) tags.push('WiFi PGs');
     if (food) tags.push('food included');
     if (ac) tags.push('AC rooms');
@@ -115,12 +123,12 @@ export function pgLocationSeoWithQuery(
     if (price === 'mid') tags.push('mid-range');
     if (price === 'high') tags.push('premium');
     if (tags.length) {
-        title = `PG in ${locationName}: ${tags.join(' · ')} | Verified stays ₹6k–₹18k`;
+        title = `Verified PG in ${locationName}: ${tags.join(' · ')} | Zero brokerage`;
     }
 
-    let description = `Find verified PG in ${locationName}, Bangalore — compare rent (₹6,000–₹18,000/mo), meals, WiFi & safety. Listings on ${SITE_NAME}.`;
+    let description = `Verified PG in ${locationName}, Bangalore — zero brokerage on many listings, real photos, ₹6k–₹18k/mo bands. Compare WiFi, meals & security on ${SITE_NAME}.`;
     if (tags.length) {
-        description = `PG in ${locationName} — ${tags.join(', ')}. Browse verified listings with transparent pricing; book visits or pay tokens online where enabled.`;
+        description = `PG in ${locationName} — ${tags.join(', ')}. Verified listings, transparent pricing; book visits or pay tokens online where enabled on ${SITE_NAME}.`;
     }
 
     return {
@@ -133,6 +141,31 @@ export function pgLocationSeoWithQuery(
 
 export function pgLocationSeo(locationName: string, slug: string): PageSEOInput {
     return pgLocationSeoWithQuery(locationName, slug, new URLSearchParams());
+}
+
+/** SEO for `/rent/:slug` locality hub (flats & houses on rent). */
+export function rentLocationHubSeo(locationName: string, slug: string): PageSEOInput {
+    return {
+        title: `Verified flats & 1BHK in ${locationName} | Zero brokerage rents`,
+        description: `Browse verified 1BHK, 2BHK & family homes for rent in ${locationName}, Bangalore on ${SITE_NAME} — real photos, transparent rent, zero brokerage on many listings.`,
+        path: `/rent/${slug}`,
+    };
+}
+
+/** Long-tail: `/pg-for-boys-in-:slug` and `/pg-for-girls-in-:slug` (and men/women aliases). */
+export function pgGenderLocalitySeo(
+    locationName: string,
+    slug: string,
+    variant: 'male' | 'female' | 'men' | 'women'
+): PageSEOInput {
+    const isMale = variant === 'male' || variant === 'men';
+    const pathPrefix = isMale ? 'pg-for-boys-in' : 'pg-for-girls-in';
+    const label = isMale ? 'Boys PG' : 'Girls PG';
+    return {
+        title: `Verified ${label} in ${locationName} | Zero brokerage · near IT parks`,
+        description: `Find verified ${label.toLowerCase()} in ${locationName}, Bangalore — WiFi, meals & security on many listings. Zero brokerage on select stays. Browse on ${SITE_NAME}.`,
+        path: `/${pathPrefix}-${slug}`,
+    };
 }
 
 function ogImageFromProperty(property: Property): string | undefined {
@@ -162,8 +195,7 @@ function buildPropertyMetaTitle(property: Property): string {
     const bhk = property.type || '1BHK';
 
     if (isPG) {
-        // High-intent PG title: PG in {Location} for Rent
-        return `PG in ${location} for Rent | ${name}`;
+        return `Verified PG in ${location} for rent | ${name}`;
     }
 
     // Rental property title pattern: {BHK} Flat for Rent in {Location}
@@ -287,12 +319,12 @@ export function pgFeaturePathToKind(pathname: string): 'wifi' | 'food' | 'ac' | 
 
 export function pgFeatureLandingSeo(feature: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'): PageSEOInput {
     const titles = {
-        wifi: 'PG with WiFi in Bangalore | High-speed internet — verified listings',
-        food: 'PG with food in Bangalore | Meals included — verified PG stays',
-        ac: 'PG with AC in Bangalore | Cool rooms — verified listings',
-        girls: 'Girls PG in Bangalore | Safe & verified female accommodations',
-        boys: 'Boys PG in Bangalore | Affordable male coliving & PG stays',
-        single: 'Single Room PG in Bangalore | Private rooms with no sharing',
+        wifi: 'PG with WiFi in Bangalore | Verified · zero brokerage on many stays',
+        food: 'PG with food in Bangalore | Verified meals-included stays · zero brokerage',
+        ac: 'PG with AC in Bangalore | Verified AC rooms · compare rent bands',
+        girls: 'Girls PG in Bangalore | Verified & safe · zero brokerage options',
+        boys: 'Boys PG in Bangalore | Verified male PG & coliving · zero brokerage',
+        single: 'Single room PG in Bangalore | Verified private rooms · zero brokerage',
     };
     const desc = {
         wifi: 'Looking for PG with reliable WiFi in Bangalore? Explore verified paying guest stays with transparent pricing, filters for connectivity, and book online.',
@@ -330,7 +362,7 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Verified PG, 1BHK & 2BHK flats on rent in Bangalore',
+        title: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals',
         description:
             'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage. Book a visit in 60 seconds on MakeMyStay.ai.',
         path: '/',
@@ -408,9 +440,18 @@ export interface ListingsPageSeoInput {
     /** `locationFilter` from listings UI (`all` or city name). */
     cityLabel: string;
     totalCount?: number;
+    /** Crawlable pagination (1-based). Page 1 omitted from canonical. */
+    listingPage?: number;
 }
 
-/** Listings index routes (`/pg`, `/rent`, `/properties`, …): distinct title + description + canonical path. */
+/** Listings index routes (`/pg`, `/rent`, `/properties`, …) + optional `?page=` crawl depth. */
+export function isValidListingPageParam(raw: string | null | undefined): boolean {
+    if (raw === null || raw === undefined || raw === '') return true;
+    if (!/^\d+$/.test(raw.trim())) return false;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 1 && n <= 100;
+}
+
 export function listingsPageSeo(input: ListingsPageSeoInput): PageSEOInput {
     const pathOnly = canonicalPath(input.pathname.split('?')[0]);
     const city = input.cityLabel === 'all' ? 'Bangalore' : input.cityLabel;
@@ -426,11 +467,15 @@ export function listingsPageSeo(input: ListingsPageSeoInput): PageSEOInput {
                 : input.category === 'buy'
                   ? 'sale'
                   : 'plot & land';
-    const title = `${input.pageTitle} — ${city}`;
+    const lp = input.listingPage && input.listingPage > 1 ? input.listingPage : undefined;
+    const titleBase = `${input.pageTitle} — ${city}`;
+    const title = lp ? `${titleBase} — Page ${lp}` : titleBase;
     const description = `${input.pageSubtitle} Explore ${countBit}verified ${categoryPhrase} listings in ${city}. Transparent pricing and expert support on ${SITE_NAME}.`;
+    const path = lp ? `${pathOnly}?page=${lp}` : pathOnly;
     return {
         title,
         description,
-        path: pathOnly,
+        path,
+        noindex: lp != null && lp > 50,
     };
 }

@@ -22,7 +22,7 @@ Replicate the same rules in your edge config if you do not use `_redirects`.
 
 ## Verification
 
-**Baseline (SPA only):** Until prerender or bot routing is configured at the CDN, `curl` with a Googlebot User-Agent will typically return the same static `index.html` shell (generic `<title>`, empty `#root`). That confirms the need for the steps above.
+**Baseline (SPA only):** Until prerender or bot routing is configured at the CDN, `curl` with a Googlebot User-Agent will typically return the static `index.html` shell with an empty `#root`. The shell’s default `<title>`, meta description, and Open Graph tags are aligned with the homepage (`buildHomeSEO`), and **no** duplicate `LocalBusiness` JSON-LD is embedded there — structured data comes from the React app (and from prerendered HTML once bots are routed). Rich schema in the first response still requires prerender or SSR.
 
 After prerender is live, the first HTML response for a listing hub should contain visible text, not an empty shell:
 

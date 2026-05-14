@@ -77,8 +77,8 @@ function filtersReady(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'
     if (kind === 'wifi') return sp.get('wifi') === 'true';
     if (kind === 'food') return sp.get('food') === 'true';
     if (kind === 'ac') return sp.get('ac') === 'true';
-    if (kind === 'girls') return sp.get('gender') === 'Female';
-    if (kind === 'boys') return sp.get('gender') === 'Male';
+    if (kind === 'girls') return sp.get('gender') === 'female' || sp.get('gender') === 'Female';
+    if (kind === 'boys') return sp.get('gender') === 'male' || sp.get('gender') === 'Male';
     return sp.get('beds') === '1' || !!sp.get('sharing')?.includes('Single');
 }
 
@@ -93,8 +93,8 @@ export default function PgFeatureLandingPage() {
         if (kind === 'wifi') params.wifi = 'true';
         if (kind === 'food') params.food = 'true';
         if (kind === 'ac') params.ac = 'true';
-        if (kind === 'girls') params.gender = 'Female';
-        if (kind === 'boys') params.gender = 'Male';
+        if (kind === 'girls') params.gender = 'female';
+        if (kind === 'boys') params.gender = 'male';
         if (kind === 'single') params.beds = '1';
         setSearchParams(params, { replace: true });
     }, [kind, setSearchParams]);

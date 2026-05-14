@@ -30,3 +30,39 @@ export function propertyMatchesPgFeatureFilters(
     if (f.ac && !propertyLikelyHasAc(property)) return false;
     return true;
 }
+
+export type PgGenderFilter = 'male' | 'female';
+
+/** Normalize `gender` query values (legacy Male/Female + new male/female). */
+export function normalizePgGenderParam(raw: string | null | undefined): PgGenderFilter | undefined {
+    if (raw == null || typeof raw !== 'string') return undefined;
+    const s = raw.trim().toLowerCase();
+    if (s === 'male' || s === 'm' || s === 'men' || s === 'boys' || s === 'gents') return 'male';
+    if (s === 'female' || s === 'f' || s === 'women' || s === 'girls' || s === 'ladies') return 'female';
+    if (raw === 'Male') return 'male';
+    if (raw === 'Female') return 'female';
+    return undefined;
+}
+
+/**
+ * Best-effort client filter when the API has no gender field — uses title/type/features text.
+ * Inclusive: ambiguous listings stay visible to avoid empty hubs.
+ */
+export function propertyMatchesPgGenderFilter(property: Property, gender: PgGenderFilter): boolean {
+    const text = [property.title, property.description, property.type, ...(property.features ?? [])]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+    const hasFemaleCue = /\b(female|girls|ladies|women|she|her|woman-only|ladies only|girls pg|ladies pg)\b/i.test(
+        text
+    );
+    const hasMaleCue = /\b(male|boys|gents|men|stag|bachelor|his|him|boys pg|gents pg)\b/i.test(text);
+
+    if (gender === 'male') {
+        if (hasFemaleCue && !hasMaleCue) return false;
+        return true;
+    }
+    if (hasMaleCue && !hasFemaleCue) return false;
+    return true;
+}

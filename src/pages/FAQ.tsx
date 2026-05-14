@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
+import { BRAND_ONE_LINER } from '@/lib/brandEntity';
 import { buildPageSEO, buildFaqPageSEO } from '@/lib/seo';
 import { buildFaqPageSchema } from '@/lib/schema';
 
@@ -26,22 +27,21 @@ const faqData: FAQSection[] = [
         emoji: '🔹',
         items: [
             {
-                q: 'What is MakeMyStay?',
-                a: 'MakeMyStay is a real estate facilitation platform that helps users find PG accommodations, rental homes, properties for purchase, and plots with end-to-end assistance — from search to closure.',
-                schemaAnswer:
-                    'MakeMyStay is a real estate facilitation platform that helps users find PG accommodations, rental homes, properties for purchase, and plots with end-to-end assistance — from search to closure.',
+                q: 'What is MakeMyStay.ai?',
+                a: BRAND_ONE_LINER,
+                schemaAnswer: BRAND_ONE_LINER,
             },
             {
                 q: 'How does MakeMyStay work?',
-                a: 'Users can browse listings, submit inquiries, schedule visits, receive negotiation and documentation guidance, and complete booking or registration with coordinated support.',
+                a: 'Browse verified PGs, flats, and coliving on MakeMyStay.ai, filter by area and budget, shortlist listings with real photos, schedule visits, and complete booking or token payment with coordinated support when available.',
                 schemaAnswer:
-                    'Users can browse listings, submit inquiries, schedule visits, receive negotiation and documentation guidance, and complete booking or registration with coordinated support.',
+                    'Browse verified PGs, flats, and coliving on MakeMyStay.ai, filter by area and budget, shortlist listings with real photos, schedule visits, and complete booking or token payment with coordinated support when available.',
             },
             {
                 q: 'What locations do you operate in?',
-                a: 'Service availability depends on active listings in specific cities. Please check the website for current coverage.',
+                a: 'MakeMyStay.ai is strongest in Bangalore across major IT and residential corridors. We also list inventory in Hyderabad and Pune where supply is live — check the city hubs on the site for current coverage.',
                 schemaAnswer:
-                    'Service availability depends on active listings in specific cities. Please check the website for current coverage.',
+                    'MakeMyStay.ai is strongest in Bangalore across major IT and residential corridors. We also list inventory in Hyderabad and Pune where supply is live — check the city hubs on the site for current coverage.',
             },
             {
                 q: 'Do I need to create an account?',
@@ -51,8 +51,9 @@ const faqData: FAQSection[] = [
             },
             {
                 q: 'What makes MakeMyStay different?',
-                a: 'We provide guided support throughout the property journey rather than just listing properties.',
-                schemaAnswer: 'We provide guided support throughout the property journey rather than just listing properties.',
+                a: 'MakeMyStay.ai combines AI-powered discovery with verified listings, transparent pricing, and zero brokerage on many properties — so you spend less time on broker calls and more time visiting real homes.',
+                schemaAnswer:
+                    'MakeMyStay.ai combines AI-powered discovery with verified listings, transparent pricing, and zero brokerage on many properties — so you spend less time on broker calls and more time visiting real homes.',
             },
             {
                 q: 'Can NRIs use MakeMyStay?',

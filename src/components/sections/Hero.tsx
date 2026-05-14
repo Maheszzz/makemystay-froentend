@@ -51,6 +51,7 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                             className="w-full h-full object-cover object-center"
                             onError={() => setImgError(true)}
                             fetchPriority="high"
+                            decoding="async"
                         />
                         {/* Mobile solid overlay */}
                         <div className="absolute inset-0 bg-slate-50/95 lg:hidden" />

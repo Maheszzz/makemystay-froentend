@@ -6,6 +6,7 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { PG_LOCATIONS } from '@/data/pgLocations';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
 import { BLOG_POSTS } from '@/data/blogPosts';
+import { BRAND_EXTENDED } from '@/lib/brandEntity';
 
 export function Footer() {
     return (
@@ -24,7 +25,7 @@ export function Footer() {
                             </span>
                         </div>
                         <p className="text-sm leading-relaxed mb-6 text-slate-400 font-medium max-w-md">
-                            Your trusted real estate facilitation platform — from PGs and rentals to buying your dream home.
+                            {BRAND_EXTENDED}
                         </p>
                         <div className="flex space-x-3">
                             <a href="https://www.facebook.com/profile.php?id=61569413385115" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 hover:bg-[#1877F2] hover:text-white flex items-center justify-center transition-all duration-300 border border-white/5 hover:border-[#1877F2] hover:shadow-glow hover:-translate-y-1" aria-label="Facebook">

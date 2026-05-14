@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { MapPin, Shield } from 'lucide-react';
 import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
@@ -53,6 +54,18 @@ export function PgLocalitySeoContent({ name, slug, faqSectionId = 'pg-locality-f
             </section>
 
             <QuickAnswersBlock locationName={name} />
+
+            <p className="text-sm text-slate-600 leading-relaxed max-w-3xl">
+                New to Bangalore? Read our{' '}
+                <Link to="/blog/pg-in-bangalore-guide" className="font-semibold text-brand-red hover:underline">
+                    PG in Bangalore guide
+                </Link>{' '}
+                for budgets and red flags, or browse{' '}
+                <Link to={`/rent/${slug}`} className="font-semibold text-brand-red hover:underline">
+                    flats for rent in {name}
+                </Link>{' '}
+                if you prefer an independent flat.
+            </p>
 
             <PeopleAlsoAsk items={faqs} />
 

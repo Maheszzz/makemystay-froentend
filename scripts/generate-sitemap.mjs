@@ -38,7 +38,21 @@ const STATIC_PATHS = [
 
 const locJson = JSON.parse(readFileSync(join(root, 'src/data/pg-locations.json'), 'utf8'));
 
+const PG_NEAR_LANDMARK_PATHS = [
+    'pg-near-ecospace',
+    'pg-near-rmz-ecoworld',
+    'pg-near-wipro-ecity',
+    'pg-near-manyata',
+    'pg-near-itpl',
+    'pg-near-embassy-techvillage',
+    'pg-near-ecity-phase-2',
+    'pg-near-prestige-tech-park',
+];
+
 const BLOG_SLUGS = [
+    'pg-in-bangalore-guide',
+    'pg-near-whitefield-bangalore',
+    'pg-checklist-new-joiners-bangalore',
     'how-to-choose-pg-in-bangalore',
     'pg-rent-vs-flat-rent-bangalore',
     'best-pg-areas-bangalore-it-pros',
@@ -49,7 +63,11 @@ const BLOG_SLUGS = [
     'dynamic-pricing-coliving-revenue',
     'bangalore-rental-laws-compliance',
     'ai-vs-brokers-real-estate-future',
-    'emerging-rental-hotspots-bangalore-2027'
+    'emerging-rental-hotspots-bangalore-2027',
+    'best-areas-to-live-bangalore-working-professionals-2026',
+    'how-to-find-verified-rentals-bangalore-2026',
+    'affordable-coliving-spaces-bangalore-2026',
+    'pg-electronic-city-it-professionals-2026',
 ];
 
 function titleToSlug(title = '') {
@@ -149,11 +167,13 @@ for (const row of locJson) {
     body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-10000`, '0.88', 'weekly');
     body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-15000`, '0.88', 'weekly');
     
-    // Top intent hubs for rentals — canonical `/rent/{slug}` (legacy `/rent-in-*` redirects in app + public/_redirects)
-    const rentAreas = ['whitefield', 'marathahalli', 'btm', 'koramangala', 'hsr-layout', 'electronic-city', 'indiranagar', 'bellandur', 'hebbal', 'jp-nagar', 'bannerghatta-road', 'sarjapur-road'];
-    if (rentAreas.includes(row.slug)) {
-        body += urlEntry(`${BASE}/rent/${row.slug}`, '0.90', 'daily');
-    }
+    // Long-tail gender + locality (canonical boys/girls URLs; men/women alias pages set canonical in-page)
+    body += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
+    body += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
+}
+
+for (const p of PG_NEAR_LANDMARK_PATHS) {
+    body += urlEntry(`${BASE}/${p}`, '0.86', 'weekly');
 }
 
 body += urlEntry(`${BASE}/flats-in-bangalore`, '0.90', 'daily');
@@ -184,5 +204,11 @@ const outDist = join(root, 'dist/sitemap.xml');
 if (existsSync(join(root, 'dist'))) {
     writeFileSync(outDist, xml);
 }
-const n = STATIC_PATHS.length + locJson.length + BLOG_SLUGS.length + propertyCount;
+const n =
+    STATIC_PATHS.length +
+    locJson.length * 6 +
+    PG_NEAR_LANDMARK_PATHS.length +
+    1 +
+    BLOG_SLUGS.length +
+    propertyCount;
 console.log(`Wrote ${outPublic}${existsSync(join(root, 'dist')) ? ` and ${outDist}` : ''} (${n} URLs)`);

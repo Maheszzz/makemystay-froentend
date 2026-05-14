@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { Navbar } from '@/components/layout/Navbar';
@@ -11,8 +11,12 @@ import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
-import { propertyMatchesPgFeatureFilters } from '@/lib/propertySeoUtils';
-import { buildPageSEO, listingsPageSeo } from '@/lib/seo';
+import {
+    normalizePgGenderParam,
+    propertyMatchesPgFeatureFilters,
+    propertyMatchesPgGenderFilter,
+} from '@/lib/propertySeoUtils';
+import { buildPageSEO, isValidListingPageParam, listingsPageSeo } from '@/lib/seo';
 import {
     listingsHubTabNavigateUrl,
     listingsLegacyCatRedirectPath,
@@ -66,6 +70,8 @@ interface PropertiesProps {
     onEmptyResultsChange?: (isEmpty: boolean) => void;
     /** Hub shells (e.g. PG city page) can mirror visible inventory into ItemList JSON-LD — max 100 items. */
     onDisplayedListingsForSeo?: (list: Property[]) => void;
+    /** When set (e.g. `/pg-for-boys-in-*` hubs), filter PG listings client-side without relying on `?gender=`. */
+    forcedGenderFilter?: 'male' | 'female';
 }
 
 export default function Properties({
@@ -83,6 +89,7 @@ export default function Properties({
     onPlotHubInventoryRange,
     onEmptyResultsChange,
     onDisplayedListingsForSeo,
+    forcedGenderFilter,
 }: PropertiesProps) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -102,6 +109,14 @@ export default function Properties({
     const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'review_count_desc');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
     
+    const pageQueryParam = searchParams.get('page');
+    const listingPageNum = useMemo(() => {
+        if (!pageQueryParam || !isValidListingPageParam(pageQueryParam)) return 1;
+        const n = parseInt(pageQueryParam, 10);
+        if (!Number.isFinite(n)) return 1;
+        return Math.max(1, Math.min(100, n));
+    }, [pageQueryParam]);
+
     const [showFilters, setShowFilters] = useState(false);
 
     // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
@@ -119,7 +134,12 @@ export default function Properties({
             if (sortBy !== 'review_count_desc') params.sort = sortBy;
             if (searchQuery) params.q = searchQuery;
 
-            for (const key of ['wifi', 'food', 'ac', 'price'] as const) {
+            const pageRaw = searchParams.get('page');
+            if (isValidListingPageParam(pageRaw) && pageRaw && parseInt(pageRaw, 10) > 1) {
+                params.page = pageRaw.trim();
+            }
+
+            for (const key of ['wifi', 'food', 'ac', 'price', 'gender'] as const) {
                 const v = searchParams.get(key);
                 if (v) params[key] = v;
             }
@@ -142,6 +162,7 @@ export default function Properties({
         searchQuery,
         setSearchParams,
         searchParams,
+        pageQueryParam,
     ]);
 
     // Update state if category props change (from App.tsx routes)
@@ -238,24 +259,89 @@ export default function Properties({
         loadMore,
         hasMore,
         loadingMore,
-    } = useProperties(apiParams, { infiniteScroll: true, pageSize: PAGE_SIZE });
+    } = useProperties(apiParams, {
+        infiniteScroll: true,
+        pageSize: PAGE_SIZE,
+        initialListingPage: listingPageNum,
+    });
+
+    const genderFilter = useMemo(() => {
+        if (forcedGenderFilter) return forcedGenderFilter;
+        if (category !== 'pg') return undefined;
+        return normalizePgGenderParam(searchParams.get('gender'));
+    }, [forcedGenderFilter, category, searchParams]);
+
+    const listingFilterKey = useMemo(
+        () =>
+            JSON.stringify({
+                category,
+                searchQuery,
+                typeFilter,
+                minPrice,
+                maxPrice,
+                apiCity,
+                sortBy,
+                priceTier,
+                wifiOn,
+                foodOn,
+                acOn,
+                genderKey: genderFilter ?? '',
+            }),
+        [
+            category,
+            searchQuery,
+            typeFilter,
+            minPrice,
+            maxPrice,
+            apiCity,
+            sortBy,
+            priceTier,
+            wifiOn,
+            foodOn,
+            acOn,
+            genderFilter,
+        ]
+    );
+
+    const listingFilterKeyPrev = useRef<string | null>(null);
+    useEffect(() => {
+        if (listingFilterKeyPrev.current === null) {
+            listingFilterKeyPrev.current = listingFilterKey;
+            return;
+        }
+        if (listingFilterKeyPrev.current === listingFilterKey) return;
+        listingFilterKeyPrev.current = listingFilterKey;
+        if (!searchParams.get('page')) return;
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.delete('page');
+                return next;
+            },
+            { replace: true }
+        );
+    }, [listingFilterKey, searchParams, setSearchParams]);
 
     const propertyListFiltered = useMemo(() => {
         try {
             const rawList = Array.isArray(properties) ? properties : [];
-            const list = rawList.filter(p => !!p); // Always strip nulls/undefined
-            
+            let list = rawList.filter((p) => !!p); // Always strip nulls/undefined
+
             const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
-            if (!wifiOn && !foodOn && !acOn) return list;
-            
-            return list.filter((p) => {
-                return propertyMatchesPgFeatureFilters(p, flags);
-            });
+            if (wifiOn || foodOn || acOn) {
+                list = list.filter((p) => propertyMatchesPgFeatureFilters(p, flags));
+            }
+
+            if (category === 'pg' && genderFilter) {
+                list = list.filter((p) => propertyMatchesPgGenderFilter(p, genderFilter));
+            }
+
+            return list;
         } catch (e) {
             console.error('[Properties] Filtering crash:', e);
             return [];
         }
-    }, [properties, wifiOn, foodOn, acOn]);
+    }, [properties, wifiOn, foodOn, acOn, category, genderFilter]);
 
     /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
@@ -314,10 +400,11 @@ export default function Properties({
             category,
             cityLabel: locationFilter === 'all' ? 'all' : locationFilter,
             totalCount: totalCount ?? undefined,
+            listingPage: listingPageNum,
         });
         return buildPageSEO({
             ...page,
-            noindex: shouldNoindexEmptyResults || shouldNoindexThinCategory,
+            noindex: Boolean(page.noindex) || shouldNoindexEmptyResults || shouldNoindexThinCategory,
         });
     }, [
         hideChrome,
@@ -329,6 +416,7 @@ export default function Properties({
         totalCount,
         shouldNoindexEmptyResults,
         shouldNoindexThinCategory,
+        listingPageNum,
     ]);
 
     useEffect(() => {

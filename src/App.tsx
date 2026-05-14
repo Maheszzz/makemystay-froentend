@@ -27,18 +27,21 @@ const PGPuneHub = lazy(() => import('./pages/PGPuneHub'));
 const RentBangaloreHub = lazy(() => import('./pages/RentBangaloreHub'));
 const RentHyderabadHub = lazy(() => import('./pages/RentHyderabadHub'));
 const RentPuneHub = lazy(() => import('./pages/RentPuneHub'));
+const RentLocationPage = lazy(() => import('./pages/RentLocationPage'));
 const BuyBangaloreHub = lazy(() => import('./pages/BuyBangaloreHub'));
 const PlotBangaloreHub = lazy(() => import('./pages/PlotBangaloreHub'));
 const PgFeatureLandingPage = lazy(() => import('./pages/PgFeatureLandingPage'));
 const PgVsFlatBangalore = lazy(() => import('./pages/PgVsFlatBangalore'));
 const PGLocationPage = lazy(() => import('./pages/PGLocationPage'));
-const PgNearMe = lazy(() => import('./pages/PgNearMe'));
+const PgGenderLocalityPage = lazy(() => import('./pages/PgGenderLocalityPage'));
+const PgNearLandmarkPage = lazy(() => import('./pages/PgNearLandmarkPage'));
 const BlogIndex = lazy(() => import('./pages/BlogIndex'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
 
 // Import location data for programmatic routing
 import locJson from './data/pg-locations.json';
+import { PG_NEAR_LANDMARKS } from './data/pgNearLandmarks';
 import { canonicalRentPathForRentInSegment } from '@/lib/rentLegacyRedirects';
 
 /** 301-style in-app redirect; see `public/_redirects` for static hosts. */
@@ -96,7 +99,8 @@ function PGPriceTierRouter() {
 /**
  * Smart Router for /rent/:slug
  * - starts with digit → PropertyDetails
- * - else → Properties (Locality filtering for rent)
+ * - city hubs bangalore / hyderabad / pune → dedicated hub pages
+ * - known locality slug → RentLocationPage (SEO shell + listings)
  */
 function RentRouter() {
     const { slug } = useParams<{ slug: string }>();
@@ -122,13 +126,7 @@ function RentRouter() {
         );
     }
 
-    return (
-        <Properties
-            key={`rent-${slug ?? 'hub'}`}
-            initialCategory="rent"
-            initialCity={slug ?? 'all'}
-        />
-    );
+    return <RentLocationPage />;
 }
 
 /** Wrapper for City-specific SEO pages */
@@ -182,6 +180,13 @@ function App() {
                              <Route path="/pg-with-ac" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-for-girls" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-for-boys" element={<PgFeatureLandingPage />} />
+                             <Route path="/pg-for-boys-in-:slug" element={<PgGenderLocalityPage />} />
+                             <Route path="/pg-for-girls-in-:slug" element={<PgGenderLocalityPage />} />
+                             <Route path="/pg-for-men-in-:slug" element={<PgGenderLocalityPage />} />
+                             <Route path="/pg-for-women-in-:slug" element={<PgGenderLocalityPage />} />
+                             {PG_NEAR_LANDMARKS.map((entry) => (
+                                 <Route key={entry.path} path={`/${entry.path}`} element={<PgNearLandmarkPage />} />
+                             ))}
                              <Route path="/pg-single-room" element={<PgFeatureLandingPage />} />
                              <Route path="/pg-near-me" element={<PgNearMe />} />
                              <Route path="/pg/:slug" element={<PGRouter />} />

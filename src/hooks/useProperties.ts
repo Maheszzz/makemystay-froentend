@@ -13,6 +13,8 @@ export interface UsePropertiesOptions {
     /** Accumulate pages (skip += len) with Load more / infinite scroll */
     infiniteScroll?: boolean;
     pageSize?: number;
+    /** 1-based crawlable page (e.g. `?page=2`). Initial fetch uses skip = (page-1)*pageSize when infiniteScroll. */
+    initialListingPage?: number;
 }
 
 export interface UsePropertiesResult {
@@ -37,7 +39,8 @@ export function useProperties(
     params: PaginationParams = {},
     options: UsePropertiesOptions = {}
 ): UsePropertiesResult {
-    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE } = options;
+    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE, initialListingPage = 1 } = options;
+    const startPage = Math.max(1, Math.min(500, initialListingPage || 1));
 
     const [properties, setProperties] = useState<Property[]>([]);
     const [totalCount, setTotalCount] = useState<number>(0);
@@ -59,12 +62,13 @@ export function useProperties(
         const fetchInitial = async () => {
             setLoading(true);
             setError(null);
-            setPage(1);
+            const initialSkip = infiniteScroll ? (startPage - 1) * pageSize : 0;
+            setPage(infiniteScroll ? startPage : 1);
 
             try {
                 const response = await propertyApi.getAll({
                     ...params,
-                    skip: 0,
+                    skip: initialSkip,
                     limit: pageSize,
                 }) as any;
 
@@ -85,7 +89,7 @@ export function useProperties(
                     setProperties(list);
                     setTotalCount(total);
                     setPropertyCounts(counts);
-                    setHasMore(list.length < total);
+                    setHasMore(initialSkip + list.length < total);
                 }
             } catch (err: unknown) {
                 if (isMounted) {
@@ -105,7 +109,7 @@ export function useProperties(
 
         void fetchInitial();
         return () => { isMounted = false; };
-    }, [filterKey, pageSize]);
+    }, [filterKey, pageSize, startPage, infiniteScroll]);
 
     const loadMore = useCallback(async () => {
         if (loading || loadingMore || !hasMore) return;

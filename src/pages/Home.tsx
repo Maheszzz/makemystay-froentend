@@ -12,12 +12,14 @@ import { CTA } from '@/components/sections/CTA';
 import { Hero } from '@/components/sections/Hero';
 import { Problem } from '@/components/sections/Problem';
 import { Solution } from '@/components/sections/Solution';
+import { FaqSection } from '@/components/seo/FaqSection';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
 import { homeHeroSearchUrl, type ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { buildHomeSEO, buildPageSEO } from '@/lib/seo';
+import { MapPin } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -136,6 +138,16 @@ export default function Home() {
                 <Comparison />
                 <CaseStudy />
                 <CTA />
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
+                    <FaqSection
+                        id="home-faq-heading"
+                        title="Frequently asked questions"
+                        items={HOME_PG_FAQS}
+                        variant="light"
+                        titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
+                    />
+                </div>
             </main>
 
             <Footer />
