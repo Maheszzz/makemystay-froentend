@@ -35,6 +35,7 @@ const PgVsFlatBangalore = lazy(() => import('./pages/PgVsFlatBangalore'));
 const PGLocationPage = lazy(() => import('./pages/PGLocationPage'));
 const PgGenderLocalityPage = lazy(() => import('./pages/PgGenderLocalityPage'));
 const PgNearLandmarkPage = lazy(() => import('./pages/PgNearLandmarkPage'));
+const PgNearMe = lazy(() => import('./pages/PgNearMe'));
 const BlogIndex = lazy(() => import('./pages/BlogIndex'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
 const SkipLink = lazy(() => import('./components/a11y/SkipLink').then(m => ({ default: m.SkipLink })));
@@ -164,7 +165,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/contact-us" element={<Contact />} />
-                            <Route path="/properties" element={<Properties key="all" />} />
+                            <Route path="/properties" element={<Properties key="all" initialCity="Bangalore" />} />
                             <Route path="/properties/in/:city" element={<CityProperties category="all" />} />
 
                             <Route path="/rent" element={<Properties key="rent" initialCategory="rent" initialCity="Bangalore" pageTitle="Properties for Rent" pageSubtitle="Find your perfect rental home in Bangalore" />} />

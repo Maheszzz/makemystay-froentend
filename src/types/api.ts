@@ -179,6 +179,7 @@ export interface PaginationParams {
     max_price?: number;
     city?: string;
     sort_by?: string;
+    is_available?: boolean;
 }
 
 export interface ContactCreateRequest {

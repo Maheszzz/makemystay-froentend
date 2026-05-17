@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BLOG_POSTS, getBlogPost } from '@/data/blogPosts';
+import { getBlogCoverImage, handleBlogCoverImageError } from '@/lib/blogAssets';
 import { buildPageSEO } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
 import { buildBreadcrumbSchema } from '@/lib/schema';
@@ -19,6 +20,10 @@ export default function BlogPost() {
     }
 
     const canonical = `${SITE_URL}/blog/${post.slug}`;
+    const coverImage = getBlogCoverImage(post);
+    const coverAbsolute = coverImage.startsWith('http')
+        ? coverImage
+        : `${SITE_URL}${coverImage}`;
     const helmet = buildPageSEO({
         title: post.title,
         description: post.description,
@@ -36,7 +41,7 @@ export default function BlogPost() {
             '@type': post.authorType ?? 'Organization',
             name: post.authorName ?? 'MakeMyStay.ai',
         },
-        image: post.imageUrl ? `${SITE_URL}${post.imageUrl}` : undefined,
+        image: coverAbsolute,
         publisher: { '@type': 'Organization', name: 'MakeMyStay.ai' },
         mainEntityOfPage: canonical,
     };
@@ -60,7 +65,12 @@ export default function BlogPost() {
         { name: post.title, path: `/blog/${post.slug}` },
     ]);
 
-    const relatedPosts = BLOG_POSTS.filter((p) => p.slug !== post.slug).slice(0, 3);
+    const others = BLOG_POSTS.filter((p) => p.slug !== post.slug);
+    const sameCategory = others.filter((p) => p.category === post.category);
+    const relatedPosts = [...sameCategory, ...others.filter((p) => p.category !== post.category)].slice(
+        0,
+        3,
+    );
 
     return (
         <div className="min-h-screen bg-white font-sans flex flex-col">
@@ -126,17 +136,18 @@ export default function BlogPost() {
                     </header>
 
                     {/* Featured Image */}
-                    {post.imageUrl && (
+                    {coverImage && (
                         <motion.div 
                             className="mb-16 relative rounded-[2.5rem] overflow-hidden shadow-2xl"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <img 
-                                src={post.imageUrl} 
-                                alt={post.title} 
+                            <img
+                                src={coverImage}
+                                alt={post.title}
                                 className="w-full h-full object-cover aspect-[21/9]"
+                                onError={handleBlogCoverImageError}
                             />
                         </motion.div>
                     )}
@@ -228,10 +239,11 @@ export default function BlogPost() {
                                 className="group block overflow-hidden"
                             >
                                 <div className="aspect-[16/10] rounded-3xl overflow-hidden mb-4 shadow-sm border border-slate-100">
-                                    <img 
-                                        src={p.imageUrl || "/images/blog/pg-living.png"} 
-                                        alt={p.title} 
+                                    <img
+                                        src={getBlogCoverImage(p)}
+                                        alt={p.title}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        onError={handleBlogCoverImageError}
                                     />
                                 </div>
                                 <h3 className="font-bold text-slate-900 group-hover:text-brand-red transition-colors line-clamp-2 leading-tight">

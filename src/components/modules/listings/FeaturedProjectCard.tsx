@@ -1,4 +1,4 @@
-import { ArrowRight, Heart, MapPin } from 'lucide-react';
+import { ArrowRight, Heart, MapPin, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
@@ -8,6 +8,8 @@ interface FeaturedProjectCardProps {
     property: Property;
     rank?: number;
     featured?: boolean;
+    /** Homepage new-launch slot — special badge instead of numeric rank */
+    launch?: boolean;
 }
 
 const FALLBACK_IMAGE =
@@ -28,7 +30,7 @@ function rankLabel(rank: number) {
     return rank.toString().padStart(2, '0');
 }
 
-export function FeaturedProjectCard({ property, rank, featured }: FeaturedProjectCardProps) {
+export function FeaturedProjectCard({ property, rank, featured, launch }: FeaturedProjectCardProps) {
     const detailHref = getPropertyDetailPath(property);
     const title = property.title || 'Untitled Property';
     const image = property.image || FALLBACK_IMAGE;
@@ -40,7 +42,11 @@ export function FeaturedProjectCard({ property, rank, featured }: FeaturedProjec
     return (
         <Link
             to={detailHref}
-            className="group flex flex-col rounded-2xl border border-slate-200/80 bg-white shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+            className={`group flex flex-col rounded-2xl bg-white shadow-sm hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 overflow-hidden ${
+                launch
+                    ? 'border-2 border-brand-red/40 ring-2 ring-brand-red/10 shadow-[0_12px_40px_-16px_rgba(217,32,39,0.35)]'
+                    : 'border border-slate-200/80'
+            }`}
         >
             {/* Image + overlays */}
             <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
@@ -52,13 +58,20 @@ export function FeaturedProjectCard({ property, rank, featured }: FeaturedProjec
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
-                {/* Rank badge — top-left */}
-                {typeof rank === 'number' && rank > 0 && (
-                    <span
-                        className={`absolute left-3 top-3 z-10 flex h-8 w-10 items-center justify-center rounded-md text-sm font-extrabold text-white ${badgeBg}`}
-                    >
-                        {rankLabel(rank)}
+                {launch ? (
+                    <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-md bg-brand-red px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">
+                        <Sparkles className="w-3 h-3" />
+                        New
                     </span>
+                ) : (
+                    typeof rank === 'number' &&
+                    rank > 0 && (
+                        <span
+                            className={`absolute left-3 top-3 z-10 flex h-8 w-10 items-center justify-center rounded-md text-sm font-extrabold text-white ${badgeBg}`}
+                        >
+                            {rankLabel(rank)}
+                        </span>
+                    )
                 )}
 
                 {/* Heart / wishlist — top-right */}

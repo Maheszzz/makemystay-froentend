@@ -6,7 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
-import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw } from 'lucide-react';
+import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw, ArrowRight } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
@@ -191,6 +191,11 @@ export default function Properties({
         };
     }, [location.key]);
 
+    /** Metro slug when "Entire Bangalore" / hub default applies (not all-India). */
+    const defaultMetroSlug = useMemo(() => {
+        return normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined) ?? 'bangalore';
+    }, [initialCity]);
+
     /** City slug for tab navigation: URL param wins, then initial hub city, then search query city, then filter. */
     const citySlugForTabs = useMemo(() => {
         const fromRoute = normalizeCitySlug(routeParams.city);
@@ -199,8 +204,8 @@ export default function Properties({
         if (fromQuery) return fromQuery;
         const init = normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined);
         if (init) return init;
-        return normalizeCitySlug(locationFilter !== 'all' ? locationFilter : undefined);
-    }, [routeParams.city, searchParams, initialCity, locationFilter]);
+        return normalizeCitySlug(locationFilter !== 'all' ? locationFilter : undefined) ?? defaultMetroSlug;
+    }, [routeParams.city, searchParams, initialCity, locationFilter, defaultMetroSlug]);
 
     /** Tab highlight follows URL so back/forward and deep links stay correct. */
     const activeTabKey = useMemo((): CategoryKey => {
@@ -221,11 +226,14 @@ export default function Properties({
     const acOn = searchParams.get('ac') === 'true';
     const priceTier = searchParams.get('price');
 
-    /** City sent to API — normalized slug; never mixed into `search` (text query stays in `q` only). */
+    /**
+     * City sent to API — normalized slug; never mixed into `search` (text query stays in `q` only).
+     * Filter value `all` means "Entire Bangalore" (all areas in the metro), not all cities globally.
+     */
     const apiCity = useMemo(() => {
-        if (locationFilter === 'all') return undefined;
+        if (locationFilter === 'all') return defaultMetroSlug;
         return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase();
-    }, [locationFilter]);
+    }, [locationFilter, defaultMetroSlug]);
 
     // 4. API Parameters (Derived from URL/State)
     const apiParams = useMemo(() => {

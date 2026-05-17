@@ -207,6 +207,9 @@ export function Navbar() {
                                     {item}
                                 </a>
                             ))}
+                            <Link to="/blog" className={navLinkDesktop}>
+                                Blog
+                            </Link>
                             <Link to="/quick-pay" className={navLinkDesktop}>
                                 Quick Pay
                             </Link>

@@ -49,26 +49,9 @@ const PG_NEAR_LANDMARK_PATHS = [
     'pg-near-prestige-tech-park',
 ];
 
-const BLOG_SLUGS = [
-    'pg-in-bangalore-guide',
-    'pg-near-whitefield-bangalore',
-    'pg-checklist-new-joiners-bangalore',
-    'how-to-choose-pg-in-bangalore',
-    'pg-rent-vs-flat-rent-bangalore',
-    'best-pg-areas-bangalore-it-pros',
-    'pg-deposits-notice-period-guide',
-    'safety-guide-female-pg-bangalore',
-    'rental-agreement-bangalore',
-    'tenant-acquisition-24-hours',
-    'dynamic-pricing-coliving-revenue',
-    'bangalore-rental-laws-compliance',
-    'ai-vs-brokers-real-estate-future',
-    'emerging-rental-hotspots-bangalore-2027',
-    'best-areas-to-live-bangalore-working-professionals-2026',
-    'how-to-find-verified-rentals-bangalore-2026',
-    'affordable-coliving-spaces-bangalore-2026',
-    'pg-electronic-city-it-professionals-2026',
-];
+/** Keep in sync with `src/data/blogPosts.ts` — parsed at build time. */
+const blogPostsSrc = readFileSync(join(root, 'src/data/blogPosts.ts'), 'utf8');
+const BLOG_SLUGS = [...blogPostsSrc.matchAll(/slug:\s*'([^']+)'/g)].map((m) => m[1]);
 
 function titleToSlug(title = '') {
     return title

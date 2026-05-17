@@ -25,6 +25,8 @@ export interface HeroSearchFilters {
     max_price?: number;
     amenity: '' | 'wifi' | 'food' | 'ac' | 'parking';
     gender: '' | 'male' | 'female' | 'unisex';
+    /** Immediate → API `is_available=true`; other values are reserved for future backend support. */
+    move_in?: '' | 'immediate' | '7days' | '30days';
 }
 
 function mergeCommittedQuery(searchQuery: string | undefined, pendingInput: string): string {

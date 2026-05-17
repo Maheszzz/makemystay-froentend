@@ -37,6 +37,7 @@ export default function Home() {
         max_price: undefined,
         amenity: '',
         gender: '',
+        move_in: '',
     });
 
     useEffect(() => {
@@ -120,7 +121,13 @@ export default function Home() {
                     />
                 </section>
 
-                <PropertyGrid category="all" searchQuery={searchQuery} cardVariant="project" filters={heroFilters} />
+                <PropertyGrid
+                    category="pg"
+                    searchQuery={searchQuery}
+                    cardVariant="project"
+                    filters={heroFilters}
+                    setFilters={setHeroFilters}
+                />
 
                 <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">
