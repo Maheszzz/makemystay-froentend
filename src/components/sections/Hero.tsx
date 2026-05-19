@@ -28,11 +28,27 @@ interface HeroProps {
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     listingsNavigate?: (tab: HomeHeroNavigateTab, query: string) => void;
+    filterTabsInPlace?: boolean;
+    activeHubTab?: HomeHeroNavigateTab;
+    onHubTabChange?: (tab: HomeHeroNavigateTab) => void;
+    onFilterSearch?: (tab: HomeHeroNavigateTab, query: string) => void;
     filters?: HeroSearchFilters;
     setFilters?: (next: HeroSearchFilters) => void;
 }
 
-export function Hero({ category, setCategory, searchQuery, setSearchQuery, listingsNavigate, filters, setFilters }: HeroProps) {
+export function Hero({
+    category,
+    setCategory,
+    searchQuery,
+    setSearchQuery,
+    listingsNavigate,
+    filterTabsInPlace,
+    activeHubTab,
+    onHubTabChange,
+    onFilterSearch,
+    filters,
+    setFilters,
+}: HeroProps) {
     const [imgError, setImgError] = useState(false);
 
     return (
@@ -106,6 +122,10 @@ export function Hero({ category, setCategory, searchQuery, setSearchQuery, listi
                                     searchQuery={searchQuery}
                                     setSearchQuery={setSearchQuery}
                                     listingsNavigate={listingsNavigate}
+                                    filterTabsInPlace={filterTabsInPlace}
+                                    activeHubTab={activeHubTab}
+                                    onHubTabChange={onHubTabChange}
+                                    onFilterSearch={onFilterSearch}
                                     filters={filters}
                                     setFilters={setFilters}
                                 />

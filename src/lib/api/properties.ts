@@ -400,24 +400,40 @@ export const propertyApi = {
      * @param query - The search string
      * @returns Array of strings
      */
-    getSuggestions: async (query: string): Promise<string[]> => {
-        if (!query || query.length < 1) return [];
+    getSuggestions: async (
+        query: string
+    ): Promise<{ properties: string[]; places: string[] }> => {
+        if (!query || query.length < 1) return { properties: [], places: [] };
         try {
-            const res = await api.get<any>(`${REALTY_PATH}/suggestions`, {
-                params: { q: query }
+            const res = await api.get<{
+                properties?: string[];
+                places?: string[];
+            }>(`${REALTY_PATH}/suggestions`, {
+                params: { q: query },
             });
-            // Handle { items: [...] } or { data: [...] } if API format changes
-            if (Array.isArray(res)) return res;
-            if (res && typeof res === 'object') {
-                const arr = res.items ?? res.data ?? res.suggestions;
-                if (Array.isArray(arr)) return arr;
+            if (Array.isArray(res)) {
+                return { properties: [], places: res };
             }
-            return [];
+            if (res && typeof res === 'object') {
+                const properties = Array.isArray(res.properties) ? res.properties : [];
+                const places = Array.isArray(res.places) ? res.places : [];
+                if (properties.length || places.length) {
+                    return { properties, places };
+                }
+                const legacy = (res as { items?: string[]; data?: string[]; suggestions?: string[] })
+                    .items ??
+                    (res as { data?: string[] }).data ??
+                    (res as { suggestions?: string[] }).suggestions;
+                if (Array.isArray(legacy)) {
+                    return { properties: [], places: legacy };
+                }
+            }
+            return { properties: [], places: [] };
         } catch (err) {
             console.warn('[propertyApi.getSuggestions] Failed:', err);
-            return [];
+            return { properties: [], places: [] };
         }
-    }
+    },
 };
 
 export default propertyApi;

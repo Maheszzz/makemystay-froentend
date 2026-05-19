@@ -16,19 +16,32 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
-import { homeHeroSearchUrl, type ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
+import {
+    homeHeroTabToListingsCategory,
+    parseHomeHeroTab,
+    type HomeHeroNavigateTab,
+    type ListingsCategoryKey,
+} from '@/lib/listingsCategoryHubs';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { buildHomeSEO, buildPageSEO } from '@/lib/seo';
 import { MapPin } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
+function scrollToFeaturedListings() {
+    requestAnimationFrame(() => {
+        document.getElementById('featured-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
+
 export default function Home() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
     const searchQuery = searchParams.get('q') || '';
+    const heroTab = parseHomeHeroTab(searchParams.get('cat') ?? searchParams.get('category'));
+    const listingsCategory = useMemo(() => homeHeroTabToListingsCategory(heroTab), [heroTab]);
+
     const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
     const [heroFilters, setHeroFilters] = useState<HeroSearchFilters>({
         city: 'bangalore',
@@ -48,12 +61,11 @@ export default function Home() {
         }
     }, []);
 
-    // Legacy `/?category=pg` (etc.) → canonical SEO URL; `?category=all` → strip param only.
+    // Legacy `/?category=rent` → `/?cat=rent` on homepage (no redirect to hub pages).
     useEffect(() => {
-        const cat = searchParams.get('category');
-        if (!cat) return;
-        const q = searchParams.get('q') || '';
-        if (!LEGACY_HOME_CATEGORY.has(cat as ListingsCategoryKey)) {
+        const legacy = searchParams.get('category');
+        if (!legacy) return;
+        if (!LEGACY_HOME_CATEGORY.has(legacy as ListingsCategoryKey)) {
             setSearchParams(
                 (prev) => {
                     const next = new URLSearchParams(prev);
@@ -64,34 +76,73 @@ export default function Home() {
             );
             return;
         }
-        if (cat === 'all') {
-            setSearchParams(
-                (prev) => {
-                    const next = new URLSearchParams(prev);
-                    next.delete('category');
-                    return next;
-                },
-                { replace: true }
-            );
-            return;
-        }
-        navigate(homeHeroSearchUrl(cat as ListingsCategoryKey, q), { replace: true });
-    }, [searchParams, navigate, setSearchParams]);
-
-    const setSearchQuery = (newQuery: string) => {
         setSearchParams(
             (prev) => {
                 const next = new URLSearchParams(prev);
-                if (newQuery) {
-                    next.set('q', newQuery);
+                next.delete('category');
+                if (legacy !== 'pg' && legacy !== 'all') {
+                    next.set('cat', legacy);
                 } else {
-                    next.delete('q');
+                    next.delete('cat');
                 }
                 return next;
             },
             { replace: true }
         );
-    };
+    }, [searchParams, setSearchParams]);
+
+    const setSearchQuery = useCallback(
+        (newQuery: string) => {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    if (newQuery) {
+                        next.set('q', newQuery);
+                    } else {
+                        next.delete('q');
+                    }
+                    return next;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    const setHeroTab = useCallback(
+        (tab: HomeHeroNavigateTab) => {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    if (tab === 'pg') {
+                        next.delete('cat');
+                    } else {
+                        next.set('cat', tab);
+                    }
+                    return next;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    const handleHubTabChange = useCallback(
+        (tab: HomeHeroNavigateTab) => {
+            setHeroTab(tab);
+            scrollToFeaturedListings();
+        },
+        [setHeroTab]
+    );
+
+    const handleFilterSearch = useCallback(
+        (tab: HomeHeroNavigateTab, query: string) => {
+            setHeroTab(tab);
+            setSearchQuery(query);
+            scrollToFeaturedListings();
+        },
+        [setHeroTab, setSearchQuery]
+    );
 
     const homeHelmet = buildPageSEO(buildHomeSEO());
 
@@ -105,24 +156,20 @@ export default function Home() {
             <main id="main-content" className="min-h-screen bg-white pb-24 md:pb-0">
                 <section id="home">
                     <Hero
-                        category="pg"
+                        category={listingsCategory}
                         searchQuery={searchQuery}
                         setSearchQuery={setSearchQuery}
                         filters={heroFilters}
                         setFilters={setHeroFilters}
-                        listingsNavigate={(tab, q) => {
-                            if (tab === 'commercial') {
-                                const qt = q.trim();
-                                navigate(qt ? `/properties?q=${encodeURIComponent(qt)}` : '/properties');
-                                return;
-                            }
-                            navigate(homeHeroSearchUrl(tab, q));
-                        }}
+                        filterTabsInPlace
+                        activeHubTab={heroTab}
+                        onHubTabChange={handleHubTabChange}
+                        onFilterSearch={handleFilterSearch}
                     />
                 </section>
 
                 <PropertyGrid
-                    category="pg"
+                    category={listingsCategory}
                     searchQuery={searchQuery}
                     cardVariant="project"
                     filters={heroFilters}

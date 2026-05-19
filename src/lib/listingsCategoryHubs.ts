@@ -7,8 +7,22 @@ export type ListingsCategoryKey = 'all' | 'pg' | 'rent' | 'buy' | 'plot';
 
 export type ListingsHubTab = 'pg' | 'rent' | 'buy' | 'plot';
 
-/** Homepage hero search tabs (no legacy `all`; commercial → `/properties`). */
+/** Homepage hero search tabs (no legacy `all`; commercial → all listings on home). */
 export type HomeHeroNavigateTab = ListingsHubTab | 'commercial';
+
+const HOME_HERO_TABS = new Set<HomeHeroNavigateTab>(['pg', 'rent', 'buy', 'plot', 'commercial']);
+
+export function parseHomeHeroTab(raw: string | null | undefined): HomeHeroNavigateTab {
+    const s = (raw || '').trim().toLowerCase();
+    if (HOME_HERO_TABS.has(s as HomeHeroNavigateTab)) return s as HomeHeroNavigateTab;
+    return 'pg';
+}
+
+/** Maps hero tab → PropertyGrid / API listing category on the homepage. */
+export function homeHeroTabToListingsCategory(tab: HomeHeroNavigateTab): ListingsCategoryKey {
+    if (tab === 'commercial') return 'all';
+    return tab;
+}
 
 /** Normalized slug for URLs (undefined = no city / all-India listing index). */
 export function normalizeCitySlug(city: string | undefined | null): string | undefined {

@@ -2,7 +2,8 @@
 
 import { propertyApi } from '@/lib/api';
 import type { HomeHeroNavigateTab } from '@/lib/listingsCategoryHubs';
-import { ChevronDown, MapPin, Search, X } from 'lucide-react';
+import { mergeSuggestionGroups, type SearchSuggestionGroups } from '@/lib/searchPlaces';
+import { Building2, ChevronDown, MapPin, Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export interface SmartSearchBarProps {
@@ -11,9 +12,14 @@ export interface SmartSearchBarProps {
     searchQuery?: string;
     setSearchQuery?: (query: string) => void;
     /**
-     * Homepage hero: underline tabs incl. Commercial; navigate to hubs or `/properties`.
+     * Homepage hero: navigate to category hubs (legacy). Omit when using `filterTabsInPlace`.
      */
     listingsNavigate?: (tab: HomeHeroNavigateTab, query: string) => void;
+    /** Homepage: tabs filter results below without leaving `/`. */
+    filterTabsInPlace?: boolean;
+    activeHubTab?: HomeHeroNavigateTab;
+    onHubTabChange?: (tab: HomeHeroNavigateTab) => void;
+    onFilterSearch?: (tab: HomeHeroNavigateTab, query: string) => void;
     filters?: HeroSearchFilters;
     setFilters?: (next: HeroSearchFilters) => void;
 }
@@ -58,25 +64,42 @@ export function SmartSearchBar({
     searchQuery,
     setSearchQuery,
     listingsNavigate,
+    filterTabsInPlace = false,
+    activeHubTab: activeHubTabProp,
+    onHubTabChange,
+    onFilterSearch,
     filters,
     setFilters,
 }: SmartSearchBarProps) {
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+    const [suggestionGroups, setSuggestionGroups] = useState<SearchSuggestionGroups>({
+        properties: [],
+        places: [],
+    });
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const suggestionRef = useRef<HTMLDivElement>(null);
     const [inputValue, setInputValue] = useState('');
-    const [activeHubTab, setActiveHubTab] = useState<HomeHeroNavigateTab>('pg');
+    const [internalHubTab, setInternalHubTab] = useState<HomeHeroNavigateTab>('pg');
     const [activeLegacyTab, setActiveLegacyTab] = useState<'pg' | 'rent' | 'buy' | 'plot' | 'all'>(category ?? 'all');
 
-    const hubMode = Boolean(listingsNavigate);
+    const hubTabsUi = filterTabsInPlace || Boolean(listingsNavigate);
+    const hubMode = Boolean(listingsNavigate) && !filterTabsInPlace;
 
     useEffect(() => {
-        if (hubMode) return;
+        if (hubTabsUi) return;
         setActiveLegacyTab(category ?? 'all');
-    }, [category, hubMode]);
+    }, [category, hubTabsUi]);
 
-    const effectiveHubTab = activeHubTab;
+    useEffect(() => {
+        if (activeHubTabProp) setInternalHubTab(activeHubTabProp);
+    }, [activeHubTabProp]);
+
+    const setHubTab = (tab: HomeHeroNavigateTab) => {
+        if (activeHubTabProp === undefined) setInternalHubTab(tab);
+        onHubTabChange?.(tab);
+    };
+
+    const effectiveHubTab = activeHubTabProp ?? internalHubTab;
     const effectiveLegacyTab = activeLegacyTab;
 
     useEffect(() => {
@@ -84,18 +107,19 @@ export function SmartSearchBar({
             if (inputValue && inputValue.trim().length >= 1) {
                 try {
                     setIsLoadingSuggestions(true);
-                    const results = await propertyApi.getSuggestions(inputValue);
-                    setFilteredSuggestions(results);
-                    setShowSuggestions(results.length > 0);
+                    const apiResults = await propertyApi.getSuggestions(inputValue);
+                    const merged = mergeSuggestionGroups(apiResults, inputValue);
+                    setSuggestionGroups(merged);
+                    setShowSuggestions(merged.properties.length > 0 || merged.places.length > 0);
                 } catch (error) {
                     console.error('Failed to fetch suggestions:', error);
-                    setFilteredSuggestions([]);
+                    setSuggestionGroups({ properties: [], places: [] });
                     setShowSuggestions(false);
                 } finally {
                     setIsLoadingSuggestions(false);
                 }
             } else {
-                setFilteredSuggestions([]);
+                setSuggestionGroups({ properties: [], places: [] });
                 setShowSuggestions(false);
             }
         };
@@ -142,6 +166,15 @@ export function SmartSearchBar({
 
     const onSearchClick = () => {
         const merged = mergedForSubmit;
+        if (filterTabsInPlace) {
+            if (merged !== (searchQuery || '').trim()) {
+                setSearchQuery?.(merged);
+            }
+            onFilterSearch?.(effectiveHubTab, merged);
+            setInputValue('');
+            setShowSuggestions(false);
+            return;
+        }
         if (hubMode && listingsNavigate) {
             listingsNavigate(effectiveHubTab, merged);
             if (merged !== (searchQuery || '').trim()) {
@@ -164,21 +197,18 @@ export function SmartSearchBar({
     return (
         <div
             className={
-                hubMode
+                hubTabsUi
                     ? 'bg-white rounded-2xl md:rounded-[2rem] shadow-sm p-3 md:p-7 w-full relative border border-slate-200'
                     : 'bg-white rounded-2xl md:rounded-[2rem] shadow-md p-3 md:p-7 w-full relative border border-slate-200'
             }
         >
-            {hubMode ? (
+            {hubTabsUi ? (
                 <div className="mb-4 md:mb-5 overflow-x-auto hide-scrollbar flex gap-1.5 sm:gap-3 border-b border-slate-100 pb-px -mx-0.5 px-0.5">
                     {HUB_TAB_CONFIG.map((tab) => (
                         <button
                             key={tab.id}
                             type="button"
-                            onClick={() => {
-                                setActiveHubTab(tab.id);
-                                listingsNavigate?.(tab.id, (searchQuery || '').trim());
-                            }}
+                            onClick={() => setHubTab(tab.id)}
                             className={`shrink-0 pb-2.5 px-1.5 sm:px-2 text-[11px] sm:text-xs font-semibold tracking-wide transition-colors border-b-[3px] -mb-[2px] ${
                                 effectiveHubTab === tab.id
                                     ? 'text-slate-900 border-brand-red'
@@ -213,7 +243,7 @@ export function SmartSearchBar({
                 </div>
             )}
 
-            {hubMode && (
+            {hubTabsUi && (
                 <div className="flex items-center gap-2 mb-4 md:mb-5">
                     <div className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 min-h-[44px] md:min-h-[48px]">
                         <MapPin className="w-4 h-4 shrink-0 text-slate-400" aria-hidden />
@@ -271,7 +301,14 @@ export function SmartSearchBar({
                                 }
                                 if (e.key === 'Enter') {
                                     const merged = mergeCommittedQuery(searchQuery, inputValue);
-                                    if (hubMode && listingsNavigate) {
+                                    if (filterTabsInPlace) {
+                                        if (merged !== (searchQuery || '').trim()) {
+                                            setSearchQuery?.(merged);
+                                        }
+                                        onFilterSearch?.(effectiveHubTab, merged);
+                                        setInputValue('');
+                                        setShowSuggestions(false);
+                                    } else if (hubMode && listingsNavigate) {
                                         if (inputValue.trim()) {
                                             listingsNavigate(effectiveHubTab, merged);
                                             setSearchQuery?.(merged);
@@ -291,7 +328,13 @@ export function SmartSearchBar({
                                     e.preventDefault();
                                 }
                             }}
-                            placeholder={(searchQuery || '').trim() ? '' : hubMode ? 'Search by area, locality or landmark...' : 'Search locations...'}
+                            placeholder={
+                                (searchQuery || '').trim()
+                                    ? ''
+                                    : hubMode
+                                      ? 'Search property, area or landmark...'
+                                      : 'Search property or location...'
+                            }
                             className="flex-1 min-w-[80px] min-h-0 self-center bg-transparent text-slate-900 placeholder:text-slate-400 outline-none text-[13px] md:text-sm leading-normal font-medium"
                             style={{ fontFamily: "'Montserrat', sans-serif" }}
                         />
@@ -304,7 +347,7 @@ export function SmartSearchBar({
                                 setSearchQuery?.('');
                                 setInputValue('');
                                 setShowSuggestions(false);
-                                setFilteredSuggestions([]);
+                                setSuggestionGroups({ properties: [], places: [] });
                             }}
                             className="absolute right-2 top-1/2 -translate-y-1/2 sm:static sm:translate-y-0 sm:self-center text-slate-400 hover:text-slate-700 transition-colors p-1"
                             aria-label="Clear all"
@@ -326,7 +369,7 @@ export function SmartSearchBar({
                 </button>
             </div>
 
-            {hubMode && (
+            {hubTabsUi && (
                 <div className="mt-4 md:mt-5 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2.5" role="group" aria-label="Additional filters">
                     <div className="relative w-full lg:w-auto">
                         <select
@@ -415,23 +458,52 @@ export function SmartSearchBar({
                         </div>
                     ) : (
                         <>
-                            {Array.isArray(filteredSuggestions) && filteredSuggestions.length > 0 ? (
-                                filteredSuggestions.map((suggestion, index) => (
-                                    <button
-                                        key={index}
-                                        type="button"
-                                        onClick={() => handleSelectSuggestion(suggestion)}
-                                        className="w-full text-left px-6 py-3 hover:bg-slate-50 flex items-center gap-3 text-slate-700 transition-colors group border-b border-slate-100 last:border-0"
-                                    >
-                                        <MapPin className="w-4 h-4 text-slate-400 group-hover:text-brand-red transition-colors" />
-                                        <span className="text-sm font-medium group-hover:text-slate-900 transition-colors">{suggestion}</span>
-                                    </button>
-                                ))
-                            ) : (
-                                <div className="px-6 py-4 text-center text-slate-500 text-sm font-medium">
-                                    No results found
+                            {suggestionGroups.properties.length > 0 && (
+                                <div className="border-b border-slate-100">
+                                    <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                        Properties
+                                    </p>
+                                    {suggestionGroups.properties.map((suggestion) => (
+                                        <button
+                                            key={`p-${suggestion}`}
+                                            type="button"
+                                            onClick={() => handleSelectSuggestion(suggestion)}
+                                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-3 text-slate-700 transition-colors group"
+                                        >
+                                            <Building2 className="w-4 h-4 text-slate-400 group-hover:text-brand-red transition-colors shrink-0" />
+                                            <span className="text-sm font-medium group-hover:text-slate-900 transition-colors truncate">
+                                                {suggestion}
+                                            </span>
+                                        </button>
+                                    ))}
                                 </div>
                             )}
+                            {suggestionGroups.places.length > 0 && (
+                                <div>
+                                    <p className="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                                        Areas &amp; landmarks
+                                    </p>
+                                    {suggestionGroups.places.map((suggestion) => (
+                                        <button
+                                            key={`l-${suggestion}`}
+                                            type="button"
+                                            onClick={() => handleSelectSuggestion(suggestion)}
+                                            className="w-full text-left px-4 py-2.5 hover:bg-slate-50 flex items-center gap-3 text-slate-700 transition-colors group border-t border-slate-50 first:border-t-0"
+                                        >
+                                            <MapPin className="w-4 h-4 text-slate-400 group-hover:text-brand-red transition-colors shrink-0" />
+                                            <span className="text-sm font-medium group-hover:text-slate-900 transition-colors truncate">
+                                                {suggestion}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            {suggestionGroups.properties.length === 0 &&
+                                suggestionGroups.places.length === 0 && (
+                                    <div className="px-6 py-4 text-center text-slate-500 text-sm font-medium">
+                                        No results found
+                                    </div>
+                                )}
                         </>
                     )}
                 </div>
