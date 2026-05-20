@@ -92,8 +92,8 @@ export function Hero({
                                     fontSize: 'clamp(2.4rem, 4.6vw, 4rem)',
                                 }}
                             >
-                                Find your perfect<br />
-                                <span className="text-brand-red">co-living</span> space
+                                Comfortable <span className="text-brand-red">spaces</span><br />
+                                Hassle-free living
                             </h1>
 
                             {/* Subtitle */}
