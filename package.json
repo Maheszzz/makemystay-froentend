@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "dev:clean": "rm -rf .next && next dev",
     "dev:vite": "vite",
     "check:local": "node scripts/check-local.mjs",
     "build": "next build && node scripts/prepare-next-deploy.mjs && node scripts/generate-version.js && node scripts/generate-sitemap.mjs",
@@ -13,7 +14,9 @@
     "preview": "next start",
     "generate:next-pages": "node scripts/generate-next-pages.mjs",
     "install:next-ec2": "bash scripts/install-next-remote.sh",
+    "deploy": "bash deploy.sh",
     "nginx:cleanup-ec2": "bash scripts/nginx-cleanup-remote.sh",
+    "nginx:next-ec2": "bash scripts/nginx-next-remote.sh",
     "clean:vite": "rm -rf node_modules/.vite",
     "clean:code": "knip && unimported && ts-prune",
     "prepare": "husky",

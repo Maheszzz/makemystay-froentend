@@ -103,10 +103,15 @@ for HOST in "${HOSTS[@]}"; do
       "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
   fi
 
+  RSYNC_EXTRA=(--exclude '.git')
+  # Standalone dist/ must include its traced node_modules; only skip repo-root node_modules.
+  if [[ "$DEPLOY_SOURCE" == "." ]]; then
+    RSYNC_EXTRA+=(--exclude 'node_modules')
+  fi
+
   rsync $RSYNC_FLAGS \
     -e "ssh $SSH_OPTS -i $PEM_KEY" \
-    --exclude '.git' \
-    --exclude 'node_modules' \
+    "${RSYNC_EXTRA[@]}" \
     "$RSYNC_FROM" "$DEPLOY_USER@$HOST:$DEPLOY_PATH"
 
   # -----------------------------
@@ -122,8 +127,17 @@ for HOST in "${HOSTS[@]}"; do
     echo "🔁 Restarting Next.js app..."
     if systemctl list-unit-files makemystay-next.service >/dev/null 2>&1; then
       sudo systemctl restart makemystay-next
-    elif [ -x ./start.sh ]; then
-      echo "⚠️  makemystay-next.service missing — start manually: ./start.sh"
+      sudo systemctl is-active makemystay-next
+    elif [ -f server.js ]; then
+      echo "⚠️  makemystay-next.service missing — restarting node server.js (install once: deploy/install-next-on-ec2.sh)"
+      pkill -f "${DEPLOY_PATH}/server.js" 2>/dev/null || true
+      sleep 1
+      nohup env NODE_ENV=production PORT=3000 node server.js >> /tmp/makemystay-next.log 2>&1 &
+      sleep 2
+      curl -sf -o /dev/null http://127.0.0.1:3000/health.json && echo "Next.js responding on :3000" || echo "⚠️  health check failed — see /tmp/makemystay-next.log"
+    else
+      echo "❌ server.js not found in $DEPLOY_PATH"
+      exit 1
     fi
 
     if command -v nginx >/dev/null 2>&1; then

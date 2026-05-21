@@ -55,7 +55,14 @@ for IP in "${ADDR[@]}"; do
         # Keep only last 5 releases to save disk
         cd $RELEASES_DIR && ls -1tr | head -n -5 | xargs -r sudo rm -rf
         
-        # Verify and reload Nginx
+        if systemctl list-unit-files makemystay-next.service >/dev/null 2>&1; then
+            sudo systemctl restart makemystay-next
+        elif [ -f "$REMOTE_DIR/server.js" ]; then
+            pkill -f "$REMOTE_DIR/server.js" 2>/dev/null || true
+            sleep 1
+            cd "$REMOTE_DIR" && nohup env NODE_ENV=production PORT=3000 node server.js >> /tmp/makemystay-next.log 2>&1 &
+        fi
+
         sudo nginx -t && sudo systemctl reload nginx
 ENDSSH
 
