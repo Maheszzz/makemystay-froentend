@@ -432,6 +432,17 @@ export function propertyErrorSeo(pathname: string): PageSEOInput {
     };
 }
 
+/** Removed or fully booked listing — keep URL, noindex, suggest nearby hubs. */
+export function propertyUnavailableSeo(pathname: string, localityLabel?: string): PageSEOInput {
+    const area = localityLabel?.trim() ? ` in ${localityLabel}` : '';
+    return {
+        title: 'Property no longer available',
+        description: `This listing${area} is no longer available on ${SITE_NAME}. Explore similar PG and coliving stays nearby.`,
+        path: canonicalPath(pathname.split('?')[0]),
+        noindex: true,
+    };
+}
+
 export interface ListingsPageSeoInput {
     pathname: string;
     pageTitle: string;

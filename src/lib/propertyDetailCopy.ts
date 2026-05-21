@@ -9,7 +9,7 @@ function locationMentionsBangalore(location: string): boolean {
  * Single SEO-oriented H1: locality + type + price when available (matches audit pattern).
  */
 export function buildPropertySeoHeading(property: Property): string {
-    const title = formatPropertyTitle(property.title) || property.title.trim();
+    const title = formatPropertyTitle(property.title) || (property.title?.trim() ?? 'Property');
     const type = (property.type || 'Property').trim();
     const loc = (property.location || '').trim() || 'Bangalore';
     const bangaloreSuffix = locationMentionsBangalore(loc) ? '' : ' Bangalore';
@@ -19,7 +19,7 @@ export function buildPropertySeoHeading(property: Property): string {
     const isRent = property.category === 'rent';
 
     if (isRent && priceOk) {
-        const price = property.price.trim();
+        const price = property.price?.trim() ?? '';
         return `${title} ${type} in ${locPhrase} (${price}/month)`.replace(/\s+/g, ' ').trim();
     }
     if (isRent) {

@@ -8,8 +8,10 @@ on:
       - 'src/**'
       - 'public/**'
       - 'package.json'
-      - 'vite.config.ts'
+      - 'next.config.ts'
       - 'scripts/deploy-all.sh'
+      - 'scripts/prepare-next-deploy.mjs'
+      - 'deploy/**'
 
 jobs:
   build-and-deploy:
@@ -32,6 +34,7 @@ jobs:
       - name: Build production app
         run: npm run build
         env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Set up SSH key

@@ -1,7 +1,6 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/context/AuthContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -23,18 +22,16 @@ export function Providers({ children }: { children: ReactNode }) {
 
     return (
         <ErrorBoundary>
-            <HelmetProvider>
-                <AuthProvider>
-                    <WishlistProvider>
-                        <SkipLink />
-                        <ScrollToTop />
-                        <PrerenderSafetyTimeout />
-                        {children}
-                        <MobileBottomCTA />
-                        <WhatsAppWidget />
-                    </WishlistProvider>
-                </AuthProvider>
-            </HelmetProvider>
+            <AuthProvider>
+                <WishlistProvider>
+                    <SkipLink />
+                    <ScrollToTop />
+                    <PrerenderSafetyTimeout />
+                    {children}
+                    <MobileBottomCTA />
+                    <WhatsAppWidget />
+                </WishlistProvider>
+            </AuthProvider>
         </ErrorBoundary>
     );
 }

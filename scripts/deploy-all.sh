@@ -13,7 +13,7 @@ RELEASES_DIR="$BASE_DIR/releases"
 BUILD_DIR="dist"
 
 # Default inventory if not provided
-IPS_STR="${DEPLOY_HOSTS:-13.201.61.117}"
+IPS_STR="${DEPLOY_HOSTS:-13.201.61.117,13.203.198.175,13.234.34.152}"
 IFS=',' read -ra ADDR <<< "$IPS_STR"
 
 # Security check

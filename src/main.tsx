@@ -17,9 +17,8 @@ root.render(
     </StrictMode>,
 );
 
-// Signal to Prerender.io that the page is fully hydrated
-// (This ensures capture happens after Helmet/SEO tags are ready)
+// Prerender.io: route hooks set `prerenderReady` when async SEO content is ready.
 if (typeof window !== 'undefined') {
-    (window as any).prerenderReady = true;
+    (window as any).prerenderReady = false;
     initWebVitalsReporting();
 }

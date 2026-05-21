@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { propertyApi } from '@/lib/api';
+import { inferPropertyTypeFromPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import type { Property, PropertyId, ApiError, PaginationParams } from '@/types/api';
 
 /** Stable key for filters (excludes pagination). */
@@ -249,6 +250,23 @@ export function useProperty(id: number | string | null | undefined): UseProperty
 /**
  * Custom hook to fetch a single property by type and slug
  */
+/**
+ * Resolve PDP data from `/pg|rent|property|properties/:slug` (numeric id or legacy slug-only).
+ */
+export function usePropertyFromRoute(
+    slugParam: string | undefined,
+    pathname: string,
+): UsePropertyResult {
+    const id = slugParam ? parsePropertySlugParam(slugParam) : '';
+    const byId = useProperty(id || null);
+    const legacySlug = slugParam && !id ? slugParam : undefined;
+    const bySlug = usePropertyBySlug(
+        legacySlug ? inferPropertyTypeFromPath(pathname) : undefined,
+        legacySlug,
+    );
+    return id ? byId : bySlug;
+}
+
 export function usePropertyBySlug(type: string | undefined, slug: string | undefined): UsePropertyResult {
     const [property, setProperty] = useState<Property | null>(null);
     const [loading, setLoading] = useState<boolean>(true);

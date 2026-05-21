@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle } from 'lucide-react';
-import { Link, useParams, useLocation, Navigate } from '@/lib/navigation';
-import { useProperty, useSmartBack } from '@/hooks';
+import { Link, useParams, useLocation } from '@/lib/navigation';
+import { usePropertyFromRoute, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
-import { getPropertyDetailPath, isPropertyDetailCanonicalPath, parsePropertySlugParam } from '@/lib/propertyRouting';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { getOptimizedImageUrl } from '@/lib/utils/images';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -47,9 +47,8 @@ import { findPgLocationForArea } from '@/data/pgLocations';
 export default function PropertyDetails() {
     const { slug: slugParam } = useParams<{ slug: string }>();
     const location = useLocation();
-    const propertyId = parsePropertySlugParam(slugParam ?? '');
     const goBack = useSmartBack({ fallback: '/properties' });
-    const { property, loading, error, refetch } = useProperty(propertyId);
+    const { property, loading, error, refetch } = usePropertyFromRoute(slugParam, location.pathname);
     const { isWishlisted, toggleWishlist } = useWishlist();
 
 
@@ -88,6 +87,7 @@ export default function PropertyDetails() {
     const displayTitle = useMemo(() => formatPropertyTitle(property?.title), [property?.title]);
 
     const canonicalDetailPath = property ? getPropertyDetailPath(property) : (slugParam ? `/pg/${slugParam}` : '/pg');
+
     const detailHelmet = useMemo(() => {
         if (!property) return null;
         return buildPageSEO(propertyDetailPageSeo(property, canonicalDetailPath));
@@ -242,22 +242,6 @@ export default function PropertyDetails() {
                     </div>
                 </main>
                 <Footer />
-            </div>
-        );
-    }
-
-    if (
-        isPropertyDetailCanonicalPath(canonicalDetailPath) &&
-        location.pathname !== canonicalDetailPath
-    ) {
-        return (
-            <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-                <SEOHead 
-                    {...interimHelmet} 
-                    prerenderStatus={301} 
-                    prerenderHeaders={{ Location: `${canonicalDetailPath}${location.search}${location.hash}` }}
-                />
-                <Navigate to={`${canonicalDetailPath}${location.search}${location.hash}`} replace />
             </div>
         );
     }

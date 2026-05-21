@@ -80,15 +80,38 @@ function buildPropertySeoSlug(property) {
     return deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '') || property.slug || titleToSlug(property.property_name || '');
 }
 
+/** Align with `src/lib/api/properties.ts` deriveUiCategory */
+function deriveUiCategory(item) {
+    const raw = item.category;
+    if (typeof raw === 'string' && raw.trim()) {
+        const c = raw.trim().toLowerCase();
+        if (c === 'pg' || c === 'plot' || c === 'rent' || c === 'buy') return c;
+    }
+    const pt = (item.property_type || '').toLowerCase();
+    if (pt === 'pg') return 'pg';
+    if (pt === 'plot') return 'plot';
+    const lt = (item.listing_type ?? 'rent').toString().toLowerCase();
+    if (lt === 'buy' || lt === 'sale') return 'buy';
+    return 'rent';
+}
+
 function buildPropertyDetailPath(property) {
     const id = String(property.id || '').trim();
     const slug = buildPropertySeoSlug(property);
-    const category = (property.category || '').toLowerCase();
+    const category = deriveUiCategory(property);
     const typeLower = (property.property_type || '').toLowerCase();
-    const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
-    
-    const prefix = (isPgType || category === 'pg') ? 'pg' : (category === 'rent' ? 'rent' : 'property');
-    return slug ? `/${prefix}/${id}-${slug}` : `/${prefix}/${id}`;
+    const isPgType = ['pg', 'hostel', 'coliving'].some((t) => typeLower.includes(t));
+
+    let prefix = '/pg';
+    if (category === 'rent' && !isPgType) {
+        prefix = '/rent';
+    } else if (category === 'buy' || category === 'plot') {
+        prefix = '/property';
+    } else if (isPgType || category === 'pg') {
+        prefix = '/pg';
+    }
+
+    return slug ? `${prefix}/${id}-${slug}` : `${prefix}/${id}`;
 }
 
 function resolveApiBase() {
@@ -130,8 +153,24 @@ async function fetchAllProperties() {
         skip += items.length;
     }
 
-    return rows.filter((row) => row && row.id);
+    return rows.filter((row) => row && row.id && row.is_available !== false);
 }
+
+/** Keep in sync with `src/data/rentHubSlugs.ts` */
+const RENT_HUB_LOCATION_SLUGS = [
+    'whitefield',
+    'marathahalli',
+    'btm',
+    'koramangala',
+    'hsr-layout',
+    'electronic-city',
+    'indiranagar',
+    'bellandur',
+    'hebbal',
+    'jp-nagar',
+    'bannerghatta-road',
+    'sarjapur-road',
+];
 
 let body = '';
 for (const s of STATIC_PATHS) {
@@ -160,6 +199,10 @@ for (const p of PG_NEAR_LANDMARK_PATHS) {
 }
 
 body += urlEntry(`${BASE}/flats-in-bangalore`, '0.90', 'daily');
+
+for (const rentSlug of RENT_HUB_LOCATION_SLUGS) {
+    body += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');
+}
 
 for (const slug of BLOG_SLUGS) {
     body += urlEntry(`${BASE}/blog/${slug}`, '0.72', 'monthly');
@@ -192,6 +235,7 @@ const n =
     locJson.length * 6 +
     PG_NEAR_LANDMARK_PATHS.length +
     1 +
+    RENT_HUB_LOCATION_SLUGS.length +
     BLOG_SLUGS.length +
     propertyCount;
-console.log(`Wrote ${outPublic}${existsSync(join(root, 'dist')) ? ` and ${outDist}` : ''} (${n} URLs)`);
+console.log(`Wrote ${outPublic}${existsSync(join(root, 'dist')) ? ` and ${outDist}` : ''} (${n} URLs, ${propertyCount} properties)`);

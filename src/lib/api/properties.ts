@@ -1,5 +1,6 @@
 import { api } from './client';
 import type {
+    ApiError,
     Property,
     PropertyImage,
     RealtyProperty,
@@ -88,10 +89,33 @@ function deriveUiCategory(item: RealtyProperty): Property['category'] {
     return 'rent';
 }
 
+function propertyNotFoundError(detail?: string): ApiError {
+    return {
+        message: 'Property not found',
+        status: 404,
+        detail: detail ?? 'Listing is missing or was removed',
+    };
+}
+
+/** True when mapped property matches the id requested on the PDP route. */
+export function propertyIdsMatch(requested: string | number, property: Property | null | undefined): boolean {
+    if (property?.id == null || property.id === '') return false;
+    const a = String(requested).trim();
+    const b = String(property.id).trim();
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const na = Number(a);
+    const nb = Number(b);
+    return Number.isFinite(na) && Number.isFinite(nb) && na === nb;
+}
+
 /**
  * Maps the backend RealtyProperty to the frontend Property interface
  */
 function mapRealtyToProperty(item: RealtyProperty): Property {
+    if (item?.id == null) {
+        throw propertyNotFoundError('Missing property id in API response');
+    }
     const ptLower = (item.property_type || '').toLowerCase();
     const rawLt = (item.listing_type ?? 'rent').toString().toLowerCase();
     const isRentListing = rawLt === 'rent';
@@ -206,10 +230,11 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
             : null;
 
     return {
-        id: item.id || Math.random().toString(), // Fallback ID
+        id: item.id,
         slug: item.slug || '',
         title: item.property_name || 'Untitled Property',
         location: item.location || 'Unknown Location',
+        city: typeof item.city === 'string' ? item.city : undefined,
         price: priceDisplay,
         type: item.property_type || 'Apartment',
         beds: beds,
@@ -323,23 +348,28 @@ export const propertyApi = {
         id: number | string,
         params: { limit?: number } = {}
     ): Promise<{ items: Property[]; total: number }> => {
-        const queryParams = new URLSearchParams();
-        if (params.limit !== undefined) queryParams.append('limit', String(params.limit));
-        const qs = queryParams.toString();
-        const url = `${REALTY_PATH}/${id}/similar${qs ? `?${qs}` : ''}`;
-        const response = await api.get<unknown>(url, {
-            timeout: 45000,
-        });
-        const { rows, total } = normalizePropertyListResponse(response);
-        const items: Property[] = [];
-        for (const row of rows) {
-            try {
-                items.push(mapRealtyToProperty(row as RealtyProperty));
-            } catch (e) {
-                console.warn('[propertyApi.getSimilar] Skipping malformed property row:', e, row);
+        try {
+            const queryParams = new URLSearchParams();
+            if (params.limit !== undefined) queryParams.append('limit', String(params.limit));
+            const qs = queryParams.toString();
+            const url = `${REALTY_PATH}/${id}/similar${qs ? `?${qs}` : ''}`;
+            const response = await api.get<unknown>(url, {
+                timeout: 45000,
+            });
+            const { rows, total } = normalizePropertyListResponse(response);
+            const items: Property[] = [];
+            for (const row of rows) {
+                try {
+                    items.push(mapRealtyToProperty(row as RealtyProperty));
+                } catch (e) {
+                    console.warn('[propertyApi.getSimilar] Skipping malformed property row:', e, row);
+                }
             }
+            return { items, total };
+        } catch (e) {
+            console.warn('[propertyApi.getSimilar] Failed:', e);
+            return { items: [], total: 0 };
         }
-        return { items, total };
     },
 
     /**
@@ -348,10 +378,15 @@ export const propertyApi = {
      * @returns Property object
      */
     getById: async (id: number | string): Promise<Property> => {
-        // Use generic get for now (or specific if implemented)
-        // Usually backends implement /api/v1/realty/properties/{id}
         const response = await api.get<RealtyProperty>(`${REALTY_PATH}/${id}`);
-        return mapRealtyToProperty(response);
+        if (!response || typeof response !== 'object' || response.id == null) {
+            throw propertyNotFoundError();
+        }
+        const mapped = mapRealtyToProperty(response);
+        if (!propertyIdsMatch(id, mapped)) {
+            throw propertyNotFoundError('Property id mismatch');
+        }
+        return mapped;
     },
 
     /**
@@ -361,7 +396,12 @@ export const propertyApi = {
      * @returns Property object
      */
     getBySlug: async (type: string, slug: string): Promise<Property> => {
-        const response = await api.get<RealtyProperty>(`${REALTY_PATH}/by-slug/${encodeURIComponent(type)}/${encodeURIComponent(slug)}`);
+        const response = await api.get<RealtyProperty>(
+            `${REALTY_PATH}/by-slug/${encodeURIComponent(type)}/${encodeURIComponent(slug)}`
+        );
+        if (!response || typeof response !== 'object' || response.id == null) {
+            throw propertyNotFoundError();
+        }
         return mapRealtyToProperty(response);
     },
 

@@ -38,7 +38,7 @@ export function buildClientSeoAbout(property: Property): string {
         return raw.slice(0, 5000).trim();
     }
 
-    const name = formatPropertyTitle(property.title) || property.title.trim();
+    const name = formatPropertyTitle(property.title) || (property.title?.trim() ?? 'Property');
     const loc = property.location?.trim() || 'Bangalore';
     const pt = (property.type || 'Home').trim();
     const price = fmtPrice(property);
@@ -57,7 +57,7 @@ export function buildClientSeoAbout(property: Property): string {
 
 /** FAQ snippets for PDP (concise, no meta-commentary). */
 export function buildPropertyPdpFaqs(property: Property): PropertyPdpFaq[] {
-    const name = formatPropertyTitle(property.title) || property.title.trim();
+    const name = formatPropertyTitle(property.title) || (property.title?.trim() ?? 'Property');
     const loc = property.location?.trim() || 'Bangalore';
     const price = fmtPrice(property);
     const type = property.type || 'property';

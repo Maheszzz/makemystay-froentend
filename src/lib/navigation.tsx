@@ -124,7 +124,7 @@ type AppLinkProps = Omit<ComponentProps<typeof NextLink>, 'href'> & {
 
 export function Link({ to, replace, state: _state, ...props }: AppLinkProps) {
     const { href: _ignoredHref, to: _ignoredTo, ...rest } = props as AppLinkProps & { href?: string };
-    return <NextLink href={resolveNavigationHref(to)} replace={replace} {...rest} />;
+    return <NextLink href={resolveNavigationHref(to)} replace={replace} scroll {...rest} />;
 }
 
 export function Navigate({ to, replace = true }: { to: LegacyTo; replace?: boolean }) {

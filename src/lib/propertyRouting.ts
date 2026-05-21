@@ -1,5 +1,26 @@
 import type { Property } from "@/types/api";
 
+/** Coerce API `id` (number, string, or bad object) to a numeric route segment. */
+export function normalizePropertyId(id: unknown): string {
+    if (id == null || id === '') return '';
+    if (typeof id === 'number' && Number.isFinite(id)) return String(Math.trunc(id));
+    if (typeof id === 'string') {
+        const t = id.trim();
+        if (!t || t === '[object Object]') return '';
+        const m = t.match(/^(\d+)/);
+        return m ? m[1] : t;
+    }
+    if (typeof id === 'object') {
+        const o = id as Record<string, unknown>;
+        if ('id' in o) return normalizePropertyId(o.id);
+        if ('$oid' in o) return normalizePropertyId(o.$oid);
+    }
+    const s = String(id);
+    if (s === '[object Object]') return '';
+    const m = s.match(/^(\d+)/);
+    return m ? m[1] : '';
+}
+
 /**
  * Convert a property title into a URL-safe slug segment.
  * e.g. "SLC BHK 2 — BTM Layout!" → "slc-bhk-2-btm-layout"
@@ -30,11 +51,14 @@ function tokenizeSlugSource(value: string | undefined): string[] {
  * "New Living Homes" + "1BHK" + "Bellandur, Bangalore"
  *   → "new-living-homes-1bhk-bellandur-bangalore"
  */
-export function buildPropertySeoSlug(property: Pick<Property, 'title' | 'type' | 'location' | 'slug'>): string {
+export function buildPropertySeoSlug(
+    property: Pick<Property, 'title' | 'type' | 'location' | 'slug' | 'city'>,
+): string {
     const orderedTokens = [
         ...tokenizeSlugSource(property.title),
         ...tokenizeSlugSource(property.type),
         ...tokenizeSlugSource(property.location),
+        ...tokenizeSlugSource(property.city),
     ];
     const deduped = orderedTokens.filter((token, index) => orderedTokens.indexOf(token) === index);
     const semanticSlug = deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '');
@@ -51,7 +75,8 @@ export function buildPropertySeoSlug(property: Pick<Property, 'title' | 'type' |
  *   /properties/45-premium-pg-koramangala
  */
 export function getPropertyDetailPath(property: Property): string {
-    const id = String(property.id);
+    const id = normalizePropertyId(property.id);
+    if (!id) return '/properties';
     const slugPart = buildPropertySeoSlug(property);
     
     const category = (property.category || '').toLowerCase();
@@ -84,7 +109,14 @@ export function getPropertyDetailPath(property: Property): string {
  */
 export function parsePropertySlugParam(param: string): string {
     const match = param.match(/^(\d+)/);
-    return match ? match[1] : param;
+    return match ? match[1] : '';
+}
+
+/** Backend `by-slug` type segment from PDP path prefix. */
+export function inferPropertyTypeFromPath(pathname: string): string {
+    if (pathname.startsWith('/rent/')) return 'rent';
+    if (pathname.startsWith('/property/')) return 'plot';
+    return 'PG';
 }
 
 /** True when path looks like a property PDP (`/pg/96-foo`, `/rent/79-bar`, `/properties/12-baz`), not a city hub (`/pg/bangalore`). */
