@@ -119,11 +119,16 @@ for HOST in "${HOSTS[@]}"; do
 
     cd $DEPLOY_PATH
 
-    echo "📦 Installing dependencies..."
-    # npm ci --production
+    echo "🔁 Restarting Next.js app..."
+    if systemctl list-unit-files makemystay-next.service >/dev/null 2>&1; then
+      sudo systemctl restart makemystay-next
+    elif [ -x ./start.sh ]; then
+      echo "⚠️  makemystay-next.service missing — start manually: ./start.sh"
+    fi
 
-    echo "🔁 Restarting app..."
-    # pm2 reload app || pm2 start ecosystem.config.js
+    if command -v nginx >/dev/null 2>&1; then
+      sudo nginx -t && sudo systemctl reload nginx
+    fi
 
     echo "✅ Server updated"
 EOF

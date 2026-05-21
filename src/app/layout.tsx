@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { Providers } from './providers';
 import '@/globals.css';
@@ -33,6 +33,9 @@ export const metadata: Metadata = {
         apple: '/logo.svg',
     },
     manifest: '/manifest.json',
+};
+
+export const viewport: Viewport = {
     themeColor: '#c0392b',
 };
 
