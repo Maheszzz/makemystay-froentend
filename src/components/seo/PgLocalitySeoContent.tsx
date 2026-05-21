@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { MapPin, Shield } from 'lucide-react';
 import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { useSimilarProperties } from '@/hooks';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import type { Property } from '@/types/api';

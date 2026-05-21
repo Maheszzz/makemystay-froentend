@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@/lib/navigation';
 import { useRef, useState } from 'react';
 import { ArrowRight, BadgeCheck, MapPin, MessageCircle, Star } from 'lucide-react';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';

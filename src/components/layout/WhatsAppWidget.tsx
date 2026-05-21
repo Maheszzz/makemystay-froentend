@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from '@/lib/navigation';
 
 const WHATSAPP_NUMBER = '8150099911'; // +91 81500 99911
 const WHATSAPP_MESSAGE = encodeURIComponent(

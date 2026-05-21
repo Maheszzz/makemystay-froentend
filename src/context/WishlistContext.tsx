@@ -1,5 +1,8 @@
+'use client';
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Property } from '@/types/api';
+import { getLocalItem, setLocalItem } from '@/lib/browserStorage';
 
 interface WishlistContextType {
     wishlist: Property[];
@@ -13,19 +16,25 @@ const WishlistContext = createContext<WishlistContextType | null>(null);
 const STORAGE_KEY = 'mms_wishlist';
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-    const [wishlist, setWishlist] = useState<Property[]>(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            const parsed = stored ? JSON.parse(stored) : [];
-            return Array.isArray(parsed) ? parsed : [];
-        } catch {
-            return [];
-        }
-    });
+    const [wishlist, setWishlist] = useState<Property[]>([]);
+    const [hydrated, setHydrated] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-    }, [wishlist]);
+        try {
+            const stored = getLocalItem(STORAGE_KEY);
+            const parsed = stored ? JSON.parse(stored) : [];
+            setWishlist(Array.isArray(parsed) ? parsed : []);
+        } catch {
+            setWishlist([]);
+        } finally {
+            setHydrated(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!hydrated) return;
+        setLocalItem(STORAGE_KEY, JSON.stringify(wishlist));
+    }, [wishlist, hydrated]);
 
     const isWishlisted = (id: string | number) => wishlist.some((p) => String(p.id) === String(id));
 

@@ -1,4 +1,7 @@
+'use client';
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getLocalItem, removeLocalItem, setLocalItem } from '@/lib/browserStorage';
 
 interface User {
     email: string;
@@ -18,12 +21,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(localStorage.getItem('admin_token'));
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
-        const savedToken = localStorage.getItem('admin_token');
-        const savedRole = localStorage.getItem('admin_role') as User['role'];
-        const savedEmail = localStorage.getItem('admin_email');
+        const savedToken = getLocalItem('admin_token');
+        const savedRole = getLocalItem('admin_role') as User['role'];
+        const savedEmail = getLocalItem('admin_email');
 
         if (savedToken && savedRole && savedEmail) {
             setToken(savedToken);
@@ -32,17 +35,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     const login = (newToken: string, role: string, email: string) => {
-        localStorage.setItem('admin_token', newToken);
-        localStorage.setItem('admin_role', role);
-        localStorage.setItem('admin_email', email);
+        setLocalItem('admin_token', newToken);
+        setLocalItem('admin_role', role);
+        setLocalItem('admin_email', email);
         setToken(newToken);
         setUser({ email, role: role as User['role'] });
     };
 
     const logout = () => {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_role');
-        localStorage.removeItem('admin_email');
+        removeLocalItem('admin_token');
+        removeLocalItem('admin_role');
+        removeLocalItem('admin_email');
         setToken(null);
         setUser(null);
     };

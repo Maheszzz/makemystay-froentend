@@ -1,5 +1,5 @@
 import { ArrowRight, Award, CheckCircle, Heart, Lightbulb, Phone, Target, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 const whatWeDo = [
     { icon: CheckCircle, title: 'Verified & quality-checked listings', desc: 'Every property is reviewed for accuracy before it goes live.' },

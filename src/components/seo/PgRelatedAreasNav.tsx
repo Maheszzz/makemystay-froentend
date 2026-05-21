@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { PG_LOCATIONS } from '@/data/pgLocations';
 
 const MAX_LINKS = 20;

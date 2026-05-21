@@ -14,7 +14,7 @@ import { buildFeaturedExploreUrl, heroFiltersToApiParams } from '@/lib/heroFilte
 import type { PaginationParams } from '@/types/api';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, IndianRupee, ShieldCheck } from 'lucide-react';
 import { useMemo, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '@/lib/navigation';
 
 interface PropertyGridProps {
     category: 'pg' | 'rent' | 'buy' | 'plot' | 'all';
@@ -83,7 +83,7 @@ export function PropertyGrid({
     );
 
     const { property: launchById } = useProperty(
-        cardVariant === 'project' && !launchFromList ? FEATURED_LAUNCH.propertyId : undefined
+        cardVariant === 'project' && !launchFromList ? FEATURED_LAUNCH.propertyId : null
     );
 
     const launchProperty = launchFromList ?? launchById ?? null;

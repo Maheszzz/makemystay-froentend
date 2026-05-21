@@ -210,7 +210,7 @@ export interface UsePropertyResult {
 /**
  * Custom hook to fetch a single property by ID
  */
-export function useProperty(id: number | string): UsePropertyResult {
+export function useProperty(id: number | string | null | undefined): UsePropertyResult {
     const [property, setProperty] = useState<Property | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<ApiError | null>(null);

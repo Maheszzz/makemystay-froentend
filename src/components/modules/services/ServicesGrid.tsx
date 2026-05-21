@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Wallet, Users, BarChart3 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 const services = [
     {

@@ -1,5 +1,5 @@
 import { Banknote, MapPin, Shield, Users, Utensils, Wifi, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 interface PgLocationDeepContentProps {
     name: string;

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { getPgLocationBySlug } from '@/data/pgLocations';
 
 export interface RelatedSearchesBlockProps {

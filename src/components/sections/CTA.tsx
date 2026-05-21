@@ -1,6 +1,6 @@
 import { Calendar, MessageCircle, Phone, X } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { contactApi } from '@/lib/api/contacts';
 
 export function CTA() {

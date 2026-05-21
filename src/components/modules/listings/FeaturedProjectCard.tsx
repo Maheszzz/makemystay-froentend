@@ -1,5 +1,5 @@
 import { ArrowRight, Heart, MapPin, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';

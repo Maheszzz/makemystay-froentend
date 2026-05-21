@@ -1,6 +1,8 @@
+import { getWhatsAppPhone } from '@/lib/env';
+
 /** WhatsApp Business number for pre-filled chat links (digits only, country code included). */
 export function getWhatsappDigits(): string {
-    const env = import.meta.env.VITE_WHATSAPP_PHONE as string | undefined;
+    const env = getWhatsAppPhone();
     const raw = env?.replace(/\D/g, '');
     if (raw && raw.length >= 10) return raw;
     return '918150099911';

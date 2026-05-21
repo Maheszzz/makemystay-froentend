@@ -12,7 +12,7 @@ import {
     ShieldCheck,
 } from 'lucide-react';
 import { useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from '@/lib/navigation';
 
 import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';

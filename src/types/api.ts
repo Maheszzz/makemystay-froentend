@@ -99,6 +99,7 @@ export interface Property {
     lift?: boolean;
     area?: number;
     wifi?: boolean;
+    ac?: boolean;
     housekeeping?: boolean;
     power_backup?: boolean;
     gym?: boolean;

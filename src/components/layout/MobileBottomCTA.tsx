@@ -1,5 +1,5 @@
 import { Mail, Phone } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 
 /** Official-style WhatsApp mark (matches WhatsAppWidget). */
 function WhatsAppMark({ className }: { className?: string }) {

@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/types/api';
+import { getLocalItem } from '@/lib/browserStorage';
+import { getApiBaseUrl, isDev } from '@/lib/env';
 
 /** Public site hostnames that serve this SPA (www vs apex are different browser origins). */
 const SAME_BRAND_SITE_HOSTS = new Set(['makemystay.ai', 'www.makemystay.ai']);
@@ -11,9 +13,9 @@ const SAME_BRAND_SITE_HOSTS = new Set(['makemystay.ai', 'www.makemystay.ai']);
  * and "Provisional headers" in DevTools. Other hosts still use env / fallbacks.
  */
 function resolveApiBaseUrl(): string {
-    const raw = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
-    if (import.meta.env.DEV) {
-        return raw || 'http://localhost:8000/api/v1';
+    const raw = getApiBaseUrl();
+    if (isDev()) {
+        return raw || '/api/v1';
     }
     if (typeof window !== 'undefined') {
         const pageHost = window.location.hostname;
@@ -66,7 +68,7 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth tokens if needed in the future
 apiClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('admin_token');
+        const token = getLocalItem('admin_token');
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
         }

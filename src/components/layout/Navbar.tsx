@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Menu, Phone, ArrowRight, Search, Heart, CreditCard, Video, BookOpen, MapPin, ChevronDown, Check } from 'lucide-react';
 import { navigationLinks } from '@/data/content';
 import { Button } from '@/components/ui/Button';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from '@/lib/navigation';
 import { useAuth } from '@/context/AuthContext';
-import logoImage from '@/assets/MakeMysStaylogo.svg';
+import { BRAND_LOGO_PATH } from '@/lib/brand';
 
 const NAV_CITIES = [
     { slug: 'bangalore', label: 'Bangalore' },
@@ -188,7 +188,7 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_auto_1fr_auto] md:items-center md:gap-4 lg:gap-8">
                         <div className="flex items-center gap-2 shrink-0">
-                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-sm bg-white" />
+                            <img src={BRAND_LOGO_PATH} alt="MakeMyStay Logo" className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-cover shadow-sm bg-white" />
                             <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
@@ -266,7 +266,7 @@ export function Navbar() {
                     {/* Menu Header */}
                     <div className="flex items-center justify-between p-6 border-b border-white/10">
                         <div className="flex items-center space-x-2">
-                            <img src={logoImage} alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg object-cover" />
+                            <img src={BRAND_LOGO_PATH} alt="MakeMyStay Logo" className="w-8 h-8 rounded-lg object-cover" />
                             <span className="text-lg font-bold text-white font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>

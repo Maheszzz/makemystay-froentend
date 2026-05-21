@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight,
