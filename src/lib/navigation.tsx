@@ -65,18 +65,28 @@ export function useSearchParams(): [
     return [searchParams, setSearchParams];
 }
 
+/**
+ * Pathname-only location (safe during ISR/static generation).
+ * For query strings use `useSearchParams()` inside a Suspense boundary.
+ */
 export function useLocation() {
     const pathname = usePathname() ?? '/';
-    const nextParams = useNextSearchParams();
-    const qs = nextParams?.toString() ?? '';
-    const search = qs ? `?${qs}` : '';
     return {
         pathname,
-        search,
+        search: '',
         hash: '',
         state: null as unknown,
         key: 'default',
     };
+}
+
+/** Listing cards: preserve full URL for back-navigation state (call inside Suspense). */
+export function useListingFromUrl(): { pathname: string; search: string; from: string } {
+    const pathname = usePathname() ?? '/';
+    const nextParams = useNextSearchParams();
+    const qs = nextParams?.toString() ?? '';
+    const search = qs ? `?${qs}` : '';
+    return { pathname, search, from: `${pathname}${search}` };
 }
 
 export function useNavigate() {

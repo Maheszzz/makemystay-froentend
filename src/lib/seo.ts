@@ -1,3 +1,4 @@
+import { buildPropertyOgImageUrl } from '@/lib/ogImage';
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
@@ -258,7 +259,7 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
         title: buildPropertyMetaTitle(property),
         description,
         path,
-        ogImage: ogImageFromProperty(property) ?? DEFAULT_OG_IMAGE,
+        ogImage: buildPropertyOgImageUrl(property),
         keywords,
     };
 }
@@ -389,6 +390,92 @@ export function buildHowWeVerifyPageSEO(): PageSEOInput {
     };
 }
 
+/** `/contact-us` */
+export function buildContactPageSEO(): PageSEOInput {
+    return {
+        title: 'Contact MakeMyStay — PG & rental support in Bangalore',
+        description:
+            'Reach MakeMyStay for PG and rental enquiries, listing support, and visit bookings in Bangalore. Call, WhatsApp, or submit the contact form.',
+        path: '/contact-us',
+    };
+}
+
+/** `/blog` index */
+export function buildBlogIndexSEO(postCount = 0): PageSEOInput {
+    const countBit = postCount > 0 ? `${postCount}+ ` : '';
+    return {
+        title: 'Guides & Insights — PG, Rent & Bangalore Living (2026)',
+        description: `${countBit}expert guides on PG in Bangalore, area-wise rent, legal checklists, safety, and verified rentals — updated for 2026.`,
+        path: '/blog',
+    };
+}
+
+/** `/pg-near-me` */
+export function buildPgNearMeSEO(): PageSEOInput {
+    return {
+        title: 'PG Near Me in Bangalore | Top-rated verified PG stays',
+        description:
+            'Searching for PG near me? Find verified paying guest accommodations in Bangalore with WiFi, meals, and 24/7 security. Compare top listings in your immediate area.',
+        path: '/pg-near-me',
+    };
+}
+
+export function buildFlatsInBangaloreSEO(): PageSEOInput {
+    return {
+        title: 'Flats for Rent in Bangalore — Verified 1BHK & 2BHK | Zero brokerage',
+        description:
+            'Browse verified flats for rent in Bangalore — Koramangala, Whitefield, HSR, Bellandur and more. Real photos, transparent rent, zero brokerage on MakeMyStay.ai.',
+        path: '/flats-in-bangalore',
+    };
+}
+
+export function build1BhkSEO(): PageSEOInput {
+    return {
+        title: '1BHK for Rent in Bangalore — Verified flats | Zero brokerage',
+        description:
+            'Find verified 1BHK flats for rent in Bangalore with real photos and transparent pricing. Compare localities and book a visit on MakeMyStay.ai.',
+        path: '/1bhk',
+    };
+}
+
+export function build2BhkSEO(): PageSEOInput {
+    return {
+        title: '2BHK for Rent in Bangalore — Verified family homes | Zero brokerage',
+        description:
+            'Browse verified 2BHK flats and homes for rent in Bangalore. Zero brokerage on many listings — compare rent across top localities on MakeMyStay.ai.',
+        path: '/2bhk',
+    };
+}
+
+export function buildPrivacyPageSEO(): PageSEOInput {
+    return {
+        title: 'Privacy Policy',
+        description: 'How MakeMyStay Realty collects, uses, and protects your personal information on makemystay.ai.',
+        path: '/privacy',
+    };
+}
+
+export function buildTermsPageSEO(): PageSEOInput {
+    return {
+        title: 'Terms and Conditions',
+        description: 'Terms governing use of makemystay.ai and MakeMyStay Realty rental services in Bangalore.',
+        path: '/terms',
+    };
+}
+
+export function buildRefundPolicyPageSEO(): PageSEOInput {
+    return {
+        title: 'Refund & Cancellation Policy',
+        description: 'Refund and cancellation terms for payments made on makemystay.ai operated by MakeMyStay Realty.',
+        path: '/refund-policy',
+    };
+}
+
+/** Thin / utility routes — do not index. */
+export function buildNoindexUtilitySEO(title: string, path: string): PageSEOInput {
+    return { title, description: `${SITE_NAME} — ${title}`, path, noindex: true };
+}
+
 /** Meta for `/faq` (Help Center). */
 export function buildFaqPageSEO(): PageSEOInput {
     return {
@@ -453,6 +540,7 @@ export interface ListingsPageSeoInput {
     totalCount?: number;
     /** Crawlable pagination (1-based). Page 1 omitted from canonical. */
     listingPage?: number;
+    noindex?: boolean;
 }
 
 /** Listings index routes (`/pg`, `/rent`, `/properties`, …) + optional `?page=` crawl depth. */
@@ -487,6 +575,6 @@ export function listingsPageSeo(input: ListingsPageSeoInput): PageSEOInput {
         title,
         description,
         path,
-        noindex: lp != null && lp > 50,
+        noindex: input.noindex || (lp != null && lp > 50),
     };
 }

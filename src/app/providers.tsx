@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -25,7 +25,9 @@ export function Providers({ children }: { children: ReactNode }) {
             <AuthProvider>
                 <WishlistProvider>
                     <SkipLink />
-                    <ScrollToTop />
+                    <Suspense fallback={null}>
+                        <ScrollToTop />
+                    </Suspense>
                     <PrerenderSafetyTimeout />
                     {children}
                     <MobileBottomCTA />

@@ -78,6 +78,17 @@ if [[ "$DEPLOY_SOURCE" != "." && ! -d "$DEPLOY_SOURCE" ]]; then
   exit 1
 fi
 
+if [[ "$DEPLOY_SOURCE" != "." ]]; then
+  for hero_asset in hero-sunset.avif hero-sunset-mobile.avif; do
+    if [[ ! -f "${DEPLOY_SOURCE}/public/images/blog/${hero_asset}" ]]; then
+      echo "❌ Missing ${DEPLOY_SOURCE}/public/images/blog/${hero_asset}"
+      echo "   Run: npm run build  (includes optimize:hero)"
+      exit 1
+    fi
+  done
+  echo "✅ Optimized hero assets found in ${DEPLOY_SOURCE}/public"
+fi
+
 RSYNC_FROM="./"
 if [[ "$DEPLOY_SOURCE" != "." ]]; then
   RSYNC_FROM="${DEPLOY_SOURCE}/"

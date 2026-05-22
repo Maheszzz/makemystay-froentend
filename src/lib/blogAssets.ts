@@ -8,7 +8,7 @@ const LOCAL = {
     safety: '/images/blog/safety.png',
     ai: '/images/blog/ai.png',
     hero: '/images/blog/hero.png',
-    heroSunset: '/images/blog/hero-sunset.jpg',
+    heroSunset: '/images/blog/hero-sunset.webp',
 } as const;
 
 /** Unique Unsplash covers (w=1200) — one per slug where local assets run out. */

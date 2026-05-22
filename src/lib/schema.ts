@@ -301,7 +301,8 @@ export function buildPropertyDetailGraph(
                 },
                 datePublished: r.created_at,
             };
-            const body = r.comment?.trim() ? stripMarkdownLight(r.comment).slice(0, 5000) : '';
+            const rawBody = (r.comment ?? (r as { review_text?: string }).review_text)?.trim();
+            const body = rawBody ? stripMarkdownLight(rawBody).slice(0, 5000) : '';
             if (body) node.reviewBody = body;
             return node;
         });

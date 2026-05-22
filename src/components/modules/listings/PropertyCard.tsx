@@ -12,14 +12,16 @@ import {
     ShieldCheck,
 } from 'lucide-react';
 import { useMemo } from 'react';
-import { Link, useLocation } from '@/lib/navigation';
+import { Link, useListingFromUrl } from '@/lib/navigation';
 
 import { useWishlist } from '@/context/WishlistContext';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
-import { getOptimizedImageUrl } from '@/lib/utils/images';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { FreshnessBadge } from '@/components/trust/FreshnessBadge';
+import { getFreshnessBadges } from '@/lib/freshness';
 import type { Property } from '@/types/api';
 
 interface PropertyCardProps {
@@ -41,7 +43,7 @@ function getFallbackImageForType(type?: string): string {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-    const location = useLocation();
+    const { from: listingFrom } = useListingFromUrl();
     const { isWishlisted, toggleWishlist } = useWishlist();
     const wishlisted = isWishlisted(String(property.id));
 
@@ -94,11 +96,21 @@ export function PropertyCard({ property }: PropertyCardProps) {
     const unitsLeft = typeof property.units_remaining === 'number' && property.units_remaining > 0 ? property.units_remaining : null;
     const hasRating = (property.rating ?? 0) > 0;
     const secondaryBadge = property.listing_badge?.trim() || (property.is_available === false ? 'Fully booked' : '');
+    const freshnessBadges = useMemo(
+        () =>
+            getFreshnessBadges({
+                last_verified_at: property.last_verified_at,
+                last_booked_at: property.last_booked_at,
+                last_review_at: property.last_review_at,
+                updated_at: property.updated_at,
+            }),
+        [property.last_verified_at, property.last_booked_at, property.last_review_at, property.updated_at],
+    );
 
     return (
         <Link
             to={propertyPath}
-            state={{ from: `${location.pathname}${location.search}` }}
+            state={{ from: listingFrom }}
             className="block h-full group outline-none"
             aria-label={`View details for ${displayTitle} in ${property.location}`}
         >
@@ -107,12 +119,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
                 {/* 1. Image Section */}
                 <div className="relative w-full h-[240px] shrink-0 overflow-hidden bg-slate-100">
                     {displayImage ? (
-                        <img
-                            src={getOptimizedImageUrl(displayImage, 'medium')}
+                        <OptimizedImage
+                            src={displayImage}
                             alt={displayTitle}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            loading="lazy"
-                            decoding="async"
+                            fill
+                            size="medium"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
                         <div className="w-full h-full bg-slate-900 flex items-center justify-center">
@@ -173,6 +186,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                             <MapPin className="w-4 h-4 shrink-0 text-brand-red/70" />
                             <span className="truncate">{property.location}</span>
                         </div>
+                        <FreshnessBadge items={freshnessBadges} className="mt-2" />
                     </div>
 
                     {/* Property Specs Row */}

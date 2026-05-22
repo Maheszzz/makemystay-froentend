@@ -64,13 +64,25 @@ export interface RealtyProperty {
     category?: 'pg' | 'rent' | 'buy' | 'plot' | string;
 }
 
+export type ReviewStatus = 'pending' | 'approved' | 'rejected';
+
 export interface Review {
     id: number;
     property_id: number;
     rating: number;
     user_name: string;
     comment?: string;
+    review_text?: string;
+    cleanliness_rating?: number;
+    wifi_rating?: number;
+    food_rating?: number;
+    safety_rating?: number;
+    owner_response?: string;
+    review_images?: string[];
+    verified_stay?: boolean;
+    status?: ReviewStatus;
     created_at: string;
+    updated_at?: string;
 }
 
 export interface PropertyImage {
@@ -125,6 +137,9 @@ export interface Property {
     average_rating?: number;
     review_count?: number;
     reviews_list?: Review[];
+    last_verified_at?: string;
+    last_booked_at?: string;
+    last_review_at?: string;
     created_at?: string;
     updated_at?: string;
     postedDate?: string;

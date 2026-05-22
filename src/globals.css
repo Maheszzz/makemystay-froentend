@@ -16,9 +16,9 @@
     --color-secondary: var(--color-brand-charcoal);
     --color-background: #FFFFFF;
 
-    --font-heading: 'Montserrat', sans-serif;
-    --font-sans: 'Inter', sans-serif;
-    --font-luxury: 'Playfair Display', serif;
+    --font-heading: var(--font-montserrat), 'Montserrat', sans-serif;
+    --font-sans: var(--font-inter), 'Inter', sans-serif;
+    --font-luxury: var(--font-playfair), 'Playfair Display', serif;
     --font-cormorant: 'Cormorant Garamond', serif;
 
     --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);

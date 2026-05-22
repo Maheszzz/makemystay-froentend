@@ -21,6 +21,12 @@ cpSync(standalone, out, { recursive: true });
 cpSync(join(root, '.next/static'), join(out, '.next/static'), { recursive: true });
 cpSync(join(root, 'public'), join(out, 'public'), { recursive: true });
 
+const heroAvif = join(out, 'public/images/blog/hero-sunset.avif');
+if (!existsSync(heroAvif)) {
+    console.error('Missing dist hero AVIF — run `npm run optimize:hero` before build.');
+    process.exit(1);
+}
+
 writeFileSync(
     join(out, 'start.sh'),
     `#!/bin/sh

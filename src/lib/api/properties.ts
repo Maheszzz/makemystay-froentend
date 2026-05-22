@@ -5,7 +5,8 @@ import type {
     PropertyImage,
     RealtyProperty,
     PropertyCreateRequest,
-    PropertyUpdateRequest
+    PropertyUpdateRequest,
+    Review,
 } from '@/types/api';
 
 const REALTY_PATH = '/realty/properties';
@@ -112,7 +113,7 @@ export function propertyIdsMatch(requested: string | number, property: Property 
 /**
  * Maps the backend RealtyProperty to the frontend Property interface
  */
-function mapRealtyToProperty(item: RealtyProperty): Property {
+export function mapRealtyToProperty(item: RealtyProperty): Property {
     if (item?.id == null) {
         throw propertyNotFoundError('Missing property id in API response');
     }
@@ -273,7 +274,15 @@ function mapRealtyToProperty(item: RealtyProperty): Property {
         reviews: item.review_count || 0,
         average_rating: item.average_rating,
         review_count: item.review_count,
-        reviews_list: Array.isArray(item.reviews) ? item.reviews : [],
+        reviews_list: Array.isArray(item.reviews)
+            ? item.reviews.map((r: Review) => ({
+                  ...r,
+                  comment: r.comment ?? r.review_text,
+              }))
+            : [],
+        last_verified_at: item.last_verified_at,
+        last_booked_at: item.last_booked_at,
+        last_review_at: item.last_review_at,
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,

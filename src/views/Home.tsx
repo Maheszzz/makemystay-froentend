@@ -2,22 +2,11 @@
 
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
-import { SafetyPopup } from '@/components/modals/SafetyPopup';
-import { InvestmentCalculator } from '@/components/modules/calculator/InvestmentCalculator';
-import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
-import { ServicesGrid } from '@/components/modules/services/ServicesGrid';
-import { About } from '@/components/sections/About';
-import { CaseStudy } from '@/components/sections/CaseStudy';
-import { Comparison } from '@/components/sections/Comparison';
-import { CTA } from '@/components/sections/CTA';
 import { Hero } from '@/components/sections/Hero';
-import { Problem } from '@/components/sections/Problem';
-import { Solution } from '@/components/sections/Solution';
-import { FaqSection } from '@/components/seo/FaqSection';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { SEOHead } from '@/components/seo/SEOHead';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
+import { HomeBelowFold } from '@/views/HomeBelowFold';
 import {
     homeHeroTabToListingsCategory,
     parseHomeHeroTab,
@@ -25,8 +14,6 @@ import {
     type ListingsCategoryKey,
 } from '@/lib/listingsCategoryHubs';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
-import { buildHomeSEO, buildPageSEO } from '@/lib/seo';
-import { MapPin } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from '@/lib/navigation';
 
@@ -146,11 +133,8 @@ export default function Home() {
         [setHeroTab, setSearchQuery]
     );
 
-    const homeHelmet = buildPageSEO(buildHomeSEO());
-
     return (
         <>
-            <SEOHead {...homeHelmet} />
             <JsonLd data={buildFaqPageSchema(HOME_PG_FAQS)} id="home-faq-schema" />
             <JsonLd data={buildHomeOrganizationLocalWebGraph()} id="home-org-local-website-schema" />
 
@@ -170,44 +154,18 @@ export default function Home() {
                     />
                 </section>
 
-                <PropertyGrid
-                    category={listingsCategory}
+                <HomeBelowFold
+                    listingsCategory={listingsCategory}
                     searchQuery={searchQuery}
-                    cardVariant="project"
-                    filters={heroFilters}
-                    setFilters={setHeroFilters}
+                    heroFilters={heroFilters}
+                    setHeroFilters={setHeroFilters}
+                    isSafetyPopupOpen={isSafetyPopupOpen}
+                    onSafetyClose={() => setIsSafetyPopupOpen(false)}
+                    homeFaqs={HOME_PG_FAQS}
                 />
-
-                <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="mb-10 text-center">
-                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Our Services</h2>
-                        <p className="text-slate-500 mt-2 text-sm sm:text-base">Comprehensive solutions for every real estate need</p>
-                    </div>
-                    <ServicesGrid />
-                </section>
-
-                <InvestmentCalculator />
-
-                <About />
-                <Problem />
-                <Solution />
-                <Comparison />
-                <CaseStudy />
-                <CTA />
-
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
-                    <FaqSection
-                        id="home-faq-heading"
-                        title="Frequently asked questions"
-                        items={HOME_PG_FAQS}
-                        variant="light"
-                        titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
-                    />
-                </div>
             </main>
 
             <Footer />
-            <SafetyPopup isOpen={isSafetyPopupOpen} onClose={() => setIsSafetyPopupOpen(false)} />
         </>
     );
 }

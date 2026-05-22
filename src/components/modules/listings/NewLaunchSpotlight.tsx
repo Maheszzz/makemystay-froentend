@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from '@/lib/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import {
     ArrowRight,
     Bath,
@@ -68,28 +68,18 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
     };
 
     return (
-        <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-48px' }}
-            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-5 md:mb-6"
-            aria-label="Newly launched property"
-        >
-            <motion.div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_16px_48px_-28px_rgba(15,23,42,0.14)] ring-1 ring-slate-900/[0.04] lg:max-h-[320px]">
-                        <motion.div
+        <section className="mb-5 md:mb-6" aria-label="Newly launched property">
+            <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-white via-white to-slate-50/80 shadow-[0_16px_48px_-28px_rgba(15,23,42,0.14)] ring-1 ring-slate-900/[0.04] lg:max-h-[320px]">
+                        <div
                             aria-hidden
-                            className="absolute -left-20 -top-20 h-48 w-48 rounded-full bg-red-500/[0.06] blur-3xl pointer-events-none"
+                            className="absolute -left-20 -top-20 h-48 w-48 rounded-full bg-red-500/[0.06] pointer-events-none"
                         />
 
                 <div className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] gap-0 lg:max-h-[320px]">
                     {/* Copy */}
                     <div className="relative z-10 flex flex-col justify-center p-4 sm:p-5 lg:py-4 lg:px-6 order-2 lg:order-1 lg:overflow-hidden">
                         <div className="inline-flex items-center gap-1.5 w-fit rounded-full border border-red-100 bg-red-50/90 px-2.5 py-1 mb-2.5 shadow-sm">
-                            <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-red opacity-50" />
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" />
-                            </span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-red" aria-hidden />
                             <Sparkles className="w-3.5 h-3.5 text-brand-red" />
                             <span className="text-[10px] font-black uppercase tracking-[0.22em] text-brand-red">
                                 {FEATURED_LAUNCH.badge}
@@ -128,9 +118,9 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
                             </span>
                         </div>
 
-                        <motion.div className="mt-2 inline-flex w-fit rounded-full bg-red-50 border border-red-100 px-3 py-1">
+                        <div className="mt-2 inline-flex w-fit rounded-full bg-red-50 border border-red-100 px-3 py-1">
                             <span className="text-xs font-bold text-brand-red tabular-nums">{priceDisplay}</span>
-                        </motion.div>
+                        </div>
 
                         <div className="mt-2.5 flex flex-col sm:flex-row gap-2">
                             <Link
@@ -177,20 +167,15 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
                     </div>
 
                     {/* Gallery */}
-                    <div className="relative order-1 lg:order-2 min-h-[180px] sm:min-h-[200px] lg:min-h-0 lg:h-full lg:max-h-[320px]">
-                        <AnimatePresence mode="wait">
-                            <motion.img
-                                key={images[activeImage]}
-                                src={images[activeImage]}
-                                alt={title}
-                                initial={{ opacity: 0, scale: 1.03 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.45 }}
-                                className="absolute inset-0 h-full w-full object-cover"
-                                loading="eager"
-                            />
-                        </AnimatePresence>
+                    <div className="relative order-1 lg:order-2 min-h-[180px] sm:min-h-[200px] lg:min-h-0 lg:h-full lg:max-h-[320px] aspect-[4/3] lg:aspect-auto">
+                        <OptimizedImage
+                            key={images[activeImage]}
+                            src={images[activeImage]}
+                            alt={title}
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            className="object-cover"
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/10 to-slate-900/10 lg:bg-gradient-to-l lg:from-transparent lg:via-transparent lg:to-slate-900/5" />
 
                         {images.length > 1 && (
@@ -283,7 +268,7 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
                         )}
                     </div>
                 </div>
-            </motion.div>
-        </motion.section>
+            </div>
+        </section>
     );
 }

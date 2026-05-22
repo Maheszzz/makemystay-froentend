@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { resolveRentSlugMetadata } from '@/lib/routeMetadata';
 import RentSlugRoute from '@/routes/RentSlugRoute';
 
-export const dynamic = 'force-dynamic';
 
 type PageProps = { params: Promise<{ slug: string }> };
 

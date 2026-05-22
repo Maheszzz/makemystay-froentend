@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@/lib/navigation';
+import { Link, useListingFromUrl } from '@/lib/navigation';
 import { useRef, useState } from 'react';
 import { ArrowRight, BadgeCheck, MapPin, MessageCircle, Star } from 'lucide-react';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
@@ -90,8 +90,7 @@ function SwipeableImageGallery({ images, fallbackImg, title }: { images: string[
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
     const list = Array.isArray(properties) ? properties : [];
     if (list.length === 0) return null;
-    const location = useLocation();
-    const from = `${location.pathname}${location.search}${location.hash}`;
+    const { from } = useListingFromUrl();
 
     return (
         <div className="md:hidden px-4 flex flex-col gap-4">

@@ -1,11 +1,37 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Montserrat, Playfair_Display } from 'next/font/google';
+import { Suspense } from 'react';
 import Script from 'next/script';
+import { PageRouteFallback } from '@/components/ui/PageRouteFallback';
 import { Providers } from './providers';
 import '@/globals.css';
 
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-inter',
+    display: 'swap',
+});
+
+const montserrat = Montserrat({
+    subsets: ['latin'],
+    weight: ['400', '700'],
+    variable: '--font-montserrat',
+    display: 'swap',
+});
+
+const playfair = Playfair_Display({
+    subsets: ['latin'],
+    weight: ['400', '700', '900'],
+    variable: '--font-playfair',
+    display: 'swap',
+});
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://makemystay.ai'),
-    title: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals | MakeMyStay.ai',
+    title: {
+        default: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals | MakeMyStay.ai',
+        template: '%s | MakeMyStay.ai',
+    },
     description:
         'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage. Book a visit in 60 seconds on MakeMyStay.ai.',
     openGraph: {
@@ -39,24 +65,19 @@ export const viewport: Viewport = {
     themeColor: '#c0392b',
 };
 
+/** Cached HTML for hubs/PDPs; client islands hydrate inside Suspense. */
+export const revalidate = 3600;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
-            <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@400;700&family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap"
-                    rel="stylesheet"
-                />
-            </head>
-            <body className="antialiased">
+        <html lang="en" className={`${inter.variable} ${montserrat.variable} ${playfair.variable}`}>
+            <body className="antialiased font-sans">
                 <Script
                     src="https://cdn-in.pagesense.io/js/60068323066/7e76ea503238457e82afc5266e8977c1.js"
-                    strategy="afterInteractive"
+                    strategy="lazyOnload"
                 />
-                <Script src="https://www.googletagmanager.com/gtag/js?id=G-7THZ376P8D" strategy="afterInteractive" />
-                <Script id="gtag-init" strategy="afterInteractive">
+                <Script src="https://www.googletagmanager.com/gtag/js?id=G-7THZ376P8D" strategy="lazyOnload" />
+                <Script id="gtag-init" strategy="lazyOnload">
                     {`
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
@@ -66,7 +87,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     gtag('config', 'AW-11313350010');
                     `}
                 </Script>
-                <Providers>{children}</Providers>
+                <Providers>
+                    <Suspense fallback={<PageRouteFallback />}>{children}</Suspense>
+                </Providers>
             </body>
         </html>
     );

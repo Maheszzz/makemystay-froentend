@@ -1,3 +1,4 @@
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/lib/navigation';
 
@@ -89,11 +90,13 @@ export function PresentInCities({ hideSectionLabel = false }: PresentInCitiesPro
                             )}
 
                             <div className="w-full aspect-[16/10] bg-slate-100 overflow-hidden relative pointer-events-none z-0">
-                                <img
+                                <OptimizedImage
                                     src={city.image}
                                     alt={`${city.name} properties`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                    loading="lazy"
+                                    fill
+                                    size="medium"
+                                    sizes="(max-width: 768px) 100vw, 33vw"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     style={{ filter: isActive ? 'none' : 'saturate(0.4) brightness(0.9)' }}
                                 />
                             </div>

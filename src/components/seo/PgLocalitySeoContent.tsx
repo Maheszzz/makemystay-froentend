@@ -1,12 +1,16 @@
 import { Link } from '@/lib/navigation';
 import { MapPin, Shield } from 'lucide-react';
+import { QuickAnswer } from '@/components/seo/QuickAnswer';
 import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
+import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
+import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { PgFilterQuickLinks } from '@/components/seo/PgFilterQuickLinks';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { buildPgLocationFaqs } from '@/lib/pgLocalityFaqs';
+import { buildLocalityFaqs, resolveLocalityProfile } from '@/lib/pgLocalityContent';
+import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 
 export interface PgLocalitySeoContentProps {
     name: string;
@@ -19,10 +23,17 @@ export interface PgLocalitySeoContentProps {
  * Shared long-form PG locality SEO: deep copy, tools (filters + insight), Q&A stack, related areas.
  */
 export function PgLocalitySeoContent({ name, slug, faqSectionId = 'pg-locality-faq-heading' }: PgLocalitySeoContentProps) {
-    const faqs = buildPgLocationFaqs(name);
+    const profile = resolveLocalityProfile(slug);
+    const faqs = buildLocalityFaqs(name, slug);
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
+            <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
+
+            <LocalityTrustStrip slug={slug} name={name} />
+
+            <LocalityAuthoritySections profile={profile} />
+
             <div className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
                 <PgLocationDeepContent name={name} />
             </div>
@@ -77,7 +88,9 @@ export function PgLocalitySeoContent({ name, slug, faqSectionId = 'pg-locality-f
                 titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
             />
 
-            <PgRelatedAreasNav currentSlug={slug} />
+            <LocalityInternalLinkHub profile={profile} />
+
+            <PgRelatedAreasNav currentSlug={slug} nearbySlugs={profile.nearbySlugs} />
         </div>
     );
 }

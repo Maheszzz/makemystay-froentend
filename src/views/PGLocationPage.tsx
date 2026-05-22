@@ -10,9 +10,10 @@ import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalitySeoContent } from '@/components/seo/PgLocalitySeoContent';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
-import { buildPgLocationFaqs } from '@/lib/pgLocalityFaqs';
+import { buildLocalityFaqs, buildLocalityAeoGraph, resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
-import { buildPgLocationCombinedGraph } from '@/lib/schema';
+import { QuickAnswer } from '@/components/seo/QuickAnswer';
+import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 import { LocationComparisonTable } from '@/components/seo/LocationComparisonTable';
 import locJson from '@/data/pg-locations.json';
 import Properties from '@/views/Properties';
@@ -36,14 +37,15 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
     const { name, slug } = loc;
     const seoInput = pgLocationSeoWithQuery(name, slug, searchParams);
     const helmet = buildPageSEO(seoInput);
-    const faqs = buildPgLocationFaqs(name);
+    const profile = resolveLocalityProfile(slug);
+    const faqs = buildLocalityFaqs(name, slug);
     const canonicalListingPath = stablePgListingCanonical(slug, searchParams);
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
         { name: 'PG', path: '/pg' },
         { name: `PG in ${name}`, path: canonicalListingPath },
     ];
-    const combinedLd = buildPgLocationCombinedGraph(faqs, breadcrumbItems, name);
+    const combinedLd = buildLocalityAeoGraph(profile, faqs, breadcrumbItems, canonicalListingPath);
 
     const pageTitle = overrideMaxPrice ? `Budget PG in ${name} under ₹${overrideMaxPrice}` : `PG in ${name}`;
     const pageSubtitle = overrideMaxPrice
@@ -80,16 +82,9 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
                                     Verified accommodations in <strong className="text-slate-700">{name}</strong> — transparent pricing,
                                     instant shortlist, and secure online booking.
                                 </p>
-                                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-3 text-sm text-slate-700 max-w-2xl">
-                                    <p className="font-semibold text-slate-900">Quick facts</p>
-                                    <p className="mt-1">
-                                        <span className="font-medium">Best for:</span> students, working professionals, families on
-                                        budget.
-                                    </p>
-                                    <p className="mt-1">
-                                        <span className="font-medium">Typical rent band:</span> ₹6,000–₹18,000/mo for shared PG;
-                                        private rooms often higher.
-                                    </p>
+                                <div className="mt-4 max-w-2xl space-y-3">
+                                    <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
+                                    <LocalityTrustStrip slug={slug} name={name} />
                                 </div>
                             </div>
                             <Link
@@ -135,26 +130,27 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
                             Explore Nearby Area Hubs
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            {locJson
-                                .filter(l => l.slug !== slug)
-                                .sort(() => 0.5 - Math.random())
-                                .slice(0, 10)
-                                .map(item => {
-                                    const hubSlug = item.slug === 'btm' ? 'btm-layout' : item.slug;
-                                    return (
-                                        <Link
-                                            key={item.slug}
-                                            to={`/pg-in-${hubSlug}`}
-                                            className="group flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-brand-red/30 hover:shadow-md transition-all duration-200"
-                                        >
-                                            <MapPin className="w-3 h-3 text-slate-400 group-hover:text-brand-red shrink-0 transition-colors" />
-                                            <span className="text-[12px] font-semibold text-slate-600 group-hover:text-brand-red transition-colors truncate">
-                                                {item.name}
-                                            </span>
-                                        </Link>
-                                    );
-                                })
-                            }
+                            {(profile.nearbySlugs.length > 0
+                                ? profile.nearbySlugs
+                                      .map((s) => locJson.find((l) => l.slug === s || (s === 'btm' && l.slug === 'btm')))
+                                      .filter(Boolean)
+                                : locJson.filter((l) => l.slug !== slug).slice(0, 10)
+                            ).map((item) => {
+                                if (!item) return null;
+                                const hubSlug = item.slug === 'btm' ? 'btm' : item.slug;
+                                return (
+                                    <Link
+                                        key={item.slug}
+                                        to={`/pg/${hubSlug}`}
+                                        className="group flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-brand-red/30 hover:shadow-md transition-all duration-200"
+                                    >
+                                        <MapPin className="w-3 h-3 text-slate-400 group-hover:text-brand-red shrink-0 transition-colors" />
+                                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-brand-red transition-colors truncate">
+                                            {item.name}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </section>
                 </div>

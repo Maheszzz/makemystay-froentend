@@ -1,3 +1,15 @@
-export const dynamic = 'force-dynamic';
+import type { Metadata } from 'next';
+import { resolvePgGenderLocalityMetadata } from '@/lib/routeMetadata';
+import PgGenderLocalityPage from '@/views/PgGenderLocalityPage';
 
-export { default } from '@/views/PgGenderLocalityPage';
+
+type PageProps = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    return resolvePgGenderLocalityMetadata(slug, 'girls');
+}
+
+export default function Page() {
+    return <PgGenderLocalityPage />;
+}

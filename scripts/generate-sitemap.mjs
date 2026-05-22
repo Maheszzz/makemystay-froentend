@@ -1,5 +1,6 @@
 /**
- * Generates public/sitemap.xml from static routes + locality hubs + blog + live property detail pages.
+ * Generates sitemap index + split sitemaps (static, localities, blog, properties).
+ * Canonical URLs only — no /pg-in-* duplicates, no blocked utility paths.
  * Run after build: node scripts/generate-sitemap.mjs
  */
 import { existsSync, readFileSync, writeFileSync } from 'fs';
@@ -23,17 +24,24 @@ const STATIC_PATHS = [
     { path: '/pg-with-food', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-with-ac', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-vs-flat-bangalore', priority: '0.8', changefreq: 'monthly' },
+    { path: '/compare/hsr-layout-vs-koramangala', priority: '0.78', changefreq: 'monthly' },
+    { path: '/compare/hsr-layout-vs-bellandur', priority: '0.78', changefreq: 'monthly' },
+    { path: '/compare/whitefield-vs-marathahalli', priority: '0.78', changefreq: 'monthly' },
+    { path: '/compare/koramangala-vs-indiranagar', priority: '0.78', changefreq: 'monthly' },
+    { path: '/pg-near-me', priority: '0.84', changefreq: 'weekly' },
     { path: '/rent', priority: '0.85', changefreq: 'daily' },
     { path: '/rent/bangalore', priority: '0.93', changefreq: 'daily' },
     { path: '/rent/hyderabad', priority: '0.92', changefreq: 'daily' },
     { path: '/rent/pune', priority: '0.92', changefreq: 'daily' },
-    // /buy and /plots omitted while inventory is thin (pages use noindex); city hubs remain via loop where needed.
     { path: '/faq', priority: '0.75', changefreq: 'monthly' },
     { path: '/about', priority: '0.78', changefreq: 'monthly' },
     { path: '/how-we-verify', priority: '0.8', changefreq: 'monthly' },
     { path: '/blog', priority: '0.8', changefreq: 'weekly' },
-    { path: '/quick-pay', priority: '0.6', changefreq: 'monthly' },
-    { path: '/schedule-demo', priority: '0.7', changefreq: 'monthly' },
+    { path: '/flats-in-bangalore', priority: '0.9', changefreq: 'daily' },
+    { path: '/1bhk', priority: '0.88', changefreq: 'weekly' },
+    { path: '/2bhk', priority: '0.88', changefreq: 'weekly' },
+    { path: '/buy/in/bangalore', priority: '0.82', changefreq: 'weekly' },
+    { path: '/plots/in/bangalore', priority: '0.82', changefreq: 'weekly' },
 ];
 
 const locJson = JSON.parse(readFileSync(join(root, 'src/data/pg-locations.json'), 'utf8'));
@@ -49,9 +57,23 @@ const PG_NEAR_LANDMARK_PATHS = [
     'pg-near-prestige-tech-park',
 ];
 
-/** Keep in sync with `src/data/blogPosts.ts` — parsed at build time. */
 const blogPostsSrc = readFileSync(join(root, 'src/data/blogPosts.ts'), 'utf8');
 const BLOG_SLUGS = [...blogPostsSrc.matchAll(/slug:\s*'([^']+)'/g)].map((m) => m[1]);
+
+const RENT_HUB_LOCATION_SLUGS = [
+    'whitefield',
+    'marathahalli',
+    'btm',
+    'koramangala',
+    'hsr-layout',
+    'electronic-city',
+    'indiranagar',
+    'bellandur',
+    'hebbal',
+    'jp-nagar',
+    'bannerghatta-road',
+    'sarjapur-road',
+];
 
 function titleToSlug(title = '') {
     return title
@@ -61,7 +83,7 @@ function titleToSlug(title = '') {
 }
 
 function tokenizeSlugSource(value = '') {
-    return value
+    return String(value ?? '')
         .toLowerCase()
         .replace(/\bin\b/g, ' ')
         .replace(/[^a-z0-9]+/g, ' ')
@@ -80,14 +102,13 @@ function buildPropertySeoSlug(property) {
     return deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '') || property.slug || titleToSlug(property.property_name || '');
 }
 
-/** Align with `src/lib/api/properties.ts` deriveUiCategory */
 function deriveUiCategory(item) {
     const raw = item.category;
     if (typeof raw === 'string' && raw.trim()) {
         const c = raw.trim().toLowerCase();
         if (c === 'pg' || c === 'plot' || c === 'rent' || c === 'buy') return c;
     }
-    const pt = (item.property_type || '').toLowerCase();
+    const pt = String(item.property_type ?? '').toLowerCase();
     if (pt === 'pg') return 'pg';
     if (pt === 'plot') return 'plot';
     const lt = (item.listing_type ?? 'rent').toString().toLowerCase();
@@ -115,7 +136,12 @@ function buildPropertyDetailPath(property) {
 }
 
 function resolveApiBase() {
-    const raw = (process.env.VITE_API_BASE_URL || process.env.VITE_API_URL || '/api/v1').trim();
+    const raw = (
+        process.env.NEXT_PUBLIC_API_BASE_URL ||
+        process.env.VITE_API_BASE_URL ||
+        process.env.VITE_API_URL ||
+        '/api/v1'
+    ).trim();
     if (!raw) return `${BASE}/api/v1`;
     if (/^https?:\/\//i.test(raw)) return raw.replace(/\/+$/, '');
     if (raw.startsWith('/')) return `${BASE}${raw}`.replace(/\/+$/, '');
@@ -127,6 +153,21 @@ function urlEntry(loc, priority, changefreq) {
     return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>\n`;
 }
 
+function wrapUrlset(body) {
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}</urlset>\n`;
+}
+
+function wrapIndex(entries) {
+    const lastmod = new Date().toISOString();
+    const body = entries
+        .map(
+            (e) =>
+                `  <sitemap>\n    <loc>${e.loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </sitemap>`,
+        )
+        .join('\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</sitemapindex>\n`;
+}
+
 async function fetchAllProperties() {
     const apiBase = resolveApiBase();
     const rows = [];
@@ -136,19 +177,14 @@ async function fetchAllProperties() {
 
     while (skip < total) {
         const url = `${apiBase}/realty/properties?skip=${skip}&limit=${limit}&sort_by=newest`;
-        const response = await fetch(url, {
-            headers: { Accept: 'application/json' },
-        });
-
+        const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) {
             throw new Error(`Failed to fetch property sitemap rows from ${url}: ${response.status}`);
         }
-
         const payload = await response.json();
         const items = Array.isArray(payload?.items) ? payload.items : [];
         total = typeof payload?.total === 'number' ? payload.total : items.length;
         rows.push(...items);
-
         if (items.length === 0) break;
         skip += items.length;
     }
@@ -156,86 +192,79 @@ async function fetchAllProperties() {
     return rows.filter((row) => row && row.id && row.is_available !== false);
 }
 
-/** Keep in sync with `src/data/rentHubSlugs.ts` */
-const RENT_HUB_LOCATION_SLUGS = [
-    'whitefield',
-    'marathahalli',
-    'btm',
-    'koramangala',
-    'hsr-layout',
-    'electronic-city',
-    'indiranagar',
-    'bellandur',
-    'hebbal',
-    'jp-nagar',
-    'bannerghatta-road',
-    'sarjapur-road',
-];
-
-let body = '';
+let staticBody = '';
 for (const s of STATIC_PATHS) {
     const loc = s.path === '/' ? BASE : `${BASE}${s.path}`;
-    body += urlEntry(loc, s.priority, s.changefreq);
+    staticBody += urlEntry(loc, s.priority, s.changefreq);
 }
-
-for (const row of locJson) {
-    body += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
-    
-    // Programmatic Hubs (v2 SEO)
-    const hubSlug = row.slug === 'btm' ? 'btm-layout' : row.slug;
-    body += urlEntry(`${BASE}/pg-in-${hubSlug}`, '0.92', 'daily');
-    
-    // Hyper-Long-Tail Price Tiers
-    body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-10000`, '0.88', 'weekly');
-    body += urlEntry(`${BASE}/pg-in-${hubSlug}-under-15000`, '0.88', 'weekly');
-    
-    // Long-tail gender + locality (canonical boys/girls URLs; men/women alias pages set canonical in-page)
-    body += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
-    body += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
-}
-
 for (const p of PG_NEAR_LANDMARK_PATHS) {
-    body += urlEntry(`${BASE}/${p}`, '0.86', 'weekly');
+    staticBody += urlEntry(`${BASE}/${p}`, '0.86', 'weekly');
 }
 
-body += urlEntry(`${BASE}/flats-in-bangalore`, '0.90', 'daily');
-
+let localitiesBody = '';
+for (const row of locJson) {
+    localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
+}
 for (const rentSlug of RENT_HUB_LOCATION_SLUGS) {
-    body += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');
 }
 
+let blogBody = '';
 for (const slug of BLOG_SLUGS) {
-    body += urlEntry(`${BASE}/blog/${slug}`, '0.72', 'monthly');
+    blogBody += urlEntry(`${BASE}/blog/${slug}`, '0.72', 'monthly');
 }
 
+let propertiesBody = '';
 let propertyCount = 0;
 try {
     const properties = await fetchAllProperties();
     for (const property of properties) {
-        body += urlEntry(`${BASE}${buildPropertyDetailPath(property)}`, '0.88', 'daily');
+        propertiesBody += urlEntry(`${BASE}${buildPropertyDetailPath(property)}`, '0.88', 'daily');
     }
     propertyCount = properties.length;
 } catch (error) {
     console.warn(`Property sitemap generation skipped: ${error instanceof Error ? error.message : String(error)}`);
 }
 
-const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${body}</urlset>
-`;
-
-const outPublic = join(root, 'public/sitemap.xml');
-writeFileSync(outPublic, xml);
-const outDist = join(root, 'dist/sitemap.xml');
-if (existsSync(join(root, 'dist'))) {
-    writeFileSync(outDist, xml);
+const files = [
+    { name: 'sitemap-static.xml', body: staticBody },
+    { name: 'sitemap-localities.xml', body: localitiesBody },
+    { name: 'sitemap-blog.xml', body: blogBody },
+];
+if (propertiesBody) {
+    files.push({ name: 'sitemap-properties.xml', body: propertiesBody });
 }
+
+const publicDir = join(root, 'public');
+for (const f of files) {
+    writeFileSync(join(publicDir, f.name), wrapUrlset(f.body));
+}
+
+const indexEntries = files.map((f) => ({ loc: `${BASE}/${f.name}` }));
+const indexXml = wrapIndex(indexEntries);
+writeFileSync(join(publicDir, 'sitemap.xml'), indexXml);
+
+// Legacy single-file consumers: combined urlset (canonical URLs only)
+const combinedBody = staticBody + localitiesBody + blogBody + propertiesBody;
+writeFileSync(join(publicDir, 'sitemap-all.xml'), wrapUrlset(combinedBody));
+
+const distDir = join(root, 'dist');
+if (existsSync(distDir)) {
+    for (const f of files) {
+        writeFileSync(join(distDir, f.name), wrapUrlset(f.body));
+    }
+    writeFileSync(join(distDir, 'sitemap.xml'), indexXml);
+}
+
 const n =
     STATIC_PATHS.length +
-    locJson.length * 6 +
     PG_NEAR_LANDMARK_PATHS.length +
-    1 +
+    locJson.length * 3 +
     RENT_HUB_LOCATION_SLUGS.length +
     BLOG_SLUGS.length +
     propertyCount;
-console.log(`Wrote ${outPublic}${existsSync(join(root, 'dist')) ? ` and ${outDist}` : ''} (${n} URLs, ${propertyCount} properties)`);
+console.log(
+    `Wrote sitemap index + ${files.length} child sitemaps (${n} URLs, ${propertyCount} properties)`,
+);

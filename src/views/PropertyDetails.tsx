@@ -12,7 +12,7 @@ import { usePropertyFromRoute, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
-import { getOptimizedImageUrl } from '@/lib/utils/images';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
@@ -32,6 +32,8 @@ import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
 import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
+import { FreshnessBadge } from '@/components/trust/FreshnessBadge';
+import { getFreshnessBadges } from '@/lib/freshness';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
 import { SafetyPopup } from '@/components/modals/SafetyPopup';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
@@ -120,6 +122,19 @@ export default function PropertyDetails() {
               ? `${property.reviews_list.length} reviews`
               : ''
         : '';
+
+    const freshnessBadges = useMemo(
+        () =>
+            property
+                ? getFreshnessBadges({
+                      last_verified_at: property.last_verified_at,
+                      last_booked_at: property.last_booked_at,
+                      last_review_at: property.last_review_at,
+                      updated_at: property.updated_at,
+                  })
+                : [],
+        [property],
+    );
 
     const handleWishlistToggle = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -323,15 +338,16 @@ export default function PropertyDetails() {
 
                 {/* ─── Cinematic Hero Section ─── */}
                 <section className="relative bg-[#0a0a0b] overflow-hidden group">
-                    <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 z-0 relative">
                         {heroImage && (
-                            <img 
-                                src={getOptimizedImageUrl(heroImage, 'hero')} 
-                                alt="" 
-                                className="w-full h-full object-cover opacity-40 scale-105 blur-[2px] transition-all duration-[2000ms] group-hover:scale-100 group-hover:blur-0"
-                                aria-hidden="true"
-                                loading="lazy"
-                                decoding="async"
+                            <OptimizedImage
+                                src={heroImage}
+                                alt=""
+                                fill
+                                size="hero"
+                                sizes="100vw"
+                                ariaHidden
+                                className="object-cover opacity-40 scale-105 blur-[2px] transition-all duration-[2000ms] group-hover:scale-100 group-hover:blur-0"
                             />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/60 to-transparent" />
@@ -373,14 +389,16 @@ export default function PropertyDetails() {
 
                                 <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-slate-900 group/hero">
                                     <div className={`relative ${heroIsPortrait ? 'aspect-[3/4] max-w-md mx-auto' : 'aspect-[16/9]'}`}>
-                                        <img
+                                        <OptimizedImage
                                             key={heroIdx}
-                                            src={getOptimizedImageUrl(heroImage || '', 'large')}
+                                            src={heroImage || ''}
                                             alt={heroAlt}
-                                            className="w-full h-full object-cover transition-transform duration-[1000ms] group-hover/hero:scale-110"
+                                            fill
+                                            priority
+                                            size="large"
+                                            sizes="(max-width: 1024px) 100vw, 62vw"
+                                            className="object-cover transition-transform duration-[1000ms] group-hover/hero:scale-110"
                                             onLoad={handleHeroImageLoad}
-                                            fetchPriority="high"
-                                            decoding="async"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                                         
@@ -423,7 +441,14 @@ export default function PropertyDetails() {
                                                 className={`relative w-20 h-14 rounded-xl overflow-hidden border-2 transition-all shrink-0 ${heroIdx === idx ? 'border-brand-red scale-105 shadow-glow' : 'border-white/10 opacity-50 hover:opacity-100'}`}
                                                 aria-label={`View photo ${idx + 1}`}
                                             >
-                                                <img src={getOptimizedImageUrl(url, 'thumbnail')} className="w-full h-full object-cover" alt="" loading="lazy" decoding="async" />
+                                                <OptimizedImage
+                                                    src={url}
+                                                    alt={`${displayTitle} thumbnail ${idx + 1}`}
+                                                    fill
+                                                    size="thumbnail"
+                                                    sizes="80px"
+                                                    className="object-cover"
+                                                />
                                             </button>
                                         ))}
                                     </div>
@@ -442,7 +467,7 @@ export default function PropertyDetails() {
                                     </span>
                                 </div>
 
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tighter mb-6">
+                                <h1 data-seo="pdp-h1" className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tighter mb-6">
                                     {displayTitle}
                                 </h1>
 
@@ -487,8 +512,9 @@ export default function PropertyDetails() {
 
                 {/* ─── Main Content ─── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 lg:pt-16">
-                    <div className="mb-10">
+                    <div className="mb-10 space-y-4">
                         <BreadcrumbNav items={breadcrumbItems} />
+                        {freshnessBadges.length > 0 && <FreshnessBadge items={freshnessBadges} />}
                     </div>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-x-12 lg:gap-y-12 xl:gap-x-14 xl:gap-y-14 items-start">
@@ -572,14 +598,15 @@ export default function PropertyDetails() {
                                             <div
                                                 key={idx}
                                                 onClick={() => setLightboxIndex(idx)}
-                                                className="aspect-square rounded-[2rem] overflow-hidden group cursor-pointer relative shadow-sm border border-slate-100 hover:scale-[1.02] transition-all duration-500"
+                                                className="relative aspect-square rounded-[2rem] overflow-hidden group cursor-pointer shadow-sm border border-slate-100 hover:scale-[1.02] transition-all duration-500"
                                             >
-                                                <img
-                                                    src={getOptimizedImageUrl(url, 'thumbnail')}
+                                                <OptimizedImage
+                                                    src={url}
                                                     alt={`${displayTitle} - photo ${idx + 1}`}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                    loading="lazy"
-                                                    decoding="async"
+                                                    fill
+                                                    size="thumbnail"
+                                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                                                 />
                                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                     <Maximize2 className="w-8 h-8 text-white scale-75 group-hover:scale-100 transition-transform" />

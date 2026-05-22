@@ -6,13 +6,24 @@ const MAX_LINKS = 20;
 interface PgRelatedAreasNavProps {
     /** Current locality slug — excluded from chips */
     currentSlug: string;
+    /** Prefer graph-defined nearby slugs when available */
+    nearbySlugs?: string[];
 }
 
 /**
  * Single consolidated internal-link block for PG locality hubs (replaces duplicate Explore UIs).
  */
-export function PgRelatedAreasNav({ currentSlug }: PgRelatedAreasNavProps) {
-    const others = PG_LOCATIONS.filter((l) => l.slug !== currentSlug).slice(0, MAX_LINKS);
+export function PgRelatedAreasNav({ currentSlug, nearbySlugs }: PgRelatedAreasNavProps) {
+    const fromGraph =
+        nearbySlugs && nearbySlugs.length > 0
+            ? nearbySlugs
+                  .map((s) => PG_LOCATIONS.find((l) => l.slug === s))
+                  .filter((l): l is (typeof PG_LOCATIONS)[number] => Boolean(l))
+            : [];
+    const others =
+        fromGraph.length > 0
+            ? fromGraph.slice(0, MAX_LINKS)
+            : PG_LOCATIONS.filter((l) => l.slug !== currentSlug).slice(0, MAX_LINKS);
 
     return (
         <section

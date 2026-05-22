@@ -3,10 +3,8 @@ import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchB
 import type { HomeHeroNavigateTab } from '@/lib/listingsCategoryHubs';
 import { BadgeCheck, CheckCircle, Clock3, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
+import { HeroBackgroundImage } from './HeroBackgroundImage';
 import { PresentInCities } from './PresentInCities';
-
-// Single best-fit photo — modern apartment exterior, clean lines
-const HERO_IMAGE = '/images/blog/hero-sunset.jpg';
 
 const trustStats = [
     { value: '1,200+', label: 'Verified Listings', icon: BadgeCheck },
@@ -55,20 +53,12 @@ export function Hero({
         <>
             <section
                 id="home"
-                className="relative w-full bg-slate-50 flex items-center overflow-hidden pt-24 lg:pt-0"
-                style={{ minHeight: 'max(100svh, 800px)' }}
+                className="relative w-full bg-slate-50 flex items-center overflow-hidden pt-24 lg:pt-0 min-h-[max(100svh,800px)] aspect-auto"
             >
-                {/* Background Full-Screen Image */}
+                {/* Background — AVIF/WebP (~100–150 KB), not hero-sunset.jpg */}
                 {!imgError && (
                     <div className="absolute inset-0 z-0 pointer-events-none">
-                        <img
-                            src={HERO_IMAGE}
-                            alt="Modern apartment"
-                            className="w-full h-full object-cover object-center"
-                            onError={() => setImgError(true)}
-                            fetchPriority="high"
-                            decoding="async"
-                        />
+                        <HeroBackgroundImage onError={() => setImgError(true)} />
                         {/* Mobile solid overlay */}
                         <div className="absolute inset-0 bg-slate-50/95 lg:hidden" />
                         {/* Desktop smooth gradient fade */}
@@ -85,20 +75,13 @@ export function Hero({
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 w-full py-12 lg:py-24">
                     <div className="max-w-[34rem] xl:max-w-2xl w-full">
                             {/* Headline */}
-                            <h1
-                                className="font-black text-slate-900 leading-[1.06] tracking-tight mb-5"
-                                style={{
-                                    fontFamily: "'Montserrat', sans-serif",
-                                    fontSize: 'clamp(2.4rem, 4.6vw, 4rem)',
-                                }}
-                            >
+                            <h1 className="font-heading font-black text-slate-900 leading-[1.06] tracking-tight mb-5 text-[clamp(2.4rem,4.6vw,4rem)]">
                                 Comfortable <span className="text-brand-red">spaces</span><br />
                                 Hassle-free living
                             </h1>
 
                             {/* Subtitle */}
-                            <p className="text-slate-600 mb-6 text-base sm:text-lg max-w-md font-medium leading-relaxed"
-                               style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                            <p className="font-heading text-slate-600 mb-6 text-base sm:text-lg max-w-md font-medium leading-relaxed">
                                 Premium spaces in prime locations.<br />
                                 Flexible stays. All-inclusive living.
                             </p>
@@ -146,21 +129,15 @@ export function Hero({
                             return (
                                 <div
                                     key={stat.label}
-                                    className="flex flex-col items-center justify-center p-4 transition-all duration-300 rounded-2xl hover:bg-slate-50"
+                                    className="flex flex-col items-center justify-center p-4 rounded-2xl"
                                 >
                                     <div className="flex items-center justify-center gap-2 mb-2">
                                         <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-brand-red shrink-0" aria-hidden />
-                                        <span
-                                            className="text-2xl sm:text-3xl font-black leading-none tracking-tight text-slate-900"
-                                            style={{ fontFamily: "'Montserrat', sans-serif" }}
-                                        >
+                                        <span className="font-heading text-2xl sm:text-3xl font-black leading-none tracking-tight text-slate-900">
                                             {stat.value}
                                         </span>
                                     </div>
-                                    <p
-                                        className="text-[11px] sm:text-xs text-slate-500 font-semibold tracking-wide uppercase"
-                                        style={{ fontFamily: "'Montserrat', sans-serif" }}
-                                    >
+                                    <p className="font-heading text-[11px] sm:text-xs text-slate-600 font-semibold tracking-wide uppercase">
                                         {stat.label}
                                     </p>
                                 </div>

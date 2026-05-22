@@ -19,7 +19,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 mb-12 md:mb-16">
                     <div className="lg:col-span-2">
                         <div className="flex items-center space-x-3 mb-5">
-                            <img src={LOGO_SRC} alt="" width={32} height={32} className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-contain" />
+                            <img src={LOGO_SRC} alt="MakeMyStay" width={32} height={32} className="w-8 h-8 rounded-lg shadow-lg shadow-brand-red/20 object-contain" />
                             <span className="text-2xl font-bold text-white tracking-tight font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>
@@ -46,7 +46,7 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h4 className="font-bold mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Contact Us</h4>
+                        <h3 className="font-bold mb-5 font-heading tracking-wide uppercase text-xs text-slate-400">Contact Us</h3>
                         <ul className="space-y-4 text-sm font-medium">
                             <li className="flex items-start group">
                                 <MapPin size={16} className="mr-3 mt-0.5 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
