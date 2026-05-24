@@ -181,9 +181,19 @@ export default function Contact() {
                                             <p className="text-slate-400 font-medium text-lg">Customized occupancy strategy in under 4 hours.</p>
                                         </div>
                                         <div className="flex -space-x-3">
-                                            {[1,2,3,4].map(i => (
+                                            {[
+                                                'MakeMyStay growth advisor',
+                                                'Property onboarding specialist',
+                                                'Rental support representative',
+                                                'Customer success manager',
+                                            ].map((avatarAlt, i) => (
                                                 <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400 overflow-hidden">
-                                                    <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="" />
+                                                    <img
+                                                        src={`https://i.pravatar.cc/100?img=${i + 10}`}
+                                                        alt={avatarAlt}
+                                                        width={48}
+                                                        height={48}
+                                                    />
                                                 </div>
                                             ))}
                                             <div className="w-12 h-12 rounded-full border-4 border-white bg-brand-red flex items-center justify-center text-[10px] font-black text-white">

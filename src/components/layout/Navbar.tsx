@@ -189,7 +189,7 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_auto_1fr_auto] md:items-center md:gap-4 lg:gap-8">
                         <div className="flex items-center gap-2 shrink-0">
-                            <img src={LOGO_SRC} alt="" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-contain shadow-sm bg-white" />
+                            <img src={LOGO_SRC} alt="MakeMyStay.ai logo" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-contain shadow-sm bg-white" />
                             <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </Link>
@@ -267,7 +267,7 @@ export function Navbar() {
                     {/* Menu Header */}
                     <div className="flex items-center justify-between p-6 border-b border-white/10">
                         <div className="flex items-center space-x-2">
-                            <img src={LOGO_SRC} alt="" width={32} height={32} className="w-8 h-8 rounded-lg object-contain" />
+                            <img src={LOGO_SRC} alt="MakeMyStay.ai logo" width={32} height={32} className="w-8 h-8 rounded-lg object-contain" />
                             <span className="text-lg font-bold text-white font-heading">
                                 MakeMyStay<span className="text-brand-red">.ai</span>
                             </span>
