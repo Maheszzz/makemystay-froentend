@@ -247,7 +247,7 @@ export function buildPropertyDetailGraph(
     const productName = buildPropertyProductName(property);
 
     const product: Record<string, unknown> = {
-        '@type': ['Accommodation', 'Residence'],
+        '@type': ['Product', 'Accommodation', 'Residence'],
         name: productName,
         description: desc || `${productName} — ${property.type} in ${property.location}`,
         url,

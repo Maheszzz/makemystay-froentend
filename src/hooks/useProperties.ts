@@ -211,9 +211,12 @@ export interface UsePropertyResult {
 /**
  * Custom hook to fetch a single property by ID
  */
-export function useProperty(id: number | string | null | undefined): UsePropertyResult {
-    const [property, setProperty] = useState<Property | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+export function useProperty(
+    id: number | string | null | undefined,
+    initialProperty?: Property | null,
+): UsePropertyResult {
+    const [property, setProperty] = useState<Property | null>(initialProperty ?? null);
+    const [loading, setLoading] = useState<boolean>(!initialProperty && Boolean(id));
     const [error, setError] = useState<ApiError | null>(null);
 
     const fetchProperty = async () => {
@@ -236,6 +239,11 @@ export function useProperty(id: number | string | null | undefined): UseProperty
     };
 
     useEffect(() => {
+        if (initialProperty && String(initialProperty.id) === String(id)) {
+            setProperty(initialProperty);
+            setLoading(false);
+            return;
+        }
         void fetchProperty();
     }, [id]);
 
@@ -256,20 +264,26 @@ export function useProperty(id: number | string | null | undefined): UseProperty
 export function usePropertyFromRoute(
     slugParam: string | undefined,
     pathname: string,
+    initialProperty?: Property | null,
 ): UsePropertyResult {
     const id = slugParam ? parsePropertySlugParam(slugParam) : '';
-    const byId = useProperty(id || null);
+    const byId = useProperty(id || null, initialProperty);
     const legacySlug = slugParam && !id ? slugParam : undefined;
     const bySlug = usePropertyBySlug(
         legacySlug ? inferPropertyTypeFromPath(pathname) : undefined,
         legacySlug,
+        initialProperty,
     );
     return id ? byId : bySlug;
 }
 
-export function usePropertyBySlug(type: string | undefined, slug: string | undefined): UsePropertyResult {
-    const [property, setProperty] = useState<Property | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+export function usePropertyBySlug(
+    type: string | undefined,
+    slug: string | undefined,
+    initialProperty?: Property | null,
+): UsePropertyResult {
+    const [property, setProperty] = useState<Property | null>(initialProperty ?? null);
+    const [loading, setLoading] = useState<boolean>(!initialProperty && Boolean(type && slug));
     const [error, setError] = useState<ApiError | null>(null);
 
     const fetchProperty = async () => {

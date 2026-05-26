@@ -22,6 +22,18 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
+                source: '/sitemap.xml',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+            },
+            {
+                source: '/sitemap-:file.xml',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+            },
+            {
+                source: '/sitemap-all.xml',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+            },
+            {
                 source: '/:path*',
                 headers: [
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -68,6 +80,7 @@ const nextConfig: NextConfig = {
             { source: '/rent-in-bannerghatta-road', destination: '/rent/bannerghatta-road', permanent: true },
             { source: '/properties/id/:id', destination: '/properties/:id', permanent: true },
             { source: '/properties/:type/:slug', destination: '/properties/:slug', permanent: true },
+            { source: '/pg', destination: '/pg/bangalore', permanent: true },
         ];
     },
     async rewrites() {

@@ -395,7 +395,7 @@ export function buildContactPageSEO(): PageSEOInput {
     return {
         title: 'Contact MakeMyStay — PG & rental support in Bangalore',
         description:
-            'Reach MakeMyStay for PG and rental enquiries, listing support, and visit bookings in Bangalore. Call, WhatsApp, or submit the contact form.',
+            'Reach MakeMyStay at +91 81500 99911 or connect@makemystay.ai for PG and flat enquiries, visit bookings, and operator onboarding. Office: HSR Layout, Bangalore. Response within one business day.',
         path: '/contact-us',
     };
 }

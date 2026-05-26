@@ -110,7 +110,7 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
 
     if (/^(\d+)(-|$)/.test(param)) {
-        return resolvePropertyPageMetadata(param, `/pg/${param}`);
+        return resolvePropertyPageMetadata(param);
     }
 
     if (param === 'bangalore') return pageSeoToMetadata(pgBangaloreHubSeo());
@@ -166,7 +166,7 @@ export async function resolveRentSlugMetadata(slug: string): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
 
     if (/^(\d+)(-|$)/.test(param)) {
-        return resolvePropertyPageMetadata(param, `/rent/${param}`);
+        return resolvePropertyPageMetadata(param);
     }
 
     if (param === 'bangalore') return pageSeoToMetadata(rentBangaloreHubSeo());

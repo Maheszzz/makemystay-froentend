@@ -45,12 +45,24 @@ import {
     extractHeroLeadFromNarrative,
 } from '@/lib/propertyClientSeoNarrative';
 import { findPgLocationForArea } from '@/data/pgLocations';
+import type { Property } from '@/types/api';
 
-export default function PropertyDetails() {
-    const { slug: slugParam } = useParams<{ slug: string }>();
+type PropertyDetailsProps = {
+    /** SSR-hydrated listing from the server page (avoids empty HTML for crawlers). */
+    initialProperty?: Property;
+    slug?: string;
+};
+
+export default function PropertyDetails({ initialProperty, slug: slugProp }: PropertyDetailsProps = {}) {
+    const { slug: slugFromParams } = useParams<{ slug: string }>();
+    const slugParam = slugProp ?? slugFromParams;
     const location = useLocation();
     const goBack = useSmartBack({ fallback: '/properties' });
-    const { property, loading, error, refetch } = usePropertyFromRoute(slugParam, location.pathname);
+    const { property, loading, error, refetch } = usePropertyFromRoute(
+        slugParam,
+        location.pathname,
+        initialProperty,
+    );
     const { isWishlisted, toggleWishlist } = useWishlist();
 
 

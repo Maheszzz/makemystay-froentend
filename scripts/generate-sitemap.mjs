@@ -16,7 +16,6 @@ const STATIC_PATHS = [
     { path: '/', priority: '1.0', changefreq: 'daily' },
     { path: '/contact-us', priority: '0.85', changefreq: 'monthly' },
     { path: '/properties', priority: '0.9', changefreq: 'daily' },
-    { path: '/pg', priority: '0.95', changefreq: 'daily' },
     { path: '/pg/bangalore', priority: '0.96', changefreq: 'daily' },
     { path: '/pg/hyderabad', priority: '0.94', changefreq: 'daily' },
     { path: '/pg/pune', priority: '0.94', changefreq: 'daily' },
@@ -97,6 +96,7 @@ function buildPropertySeoSlug(property) {
         ...tokenizeSlugSource(property.property_name),
         ...tokenizeSlugSource(property.property_type),
         ...tokenizeSlugSource(property.location),
+        ...tokenizeSlugSource(property.city),
     ];
     const deduped = orderedTokens.filter((token, index) => orderedTokens.indexOf(token) === index);
     return deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '') || property.slug || titleToSlug(property.property_name || '');

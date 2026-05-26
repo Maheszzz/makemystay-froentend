@@ -1,27 +1,6 @@
-import type { Metadata } from 'next';
-import { pageSeoToMetadata } from '@/lib/nextMetadata';
-import { listingsPageSeo } from '@/lib/seo';
-import Properties from '@/views/Properties';
+import { redirect } from 'next/navigation';
 
-
-export const metadata: Metadata = pageSeoToMetadata(
-    listingsPageSeo({
-        pathname: '/pg',
-        pageTitle: 'PG in Bangalore',
-        pageSubtitle: 'Verified paying guest stays',
-        category: 'pg',
-        cityLabel: 'Bangalore',
-    }),
-);
-
-export default function Page() {
-    return (
-        <Properties
-            key="pg"
-            initialCategory="pg"
-            initialCity="Bangalore"
-            pageTitle="PG Accommodations"
-            pageSubtitle="Comfortable & verified PG options in Bangalore"
-        />
-    );
+/** Consolidate generic `/pg` into the primary city hub (stronger content, one canonical URL). */
+export default function PgIndexPage() {
+    redirect('/pg/bangalore');
 }
