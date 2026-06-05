@@ -175,17 +175,17 @@ export function Footer() {
                                     <li key={post.slug}>
                                         <Link to={`/blog/${post.slug}`} className="text-[13px] text-slate-400 hover:text-white transition-colors line-clamp-1">{post.title}</Link>
                                     </li>
-                                ))}
+                                 ))}
                              </ul>
                         </div>
                         <div>
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Category Search</p>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Research &amp; Data</p>
                             <ul className="space-y-2 lg:space-y-3">
+                                <li><Link to="/reports" className="text-[13px] text-slate-400 hover:text-white transition-colors">Bangalore PG Rent Index</Link></li>
+                                <li><Link to="/research" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG Research Hub</Link></li>
+                                <li><Link to="/statistics" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG Statistics</Link></li>
                                 <li><Link to="/pg-with-wifi" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG with WiFi</Link></li>
                                 <li><Link to="/pg-for-girls" className="text-[13px] text-slate-400 hover:text-white transition-colors">Girls PG in Bangalore</Link></li>
-                                <li><Link to="/pg-for-boys" className="text-[13px] text-slate-400 hover:text-white transition-colors">Boys PG in Bangalore</Link></li>
-                                <li><Link to="/pg-near-me" className="text-[13px] text-slate-400 hover:text-white transition-colors">PG Near Me</Link></li>
-                                <li><Link to="/pg-single-room" className="text-[13px] text-slate-400 hover:text-white transition-colors">Private Single Rooms</Link></li>
                             </ul>
                         </div>
                     </div>
@@ -200,6 +200,7 @@ export function Footer() {
                         <Link to="/faq" className="hover:text-brand-red transition-colors">FAQ</Link>
                         <Link to="/about" className="hover:text-brand-red transition-colors">About</Link>
                         <Link to="/how-we-verify" className="hover:text-brand-red transition-colors">How we verify</Link>
+                        <Link to="/reports" className="hover:text-brand-red transition-colors">Reports</Link>
                         <Link to="/blog" className="hover:text-brand-red transition-colors">Blog</Link>
                     </div>
                 </div>

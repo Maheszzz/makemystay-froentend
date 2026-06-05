@@ -7,6 +7,8 @@ Disallow: /wishlist
 Disallow: /schedule-demo
 
 Sitemap: https://makemystay.ai/sitemap.xml
+LLMs: https://makemystay.ai/llms.txt
 
-# Sitemap files are discovery hints only (not indexable pages)
-# X-Robots-Tag: noindex is set on /sitemap*.xml via Next.js headers
+# Sitemap files are discovery hints only (not indexable pages).
+# X-Robots-Tag: noindex, follow is set on /sitemap*.xml via Next.js headers
+# (noindex = sitemap XML is not a content page; follow = Googlebot crawls the listed URLs)

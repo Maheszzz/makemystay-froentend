@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
 import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import { isPropertySlugParam } from '@/lib/propertyMetadata';
@@ -42,6 +42,6 @@ export async function resolvePropertyPdpRoute(
 
 export function applyPropertyPdpRoute(result: PropertyPdpRouteResult): void {
     if (result.kind === 'redirect') {
-        redirect(result.destination);
+        permanentRedirect(result.destination);
     }
 }

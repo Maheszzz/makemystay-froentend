@@ -486,6 +486,33 @@ export function buildFaqPageSEO(): PageSEOInput {
     };
 }
 
+export function buildResearchPageSEO(): PageSEOInput {
+    return {
+        title: 'Bangalore PG research, rent index & coliving insights',
+        description:
+            'MakeMyStay.ai research on Bangalore PG rent, coliving demand, locality trends, tech park corridors, and tenant search behaviour.',
+        path: '/research',
+    };
+}
+
+export function buildReportsPageSEO(): PageSEOInput {
+    return {
+        title: 'Bangalore PG Rent Index — monthly reports',
+        description:
+            'Monthly MakeMyStay.ai reports tracking average PG rent, demand corridors, coliving trends, and Bangalore locality-level rental signals.',
+        path: '/reports',
+    };
+}
+
+export function buildStatisticsPageSEO(): PageSEOInput {
+    return {
+        title: 'Bangalore PG statistics by locality',
+        description:
+            'Structured Bangalore PG statistics: average rent bands, demand signals, nearby drivers, and audience segments by locality.',
+        path: '/statistics',
+    };
+}
+
 /** Readable phrase from `/pg/:slug` param (strips leading numeric id if present). */
 export function humanizePropertySlugParam(slugParam: string | undefined): string {
     if (!slugParam?.trim()) return 'Listing';

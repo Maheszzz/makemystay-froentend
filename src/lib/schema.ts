@@ -263,6 +263,24 @@ export function buildPropertyDetailGraph(
     }
     if (images.length > 0) product.image = images.length === 1 ? images[0] : images;
 
+    const amenityFeatures = [
+        ...(Array.isArray(property.features) ? property.features : []),
+        property.wifi ? 'WiFi' : '',
+        property.food ? 'Food plan' : '',
+        property.housekeeping ? 'Housekeeping' : '',
+        property.power_backup ? 'Power backup' : '',
+    ]
+        .filter(Boolean)
+        .slice(0, 20)
+        .map((name) => ({
+            '@type': 'LocationFeatureSpecification',
+            name,
+            value: true,
+        }));
+    if (amenityFeatures.length > 0) {
+        product.amenityFeature = amenityFeatures;
+    }
+
     if (priceAmount !== undefined) {
         product.offers = {
             '@type': 'Offer',

@@ -18,9 +18,9 @@ import { buildPgHubItemListSchema, buildPgLocationCombinedGraph } from '@/lib/sc
 import type { Property } from '@/types/api';
 import Properties from '@/views/Properties';
 
-export default function RentLocationPage() {
+export default function RentLocationPage({ overrideSlug }: { overrideSlug?: string } = {}) {
     const { slug: locationParam } = useParams<{ slug: string }>();
-    const param = (locationParam || '').toLowerCase();
+    const param = (overrideSlug || locationParam || '').toLowerCase();
     const loc = getPgLocationBySlug(param);
 
     if (!loc) {

@@ -5,6 +5,7 @@ import { Navigate } from '@/lib/navigation';
 import PGLocationPage from '@/views/PGLocationPage';
 import PgGenderLocalityPage from '@/views/PgGenderLocalityPage';
 import PgNearLandmarkPage from '@/views/PgNearLandmarkPage';
+import RentLocationPage from '@/views/RentLocationPage';
 import { PG_NEAR_LANDMARKS } from '@/data/pgNearLandmarks';
 import { canonicalRentPathForRentInSegment } from '@/lib/rentLegacyRedirects';
 
@@ -19,7 +20,15 @@ export default function ProgrammaticSeoCatchAll({ pathKey }: { pathKey: string }
     const rentIn = path.match(/^rent-in-(.+)$/);
     if (rentIn) {
         const target = canonicalRentPathForRentInSegment(rentIn[1]);
-        return <Navigate to={target ?? '/rent'} replace />;
+        const slug = target?.replace(/^\/rent\//, '');
+        return slug ? <RentLocationPage overrideSlug={slug} /> : <Navigate to="/rent" replace />;
+    }
+
+    const flatsForRentIn = path.match(/^flats-for-rent-in-(.+)$/);
+    if (flatsForRentIn) {
+        const target = canonicalRentPathForRentInSegment(flatsForRentIn[1]);
+        const slug = target?.replace(/^\/rent\//, '');
+        return slug ? <RentLocationPage overrideSlug={slug} /> : <Navigate to="/rent" replace />;
     }
 
     const near = PG_NEAR_LANDMARKS.find((e) => e.path === path);

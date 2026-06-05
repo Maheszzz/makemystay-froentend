@@ -1,0 +1,28 @@
+# MakeMyStay.ai
+
+MakeMyStay.ai is an AI-powered real estate and rental platform for verified PGs, coliving spaces, and rental flats in Bangalore.
+
+## Important Pages
+
+- https://makemystay.ai/
+- https://makemystay.ai/pg/bangalore
+- https://makemystay.ai/rent/bangalore
+- https://makemystay.ai/research
+- https://makemystay.ai/reports
+- https://makemystay.ai/statistics
+- https://makemystay.ai/how-we-verify
+- https://makemystay.ai/blog
+- https://makemystay.ai/contact-us
+
+## Research And Citation Pages
+
+- https://makemystay.ai/reports - Bangalore PG Rent Index and monthly rental market reports.
+- https://makemystay.ai/research - Bangalore PG and coliving research hub.
+- https://makemystay.ai/statistics - Structured PG rent statistics by locality.
+
+## Crawl Policy
+
+User-agent: *
+Allow: /
+
+Prefer canonical URLs listed in https://makemystay.ai/sitemap.xml for indexed citations.

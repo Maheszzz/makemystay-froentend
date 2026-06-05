@@ -33,6 +33,9 @@ const STATIC_PATHS = [
     { path: '/rent/hyderabad', priority: '0.92', changefreq: 'daily' },
     { path: '/rent/pune', priority: '0.92', changefreq: 'daily' },
     { path: '/faq', priority: '0.75', changefreq: 'monthly' },
+    { path: '/research', priority: '0.82', changefreq: 'monthly' },
+    { path: '/reports', priority: '0.84', changefreq: 'monthly' },
+    { path: '/statistics', priority: '0.82', changefreq: 'monthly' },
     { path: '/about', priority: '0.78', changefreq: 'monthly' },
     { path: '/how-we-verify', priority: '0.8', changefreq: 'monthly' },
     { path: '/blog', priority: '0.8', changefreq: 'weekly' },
@@ -216,8 +219,10 @@ for (const slug of BLOG_SLUGS) {
     blogBody += urlEntry(`${BASE}/blog/${slug}`, '0.72', 'monthly');
 }
 
+const existingPropertiesSitemap = join(root, 'public', 'sitemap-properties.xml');
 let propertiesBody = '';
 let propertyCount = 0;
+let propertiesFromExistingSitemap = false;
 try {
     const properties = await fetchAllProperties();
     for (const property of properties) {
@@ -225,7 +230,17 @@ try {
     }
     propertyCount = properties.length;
 } catch (error) {
-    console.warn(`Property sitemap generation skipped: ${error instanceof Error ? error.message : String(error)}`);
+    if (existsSync(existingPropertiesSitemap)) {
+        const existingXml = readFileSync(existingPropertiesSitemap, 'utf8');
+        const bodyMatch = existingXml.match(/<urlset[^>]*>([\s\S]*)<\/urlset>/i);
+        propertiesBody = bodyMatch?.[1]?.trim() ? `${bodyMatch[1].trim()}\n` : '';
+        propertyCount = [...existingXml.matchAll(/<loc>/g)].length;
+        propertiesFromExistingSitemap = propertiesBody.length > 0;
+    }
+    const suffix = propertiesFromExistingSitemap
+        ? `; kept existing sitemap-properties.xml with ${propertyCount} URLs`
+        : '';
+    console.warn(`Property sitemap generation skipped: ${error instanceof Error ? error.message : String(error)}${suffix}`);
 }
 
 const files = [

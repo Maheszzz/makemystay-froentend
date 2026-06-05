@@ -14,7 +14,10 @@ import {
     buildHowWeVerifyPageSEO,
     buildPgNearMeSEO,
     buildPrivacyPageSEO,
+    buildReportsPageSEO,
+    buildResearchPageSEO,
     buildRefundPolicyPageSEO,
+    buildStatisticsPageSEO,
     buildTermsPageSEO,
     buyBangaloreHubSeo,
     listingsPageSeo,
@@ -249,6 +252,13 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
         if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
     }
 
+    const flatsForRentIn = seg.match(/^flats-for-rent-in-(.+)$/);
+    if (flatsForRentIn) {
+        const slug = hubSlugToPgSlug(flatsForRentIn[1]);
+        const loc = getPgLocationBySlug(slug);
+        if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+    }
+
     const near = getPgNearLandmarkByPath(path);
     if (near) return resolveLandmarkPathMetadata(path);
 
@@ -313,6 +323,9 @@ export function resolveStaticPathMetadata(pathname: string): Metadata {
         '/': buildHomeSEO,
         '/about': buildAboutPageSEO,
         '/faq': buildFaqPageSEO,
+        '/research': buildResearchPageSEO,
+        '/reports': buildReportsPageSEO,
+        '/statistics': buildStatisticsPageSEO,
         '/how-we-verify': buildHowWeVerifyPageSEO,
         '/contact-us': buildContactPageSEO,
         '/blog': () => buildBlogIndexSEO(BLOG_POSTS.length),
