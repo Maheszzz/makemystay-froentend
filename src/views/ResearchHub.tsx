@@ -86,6 +86,7 @@ function citationSchema(kind: ResearchHubKind) {
                     '@type': 'Place',
                     name: 'Bangalore, Karnataka, India',
                 },
+                license: 'https://creativecommons.org/licenses/by/4.0/',
                 variableMeasured: ['average PG rent', 'rent range', 'locality demand signal'],
             },
         ],
