@@ -75,7 +75,7 @@ function citationSchema(kind: ResearchHubKind) {
                 '@type': 'Dataset',
                 name: `${PG_MARKET_INDEX_MONTH} Bangalore PG Rent Index`,
                 description: PG_MARKET_INDEX_SUMMARY,
-                url: `${SITE_URL}/statistics`,
+                                url: `${SITE_URL}/statistics`,
                 creator: {
                     '@type': 'Organization',
                     name: SITE_NAME,

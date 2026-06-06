@@ -112,7 +112,16 @@ export function pgLocationSeoWithQuery(
     const genderRaw = searchParams.get('gender');
     const gender = genderRaw?.trim().toLowerCase();
 
-    let title = `Verified PG in ${locationName} | Zero brokerage · ₹6k–₹18k`;
+    // Custom SEO titles for specific localities
+    if (locationName.toLowerCase() === 'whitefield') {
+        title = `PG in Whitefield Bangalore | Starting ₹6,500 | ${SITE_NAME}`;
+    } else if (locationName.toLowerCase() === 'hsr layout') {
+        title = `1 BHK for Rent in HSR Layout Bangalore | ₹25,000 | ${SITE_NAME}`;
+    } else {
+        // Default title for other locations
+        title = `Verified PG in ${locationName} | Zero brokerage · ₹6k–₹18k`;
+    }
+
     const tags: string[] = [];
     if (gender === 'male' || gender === 'female') {
         tags.push(gender === 'male' ? 'boys PG' : 'girls PG');
