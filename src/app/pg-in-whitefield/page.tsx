@@ -1,5 +1,5 @@
 import { SEOHead } from '@/components/seo/SEOHead';
-import OptimizedImage from '@/components/ui/OptimizedImage';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { SITE_NAME } from '@/lib/siteConfig';
