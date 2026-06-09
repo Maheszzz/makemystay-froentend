@@ -11,6 +11,14 @@ import { QuickAnswer } from '@/components/seo/QuickAnswer';
 import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { FaqSection } from '@/components/seo/FaqSection';
+import { LOCALITY_CONTENT } from '@/data/localityContent';
+import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
+import { FAQSchema } from '@/components/seo/FAQSchema';
+import { PlaceSchema } from '@/components/seo/PlaceSchema';
+import { ItemListSchema } from '@/components/seo/ItemListSchema';
+import { RELATED_LOCALITIES } from '@/data/relatedLocalities';
+
+
 import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
@@ -47,6 +55,7 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
   const profile = resolveLocalityProfile(locationSlug);
   const faqs = buildLocalityFaqs(name, locationSlug);
   const canonicalListingPath = stablePgListingCanonical(locationSlug, searchParams);
+const content = LOCALITY_CONTENT[locationSlug] || {};
   const breadcrumbItems = [
     { name: 'Home', path: '/' },
     { name: 'PG', path: '/pg' },
@@ -66,8 +75,14 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEOHead {...helmet} noindex={helmet.noindex || hasEmptyListings} />
+      <SEOHead {...helmet} noindex={helmet.noindex} />
       <JsonLd data={combinedLd} id="pg-location-ld-json" />
+<BreadcrumbSchema items={breadcrumbItems} />
+<FAQSchema items={faqs} />
+<PlaceSchema name={name} description={profile?.description} />
+<ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
+
+
       <Navbar />
       <main id="main-content" className="flex-grow pt-20 pb-16">
         {/* Hero Banner */}
@@ -129,6 +144,98 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
           <section className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
             <PgLocationDeepContent name={name} profile={profile} />
           </section>
+
+{/* Rent Range */}
+{loc.rentRange && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Range</h2>
+    <p className="text-slate-700">{loc.rentRange}</p>
+  </section>
+)}
+
+{/* Landmarks */}
+{loc.landmarks && loc.landmarks.length > 0 && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Landmarks</h2>
+    <ul className="list-disc pl-5 space-y-1 text-slate-700">
+      {loc.landmarks.map((lm) => (
+        <li key={lm}>{lm}</li>
+      ))}
+    </ul>
+  </section>
+)}
+
+{/* Overview */}
+{content.overview && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Overview</h2>
+    <p className="text-slate-700">{content.overview}</p>
+  </section>
+)}
+
+{/* Rent Trends */}
+{content.rentTrends && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Trends</h2>
+    <p className="text-slate-700">{content.rentTrends}</p>
+  </section>
+)}
+
+{/* Metro Connectivity */}
+{content.metroConnectivity && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro Connectivity</h2>
+    <p className="text-slate-700">{content.metroConnectivity}</p>
+  </section>
+)}
+
+{/* Nearby IT Parks */}
+{content.nearbyITParks && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby IT Parks</h2>
+    <p className="text-slate-700">{content.nearbyITParks}</p>
+  </section>
+)}
+
+{/* Nearby Colleges */}
+{content.nearbyColleges && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Colleges</h2>
+    <p className="text-slate-700">{content.nearbyColleges}</p>
+  </section>
+)}
+
+{/* Food & Lifestyle */}
+{content.foodAndLifestyle && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Food & Lifestyle</h2>
+    <p className="text-slate-700">{content.foodAndLifestyle}</p>
+  </section>
+)}
+
+{/* Safety */}
+{content.safety && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Safety</h2>
+    <p className="text-slate-700">{content.safety}</p>
+  </section>
+)}
+
+{/* Who Should Stay Here */}
+{content.whoShouldStayHere && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Who Should Stay Here</h2>
+    <p className="text-slate-700">{content.whoShouldStayHere}</p>
+  </section>
+)}
+
+{/* Pros & Cons */}
+{content.prosAndCons && (
+  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <h2 className="text-2xl font-bold text-slate-900 mb-2">Pros & Cons</h2>
+    <p className="text-slate-700">{content.prosAndCons}</p>
+  </section>
+)}
           <FaqSection
             id="pg-locality-faq-heading"
             title={`Frequently asked — PG in ${name}`}
@@ -140,6 +247,22 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
           <RelatedSearchesBlock currentSlug={locationSlug} localityName={name} variant="pg" />
           <PgRelatedAreasNav currentSlug={locationSlug} nearbySlugs={profile.nearbySlugs} />
           <LocalityAuthoritySections profile={profile} />
+          {RELATED_LOCALITIES[locationSlug]?.length > 0 && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Related PG Locations</h2>
+              <div className="flex flex-wrap gap-4">
+                {RELATED_LOCALITIES[locationSlug].map((relSlug) => {
+                  const relLoc = getPgLocationBySlug(relSlug);
+                  const relName = relLoc?.name || relSlug;
+                  return (
+                    <Link key={relSlug} href={`/pg/${relSlug}`} className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:border-brand-red/35 hover:bg-brand-red/10 hover:text-white">
+                      PG in {relName}
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
       </main>
       <Footer />
