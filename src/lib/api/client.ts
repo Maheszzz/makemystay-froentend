@@ -12,32 +12,43 @@ const SAME_BRAND_SITE_HOSTS = new Set(['makemystay.ai', 'www.makemystay.ai']);
  * an old build baked in `https://www...` vs apex — cross-origin + CORS caused pending requests
  * and "Provisional headers" in DevTools. Other hosts still use env / fallbacks.
  */
+// Resolve API base URL with explicit SSR logging
 function resolveApiBaseUrl(): string {
     const raw = getApiBaseUrl();
-    if (isDev()) {
-        return raw || '/api/v1';
-    }
-    if (typeof window !== 'undefined') {
-        const pageHost = window.location.hostname;
-        if (SAME_BRAND_SITE_HOSTS.has(pageHost)) {
-            return '/api/v1';
+    // Server-side (no window) – ensure an absolute URL.
+    if (typeof window === 'undefined') {
+        console.log('[resolveApiBaseUrl][SSR] raw env value:', raw);
+        if (raw && raw.startsWith('http')) {
+            return raw.replace(/\/+$/, '');
         }
+        // During SSR, we cannot use relative URLs. If we are running locally (dev/development),
+        // use localhost:8000 to talk to FastAPI backend directly.
+        if (isDev() || process.env.NODE_ENV === 'development') {
+            return 'http://127.0.0.1:8000/api/v1';
+        }
+        // Production fallback
+        return 'https://makemystay.ai/api/v1';
+    }
+    // Development mode (client)
+    if (isDev()) {
+        return raw && raw.startsWith('http') ? raw.replace(/\/+$/, '') : raw || '/api/v1';
+    }
+    // Client-side – host‑based resolution.
+    const pageHost = window.location.hostname;
+    if (SAME_BRAND_SITE_HOSTS.has(pageHost)) {
+        return '/api/v1';
     }
     if (!raw) {
-        return typeof window !== 'undefined' ? `${window.location.origin}/api/v1` : '/api/v1';
+        return `${window.location.origin}/api/v1`;
     }
     const normalized = raw.replace(/\/+$/, '');
-    if (typeof window === 'undefined') return normalized;
     try {
         const envUrl = normalized.startsWith('http')
             ? new URL(normalized)
             : new URL(normalized, window.location.origin);
-        const pageHost = new URL(window.location.origin).hostname;
+        const pageHost2 = new URL(window.location.origin).hostname;
         if (envUrl.origin === window.location.origin) return normalized;
-        if (
-            SAME_BRAND_SITE_HOSTS.has(envUrl.hostname) &&
-            SAME_BRAND_SITE_HOSTS.has(pageHost)
-        ) {
+        if (SAME_BRAND_SITE_HOSTS.has(envUrl.hostname) && SAME_BRAND_SITE_HOSTS.has(pageHost2)) {
             return `${window.location.origin}/api/v1`;
         }
         return normalized;
@@ -46,8 +57,12 @@ function resolveApiBaseUrl(): string {
     }
 }
 
+
+
 /** Prefer VITE_API_BASE_URL; VITE_API_URL kept for older .env / README compatibility. */
 export const API_BASE_URL = resolveApiBaseUrl();
+// Temporary log to verify which base URL is actually used during SSR and client rendering.
+console.log('[API_BASE_URL]', API_BASE_URL);
 
 function localhostApiHint(): string {
     const base = API_BASE_URL || 'http://localhost:8000/api/v1';

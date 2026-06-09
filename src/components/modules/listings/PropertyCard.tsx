@@ -1,3 +1,5 @@
+'use client';
+
 import {
     ArrowRight,
     Bath,
@@ -43,9 +45,22 @@ function getFallbackImageForType(type?: string): string {
 }
 
 export function PropertyCard({ property }: PropertyCardProps) {
-    const { from: listingFrom } = useListingFromUrl();
-    const { isWishlisted, toggleWishlist } = useWishlist();
-    const wishlisted = isWishlisted(String(property.id));
+    let listingFrom = '';
+    try {
+        const urlInfo = useListingFromUrl();
+        listingFrom = urlInfo.from;
+    } catch {
+        // Fallback for SSR when hooks like useSearchParams/usePathname are executed outside client environment
+    }
+    let wishlisted = false;
+    let toggleWishlist = (_p: Property) => {};
+    try {
+        const wishlistContext = useWishlist();
+        wishlisted = wishlistContext.isWishlisted(String(property.id));
+        toggleWishlist = wishlistContext.toggleWishlist;
+    } catch {
+        // Fallback for SSR when wishlist context is unavailable
+    }
 
     const handleHeartClick = (e: React.MouseEvent) => {
         e.preventDefault();

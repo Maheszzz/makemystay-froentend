@@ -3,7 +3,6 @@
 import { useParams } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { absoluteUrl } from '@/lib/seo';
-import { getPgLocationBySlug } from '@/data/pgLocations';
 import { getStaticPgPropertyRedirect } from '@/lib/seoPropertyRedirects';
 import { usePrerenderReady, useSafeReplace } from '@/hooks';
 import PropertyDetails from '@/views/PropertyDetails';
@@ -12,7 +11,7 @@ import PGHyderabadHub from '@/views/PGHyderabadHub';
 import PGPuneHub from '@/views/PGPuneHub';
 import PgFeatureLandingPage from '@/views/PgFeatureLandingPage';
 import PgVsFlatBangalore from '@/views/PgVsFlatBangalore';
-import PGLocationPage from '@/views/PGLocationPage';
+
 
 function PgProperty301Redirect({ to }: { to: string }) {
     usePrerenderReady(true, [to]);
@@ -45,9 +44,7 @@ export default function PgSlugRoute() {
     if (['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param)) return <PgFeatureLandingPage />;
     if (param === 'pg-vs-flat-bangalore') return <PgVsFlatBangalore />;
 
-    if (getPgLocationBySlug(param)) {
-        return <PGLocationPage />;
-    }
+
 
     return <PropertyDetails />;
 }

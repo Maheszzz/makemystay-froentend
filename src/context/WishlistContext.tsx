@@ -57,6 +57,14 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
 export function useWishlist() {
     const ctx = useContext(WishlistContext);
-    if (!ctx) throw new Error('useWishlist must be used within WishlistProvider');
+    if (!ctx) {
+        // Safe SSR fallback to prevent crashes when rendering outside Provider tree
+        return {
+            wishlist: [],
+            isWishlisted: () => false,
+            toggleWishlist: () => {},
+            clearWishlist: () => {},
+        };
+    }
     return ctx;
 }

@@ -26,6 +26,8 @@ const PLACEHOLDER_VILLA =
  * or alternate keys — always coerce to an array so `.map` never runs on a non-array.
  */
 function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
+    console.log('[normalize] response type:', typeof response);
+    console.log('[normalize] keys:', response && typeof response === 'object' ? Object.keys(response as object) : []);
     // 1. Array-first handling: if it's already a bare array, return it directly.
     if (Array.isArray(response)) {
         return { rows: response, total: response.length };
@@ -334,7 +336,9 @@ export const propertyApi = {
                 timeout: 45000,
             });
 
-            const { rows, total } = normalizePropertyListResponse(response ?? {});
+            // Use the actual JSON payload (response) for normalization
+            const { rows, total } = normalizePropertyListResponse(response);
+            console.log('[propertyApi.getAll] rows length after normalize:', rows?.length);
             const items: Property[] = [];
             for (const row of rows) {
                 try {
@@ -343,6 +347,7 @@ export const propertyApi = {
                     console.warn('[propertyApi.getAll] Skipping malformed property row:', e, row);
                 }
             }
+            console.log('[propertyApi.getAll] final items count:', items.length);
             return { items, total };
         } catch (e) {
             console.error('[propertyApi.getAll] Unexpected failure; returning empty list:', e);
