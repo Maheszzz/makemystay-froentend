@@ -1,0 +1,24 @@
+{
+  "localities": [
+    { "slug": "whitefield", "name": "Whitefield" },
+    { "slug": "marathahalli", "name": "Marathahalli" },
+    { "slug": "bellandur", "name": "Bellandur" },
+    { "slug": "hsr-layout", "name": "HSR Layout" },
+    { "slug": "electronic-city", "name": "Electronic City" },
+    { "slug": "koramangala", "name": "Koramangala" },
+    { "slug": "brookefield", "name": "Brookefield" },
+    { "slug": "kadubeesanahalli", "name": "Kadubeesanahalli" },
+    { "slug": "mahadevapura", "name": "Mahadevapura" },
+    { "slug": "hoodi", "name": "Hoodi" },
+    { "slug": "kr-puram", "name": "KR Puram" },
+    { "slug": "indiranagar", "name": "Indiranagar" },
+    { "slug": "sarjapur-road", "name": "Sarjapur Road" },
+    { "slug": "hebbal", "name": "Hebbal" },
+    { "slug": "manyata-tech-park", "name": "Manyata Tech Park" },
+    { "slug": "thanisandra", "name": "Thanisandra" },
+    { "slug": "btm-layout", "name": "BTM Layout" },
+    { "slug": "jp-nagar", "name": "JP Nagar" },
+    { "slug": "jayanagar", "name": "Jayanagar" },
+    { "slug": "yelahanka", "name": "Yelahanka" }
+  ]
+}

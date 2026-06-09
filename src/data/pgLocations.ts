@@ -3,6 +3,10 @@ import locations from './pg-locations.json';
 export interface PgLocation {
     slug: string;
     name: string;
+    title?: string;
+    description?: string;
+    rentRange?: string;
+    landmarks?: string[];
 }
 
 export const PG_LOCATIONS: PgLocation[] = locations;
