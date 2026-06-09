@@ -11,6 +11,7 @@ import PGHyderabadHub from '@/views/PGHyderabadHub';
 import PGPuneHub from '@/views/PGPuneHub';
 import PgFeatureLandingPage from '@/views/PgFeatureLandingPage';
 import PgVsFlatBangalore from '@/views/PgVsFlatBangalore';
+import { notFound } from 'next/navigation';
 
 
 function PgProperty301Redirect({ to }: { to: string }) {
@@ -44,7 +45,5 @@ export default function PgSlugRoute() {
     if (['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param)) return <PgFeatureLandingPage />;
     if (param === 'pg-vs-flat-bangalore') return <PgVsFlatBangalore />;
 
-
-
-    return <PropertyDetails />;
+    notFound();
 }

@@ -1,87 +1,290 @@
 [
-  { "slug": "whitefield", "name": "Whitefield" },
-  { "slug": "marathahalli", "name": "Marathahalli" },
-  { "slug": "btm", "name": "BTM Layout" },
-  { "slug": "electronic-city", "name": "Electronic City" },
-  { "slug": "indiranagar", "name": "Indiranagar" },
-  { "slug": "koramangala", "name": "Koramangala" },
-  { "slug": "hsr-layout", "name": "HSR Layout" },
-  { "slug": "bellandur", "name": "Bellandur" },
-  { "slug": "sarjapur-road", "name": "Sarjapur" },
-  { "slug": "hebbal", "name": "Hebbal" },
-  { "slug": "yelahanka", "name": "Yelahanka" },
-  { "slug": "kr-puram", "name": "KR Puram" },
-  { "slug": "banaswadi", "name": "Banaswadi" },
-  { "slug": "ramamurthy-nagar", "name": "Ramamurthy Nagar" },
-  { "slug": "cv-raman-nagar", "name": "CV Raman Nagar" },
-  { "slug": "malleshwaram", "name": "Malleshwaram" },
-  { "slug": "rajajinagar", "name": "Rajajinagar" },
-  { "slug": "vijayanagar", "name": "Vijayanagar" },
-  { "slug": "basavanagudi", "name": "Basavanagudi" },
-  { "slug": "jayanagar", "name": "Jayanagar" },
-  { "slug": "jp-nagar", "name": "JP Nagar" },
-  { "slug": "banashankari", "name": "Banashankari" },
-  { "slug": "uttarahalli", "name": "Uttarahalli" },
-  { "slug": "kengeri", "name": "Kengeri" },
-  { "slug": "rr-nagar", "name": "RR Nagar" },
-  { "slug": "nayandahalli", "name": "Nayandahalli" },
-  { "slug": "mysore-road", "name": "Mysore Road" },
-  { "slug": "magadi-road", "name": "Magadi Road" },
-  { "slug": "tumkur-road", "name": "Tumkur Road" },
-  { "slug": "nelamangala", "name": "Nelamangala" },
-  { "slug": "hosur-road", "name": "Hosur Road" },
-  { "slug": "bommanahalli", "name": "Bommanahalli" },
-  { "slug": "silk-board", "name": "Silk Board" },
-  { "slug": "domlur", "name": "Domlur" },
-  { "slug": "ulsoor", "name": "Ulsoor" },
-  { "slug": "frazer-town", "name": "Frazer Town" },
-  { "slug": "shivajinagar", "name": "Shivajinagar" },
-  { "slug": "richmond-town", "name": "Richmond Town" },
-  { "slug": "mg-road", "name": "MG Road" },
-  { "slug": "brigade-road", "name": "Brigade Road" },
-  { "slug": "sadashivanagar", "name": "Sadashivanagar" },
-  { "slug": "rt-nagar", "name": "RT Nagar" },
-  { "slug": "sanjay-nagar", "name": "Sanjay Nagar" },
-  { "slug": "new-bel-road", "name": "New BEL Road" },
-  { "slug": "mathikere", "name": "Mathikere" },
-  { "slug": "yeshwanthpur", "name": "Yeshwanthpur" },
-  { "slug": "peenya", "name": "Peenya" },
-  { "slug": "jalahalli", "name": "Jalahalli" },
-  { "slug": "vidyaranyapura", "name": "Vidyaranyapura" },
-  { "slug": "bagalur", "name": "Bagalur" },
-  { "slug": "bannerghatta-road", "name": "Bannerghatta Road" },
-  { "slug": "kadugodi", "name": "Kadugodi" },
-  { "slug": "brookefield", "name": "Brookefield" },
-  { "slug": "hoodi", "name": "Hoodi" },
-  { "slug": "mahadevapura", "name": "Mahadevapura" },
-  { "slug": "aecs-layout", "name": "AECS Layout" },
-  { "slug": "itpl", "name": "ITPL" },
-  { "slug": "munnekolala", "name": "Munnekolala" },
-  { "slug": "kundalahalli", "name": "Kundalahalli" },
-  { "slug": "varthur", "name": "Varthur" },
-  { "slug": "panathur", "name": "Panathur" },
-  { "slug": "kaikondrahalli", "name": "Kaikondrahalli" },
-  { "slug": "kasavanahalli", "name": "Kasavanahalli" },
-  { "slug": "haralur", "name": "Haralur" },
-  { "slug": "akshaya-nagar", "name": "Akshaya Nagar" },
-  { "slug": "begur", "name": "Begur" },
-  { "slug": "hulimavu", "name": "Hulimavu" },
-  { "slug": "gottigere", "name": "Gottigere" },
-  { "slug": "arekere", "name": "Arekere" },
-  { "slug": "bilekahalli", "name": "Bilekahalli" },
-  { "slug": "tavarekere", "name": "Tavarekere" },
-  { "slug": "ejipura", "name": "Ejipura" },
-  { "slug": "koramangala-4th-block", "name": "Koramangala 4th Block" },
-  { "slug": "koramangala-1st-block", "name": "Koramangala 1st Block" },
-  { "slug": "hebbal-kempapura", "name": "Hebbal Kempapura" },
-  { "slug": "hitech-city", "name": "HiTech City" },
-  { "slug": "gachibowli", "name": "Gachibowli" },
-  { "slug": "kondapur", "name": "Kondapur" },
-  { "slug": "madhapur", "name": "Madhapur" },
-  { "slug": "kukatpally", "name": "Kukatpally" },
-  { "slug": "hinjewadi", "name": "Hinjewadi" },
-  { "slug": "kharadi", "name": "Kharadi" },
-  { "slug": "wakad", "name": "Wakad" },
-  { "slug": "viman-nagar", "name": "Viman Nagar" },
-  { "slug": "baner", "name": "Baner" }
+  {
+    "slug": "whitefield",
+    "name": "Whitefield",
+    "title": "PG in Whitefield Bangalore",
+    "description": "Verified PGs in Whitefield offering premium amenities and convenient connectivity.",
+    "rentRange": "₹6,000 - ₹18,000",
+    "landmarks": [
+      "Whitefield Bridge",
+      "ITPL",
+      "EV Tower"
+    ]
+  },
+  {
+    "slug": "marathahalli",
+    "name": "Marathahalli",
+    "title": "PG in Marathahalli Bangalore",
+    "description": "Trusted PGs in Marathahalli with easy access to IT parks.",
+    "rentRange": "₹5,500 - ₹16,000",
+    "landmarks": [
+      "Marathahalli Bridge",
+      "Outer Ring Road",
+      "Kalamandir"
+    ]
+  },
+  {
+    "slug": "btm",
+    "name": "BTM Layout",
+    "title": "PG in BTM Layout Bangalore",
+    "description": "Affordable PGs in BTM Layout near major colleges.",
+    "rentRange": "₹5,000 - ₹15,000",
+    "landmarks": [
+      "BTM Layout Park",
+      "Jayanagar",
+      "BTM Market"
+    ]
+  },
+  {
+    "slug": "electronic-city",
+    "name": "Electronic City",
+    "title": "PG in Electronic City Bangalore",
+    "description": "Modern PGs close to Electronics City IT hub.",
+    "rentRange": "₹6,500 - ₹20,000",
+    "landmarks": [
+      "Electronic City Gate",
+      "Phase 1",
+      "Phase 2"
+    ]
+  },
+  {
+    "slug": "indiranagar",
+    "name": "Indiranagar",
+    "title": "PG in Indiranagar Bangalore",
+    "description": "Vibrant PGs in Indiranagar with nightlife.",
+    "rentRange": "₹7,000 - ₹22,000",
+    "landmarks": [
+      "Indiranagar Club",
+      "100 Feet Road",
+      "Indiranagar Metro"
+    ]
+  },
+  {
+    "slug": "koramangala",
+    "name": "Koramangala",
+    "title": "PG in Koramangala Bangalore",
+    "description": "Premium PGs in Koramangala, close to startups.",
+    "rentRange": "₹8,000 - ₹25,000",
+    "landmarks": [
+      "Koramangala 4th Block",
+      "Silk Board",
+      "Taj Vivanta"
+    ]
+  },
+  {
+    "slug": "brookefield",
+    "name": "Brookefield",
+    "title": "PG in Brookefield Bangalore",
+    "description": "Convenient PGs in Brookefield near IT parks.",
+    "rentRange": "₹6,500 - ₹18,000",
+    "landmarks": [
+      "Brookefield Mall",
+      "ITPL",
+      "Brookefield Metro"
+    ]
+  },
+  {
+    "slug": "kadubeesanahalli",
+    "name": "Kadubeesanahalli",
+    "title": "PG in Kadubeesanahalli Bangalore",
+    "description": "Quiet PGs in Kadubeesanahalli with good connectivity.",
+    "rentRange": "₹5,500 - ₹14,000",
+    "landmarks": [
+      "Kadubeesanahalli Road",
+      "Bellandur Lake"
+    ]
+  },
+  {
+    "slug": "mahadevapura",
+    "name": "Mahadevapura",
+    "title": "PG in Mahadevapura Bangalore",
+    "description": "Well-connected PGs in Mahadevapura near tech parks.",
+    "rentRange": "₹6,500 - ₹19,000",
+    "landmarks": [
+      "Mahadevapura Junction",
+      "ITPL",
+      "Whitefield Metro"
+    ]
+  },
+  {
+    "slug": "hoodi",
+    "name": "Hoodi",
+    "title": "PG in Hoodi Bangalore",
+    "description": "Affordable PGs in Hoodi with easy access to IT hubs.",
+    "rentRange": "₹5,000 - ₹13,000",
+    "landmarks": [
+      "Hoodi Metro",
+      "Hoodi Circle"
+    ]
+  },
+  {
+    "slug": "kr-puram",
+    "name": "KR Puram",
+    "title": "PG in KR Puram Bangalore",
+    "description": "Peaceful PGs in KR Puram close to the IT corridor.",
+    "rentRange": "₹5,500 - ₹15,000",
+    "landmarks": [
+      "KR Puram Bridge",
+      "Electronic City"
+    ]
+  },
+  {
+    "slug": "indiranagar",
+    "name": "Indiranagar",
+    "title": "PG in Indiranagar Bangalore",
+    "description": "Vibrant PGs in Indiranagar with nightlife.",
+    "rentRange": "₹7,000 - ₹22,000",
+    "landmarks": [
+      "Indiranagar Club",
+      "100 Feet Road",
+      "Indiranagar Metro"
+    ]
+  },
+  {
+    "slug": "sarjapur-road",
+    "name": "Sarjapur",
+    "title": "PG in Sarjapur Bangalore",
+    "description": "Growing PGs in Sarjapur with proximity to IT parks.",
+    "rentRange": "₹6,000 - ₹17,000",
+    "landmarks": [
+      "Sarjapur Road",
+      "ITPL",
+      "Eagleview Hospital"
+    ]
+  },
+  {
+    "slug": "hebbal",
+    "name": "Hebbal",
+    "title": "PG in Hebbal Bangalore",
+    "description": "Convenient PGs in Hebbal near the airport.",
+    "rentRange": "₹6,000 - ₹18,000",
+    "landmarks": [
+      "Hebbal Lake",
+      "Hebbal Bridge",
+      "Airport Road"
+    ]
+  },
+  {
+    "slug": "thanisandra",
+    "name": "Thanisandra",
+    "title": "PG in Thanisandra Bangalore",
+    "description": "Quiet PGs in Thanisandra with good connectivity.",
+    "rentRange": "₹5,500 - ₹14,500",
+    "landmarks": [
+      "Thanisandra Lake",
+      "ITPL"
+    ]
+  },
+  {
+    "slug": "manyata-tech-park",
+    "name": "Manyata Tech Park",
+    "title": "PG near Manyata Tech Park Bangalore",
+    "description": "Premium PGs near Manyata Tech Park for professionals.",
+    "rentRange": "₹7,500 - ₹25,000",
+    "landmarks": [
+      "Manyata Tech Park",
+      "Metro Station",
+      "Kalyani Nagar"
+    ]
+  },
+  {
+    "slug": "nagawara",
+    "name": "Nagawara",
+    "title": "PG in Nagawara Bangalore",
+    "description": "Emerging PGs in Nagawara with easy transport.",
+    "rentRange": "₹5,500 - ₹15,000",
+    "landmarks": [
+      "Nagawara Lake",
+      "Metro Station"
+    ]
+  },
+  {
+    "slug": "domlur",
+    "name": "Domlur",
+    "title": "PG in Domlur Bangalore",
+    "description": "Well-located PGs in Domlur near corporate offices.",
+    "rentRange": "₹6,500 - ₹18,500",
+    "landmarks": [
+      "Domlur Metro",
+      "Corporate Suites"
+    ]
+  },
+  {
+    "slug": "cv-raman-nagar",
+    "name": "CV Raman Nagar",
+    "title": "PG in CV Raman Nagar Bangalore",
+    "description": "Peaceful PGs in CV Raman Nagar.",
+    "rentRange": "₹5,000 - ₹13,500",
+    "landmarks": [
+      "CV Raman Nagar Lake"
+    ]
+  },
+  {
+    "slug": "jayanagar",
+    "name": "Jayanagar",
+    "title": "PG in Jayanagar Bangalore",
+    "description": "Established PGs in Jayanagar with great amenities.",
+    "rentRange": "₹7,000 - ₹20,000",
+    "landmarks": [
+      "Jayanagar Shopping Center"
+    ]
+  },
+  {
+    "slug": "jp-nagar",
+    "name": "JP Nagar",
+    "title": "PG in JP Nagar Bangalore",
+    "description": "Family-friendly PGs in JP Nagar.",
+    "rentRange": "₹6,500 - ₹18,000",
+    "landmarks": [
+      "JP Nagar Metro",
+      "JP Nagar Market"
+    ]
+  },
+  {
+    "slug": "yeshwanthpur",
+    "name": "Yeshwanthpur",
+    "title": "PG in Yeshwanthpur Bangalore",
+    "description": "Convenient PGs in Yeshwanthpur near the railway.",
+    "rentRange": "₹5,500 - ₹14,000",
+    "landmarks": [
+      "Yeshwanthpur Railway Station"
+    ]
+  },
+  {
+    "slug": "rajajinagar",
+    "name": "Rajajinagar",
+    "title": "PG in Rajajinagar Bangalore",
+    "description": "Affordable PGs in Rajajinagar.",
+    "rentRange": "₹5,000 - ₹13,500",
+    "landmarks": [
+      "Rajajinagar Market"
+    ]
+  },
+  {
+    "slug": "banaswadi",
+    "name": "Banaswadi",
+    "title": "PG in Banaswadi Bangalore",
+    "description": "Quiet PGs in Banaswadi.",
+    "rentRange": "₹5,000 - ₹12,500",
+    "landmarks": [
+      "Banaswadi Bus Stop"
+    ]
+  }
+,
+  {
+    "slug": "bellandur",
+    "name": "Bellandur",
+    "title": "PG in Bellandur Bangalore",
+    "description": "Modern PGs in Bellandur close to IT hubs.",
+    "rentRange": "₹6,500 - ₹18,500",
+    "landmarks": ["Bellandur Lake", "Electronic City", "Sarjapur Road"]
+  },
+  {
+    "slug": "hsr-layout",
+    "name": "HSR Layout",
+    "title": "PG in HSR Layout Bangalore",
+    "description": "Well-connected PGs in HSR Layout near tech corridors.",
+    "rentRange": "₹6,000 - ₹18,000",
+    "landmarks": ["HSR Layout Park", "Electronic City", "Sarjapur Road"]
+  }
 ]
