@@ -525,7 +525,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                 {/* ─── Main Content ─── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-14 lg:pt-16">
                     <div className="mb-10 space-y-4">
-                        <BreadcrumbNav items={breadcrumbItems} />
+
                         {freshnessBadges.length > 0 && <FreshnessBadge items={freshnessBadges} />}
                     </div>
                     
@@ -533,8 +533,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
                         {/* LEFT COLUMN: Details & Info */}
                         <div className="lg:col-span-8 space-y-12 md:space-y-14 lg:space-y-16">
-                            
-                            <AeoSnippet property={property} />
                             
                             {/* Quick Overview Grid */}
                             <section>
@@ -667,9 +665,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                 />
                             </section>
 
-                            <div className="pt-12 border-t border-slate-100">
-                                <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
-                            </div>
                         </div>
 
                         {/* RIGHT COLUMN: Sticky Sidebar */}
@@ -755,6 +750,15 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* ─── SEO / Supplementary Content ─── */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+                                            <BreadcrumbNav items={breadcrumbItems} />
+                        <AeoSnippet property={property} />
+                    <div className="border-t border-slate-100 pt-12">
+                        <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
                     </div>
                 </div>
 

@@ -1,14 +1,24 @@
 import { Banknote, MapPin, Shield, Users, Utensils, Wifi, ChevronRight } from 'lucide-react';
 import { Link } from '@/lib/navigation';
+import type { PgLocalityDeepProfile } from '@/types/localityContent';
 
 interface PgLocationDeepContentProps {
     name: string;
+    profile?: PgLocalityDeepProfile;
 }
 
 /**
  * Long-form, location-specific copy for SEO (unique via {name}) with scannable layout.
  */
-export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
+export function PgLocationDeepContent({ name, profile }: PgLocationDeepContentProps) {
+    const sharedRent = profile?.rent.shared ?? '₹6,000–₹12,000';
+    const singleRent = profile?.rent.single ?? '₹12,000–₹18,000';
+    const offices = profile?.nearbyOffices.slice(0, 4).join(', ') || 'major Bangalore tech parks';
+    const streets = profile?.bestStreets.slice(0, 3).join(', ') || `${name} residential pockets`;
+    const metro = profile?.metro || 'Check nearest metro and last-mile travel time before booking.';
+    const commute = profile?.commute || `Plan peak-hour commute from ${name} to your office before booking.`;
+    const food = profile?.foodNightlife || 'Meal-inclusive PGs are common; confirm food timings and options on each listing.';
+    const internet = profile?.internet || 'Confirm WiFi speed and power backup if you work from home.';
     const whyItems = [
         {
             title: 'Verified listings',
@@ -48,10 +58,9 @@ export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
                     </h2>
                     <p className="mt-3 text-slate-600 text-[15px] md:text-base leading-relaxed max-w-3xl">
                         Looking for the best <strong className="text-slate-800 font-semibold">PG in {name}</strong>?
-                        MakeMyStay.ai lists fully furnished paying guest and coliving options with transparent pricing —
-                        whether you are a student, fresher, or working professional near Bangalore&apos;s tech corridors.
-                        Compare room types (single, double, or multi-sharing), meal plans, and maintenance inclusions
-                        before you shortlist or pay a booking token.
+                        MakeMyStay.ai lists verified paying guest and coliving options with transparent pricing for people
+                        commuting to {offices}. Compare room types, meal plans, WiFi, security, and maintenance inclusions
+                        before you shortlist a stay.
                     </p>
                 </div>
             </div>
@@ -62,8 +71,8 @@ export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
                         <Banknote className="h-4 w-4 shrink-0 text-brand-red/90" aria-hidden />
                         <span className="text-[11px] font-bold uppercase tracking-wider">Typical rent</span>
                     </div>
-                    <p className="text-lg font-bold text-slate-900 tabular-nums">₹6,000 – ₹18,000</p>
-                    <p className="text-xs text-slate-500 mt-1.5 leading-snug">Per month · varies by room &amp; meals</p>
+                    <p className="text-lg font-bold text-slate-900 tabular-nums">{sharedRent}</p>
+                    <p className="text-xs text-slate-500 mt-1.5 leading-snug">Shared room · private usually {singleRent}</p>
                 </div>
                 <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50/80 to-white p-4 md:p-5 shadow-sm">
                     <div className="flex items-center gap-2 text-slate-500 mb-2">
@@ -71,7 +80,7 @@ export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
                         <span className="text-[11px] font-bold uppercase tracking-wider">Amenities</span>
                     </div>
                     <p className="text-sm font-semibold text-slate-800 leading-snug">
-                        WiFi, backup, housekeeping &amp; security on most stays
+                        {internet}
                     </p>
                     <p className="text-xs text-slate-500 mt-1.5">Confirm on each listing</p>
                 </div>
@@ -80,24 +89,25 @@ export function PgLocationDeepContent({ name }: PgLocationDeepContentProps) {
                         <Utensils className="h-4 w-4 shrink-0 text-brand-red/90" aria-hidden />
                         <span className="text-[11px] font-bold uppercase tracking-wider">Food</span>
                     </div>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">Often 2–3 meals / day</p>
-                    <p className="text-xs text-slate-500 mt-1.5">Veg &amp; non-veg — check the PG you pick</p>
+                    <p className="text-sm font-semibold text-slate-800 leading-snug">{food}</p>
+                    <p className="text-xs text-slate-500 mt-1.5">Confirm inclusions on the PG you pick</p>
                 </div>
             </div>
 
             <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 md:p-6 mb-8 md:mb-10">
                 <div className="space-y-4 text-[15px] md:text-[16px] text-slate-600 leading-relaxed">
                     <p>
-                        {name} continues to attract renters who want shorter commutes and reliable daily routines. Most
-                        professionally managed PGs here bundle <strong className="text-slate-800 font-semibold">high-speed WiFi</strong>, power backup, housekeeping, and security features such as CCTV and controlled access. Food may be included as 2–3 meals per day or offered as an add-on — always confirm veg/non-veg availability and timings on the listing you like.
+                        {name} continues to attract renters who want shorter commutes and reliable daily routines around{' '}
+                        <strong className="text-slate-800 font-semibold">{offices}</strong>. Common search pockets include{' '}
+                        {streets}. Most professionally managed PGs here bundle high-speed WiFi, power backup, housekeeping,
+                        and security features such as CCTV and controlled access.
                     </p>
                     <p>
-                        Budget expectations in {name} typically fall between{' '}
-                        <strong className="text-slate-800 font-semibold">₹6,000 and ₹18,000 per month</strong> depending
-                        on occupancy, floor space, AC/non-AC, and how premium the property is. Use the filters on this page
-                        to narrow by price, sort by rating, and read real photos before you visit. If you are new to the
-                        city, prioritise walkable access to metro or bus routes and clarify deposit and notice-period rules 
-                        with the operator.
+                        Budget expectations in {name} usually start near{' '}
+                        <strong className="text-slate-800 font-semibold">{sharedRent} for shared rooms</strong>, while
+                        single rooms are closer to <strong className="text-slate-800 font-semibold">{singleRent}</strong>.
+                        {` ${metro} ${commute}`} Use the filters above to narrow by price, amenities, and sort preference
+                        before you schedule a visit.
                     </p>
                     <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2">
                         <Link to="/pg/bangalore" className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-red hover:underline group">

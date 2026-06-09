@@ -17,10 +17,10 @@ import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import type { FaqItem } from '@/lib/schema';
 import Properties from '@/views/Properties';
 
-export default function PgGenderLocalityPage() {
+export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: string }) {
     const { pathname } = useLocation();
     const { slug: slugParam } = useParams<{ slug: string }>();
-    const slug = (slugParam || '').toLowerCase();
+    const slug = (overrideSlug || slugParam || '').toLowerCase();
     const loc = getPgLocationBySlug(slug);
 
     const isFemaleHub = /pg-for-(girls|women)-in-/i.test(pathname);

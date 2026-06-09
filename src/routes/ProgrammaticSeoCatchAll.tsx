@@ -37,16 +37,16 @@ export default function ProgrammaticSeoCatchAll({ pathKey }: { pathKey: string }
     }
 
     const boys = path.match(/^pg-for-boys-in-(.+)$/);
-    if (boys) return <PgGenderLocalityPage />;
+    if (boys) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(boys[1])} />;
 
     const girls = path.match(/^pg-for-girls-in-(.+)$/);
-    if (girls) return <PgGenderLocalityPage />;
+    if (girls) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(girls[1])} />;
 
     const men = path.match(/^pg-for-men-in-(.+)$/);
-    if (men) return <PgGenderLocalityPage />;
+    if (men) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(men[1])} />;
 
     const women = path.match(/^pg-for-women-in-(.+)$/);
-    if (women) return <PgGenderLocalityPage />;
+    if (women) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(women[1])} />;
 
     const priceTier = path.match(/^pg-in-(.+)-under-(\d+)$/);
     if (priceTier) {

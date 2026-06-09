@@ -111,6 +111,7 @@ export function pgLocationSeoWithQuery(
     const price = searchParams.get('price');
     const genderRaw = searchParams.get('gender');
     const gender = genderRaw?.trim().toLowerCase();
+    let title: string;
 
     // Custom SEO titles for specific localities
     if (locationName.toLowerCase() === 'whitefield') {

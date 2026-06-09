@@ -152,6 +152,7 @@ export default function Home() {
                         onHubTabChange={handleHubTabChange}
                         onFilterSearch={handleFilterSearch}
                     />
+
                 </section>
 
                 <HomeBelowFold

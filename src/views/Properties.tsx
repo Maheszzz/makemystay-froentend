@@ -3,12 +3,13 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
-import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw, ArrowRight } from 'lucide-react';
+import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
@@ -29,6 +30,7 @@ import {
     computeRentPlotStatsFromListings,
 } from '@/lib/listingInventoryStats';
 import type { Property } from '@/types/api';
+import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
 const RENT_BANGALORE_AREA_CHIPS: { label: string; to: string }[] = [
@@ -74,6 +76,8 @@ interface PropertiesProps {
     onDisplayedListingsForSeo?: (list: Property[]) => void;
     /** When set (e.g. `/pg-for-boys-in-*` hubs), filter PG listings client-side without relying on `?gender=`. */
     forcedGenderFilter?: 'male' | 'female';
+    /** Locality hubs can show a map alongside listings above the fold. */
+    showMapPanel?: boolean;
 }
 
 export default function Properties({
@@ -92,6 +96,7 @@ export default function Properties({
     onEmptyResultsChange,
     onDisplayedListingsForSeo,
     forcedGenderFilter,
+    showMapPanel = false,
 }: PropertiesProps) {
     const location = useLocation();
     const navigate = useNavigate();
@@ -129,7 +134,11 @@ export default function Properties({
             if (onPropertiesIndex && category !== 'all') {
                 params.cat = category;
             }
-            if (locationFilter !== 'all') params.city = locationFilter;
+            const embeddedDefaultCity =
+                hideChrome &&
+                initialCity !== 'all' &&
+                locationFilter.trim().toLowerCase() === String(initialCity).trim().toLowerCase();
+            if (locationFilter !== 'all' && !embeddedDefaultCity) params.city = locationFilter;
             if (typeFilter !== 'all') params.type = typeFilter;
             if (minPrice) params.min = minPrice;
             if (maxPrice) params.max = maxPrice;
@@ -162,6 +171,8 @@ export default function Properties({
         maxPrice,
         sortBy,
         searchQuery,
+        hideChrome,
+        initialCity,
         setSearchParams,
         searchParams,
         pageQueryParam,
@@ -502,6 +513,46 @@ export default function Properties({
         return 'your criteria';
     }, [searchQuery, locationFilter, cityLabelDisplay]);
 
+    const mapQuery = useMemo(() => {
+        const categoryLabel = category === 'pg' ? 'PG' : 'property';
+        return encodeURIComponent(`${categoryLabel} in ${cityLabelDisplay} Bangalore`);
+    }, [category, cityLabelDisplay]);
+
+    const listingPageLd = useMemo(() => {
+        const path = location.pathname || '/properties';
+        const url = `${SITE_URL}${path}`;
+        return {
+            '@context': 'https://schema.org',
+            '@graph': [
+                {
+                    '@type': 'CollectionPage',
+                    '@id': `${url}#collection`,
+                    url,
+                    name: pageTitle,
+                    description: pageSubtitle,
+                    isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+                },
+                {
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        {
+                            '@type': 'ListItem',
+                            position: 1,
+                            name: 'Home',
+                            item: SITE_URL,
+                        },
+                        {
+                            '@type': 'ListItem',
+                            position: 2,
+                            name: pageTitle,
+                            item: url,
+                        },
+                    ],
+                },
+            ],
+        };
+    }, [location.pathname, pageTitle, pageSubtitle]);
+
     if (redirectFromLegacyCat) {
         return <Navigate to={redirectFromLegacyCat} replace />;
     }
@@ -509,6 +560,7 @@ export default function Properties({
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
             {listingsHelmet && <SEOHead {...listingsHelmet} />}
+            <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
 
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-20 pb-20 flex-grow'}>
@@ -775,6 +827,23 @@ export default function Properties({
                                 <span className="text-[10px] font-black uppercase tracking-widest">Updating listings...</span>
                             </div>
                         )}
+                        {!loadingMore && (
+                            <label className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sort</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-transparent text-xs font-bold text-slate-700 outline-none"
+                                    aria-label="Sort properties"
+                                >
+                                    <option value="review_count_desc">Popularity</option>
+                                    <option value="rating_desc">Top Rated</option>
+                                    <option value="price_asc">Lowest Price</option>
+                                    <option value="price_desc">Highest Price</option>
+                                    <option value="newest">Recently Added</option>
+                                </select>
+                            </label>
+                        )}
                     </div>
 
                     {/* 5. Main Content Grid */}
@@ -788,54 +857,84 @@ export default function Properties({
                         </div>
                     ) : (
                         <div className="space-y-12">
-                            {/* Grid */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className={`grid gap-6 md:gap-8 ${
-                                    hideChrome ? 'md:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                                }`}
-                            >
-                                {propertyListOrdered.length > 0 ? (
-                                    propertyListOrdered.map((prop, idx) => {
-                                        if (!prop || !prop.id) return null;
-                                        return (
-                                            <motion.div
-                                                key={prop.id}
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: Math.min(idx * 0.05, 0.4), duration: 0.5 }}
-                                            >
-                                                <PropertyCard property={prop} />
-                                            </motion.div>
-                                        );
-                                    })
-                                ) : (
-                                    <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
-                                        <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 ring-8 ring-slate-100/50">
-                                            <Search className="w-10 h-10 text-slate-300" />
+                            <div className={showMapPanel ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] items-start' : ''}>
+                                {/* Grid */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className={`grid gap-6 md:gap-8 ${
+                                        hideChrome
+                                            ? showMapPanel
+                                                ? 'md:grid-cols-2'
+                                                : 'md:grid-cols-2 xl:grid-cols-3'
+                                            : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                                    }`}
+                                >
+                                    {propertyListOrdered.length > 0 ? (
+                                        propertyListOrdered.map((prop, idx) => {
+                                            if (!prop || !prop.id) return null;
+                                            return (
+                                                <motion.div
+                                                    key={prop.id}
+                                                    initial={{ opacity: 0, y: 20 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: Math.min(idx * 0.05, 0.4), duration: 0.5 }}
+                                                >
+                                                    <PropertyCard property={prop} />
+                                                </motion.div>
+                                            );
+                                        })
+                                    ) : (
+                                        <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
+                                            <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 ring-8 ring-slate-100/50">
+                                                <Search className="w-10 h-10 text-slate-300" />
+                                            </div>
+                                            <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No results found</h3>
+                                            <p className="text-slate-500 max-w-md mx-auto text-lg mb-10 leading-relaxed font-medium">
+                                                {`We couldn't find any listings matching ${emptyResultsSummary}.`}
+                                            </p>
+                                            <div className="flex flex-wrap items-center justify-center gap-4">
+                                                <button 
+                                                    onClick={resetFilters} 
+                                                    className="px-8 py-4 bg-brand-red text-white font-bold rounded-2xl shadow-glow hover:scale-[1.03] active:scale-[0.98] transition-all"
+                                                >
+                                                    Reset All Filters
+                                                </button>
+                                                <button 
+                                                    onClick={() => setLocationFilter('all')} 
+                                                    className="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all"
+                                                >
+                                                    Explore Entire City
+                                                </button>
+                                            </div>
                                         </div>
-                                        <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No results found</h3>
-                                        <p className="text-slate-500 max-w-md mx-auto text-lg mb-10 leading-relaxed font-medium">
-                                            {`We couldn't find any listings matching ${emptyResultsSummary}.`}
-                                        </p>
-                                        <div className="flex flex-wrap items-center justify-center gap-4">
-                                            <button 
-                                                onClick={resetFilters} 
-                                                className="px-8 py-4 bg-brand-red text-white font-bold rounded-2xl shadow-glow hover:scale-[1.03] active:scale-[0.98] transition-all"
-                                            >
-                                                Reset All Filters
-                                            </button>
-                                            <button 
-                                                onClick={() => setLocationFilter('all')} 
-                                                className="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all"
-                                            >
-                                                Explore Entire City
-                                            </button>
+                                    )}
+                                </motion.div>
+
+                                {showMapPanel && (
+                                    <aside className="lg:sticky lg:top-28 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                                        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100">
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Map view</p>
+                                                <h2 className="text-sm font-bold text-slate-900 truncate">PGs around {cityLabelDisplay}</h2>
+                                            </div>
+                                            <MapPin className="w-4 h-4 text-brand-red shrink-0" aria-hidden />
                                         </div>
-                                    </div>
+                                        <div className="aspect-[4/3] bg-slate-100">
+                                            <iframe
+                                                title={`Map of PGs in ${cityLabelDisplay}`}
+                                                src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                                                className="h-full w-full border-0"
+                                                loading="lazy"
+                                                referrerPolicy="no-referrer-when-downgrade"
+                                            />
+                                        </div>
+                                        <div className="px-4 py-3 text-xs text-slate-500 leading-relaxed">
+                                            Use listing cards for verified photos, pricing, and availability. Map pins are a locality guide, not live inventory.
+                                        </div>
+                                    </aside>
                                 )}
-                            </motion.div>
+                            </div>
 
                             {/* Load More Trigger */}
                             {hasMore && (

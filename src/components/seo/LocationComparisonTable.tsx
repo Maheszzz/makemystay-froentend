@@ -13,12 +13,19 @@ interface LocationComparisonTableProps {
 
 export function LocationComparisonTable({ currentLocation }: LocationComparisonTableProps) {
     // Semi-dynamic data generated for AEO richness
-    const data: ComparisonData[] = [
+    const comparisonRows: ComparisonData[] = [
         { name: currentLocation, avgRent: '₹7,500 - ₹16,000', deposit: '1-2 Months', topAmenity: 'Full Power Backup' },
         { name: 'HSR Layout', avgRent: '₹9,000 - ₹18,000', deposit: '2 Months', topAmenity: 'Professional Housekeeping' },
         { name: 'Koramangala', avgRent: '₹8,500 - ₹20,000', deposit: '1 Month', topAmenity: 'IT Hub Proximity' },
         { name: 'Whitefield', avgRent: '₹7,000 - ₹15,000', deposit: '2 Months', topAmenity: 'Corporate Shuttles' },
-    ].filter(item => item.name === currentLocation || ['HSR Layout', 'Koramangala', 'Whitefield'].includes(item.name)).slice(0, 4);
+    ];
+    const data: ComparisonData[] = Array.from(
+        new Map(
+            comparisonRows
+                .filter((item) => item.name === currentLocation || ['HSR Layout', 'Koramangala', 'Whitefield'].includes(item.name))
+                .map((item) => [item.name, item]),
+        ).values(),
+    ).slice(0, 4);
 
     return (
         <div className="my-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

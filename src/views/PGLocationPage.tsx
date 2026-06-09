@@ -7,7 +7,6 @@ import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
-import { PgLocalitySeoContent } from '@/components/seo/PgLocalitySeoContent';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildLocalityFaqs, buildLocalityAeoGraph, resolveLocalityProfile } from '@/lib/pgLocalityContent';
@@ -15,7 +14,11 @@ import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '
 import { QuickAnswer } from '@/components/seo/QuickAnswer';
 import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 import { LocationComparisonTable } from '@/components/seo/LocationComparisonTable';
-import locJson from '@/data/pg-locations.json';
+import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
+import { FaqSection } from '@/components/seo/FaqSection';
+import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
+import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
+import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import Properties from '@/views/Properties';
 import { MapPin, ChevronRight } from 'lucide-react';
 
@@ -109,50 +112,34 @@ export default function PGLocationPage({ overrideSlug, overrideMaxPrice }: { ove
                         pageTitle={pageTitle}
                         pageSubtitle={pageSubtitle}
                         onEmptyResultsChange={setHasEmptyListings}
+                        showMapPanel
                     />
                 </div>
 
-                {/* ── SEO CONTENT BELOW ── */}
+                {/* ── LOCALITY CONTEXT BELOW LISTINGS ── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
 
-                    {/* Area Guide */}
-                    <PgLocalitySeoContent name={name} slug={slug} />
+                    <section className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
+                        <PgLocationDeepContent name={name} profile={profile} />
+                    </section>
 
-                    {/* Comparison Table */}
+                    <FaqSection
+                        id="pg-locality-faq-heading"
+                        title={`Frequently asked — PG in ${name}`}
+                        items={faqs}
+                        collapsible
+                        titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
+                    />
+
                     <LocationComparisonTable currentLocation={name} />
+
+                    <LocalityInternalLinkHub profile={profile} />
 
                     <RelatedSearchesBlock currentSlug={slug} localityName={name} variant="pg" />
 
-                    {/* Nearby Localities */}
-                    <section className="pt-6 border-t border-slate-200/60">
-                        <h2 className="font-heading text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
-                            <div className="w-1.5 h-5 bg-brand-red rounded-full" />
-                            Explore Nearby Area Hubs
-                        </h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                            {(profile.nearbySlugs.length > 0
-                                ? profile.nearbySlugs
-                                      .map((s) => locJson.find((l) => l.slug === s || (s === 'btm' && l.slug === 'btm')))
-                                      .filter(Boolean)
-                                : locJson.filter((l) => l.slug !== slug).slice(0, 10)
-                            ).map((item) => {
-                                if (!item) return null;
-                                const hubSlug = item.slug === 'btm' ? 'btm' : item.slug;
-                                return (
-                                    <Link
-                                        key={item.slug}
-                                        to={`/pg/${hubSlug}`}
-                                        className="group flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-brand-red/30 hover:shadow-md transition-all duration-200"
-                                    >
-                                        <MapPin className="w-3 h-3 text-slate-400 group-hover:text-brand-red shrink-0 transition-colors" />
-                                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-brand-red transition-colors truncate">
-                                            {item.name}
-                                        </span>
-                                    </Link>
-                                );
-                            })}
-                        </div>
-                    </section>
+                    <PgRelatedAreasNav currentSlug={slug} nearbySlugs={profile.nearbySlugs} />
+
+                    <LocalityAuthoritySections profile={profile} />
                 </div>
             </main>
 
