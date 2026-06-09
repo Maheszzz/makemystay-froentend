@@ -255,7 +255,11 @@ const content = LOCALITY_CONTENT[locationSlug] || {};
                   const relLoc = getPgLocationBySlug(relSlug);
                   const relName = relLoc?.name || relSlug;
                   return (
-                    <Link key={relSlug} href={`/pg/${relSlug}`} className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs font-medium text-slate-300 hover:border-brand-red/35 hover:bg-brand-red/10 hover:text-white">
+                    <Link
+                      key={relSlug}
+                      to={`/pg/${relSlug}`}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:border-brand-red/30 hover:bg-brand-red/5 hover:text-brand-red transition-all duration-200 shadow-sm"
+                    >
                       PG in {relName}
                     </Link>
                   );
