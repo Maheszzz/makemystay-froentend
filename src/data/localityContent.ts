@@ -136,7 +136,7 @@ export const LOCALITY_CONTENT: Record<string, LocalityContent> = {
       { q: "Do PGs here offer North Indian food?", a: "Yes, due to the national student and professional crowd, menus are designed to cater to both North and South Indian tastes." },
       { q: "Is Neeladri Road a good place to live?", a: "Yes, Neeladri Road is the primary food and commercial street in Electronic City, lined with cafes and shops." },
       { q: "What is the typical deposit amount?", a: "Standard deposits are equal to 1 or 2 months of rent." },
-      { q: "Are utilities like electricity included?", a: "Yes, standard PG rents include electricity, water, and Wi-Fi." }
+      { q: "Are utilities like electricity included?", a: "Yes, standard PG rents include electricity, water, and Wi‑Fi." }
     ],
   },
   "sarjapur-road": {

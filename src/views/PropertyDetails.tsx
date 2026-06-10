@@ -592,6 +592,31 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </div>
                                 </div>
                             </section>
+{/* Added SEO sections */}
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearest Metro Stations</h2>
+  <p className="text-slate-700">{property.nearbyMetros?.join(', ') || 'Details coming soon.'}</p>
+</section>
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby IT Parks</h2>
+  <p className="text-slate-700">{property.nearbyITParks?.join(', ') || 'Details coming soon.'}</p>
+</section>
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby Colleges</h2>
+  <p className="text-slate-700">{property.nearbyColleges?.join(', ') || 'Details coming soon.'}</p>
+</section>
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Food & Lifestyle</h2>
+  <p className="text-slate-700">Explore nearby restaurants, cafes, and lifestyle amenities to enjoy your stay.</p>
+</section>
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Safety & Security</h2>
+  <p className="text-slate-700">Our properties ensure 24/7 security, CCTV coverage, and safe neighbourhoods.</p>
+</section>
+<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <h2 className="text-2xl font-bold text-slate-900 mb-4">Who Should Choose This PG?</h2>
+  <p className="text-slate-700">Ideal for students, young professionals, and anyone seeking hassle‑free, fully‑furnished living.</p>
+</section>
 
                             {/* Visual Tour */}
                             {allImages.length > 0 && (

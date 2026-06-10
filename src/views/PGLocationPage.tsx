@@ -13,16 +13,16 @@ import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { LOCALITY_CONTENT } from '@/data/localityContent';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
-import { FAQSchema } from '@/components/seo/FAQSchema';
+
 import { PlaceSchema } from '@/components/seo/PlaceSchema';
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
-import { RELATED_LOCALITIES } from '@/data/relatedLocalities';
 
 
 import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
+import RelatedLocalities from '@/components/RelatedLocalities';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -78,7 +78,7 @@ const content = LOCALITY_CONTENT[locationSlug] || {};
       <SEOHead {...helmet} noindex={helmet.noindex} />
       <JsonLd data={combinedLd} id="pg-location-ld-json" />
 <BreadcrumbSchema items={breadcrumbItems} />
-<FAQSchema items={faqs} />
+
 <PlaceSchema name={name} description={profile?.description} />
 <ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
 
@@ -247,26 +247,7 @@ const content = LOCALITY_CONTENT[locationSlug] || {};
           <RelatedSearchesBlock currentSlug={locationSlug} localityName={name} variant="pg" />
           <PgRelatedAreasNav currentSlug={locationSlug} nearbySlugs={profile.nearbySlugs} />
           <LocalityAuthoritySections profile={profile} />
-          {RELATED_LOCALITIES[locationSlug]?.length > 0 && (
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Related PG Locations</h2>
-              <div className="flex flex-wrap gap-4">
-                {RELATED_LOCALITIES[locationSlug].map((relSlug) => {
-                  const relLoc = getPgLocationBySlug(relSlug);
-                  const relName = relLoc?.name || relSlug;
-                  return (
-                    <Link
-                      key={relSlug}
-                      to={`/pg/${relSlug}`}
-                      className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:border-brand-red/30 hover:bg-brand-red/5 hover:text-brand-red transition-all duration-200 shadow-sm"
-                    >
-                      PG in {relName}
-                    </Link>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+            <RelatedLocalities locationSlug={locationSlug} />
         </div>
       </main>
       <Footer />
