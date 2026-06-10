@@ -35,3 +35,4 @@ const RelatedLocalities: React.FC<Props> = ({ locationSlug }) => {
 };
 
 export default RelatedLocalities;
+export { RelatedLocalities };
