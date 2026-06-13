@@ -66,8 +66,15 @@ const content = LOCALITY_CONTENT[locationSlug] || {};
   // Fetch initial properties for SSR (no limit – fetch all for full SEO as per user decision)
   // Debug logging for SSR fetch
   console.log('[SSR] propertyApi.getAll called with', { city: locationSlug, limit: 20, baseUrl: process.env.API_BASE_URL });
-  const { items: initialProperties } = await propertyApi.getAll({ city: locationSlug, limit: 20 });
-  console.log('[SSR] propertyApi.getAll response - count:', initialProperties?.length, 'first item:', initialProperties?.[0]);
+  let initialProperties = [];
+try {
+  const result = await propertyApi.getAll({ city: locationSlug, limit: 20 });
+  initialProperties = result.items ?? [];
+  console.log('[SSR] propertyApi.getAll response - count:', initialProperties.length, 'first item:', initialProperties[0]);
+} catch (error) {
+  console.warn('[SSR] propertyApi.getAll failed for', locationSlug, error);
+  // Continue with empty properties list to avoid 5xx
+}
   const hasEmptyListings = initialProperties.length === 0;
 
   const pageTitle = `PG in ${name}`;
