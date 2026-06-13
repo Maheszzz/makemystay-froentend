@@ -63,7 +63,11 @@ const nextConfig: NextConfig = {
             { source: '/properties', has: [{ type: 'query', key: 'cat', value: 'pg' }], destination: '/pg/bangalore', permanent: true },
             { source: '/properties/id/:id', destination: '/properties/:id', permanent: true },
             { source: '/properties/:type/:slug', destination: '/properties/:slug', permanent: true },
-            { source: '/pg', destination: '/pg/bangalore', permanent: true },
+                        { source: '/pg', destination: '/pg/bangalore', permanent: true },
+            // Legacy redirect patterns
+            { source: '/pg-in-:slug', destination: '/pg/:slug', permanent: true },
+            { source: '/pg-for-boys-in-:slug', destination: '/pg/:slug', permanent: true },
+            { source: '/pg-for-girls-in-:slug', destination: '/pg/:slug', permanent: true },
         ];
     },
     async rewrites() {

@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildLocalityFaqs, buildLocalityAeoGraph, resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
@@ -45,7 +45,7 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
 
   const loc = getPgLocationBySlug(slug);
   if (!loc) {
-    redirect('/pg');
+    notFound();
   }
 
   const { name, slug: locationSlug } = loc;
