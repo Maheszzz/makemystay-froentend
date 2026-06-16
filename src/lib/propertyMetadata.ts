@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
 import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import {
-    interimPropertyDetailSeo,
     propertyDetailPageSeo,
-    propertyErrorSeo,
     propertyUnavailableSeo,
 } from '@/lib/seo';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
@@ -15,23 +14,24 @@ export async function resolvePropertyPageMetadata(slug: string): Promise<Metadat
     const param = (slug || '').toLowerCase();
     const id = parsePropertySlugParam(param);
     if (!id) {
-        return pageSeoToMetadata(propertyErrorSeo(`/pg/${param}`));
+        // Invalid slug, trigger 404
+        notFound();
     }
 
-    const property = await fetchPropertyByIdServer(id);
+    const property = await fetchPropertyByIdServer(id!);
     if (!property) {
-        return pageSeoToMetadata(interimPropertyDetailSeo(param, `/pg/${param}`));
+        notFound();
     }
 
-    if (property.is_available === false) {
+    if (property!.is_available === false) {
         const hub = inferPgLocalityHubFromPropertySlug(param);
         const locName = hub ? getPgLocationBySlug(hub.replace('/pg/', ''))?.name : undefined;
-        const detailPath = getPropertyDetailPath(property);
+        const detailPath = getPropertyDetailPath(property!);
         return pageSeoToMetadata(propertyUnavailableSeo(detailPath, locName));
     }
 
-    const detailPath = getPropertyDetailPath(property);
-    return pageSeoToMetadata(propertyDetailPageSeo(property, detailPath));
+    const detailPath = getPropertyDetailPath(property!);
+    return pageSeoToMetadata(propertyDetailPageSeo(property!, detailPath));
 }
 
 export function isPropertySlugParam(slug: string): boolean {
