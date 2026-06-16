@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = pageSeoToMetadata({
     title: 'Page not found',
