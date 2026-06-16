@@ -1,5 +1,6 @@
 import PropertyDetails from '@/views/PropertyDetails';
 import { PropertyPdpSeoHtml } from '@/components/property/PropertyPdpSeoHtml';
+import { notFound } from 'next/navigation';
 import {
     applyPropertyPdpRoute,
     resolvePropertyPdpRoute,
@@ -18,6 +19,9 @@ export default async function PropertyDetailsPage({ slug, currentPath }: Props) 
 
     if (route.kind !== 'render') {
         return null;
+    }
+    if (!route.property) {
+        notFound();
     }
 
     return (
