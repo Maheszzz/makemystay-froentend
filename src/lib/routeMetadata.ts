@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { BLOG_POSTS, getBlogPost } from '@/data/blogPosts';
 import { getPgNearLandmarkByPath } from '@/data/pgNearLandmarks';
@@ -156,12 +157,9 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
         });
     }
 
-    return pageSeoToMetadata({
-        title: 'Area not found',
-        description: 'This PG locality page does not exist. Browse verified PG hubs in Bangalore on MakeMyStay.ai.',
-        path: `/pg/${param}`,
-        noindex: true,
-    });
+    notFound();
+    // Unreachable return to satisfy TypeScript
+    return pageSeoToMetadata({ title: 'Area not found', description: '', path: `/pg/${param}` });
 }
 
 /** `/rent/:slug` — mirrors `RentSlugRoute` + `RentLocationPage`. */
@@ -179,12 +177,9 @@ export async function resolveRentSlugMetadata(slug: string): Promise<Metadata> {
     const loc = getPgLocationBySlug(param);
     if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
 
-    return pageSeoToMetadata({
-        title: 'Rent in Bangalore',
-        description: 'Browse verified flats and houses for rent in Bangalore on MakeMyStay.ai.',
-        path: `/rent/${param}`,
-        noindex: true,
-    });
+    notFound();
+    // Unreachable return for type safety
+    return pageSeoToMetadata({ title: 'Rent not found', description: '', path: `/rent/${param}` });
 }
 
 export function resolvePgGenderLocalityMetadata(
@@ -308,12 +303,9 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
     const feature = pgFeaturePathToKind(path);
     if (feature) return pageSeoToMetadata(pgFeatureLandingSeo(feature));
 
-    return pageSeoToMetadata({
-        title: 'Page not found',
-        description: 'Browse verified PG and rental listings on MakeMyStay.ai.',
-        path,
-        noindex: true,
-    });
+    notFound();
+    // Unreachable return for type safety
+    return pageSeoToMetadata({ title: 'Page not found', description: '', path });
 }
 
 /** Known static app routes (pathname without query). */
