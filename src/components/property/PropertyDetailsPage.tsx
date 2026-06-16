@@ -11,7 +11,7 @@ type Props = {
     currentPath: string;
 };
 
-export const revalidate = 3600;
+// export const revalidate = 3600; // disabled to prevent ISR caching of 404 fallback
 
 export default async function PropertyDetailsPage({ slug, currentPath }: Props) {
     const route = await resolvePropertyPdpRoute(slug, currentPath);

@@ -5,6 +5,7 @@ import { resolvePgSlugMetadata } from '@/lib/routeMetadata';
 import PgSlugRoute from '@/routes/PgSlugRoute';
 import PGLocationPage from '@/views/PGLocationPage';
 import type { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
