@@ -237,7 +237,7 @@ function App() {
                             <Route path="/blog/:slug" element={<BlogPost />} />
                             <Route path="/blog" element={<BlogIndex />} />
 
-                            <Route path="*" element={<NotFound />} />
+                            // Catch-all route removed to allow proper 404 handling
                         </Routes>
                     </Suspense>
                     <MobileBottomCTA />

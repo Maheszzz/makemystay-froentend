@@ -287,4 +287,13 @@
     "rentRange": "₹6,000 - ₹18,000",
     "landmarks": ["HSR Layout Park", "Electronic City", "Sarjapur Road"]
   }
+,
+{
+  "slug": "banashankari",
+  "name": "Banashankari",
+  "title": "PG in Banashankari Bangalore",
+  "description": "PGs in Banashankari with good connectivity and amenities.",
+  "rentRange": "₹5,500 - ₹15,000",
+  "landmarks": ["Banashankari Temple", "KR Puram"]
+}
 ]

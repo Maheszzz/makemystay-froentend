@@ -35,5 +35,7 @@ export async function resolvePropertyPageMetadata(slug: string): Promise<Metadat
 }
 
 export function isPropertySlugParam(slug: string): boolean {
-    return /^(\d+)(-|$)/.test((slug || '').toLowerCase());
+    // Previously required a numeric prefix, which caused valid property slugs without IDs to be treated as non‑properties.
+    // Treat any non‑empty slug as a potential property slug. The server‑side resolver will perform the actual existence check.
+    return !!(slug && slug.trim().length > 0);
 }
