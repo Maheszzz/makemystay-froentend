@@ -103,14 +103,7 @@ export function PropertyGrid({
         el.scrollBy({ left: dir === 'right' ? 320 : -320, behavior: 'smooth' });
     };
 
-    const viewAllByCategory: Record<PropertyGridProps['category'], string> = {
-        all: '/properties',
-        pg: '/pg',
-        rent: '/rent',
-        buy: '/buy',
-        plot: '/plots',
-    };
-    const viewAllPath = viewAllByCategory[category];
+    const viewAllPath = '/properties';
 
     const activeFilters: HeroSearchFilters = filters ?? {
         city: 'bangalore',

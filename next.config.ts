@@ -60,7 +60,6 @@ const nextConfig: NextConfig = {
             { source: '/koramangala-vs-indiranagar', destination: '/compare/koramangala-vs-indiranagar', permanent: true },
             { source: '/buy/bangalore', destination: '/buy/in/bangalore', permanent: true },
             { source: '/plot/bangalore', destination: '/plots/in/bangalore', permanent: true },
-            { source: '/properties', has: [{ type: 'query', key: 'cat', value: 'pg' }], destination: '/pg/bangalore', permanent: true },
             { source: '/properties/id/:id', destination: '/properties/:id', permanent: true },
             // Redirect legacy property URLs to canonical PG format
             { source: '/property/:slug', destination: '/pg/:slug', permanent: true },

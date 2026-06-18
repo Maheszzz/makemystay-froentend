@@ -1,5 +1,4 @@
 # Netlify / Cloudflare Pages: legacy rent locality URLs → canonical `/rent/{slug}`
-/properties cat=pg /pg/bangalore 301
 /rent-in-whitefield /rent/whitefield 301
 /rent-in-marathahalli /rent/marathahalli 301
 /rent-in-btm-layout /rent/btm 301

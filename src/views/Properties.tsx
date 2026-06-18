@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
-import { Link, Navigate, useLocation, useNavigate, useParams, useSearchParams } from '@/lib/navigation';
+import { Link, useLocation, useSearchParams } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
@@ -21,8 +21,6 @@ import {
 } from '@/lib/propertySeoUtils';
 import { buildPageSEO, isValidListingPageParam, listingsPageSeo } from '@/lib/seo';
 import {
-    listingsHubTabNavigateUrl,
-    listingsLegacyCatRedirectPath,
     normalizeCitySlug,
     pathnameToActiveListingsTab,
 } from '@/lib/listingsCategoryHubs';
@@ -99,8 +97,6 @@ export default function Properties({
     showMapPanel = false,
 }: PropertiesProps) {
     const location = useLocation();
-    const navigate = useNavigate();
-    const routeParams = useParams<{ city?: string }>();
     const [searchParams, setSearchParams] = useSearchParams();
     const goBack = useSmartBack({ fallback: '/' });
     const { wishlist } = useWishlist();
@@ -209,25 +205,16 @@ export default function Properties({
         return normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined) ?? 'bangalore';
     }, [initialCity]);
 
-    /** City slug for tab navigation: URL param wins, then initial hub city, then search query city, then filter. */
-    const citySlugForTabs = useMemo(() => {
-        const fromRoute = normalizeCitySlug(routeParams.city);
-        if (fromRoute) return fromRoute;
-        const fromQuery = normalizeCitySlug(searchParams.get('city'));
-        if (fromQuery) return fromQuery;
-        const init = normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined);
-        if (init) return init;
-        return normalizeCitySlug(locationFilter !== 'all' ? locationFilter : undefined) ?? defaultMetroSlug;
-    }, [routeParams.city, searchParams, initialCity, locationFilter, defaultMetroSlug]);
-
     /** Tab highlight follows URL so back/forward and deep links stay correct. */
     const activeTabKey = useMemo((): CategoryKey => {
+        if (location.pathname === '/properties') return category;
         const implied = pathnameToActiveListingsTab(location.pathname);
         if (implied !== null) return implied;
         return category;
     }, [location.pathname, category]);
 
     useEffect(() => {
+        if (location.pathname === '/properties') return;
         const implied = pathnameToActiveListingsTab(location.pathname);
         if (implied !== null && implied !== category) {
             setCategory(implied);
@@ -357,6 +344,10 @@ export default function Properties({
                 list = list.filter((p) => propertyMatchesPgGenderFilter(p, genderFilter));
             }
 
+            if (category !== 'all') {
+                list = list.filter((p) => p.category === category);
+            }
+
             return list;
         } catch (e) {
             console.error('[Properties] Filtering crash:', e);
@@ -483,13 +474,22 @@ export default function Properties({
 
     const handleCategoryTab = useCallback(
         (cat: CategoryKey) => {
-            navigate(listingsHubTabNavigateUrl(cat, citySlugForTabs, searchQuery.trim()));
+            setCategory(cat);
+            setTypeFilter('all');
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    if (cat === 'all') next.delete('cat');
+                    else next.set('cat', cat);
+                    next.delete('type');
+                    next.delete('page');
+                    return next;
+                },
+                { replace: true }
+            );
         },
-        [navigate, citySlugForTabs, searchQuery]
+        [setSearchParams]
     );
-
-    const redirectFromLegacyCat =
-        location.pathname === '/properties' ? listingsLegacyCatRedirectPath(searchParams.get('cat')) : null;
 
     const showRentBangaloreHubBlocks =
         initialCategory === 'rent' &&
@@ -552,10 +552,6 @@ export default function Properties({
             ],
         };
     }, [location.pathname, pageTitle, pageSubtitle]);
-
-    if (redirectFromLegacyCat) {
-        return <Navigate to={redirectFromLegacyCat} replace />;
-    }
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">

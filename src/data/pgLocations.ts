@@ -9,7 +9,12 @@ export interface PgLocation {
     landmarks?: string[];
 }
 
-export const PG_LOCATIONS: PgLocation[] = locations;
+const seen = new Set<string>();
+export const PG_LOCATIONS: PgLocation[] = locations.filter((loc) => {
+    if (seen.has(loc.slug)) return false;
+    seen.add(loc.slug);
+    return true;
+});
 
 /** 301-style client redirects for legacy `/pg/:slug` URLs after slug renames. */
 export const LEGACY_PG_SLUG_REDIRECTS: Record<string, string> = {
