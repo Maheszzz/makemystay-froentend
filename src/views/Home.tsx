@@ -1,21 +1,23 @@
 'use client';
 
-import { Footer } from '@/components/layout/Footer';
+
+
 import { Navbar } from '@/components/layout/Navbar';
+import { Footer } from '@/components/layout/Footer';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { Hero } from '@/components/sections/Hero';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
-import { HomeBelowFold } from '@/views/HomeBelowFold';
 import {
     homeHeroTabToListingsCategory,
     parseHomeHeroTab,
     type HomeHeroNavigateTab,
     type ListingsCategoryKey,
 } from '@/lib/listingsCategoryHubs';
-import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from '@/lib/navigation';
+import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
+import { HomeBelowFold } from '@/views/HomeBelowFold';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
@@ -154,6 +156,7 @@ export default function Home() {
                     />
 
                 </section>
+
 
                 <HomeBelowFold
                     listingsCategory={listingsCategory}

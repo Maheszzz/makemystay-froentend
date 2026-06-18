@@ -58,9 +58,13 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
     const location = property.location || 'HSR Layout, Bangalore';
     const priceDisplay = formatPriceMonthly(property.price?.trim() || '₹25,000');
     const rating =
-        Number(property.rating ?? property.average_rating ?? FEATURED_LAUNCH.socialProof.rating) || 4.9;
+        (property.rating || property.average_rating)
+            ? Number(property.rating ?? property.average_rating)
+            : FEATURED_LAUNCH.socialProof.rating;
     const reviewCount =
-        property.reviews ?? property.review_count ?? FEATURED_LAUNCH.socialProof.reviewCount;
+        (property.reviews || property.review_count)
+            ? (property.reviews ?? property.review_count)
+            : FEATURED_LAUNCH.socialProof.reviewCount;
     const waLink = buildPropertyWhatsappUrl(title, location);
 
     const goImage = (dir: -1 | 1) => {
@@ -114,7 +118,7 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
                             </span>
                             <span className="inline-flex items-center gap-1.5">
                                 <MapPin className="w-3.5 h-3.5 text-brand-red" />
-                                HSR Layout
+                                {location}
                             </span>
                         </div>
 

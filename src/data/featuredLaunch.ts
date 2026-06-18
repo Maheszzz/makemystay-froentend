@@ -3,20 +3,20 @@
  * Matched by id/slug/title from API; fetched by id if not in the current list.
  */
 export const FEATURED_LAUNCH = {
-    propertyId: 248,
+    propertyId: 298,
     listingType: 'rent' as const,
-    slug: '248-urban-homes-1bhk-hsr-layout',
-    titleIncludes: 'urban homes',
-    locationIncludes: 'hsr',
+    slug: 'ekta-homes-1-1bhk-chikkakannalli',
+    titleIncludes: 'ekta homes',
+    locationIncludes: 'chikkakannalli',
     badge: 'New launch',
-    headlineLead: 'Urban Homes, Designed for',
+    headlineLead: 'Ekta Homes, Designed for',
     headlineAccent: 'You.',
-    subheadline: 'Premium 1BHK in HSR Layout — now on MakeMyStay.',
+    subheadline: 'Premium 1BHK,2BHK & 1RK in Chikkakannalli — now on MakeMyStay.',
     bullets: ['Move-in ready', 'Verified listing', 'Zero brokerage'] as const,
-    priceFromLabel: 'From ₹25,000/mo',
+    priceFromLabel: 'From ₹20,000 - 30,000 /mo ',
     socialProof: {
         label: 'Happy Tenants',
-        rating: 4.9,
+        rating: 5,
         reviewCount: 320,
     },
 } as const;
