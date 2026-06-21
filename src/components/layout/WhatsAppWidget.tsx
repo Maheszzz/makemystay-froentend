@@ -3,7 +3,7 @@ import { useLocation } from '@/lib/navigation';
 
 const WHATSAPP_NUMBER = '8150099911'; // +91 81500 99911
 const WHATSAPP_MESSAGE = encodeURIComponent(
-    "Hi MakeMyStay! 👋 I'm interested in finding a property. Can you help me?"
+    "Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?"
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 

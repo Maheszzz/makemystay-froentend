@@ -308,19 +308,21 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
         ? property.description
         : `Experience premium living at **${displayTitle}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
 
-    /** ~500-word SEO: API `seo_about` when present; else client generator (localhost-friendly). */
+    /** Short description shown in the "About this property" card (2-3 paragraphs max). */
+    const aboutNarrative = property.description?.trim() || desc;
+
+    /** Full SEO article moved to "Area Guide" section at the bottom of the page. */
     const longSeo =
         property.seo_about && property.seo_about.trim().length > 80
             ? property.seo_about.trim()
             : buildClientSeoAbout(property);
-    const aboutNarrative = longSeo.length > 80 ? longSeo : desc;
 
     const aboutWordCount = aboutNarrative.trim().split(/\s+/).filter((w) => w.length > 0).length;
     const showAboutToggle = aboutWordCount > 200;
 
     const seoHeading = buildPropertySeoHeading(property);
     const heroLead =
-        extractHeroLeadFromNarrative(aboutNarrative, 520) || buildPropertyHeroIntro(property);
+        extractHeroLeadFromNarrative(longSeo, 520) || buildPropertyHeroIntro(property);
     const crumbLabel = seoHeading.trim();
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
@@ -592,31 +594,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </div>
                                 </div>
                             </section>
-{/* Added SEO sections */}
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearest Metro Stations</h2>
-  <p className="text-slate-700">{property.nearbyMetros?.join(', ') || 'Details coming soon.'}</p>
-</section>
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby IT Parks</h2>
-  <p className="text-slate-700">{property.nearbyITParks?.join(', ') || 'Details coming soon.'}</p>
-</section>
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby Colleges</h2>
-  <p className="text-slate-700">{property.nearbyColleges?.join(', ') || 'Details coming soon.'}</p>
-</section>
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Food & Lifestyle</h2>
-  <p className="text-slate-700">Explore nearby restaurants, cafes, and lifestyle amenities to enjoy your stay.</p>
-</section>
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Safety & Security</h2>
-  <p className="text-slate-700">Our properties ensure 24/7 security, CCTV coverage, and safe neighbourhoods.</p>
-</section>
-<section className="mt-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <h2 className="text-2xl font-bold text-slate-900 mb-4">Who Should Choose This PG?</h2>
-  <p className="text-slate-700">Ideal for students, young professionals, and anyone seeking hassle‑free, fully‑furnished living.</p>
-</section>
 
                             {/* Visual Tour */}
                             {allImages.length > 0 && (
@@ -780,8 +757,31 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
                 {/* ─── SEO / Supplementary Content ─── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-                                            <BreadcrumbNav items={breadcrumbItems} />
-                        <AeoSnippet property={property} />
+                    <BreadcrumbNav items={breadcrumbItems} />
+                    <AeoSnippet property={property} />
+
+                    {/* Area Guide & Locality Information — full SEO article, below the fold */}
+                    {longSeo && longSeo.trim().length > 80 && (
+                        <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
+                            <div className="mb-8">
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">
+                                    Area Guide
+                                </p>
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                                    Area Guide &amp; Locality Information
+                                </h2>
+                                <p className="text-slate-400 text-sm font-medium mt-1">
+                                    Everything you need to know about living in {property.location}
+                                </p>
+                            </div>
+                            <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                                {longSeo.split(/\n\n+/).map((block: string, bi: number) => (
+                                    <p key={bi} className="mb-4">{block}</p>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
                     <div className="border-t border-slate-100 pt-12">
                         <PeopleAlsoAsk items={buildPropertyPdpFaqs(property)} />
                     </div>

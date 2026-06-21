@@ -26,7 +26,12 @@ export default async function PropertyDetailsPage({ slug, currentPath }: Props) 
 
     return (
         <>
-            {route.property ? <PropertyPdpSeoHtml property={route.property} /> : null}
+            {/* SEO content for crawlers only — visually hidden, not removed from DOM */}
+            {route.property && (
+                <div className="sr-only" aria-hidden="true">
+                    <PropertyPdpSeoHtml property={route.property} />
+                </div>
+            )}
             <PropertyDetails initialProperty={route.property ?? undefined} slug={route.slug} />
         </>
     );
