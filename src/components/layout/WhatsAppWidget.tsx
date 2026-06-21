@@ -1,5 +1,6 @@
 import locJson from '@/data/pg-locations.json';
 import { contactApi } from '@/lib/api/contacts';
+import type { WhatsAppWidgetLeadSubmission } from '@/lib/api/contacts';
 import { useLocation } from '@/lib/navigation';
 import { useEffect, useState } from 'react';
 
@@ -53,22 +54,36 @@ export function WhatsAppWidget() {
 
         setStatus('loading');
         try {
-            await contactApi.submitContactForm({
+            const widgetLead: WhatsAppWidgetLeadSubmission = {
                 name,
                 phone,
-                email: email || 'whatsapp-widget@makemystay.ai',
-                message: message ? `WhatsApp Widget Enquiry: ${message}` : 'User initiated chat from WhatsApp floating widget',
+                email: email || undefined,
+                preferred_location: location || undefined,
+                property_type: 'General WhatsApp Enquiry',
+                message: message || undefined,
                 source: 'Website - WhatsApp Widget',
-                location: location || undefined,
-                property_type: 'General WhatsApp Enquiry'
-            });
+            };
+
+            await contactApi.submitWhatsAppWidgetLead(widgetLead);
 
             setStatus('success');
 
             // Redirect to WhatsApp
-            const finalMessage = message
-                ? `Hi MakeMyStay! 👋 I'm interested in finding a property in ${location || 'Bangalore'}. Notes: ${message}`
-                : `Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?`;
+            let finalMessage = `Hi MakeMyStay Team,
+
+I am interested in finding a property.
+
+Source: Website Lead
+
+Name: ${name}
+Phone: ${phone}
+Preferred Location: ${location || 'Not Specified'}`;
+
+            if (message) {
+                finalMessage += `\nNotes: ${message}`;
+            }
+
+            finalMessage += `\n\nPlease contact me with more details.`;
             const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(finalMessage)}`;
             window.open(waUrl, '_blank', 'noopener,noreferrer');
 
@@ -81,6 +96,7 @@ export function WhatsAppWidget() {
             setStatus('error');
         }
     };
+
 
     return (
         <>

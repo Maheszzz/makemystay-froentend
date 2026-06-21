@@ -48,6 +48,18 @@ export interface ContactFormSubmission {
     property_type?: string;
 }
 
+// Interface for WhatsApp widget lead submission (dedicated leads endpoint)
+export interface WhatsAppWidgetLeadSubmission {
+    name: string;
+    phone: string;
+    email?: string;
+    preferred_location?: string;
+    property_type?: string;
+    message?: string;
+    source?: string;
+}
+
+
 /**
  * Contact API Service
  * Provides methods for CRUD operations on contacts
@@ -128,6 +140,17 @@ export const contactApi = {
      */
     getDemos: async (): Promise<DemoBooking[]> => {
         const response = await api.get<DemoBooking[]>('/schedule-demo');
+        return response;
+    },
+
+    /**
+     * Submit a lead from the WhatsApp floating widget form.
+     * Saves to the `leads` table in the backend CRM pipeline.
+     * @param data - Widget form data (name, phone, email, location, property_type, message)
+     * @returns Backend response with lead_id
+     */
+    submitWhatsAppWidgetLead: async (data: WhatsAppWidgetLeadSubmission): Promise<any> => {
+        const response = await api.post<any>('/whatsapp/widget-lead', data);
         return response;
     },
 };

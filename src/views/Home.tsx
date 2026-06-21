@@ -121,7 +121,6 @@ export default function Home() {
     const handleHubTabChange = useCallback(
         (tab: HomeHeroNavigateTab) => {
             setHeroTab(tab);
-            scrollToFeaturedListings();
         },
         [setHeroTab]
     );
