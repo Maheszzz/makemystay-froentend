@@ -69,9 +69,7 @@ export function WhatsAppWidget() {
             setStatus('success');
 
             // Redirect to WhatsApp
-            let finalMessage = `Hi MakeMyStay Team,
-
-I am interested in finding a property.
+            let finalMessage = `Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?
 
 Source: Website Lead
 
