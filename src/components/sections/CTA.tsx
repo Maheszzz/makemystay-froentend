@@ -1,10 +1,12 @@
+import { Link } from '@/lib/navigation';
 import { Calendar, MessageCircle, Phone, X } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from '@/lib/navigation';
-import { contactApi } from '@/lib/api/contacts';
+import { LeadCaptureModal } from '../modals/LeadCaptureModal';
 
 export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
+    const [showLeadModal, setShowLeadModal] = useState(false);
+    const whatsappUrl = "https://wa.me/918150099911?text=Hi,%20I'm%20interested%20in%20MakeMyStay";
 
     return (
         <section className="py-14 md:py-20 bg-gradient-to-br from-brand-red via-brand-red to-red-700 text-white relative overflow-hidden">
@@ -93,21 +95,13 @@ export function CTA() {
                                 </div>
                             </a>
 
-                            <a
-                                href="https://wa.me/918150099911?text=Hi, I'm interested in MakeMyStay"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={() => {
-                                    // Fire-and-forget lead creation
-                                    contactApi.submitContactForm({
-                                        name: 'WhatsApp User',
-                                        phone: '918150099911', // Placeholder for now
-                                        email: 'whatsapp@makemystay.ai',
-                                        message: 'User clicked WhatsApp CTA on Website',
-                                        source: 'Website - WhatsApp'
-                                    }).catch(console.error);
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setShowContactCard(false);
+                                    setShowLeadModal(true);
                                 }}
-                                className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-green-50 border border-slate-100 transition-colors group"
+                                className="flex items-center gap-4 p-3.5 rounded-xl bg-slate-50 hover:bg-green-50 border border-slate-100 transition-colors group w-full text-left"
                             >
                                 <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                                     <MessageCircle className="w-4 h-4 text-green-600" />
@@ -116,7 +110,7 @@ export function CTA() {
                                     <div className="text-xs text-slate-400">WhatsApp</div>
                                     <div className="font-bold text-slate-900 text-sm">Chat now → Response in 5 mins</div>
                                 </div>
-                            </a>
+                            </button>
                         </div>
 
                         {/* Footer */}
@@ -131,6 +125,15 @@ export function CTA() {
                     </div>
                 </div>
             )}
+
+            <LeadCaptureModal
+                isOpen={showLeadModal}
+                onClose={() => setShowLeadModal(false)}
+                title="Talk to a Growth Advisor"
+                subtitle="We typically respond in 5 minutes via WhatsApp."
+                source="Website - Contact CTA"
+                whatsappUrl={whatsappUrl}
+            />
         </section>
     );
 }

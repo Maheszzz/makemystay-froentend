@@ -13,6 +13,7 @@ interface LeadCaptureModalProps {
     actionLabel?: string;
     propertyTitle?: string;
     propertyLocation?: string;
+    whatsappUrl?: string;
 }
 
 export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
@@ -23,7 +24,8 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     source,
     actionLabel = "Submit Request",
     propertyTitle,
-    propertyLocation
+    propertyLocation,
+    whatsappUrl
 }) => {
     const [formData, setFormData] = useState({
         name: '',
@@ -75,6 +77,11 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             });
 
             setStatus('success');
+            
+            if (whatsappUrl) {
+                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+            }
+
             setTimeout(() => {
                 onClose();
                 // Reset form after closing
@@ -88,11 +95,14 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" onClick={(e) => e.stopPropagation()}>
             {/* Backdrop */}
             <div 
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300"
-                onClick={onClose}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                }}
             />
 
             {/* Modal Container */}
@@ -171,14 +181,24 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                                     <Button 
                                         type="submit"
                                         disabled={status === 'loading'}
-                                        className="w-full py-4 text-base font-extrabold rounded-2xl bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-xl shadow-brand-red/20 hover:shadow-brand-red/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] border-0 text-white flex items-center justify-center gap-2"
+                                        className={`w-full py-4 text-base font-extrabold rounded-2xl transition-all transform hover:scale-[1.02] active:scale-[0.98] border-0 text-white flex items-center justify-center gap-2 ${
+                                            whatsappUrl 
+                                                ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-green-600 hover:to-emerald-500 shadow-xl shadow-green-500/20 hover:shadow-green-500/30' 
+                                                : 'bg-gradient-to-r from-brand-red to-red-600 hover:from-red-600 hover:to-brand-red shadow-xl shadow-brand-red/20 hover:shadow-brand-red/30'
+                                        }`}
                                     >
                                         {status === 'loading' ? (
                                             <LoadingSpinner size={20} className="text-white" />
                                         ) : (
                                             <>
-                                                <span>{actionLabel}</span>
-                                                <Send className="w-4 h-4 ml-1" />
+                                                <span>{whatsappUrl ? (actionLabel || "Chat on WhatsApp") : actionLabel}</span>
+                                                {whatsappUrl ? (
+                                                    <svg viewBox="0 0 32 32" width="18" height="18" fill="white" xmlns="http://www.w3.org/2000/svg" className="ml-1 shrink-0">
+                                                        <path d="M16.004 2C8.28 2 2 8.28 2 16.004c0 2.46.65 4.87 1.88 6.99L2 30l7.19-1.87A13.93 13.93 0 0016.004 30C23.72 30 30 23.72 30 16.004 30 8.28 23.72 2 16.004 2zm0 25.43c-2.3 0-4.56-.62-6.52-1.79l-.47-.28-4.27 1.11 1.13-4.15-.3-.48a11.43 11.43 0 01-1.73-6.1c0-6.3 5.13-11.43 11.43-11.43 6.3 0 11.43 5.13 11.43 11.43S22.3 27.43 16 27.43zm6.28-8.56c-.34-.17-2.03-1-2.34-1.12-.32-.11-.55-.17-.78.17-.23.34-.89 1.12-1.09 1.35-.2.23-.4.26-.74.09-.34-.17-1.44-.53-2.74-1.69-1.01-.9-1.69-2.02-1.89-2.36-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.23-.34.34-.56.11-.23.06-.43-.03-.6-.09-.17-.78-1.87-1.07-2.57-.28-.67-.56-.58-.78-.59h-.66c-.23 0-.6.09-.91.43-.31.34-1.19 1.17-1.19 2.84 0 1.68 1.22 3.3 1.39 3.53.17.23 2.4 3.66 5.82 5.14.81.35 1.45.56 1.94.72.82.26 1.56.22 2.15.13.65-.1 2.03-.83 2.31-1.63.29-.8.29-1.48.2-1.63-.08-.15-.31-.23-.65-.4z" />
+                                                    </svg>
+                                                ) : (
+                                                    <Send className="w-4 h-4 ml-1" />
+                                                )}
                                             </>
                                         )}
                                     </Button>

@@ -13,10 +13,11 @@ import {
     Zap,
     ShieldCheck,
 } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useListingFromUrl } from '@/lib/navigation';
 
 import { useWishlist } from '@/context/WishlistContext';
+import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 import { amenityIconMap } from '@/lib/amenityIcons';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
@@ -121,6 +122,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             }),
         [property.last_verified_at, property.last_booked_at, property.last_review_at, property.updated_at],
     );
+
+    const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
 
     return (
         <Link
@@ -319,7 +322,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    window.open(waLink, '_blank', 'noopener,noreferrer');
+                                    setIsLeadModalOpen(true);
                                 }}
                                 className="w-[52px] h-[52px] bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all duration-300 border border-emerald-200 shadow-[0_8px_20px_-12px_rgba(16,185,129,0.5)] flex items-center justify-center group/wa shrink-0"
                                 aria-label={`Contact about ${displayTitle} on WhatsApp`}
@@ -330,6 +333,17 @@ export function PropertyCard({ property }: PropertyCardProps) {
                     </div>
                 </div>
             </div>
+            <LeadCaptureModal
+                isOpen={isLeadModalOpen}
+                onClose={() => setIsLeadModalOpen(false)}
+                title="Enquire on WhatsApp"
+                subtitle={`Get immediate pricing, availability, and scheduling details for ${displayTitle} directly on WhatsApp.`}
+                source="Website - Property Card - WhatsApp"
+                actionLabel="Submit & Chat on WhatsApp"
+                propertyTitle={displayTitle || property.title}
+                propertyLocation={property.location}
+                whatsappUrl={waLink}
+            />
         </Link>
     );
 }

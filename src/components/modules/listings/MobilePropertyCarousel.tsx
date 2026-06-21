@@ -4,6 +4,7 @@ import { ArrowRight, BadgeCheck, MapPin, MessageCircle, Star } from 'lucide-reac
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import type { Property } from '@/types/api';
+import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 
 interface MobilePropertyCarouselProps {
     properties: Property[];
@@ -91,6 +92,9 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
     const list = Array.isArray(properties) ? properties : [];
     if (list.length === 0) return null;
     const { from } = useListingFromUrl();
+
+    const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+    const [selectedWaLink, setSelectedWaLink] = useState<string>('');
 
     return (
         <div className="md:hidden px-4 flex flex-col gap-4">
@@ -187,21 +191,40 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                                         <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
                                     </span>
                                 </Link>
-                                <a
-                                    href={waLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all border active:scale-[0.98] text-stone-700 border-stone-300/80 bg-white/95 hover:bg-emerald-50/40 hover:border-emerald-300/50 hover:text-emerald-900 shadow-[0_8px_20px_-14px_rgba(16,185,129,0.55)]"
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setSelectedProperty(property);
+                                        setSelectedWaLink(waLink);
+                                    }}
+                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all border active:scale-[0.98] text-stone-700 border-stone-300/80 bg-white/95 hover:bg-emerald-50/40 hover:border-emerald-300/50 hover:text-emerald-900 shadow-[0_8px_20px_-14px_rgba(16,185,129,0.55)] cursor-pointer"
                                     aria-label="WhatsApp chat"
                                 >
                                     <MessageCircle className="w-3.5 h-3.5 shrink-0 text-emerald-600 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" aria-hidden />
                                     Chat
-                                </a>
+                                </button>
                             </div>
                         </div>
                     </div>
                 );
             })}
+            {selectedProperty && (
+                <LeadCaptureModal
+                    isOpen={!!selectedProperty}
+                    onClose={() => {
+                        setSelectedProperty(null);
+                        setSelectedWaLink('');
+                    }}
+                    title="Enquire on WhatsApp"
+                    subtitle={`Get immediate pricing, availability, and scheduling details for ${formatPropertyTitle(selectedProperty.title)} directly on WhatsApp.`}
+                    source="Website - Mobile Carousel - WhatsApp"
+                    actionLabel="Submit & Chat on WhatsApp"
+                    propertyTitle={formatPropertyTitle(selectedProperty.title) || selectedProperty.title}
+                    propertyLocation={selectedProperty.location}
+                    whatsappUrl={selectedWaLink}
+                />
+            )}
         </div>
     );
 }
