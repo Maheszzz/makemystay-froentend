@@ -83,7 +83,10 @@ Preferred Location: ${location || 'Not Specified'}`;
 
             finalMessage += `\n\nPlease contact me with more details.`;
             const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(finalMessage)}`;
-            window.open(waUrl, '_blank', 'noopener,noreferrer');
+            const newWindow = window.open(waUrl, '_blank', 'noopener,noreferrer');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                window.location.href = waUrl;
+            }
 
             setTimeout(() => {
                 setIsOpen(false);

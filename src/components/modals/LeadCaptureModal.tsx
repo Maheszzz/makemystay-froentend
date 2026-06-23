@@ -79,7 +79,10 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             setStatus('success');
             
             if (whatsappUrl) {
-                window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    window.location.href = whatsappUrl;
+                }
             }
 
             setTimeout(() => {

@@ -20,7 +20,8 @@ function WhatsAppMark({ className }: { className?: string }) {
 
 export function MobileBottomCTA() {
     const [showLeadModal, setShowLeadModal] = useState(false);
-    const whatsappUrl = "https://wa.me/918150099911?text=Hi,%20I'm%20interested%20in%20MakeMyStay";
+    const whatsappMessage = "Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?";
+    const whatsappUrl = `https://wa.me/918150099911?text=${encodeURIComponent(whatsappMessage)}`;
 
     return (
         <>

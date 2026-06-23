@@ -6,7 +6,8 @@ import { LeadCaptureModal } from '../modals/LeadCaptureModal';
 export function CTA() {
     const [showContactCard, setShowContactCard] = useState(false);
     const [showLeadModal, setShowLeadModal] = useState(false);
-    const whatsappUrl = "https://wa.me/918150099911?text=Hi,%20I'm%20interested%20in%20MakeMyStay";
+    const whatsappMessage = "Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?";
+    const whatsappUrl = `https://wa.me/918150099911?text=${encodeURIComponent(whatsappMessage)}`;
 
     return (
         <section className="py-14 md:py-20 bg-gradient-to-br from-brand-red via-brand-red to-red-700 text-white relative overflow-hidden">
