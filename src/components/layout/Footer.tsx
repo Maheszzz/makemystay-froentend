@@ -1,12 +1,12 @@
-import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
-import { Link } from '@/lib/navigation';
-const LOGO_SRC = '/logo-nav.jpg';
-import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { PG_LOCATIONS } from '@/data/pgLocations';
-import { HOME_PG_FAQS } from '@/data/homePgSeo';
+import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
 import { BLOG_POSTS } from '@/data/blogPosts';
+import { HOME_PG_FAQS } from '@/data/homePgSeo';
+import { PG_LOCATIONS } from '@/data/pgLocations';
 import { BRAND_EXTENDED } from '@/lib/brandEntity';
+import { Link } from '@/lib/navigation';
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+const LOGO_SRC = '/logo-nav.jpg';
 
 export function Footer() {
     return (
@@ -51,7 +51,7 @@ export function Footer() {
                             <li className="flex items-start group">
                                 <MapPin size={16} className="mr-3 mt-0.5 text-brand-red shrink-0 group-hover:scale-110 transition-transform" />
                                 <span className="text-slate-400 group-hover:text-white transition-colors leading-relaxed">
-                                    HSR Layout, Sector 4<br />Bangalore, India 560102
+                                    HSR Layout, Sector 7<br />Bangalore, India 560102
                                 </span>
                             </li>
                             <li className="flex items-center group">
@@ -97,7 +97,7 @@ export function Footer() {
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Popular areas</p>
                                 <h2 className="mt-1.5 text-base font-bold text-white font-heading">Top PG locations</h2>
                                 <p className="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">Area guides &amp; listings</p>
-                                 <nav className="flex flex-wrap gap-1.5" aria-label="Popular PG areas">
+                                <nav className="flex flex-wrap gap-1.5" aria-label="Popular PG areas">
                                     {PG_LOCATIONS.slice(0, 20).map((loc) => (
                                         <Link
                                             key={loc.slug}
@@ -108,7 +108,7 @@ export function Footer() {
                                         </Link>
                                     ))}
                                 </nav>
-                                
+
                                 <div className="mt-8">
                                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">PG by Category</p>
                                     <h2 className="mt-1.5 text-base font-bold text-white font-heading">Must-have features</h2>
@@ -169,14 +169,14 @@ export function Footer() {
                             </ul>
                         </div>
                         <div>
-                             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Popular Guides</p>
-                             <ul className="space-y-2 lg:space-y-3">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Popular Guides</p>
+                            <ul className="space-y-2 lg:space-y-3">
                                 {BLOG_POSTS.slice(0, 5).map(post => (
                                     <li key={post.slug}>
                                         <Link to={`/blog/${post.slug}`} className="text-[13px] text-slate-400 hover:text-white transition-colors line-clamp-1">{post.title}</Link>
                                     </li>
-                                 ))}
-                             </ul>
+                                ))}
+                            </ul>
                         </div>
                         <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 mb-4">Research &amp; Data</p>

@@ -1,11 +1,11 @@
+import { findPgLocationForArea } from '@/data/pgLocations';
 import { BRAND_CONTACT, BRAND_EXTENDED, BRAND_SAME_AS } from '@/lib/brandEntity';
+import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
+import { buildPropertyProductName } from '@/lib/propertyDetailCopy';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { parseInrOfferAmount, stripMarkdownLight } from '@/lib/propertySeoUtils';
 import { DEFAULT_OG_IMAGE, LEGAL_ENTITY_NAME, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
-import { getPropertyDetailPath } from '@/lib/propertyRouting';
-import { findPgLocationForArea } from '@/data/pgLocations';
-import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
-import { parseInrOfferAmount, stripMarkdownLight } from '@/lib/propertySeoUtils';
-import { buildPropertyProductName } from '@/lib/propertyDetailCopy';
 
 export interface FaqItem {
     question: string;
@@ -101,7 +101,7 @@ export function buildLocalBusinessSchema() {
         telephone: BRAND_CONTACT.telephone,
         address: {
             '@type': 'PostalAddress',
-            streetAddress: 'HSR Layout, Sector 4',
+            streetAddress: 'HSR Layout, Sector 7',
             addressLocality: 'Bangalore',
             postalCode: '560102',
             addressRegion: 'Karnataka',
@@ -333,9 +333,9 @@ export function buildPropertyDetailGraph(
         { name: 'Home', path: '/' },
         ...(isPgHub
             ? [
-                  { name: 'PG', path: '/pg' },
-                  ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
-              ]
+                { name: 'PG', path: '/pg' },
+                ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
+            ]
             : [{ name: 'Listings', path: '/properties' }]),
         { name: productName.slice(0, 78), path },
     ]);

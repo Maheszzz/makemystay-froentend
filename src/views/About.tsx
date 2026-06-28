@@ -1,12 +1,12 @@
 'use client';
 
-import { Link } from '@/lib/navigation';
-import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { SEOHead } from '@/components/seo/SEOHead';
+import { Navbar } from '@/components/layout/Navbar';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { buildPageSEO, buildAboutPageSEO } from '@/lib/seo';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { Link } from '@/lib/navigation';
 import { buildBreadcrumbSchema } from '@/lib/schema';
+import { buildAboutPageSEO, buildPageSEO } from '@/lib/seo';
 
 export default function About() {
     const helmet = buildPageSEO(buildAboutPageSEO());
@@ -38,7 +38,7 @@ export default function About() {
                     </ul>
                     <h2>Contact</h2>
                     <p>
-                        HSR Layout, Sector 4, Bengaluru 560102 ·{' '}
+                        HSR Layout, Sector 7, Bengaluru 560102 ·{' '}
                         <a href="mailto:connect@makemystay.ai">connect@makemystay.ai</a> ·{' '}
                         <a href="tel:+918150099911">+91 81500 99911</a>
                     </p>
