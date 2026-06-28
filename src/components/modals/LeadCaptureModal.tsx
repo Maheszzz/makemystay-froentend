@@ -66,15 +66,27 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 ? `Inquiry for ${propertyTitle} in ${propertyLocation || 'N/A'}. ${formData.message}`
                 : formData.message;
 
-            await contactApi.submitContactForm({
-                name: formData.name,
-                phone: formData.phone,
-                email: formData.email || 'web@makemystay.ai',
-                message: contextMsg || `Automated request from ${source}`,
-                source: source,
-                location: propertyLocation,
-                property_type: 'Inquiry'
-            });
+            if (whatsappUrl) {
+                await contactApi.submitWhatsAppWidgetLead({
+                    name: formData.name,
+                    phone: formData.phone,
+                    email: formData.email || undefined,
+                    preferred_location: propertyLocation || undefined,
+                    property_type: 'Mobile WhatsApp Inquiry',
+                    message: contextMsg || undefined,
+                    source: source,
+                });
+            } else {
+                await contactApi.submitContactForm({
+                    name: formData.name,
+                    phone: formData.phone,
+                    email: formData.email || 'web@makemystay.ai',
+                    message: contextMsg || `Automated request from ${source}`,
+                    source: source,
+                    location: propertyLocation,
+                    property_type: 'Inquiry'
+                });
+            }
 
             setStatus('success');
             
