@@ -14,6 +14,7 @@ export interface LocalityComparisonRef {
 }
 
 export interface PgLocalityDeepProfile {
+    description: string | undefined;
     slug: string;
     name: string;
     /** Lead paragraph for AEO / QuickAnswer (40–80 words). */

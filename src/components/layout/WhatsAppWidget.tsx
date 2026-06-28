@@ -93,7 +93,7 @@ Preferred Location: ${location || 'Not Specified'}`;
             }, 2500);
         } catch (err: any) {
             console.error('WhatsApp Widget lead submission failed:', err);
-            setErrorMsg(err.message || 'Submission failed');
+            setErrorMsg(err.message || "We couldn't save your enquiry. Please try again.");
             setStatus('error');
         }
     };

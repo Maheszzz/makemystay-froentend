@@ -150,7 +150,7 @@ export const contactApi = {
      * @returns Backend response with lead_id
      */
     submitWhatsAppWidgetLead: async (data: WhatsAppWidgetLeadSubmission): Promise<any> => {
-        const response = await api.post<any>('/whatsapp/widget-lead', data);
+        const response = await api.post<any>('/leads/widget', data);
         return response;
     },
 };

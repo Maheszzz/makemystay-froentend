@@ -188,7 +188,7 @@ export async function apiRequest<T>(
         // Interceptor already logs and transforms most errors into ApiError objects.
         // This catch block handles any catastrophic failures that bypassed the interceptor.
         console.error(`[apiRequest] Critical failure for ${config.url}:`, error);
-        return {} as T;
+        throw error;
     }
 }
 

@@ -1,35 +1,35 @@
 'use server';
 
-import { redirect, notFound } from 'next/navigation';
-import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
-import { buildLocalityFaqs, buildLocalityAeoGraph, resolveLocalityProfile } from '@/lib/pgLocalityContent';
-import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
-import { SEOHead } from '@/components/seo/SEOHead';
-import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
-import { QuickAnswer } from '@/components/seo/QuickAnswer';
-import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
-import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
-import { FaqSection } from '@/components/seo/FaqSection';
-import { LOCALITY_CONTENT } from '@/data/localityContent';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
+import { FaqSection } from '@/components/seo/FaqSection';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
+import { QuickAnswer } from '@/components/seo/QuickAnswer';
+import { SEOHead } from '@/components/seo/SEOHead';
+import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
+import { LOCALITY_CONTENT } from '@/data/localityContent';
+import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
+import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from '@/lib/pgLocalityContent';
+import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
+import { notFound, redirect } from 'next/navigation';
 
-import { PlaceSchema } from '@/components/seo/PlaceSchema';
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
+import { PlaceSchema } from '@/components/seo/PlaceSchema';
 
 
-import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
+import RelatedLocalities from '@/components/RelatedLocalities';
+import { Footer } from '@/components/layout/Footer';
+import { Navbar } from '@/components/layout/Navbar';
+import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
+import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
-import RelatedLocalities from '@/components/RelatedLocalities';
-import { PropertyCard } from '@/components/modules/listings/PropertyCard';
-import { Navbar } from '@/components/layout/Navbar';
-import { Footer } from '@/components/layout/Footer';
-import { MapPin, ChevronRight } from 'lucide-react';
-import Properties from '@/views/Properties';
 import { propertyApi } from '@/lib/api/properties';
 import { Link } from '@/lib/navigation';
+import Properties from '@/views/Properties';
+import { ChevronRight, MapPin } from 'lucide-react';
 
 /**
  * Server component for a PG locality page.
@@ -55,7 +55,7 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
   const profile = resolveLocalityProfile(locationSlug);
   const faqs = buildLocalityFaqs(name, locationSlug);
   const canonicalListingPath = stablePgListingCanonical(locationSlug, searchParams);
-const content = LOCALITY_CONTENT[locationSlug] || {};
+  const content = LOCALITY_CONTENT[locationSlug] || {};
   const breadcrumbItems = [
     { name: 'Home', path: '/' },
     { name: 'PG', path: '/pg' },
@@ -66,16 +66,15 @@ const content = LOCALITY_CONTENT[locationSlug] || {};
   // Fetch initial properties for SSR (no limit – fetch all for full SEO as per user decision)
   // Debug logging for SSR fetch
   console.log('[SSR] propertyApi.getAll called with', { city: locationSlug, limit: 20, baseUrl: process.env.API_BASE_URL });
-  let initialProperties = [];
-try {
-  const result = await propertyApi.getAll({ city: locationSlug, limit: 20 });
-  initialProperties = result.items ?? [];
-  console.log('[SSR] propertyApi.getAll response - count:', initialProperties.length, 'first item:', initialProperties[0]);
-} catch (error) {
-  console.warn('[SSR] propertyApi.getAll failed for', locationSlug, error);
-  // Continue with empty properties list to avoid 5xx
-}
-  const hasEmptyListings = initialProperties.length === 0;
+  let initialProperties: any[] = [];
+  try {
+    const result = await propertyApi.getAll({ city: locationSlug, limit: 20 });
+    initialProperties = result.items ?? [];
+    console.log('[SSR] propertyApi.getAll response - count:', initialProperties.length, 'first item:', initialProperties[0]);
+  } catch (error) {
+    console.warn('[SSR] propertyApi.getAll failed for', locationSlug, error);
+    // Continue with empty properties list to avoid 5xx
+  }
 
   const pageTitle = `PG in ${name}`;
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
@@ -84,10 +83,10 @@ try {
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
       <SEOHead {...helmet} noindex={helmet.noindex} />
       <JsonLd data={combinedLd} id="pg-location-ld-json" />
-<BreadcrumbSchema items={breadcrumbItems} />
+      <BreadcrumbSchema items={breadcrumbItems} />
 
-<PlaceSchema name={name} description={profile?.description} />
-<ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
+      <PlaceSchema name={name} description={profile?.description} />
+      <ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
 
 
       <Navbar />
@@ -152,97 +151,97 @@ try {
             <PgLocationDeepContent name={name} profile={profile} />
           </section>
 
-{/* Rent Range */}
-{loc.rentRange && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Range</h2>
-    <p className="text-slate-700">{loc.rentRange}</p>
-  </section>
-)}
+          {/* Rent Range */}
+          {loc.rentRange && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Range</h2>
+              <p className="text-slate-700">{loc.rentRange}</p>
+            </section>
+          )}
 
-{/* Landmarks */}
-{loc.landmarks && loc.landmarks.length > 0 && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Landmarks</h2>
-    <ul className="list-disc pl-5 space-y-1 text-slate-700">
-      {loc.landmarks.map((lm) => (
-        <li key={lm}>{lm}</li>
-      ))}
-    </ul>
-  </section>
-)}
+          {/* Landmarks */}
+          {loc.landmarks && loc.landmarks.length > 0 && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Landmarks</h2>
+              <ul className="list-disc pl-5 space-y-1 text-slate-700">
+                {loc.landmarks.map((lm) => (
+                  <li key={lm}>{lm}</li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-{/* Overview */}
-{content.overview && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Overview</h2>
-    <p className="text-slate-700">{content.overview}</p>
-  </section>
-)}
+          {/* Overview */}
+          {content.overview && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Overview</h2>
+              <p className="text-slate-700">{content.overview}</p>
+            </section>
+          )}
 
-{/* Rent Trends */}
-{content.rentTrends && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Trends</h2>
-    <p className="text-slate-700">{content.rentTrends}</p>
-  </section>
-)}
+          {/* Rent Trends */}
+          {content.rentTrends && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Rent Trends</h2>
+              <p className="text-slate-700">{content.rentTrends}</p>
+            </section>
+          )}
 
-{/* Metro Connectivity */}
-{content.metroConnectivity && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro Connectivity</h2>
-    <p className="text-slate-700">{content.metroConnectivity}</p>
-  </section>
-)}
+          {/* Metro Connectivity */}
+          {content.metroConnectivity && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Metro Connectivity</h2>
+              <p className="text-slate-700">{content.metroConnectivity}</p>
+            </section>
+          )}
 
-{/* Nearby IT Parks */}
-{content.nearbyITParks && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby IT Parks</h2>
-    <p className="text-slate-700">{content.nearbyITParks}</p>
-  </section>
-)}
+          {/* Nearby IT Parks */}
+          {content.nearbyITParks && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby IT Parks</h2>
+              <p className="text-slate-700">{content.nearbyITParks}</p>
+            </section>
+          )}
 
-{/* Nearby Colleges */}
-{content.nearbyColleges && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Colleges</h2>
-    <p className="text-slate-700">{content.nearbyColleges}</p>
-  </section>
-)}
+          {/* Nearby Colleges */}
+          {content.nearbyColleges && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Nearby Colleges</h2>
+              <p className="text-slate-700">{content.nearbyColleges}</p>
+            </section>
+          )}
 
-{/* Food & Lifestyle */}
-{content.foodAndLifestyle && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Food & Lifestyle</h2>
-    <p className="text-slate-700">{content.foodAndLifestyle}</p>
-  </section>
-)}
+          {/* Food & Lifestyle */}
+          {content.foodAndLifestyle && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Food & Lifestyle</h2>
+              <p className="text-slate-700">{content.foodAndLifestyle}</p>
+            </section>
+          )}
 
-{/* Safety */}
-{content.safety && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Safety</h2>
-    <p className="text-slate-700">{content.safety}</p>
-  </section>
-)}
+          {/* Safety */}
+          {content.safety && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Safety</h2>
+              <p className="text-slate-700">{content.safety}</p>
+            </section>
+          )}
 
-{/* Who Should Stay Here */}
-{content.whoShouldStayHere && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Who Should Stay Here</h2>
-    <p className="text-slate-700">{content.whoShouldStayHere}</p>
-  </section>
-)}
+          {/* Who Should Stay Here */}
+          {content.whoShouldStayHere && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Who Should Stay Here</h2>
+              <p className="text-slate-700">{content.whoShouldStayHere}</p>
+            </section>
+          )}
 
-{/* Pros & Cons */}
-{content.prosAndCons && (
-  <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <h2 className="text-2xl font-bold text-slate-900 mb-2">Pros & Cons</h2>
-    <p className="text-slate-700">{content.prosAndCons}</p>
-  </section>
-)}
+          {/* Pros & Cons */}
+          {content.prosAndCons && (
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Pros & Cons</h2>
+              <p className="text-slate-700">{content.prosAndCons}</p>
+            </section>
+          )}
           <FaqSection
             id="pg-locality-faq-heading"
             title={`Frequently asked — PG in ${name}`}
@@ -254,7 +253,7 @@ try {
           <RelatedSearchesBlock currentSlug={locationSlug} localityName={name} variant="pg" />
           <PgRelatedAreasNav currentSlug={locationSlug} nearbySlugs={profile.nearbySlugs} />
           <LocalityAuthoritySections profile={profile} />
-            <RelatedLocalities locationSlug={locationSlug} />
+          <RelatedLocalities locationSlug={locationSlug} />
         </div>
       </main>
       <Footer />
