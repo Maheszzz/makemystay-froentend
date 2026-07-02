@@ -1,6 +1,16 @@
 import { useEffect } from 'react';
 import type { HelmetSEOProps } from '@/lib/seo';
-import { OG_LOCALE, SITE_NAME, TWITTER_SITE_HANDLE } from '@/lib/siteConfig';
+import {
+    GEO_PLACENAME,
+    GEO_POSITION,
+    GEO_REGION,
+    OG_LOCALE,
+    SITE_AUTHOR,
+    SITE_NAME,
+    SITE_PUBLISHER,
+    THEME_COLOR,
+    TWITTER_SITE_HANDLE,
+} from '@/lib/siteConfig';
 
 const MMS_SEO = 'data-mms-seo';
 
@@ -79,8 +89,16 @@ export function useClientSeoHead({
         upsertMeta('description', { name: 'description', content: description }, managed);
         upsertMeta('robots', {
             name: 'robots',
-            content: noindex ? 'noindex, follow' : 'max-image-preview:large',
+            content: noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
         }, managed);
+        upsertMeta('theme-color', { name: 'theme-color', content: THEME_COLOR }, managed);
+        upsertMeta('author', { name: 'author', content: SITE_AUTHOR }, managed);
+        upsertMeta('publisher', { name: 'publisher', content: SITE_PUBLISHER }, managed);
+        upsertMeta('language', { name: 'language', content: 'en-IN' }, managed);
+        upsertMeta('geo.region', { name: 'geo.region', content: GEO_REGION }, managed);
+        upsertMeta('geo.placename', { name: 'geo.placename', content: GEO_PLACENAME }, managed);
+        upsertMeta('geo.position', { name: 'geo.position', content: GEO_POSITION }, managed);
+        upsertMeta('icbm', { name: 'ICBM', content: GEO_POSITION.replace(';', ', ') }, managed);
         upsertLink('canonical', { rel: 'canonical', href: canonicalHref }, managed);
 
         upsertMeta('og:title', { property: 'og:title', content: title }, managed);

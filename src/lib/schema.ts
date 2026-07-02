@@ -245,9 +245,12 @@ export function buildPropertyDetailGraph(
     const priceAmount = parseInrOfferAmount(property.price);
     const availability = property.is_available === false ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock';
     const productName = buildPropertyProductName(property);
+    const lowerType = (property.type || '').toLowerCase();
+    const isApartment = /bhk|rk|flat|apartment/.test(lowerType);
 
     const product: Record<string, unknown> = {
-        '@type': ['Product', 'Accommodation', 'Residence'],
+        '@type': ['Product', 'Accommodation', 'Residence', ...(isApartment ? ['Apartment'] : [])],
+        '@id': `${url}#property`,
         name: productName,
         description: desc || `${productName} — ${property.type} in ${property.location}`,
         url,
@@ -262,6 +265,16 @@ export function buildPropertyDetailGraph(
         product.category = property.type;
     }
     if (images.length > 0) product.image = images.length === 1 ? images[0] : images;
+
+    const imageObjects = images.slice(0, 12).map((imageUrl, index) => ({
+        '@type': 'ImageObject',
+        '@id': `${url}#image-${index + 1}`,
+        url: imageUrl,
+        contentUrl: imageUrl,
+        name: `${productName} photo ${index + 1}`,
+        caption: `${productName} in ${property.location || 'Bangalore'} - property photo ${index + 1}`,
+        representativeOfPage: index === 0,
+    }));
 
     const amenityFeatures = [
         ...(Array.isArray(property.features) ? property.features : []),
@@ -353,14 +366,34 @@ export function buildPropertyDetailGraph(
         },
     };
     if (images.length > 0) {
-        webPage.primaryImageOfPage = { '@type': 'ImageObject', url: images[0] };
+        webPage.primaryImageOfPage = { '@id': `${url}#image-1` };
     }
+
+    const localBusiness: Record<string, unknown> = {
+        '@type': ['LocalBusiness', 'RealEstateAgent'],
+        '@id': `${SITE_URL}/#localbusiness`,
+        name: SITE_NAME,
+        url: SITE_URL,
+        image: DEFAULT_OG_IMAGE,
+        areaServed: property.location
+            ? [`${property.location}, Bangalore`, 'Bangalore']
+            : ['Bangalore'],
+        address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Bangalore',
+            addressRegion: 'Karnataka',
+            addressCountry: 'IN',
+        },
+        priceRange: '₹6000 - ₹25000',
+    };
 
     const mergedFaqs = [...(pdpFaqs ?? []), ...(localityFaqs ?? [])].slice(0, 10);
 
     const graph: Record<string, unknown>[] = [
         schemaNodeWithoutContext(product),
         schemaNodeWithoutContext(webPage),
+        schemaNodeWithoutContext(localBusiness),
+        ...imageObjects.map((image) => schemaNodeWithoutContext(image)),
         schemaNodeWithoutContext(crumbs as Record<string, unknown>),
     ];
     if (mergedFaqs.length > 0) {

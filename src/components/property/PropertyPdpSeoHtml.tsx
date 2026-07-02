@@ -3,6 +3,7 @@ import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { propertyDetailPageSeo } from '@/lib/seo';
 import { buildPropertyPdpFaqs } from '@/lib/propertyClientSeoNarrative';
+import { buildPropertyContentGuide } from '@/lib/propertyContentEngine';
 import type { Property } from '@/types/api';
 
 function plainText(md: string): string {
@@ -24,8 +25,20 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
     const about = plainText(
         property.seo_about?.trim() || buildClientSeoAbout(property) || property.description || '',
     );
-    const faqs = buildPropertyPdpFaqs(property).slice(0, 6);
-    const features = Array.isArray(property.features) ? property.features.filter(Boolean).slice(0, 12) : [];
+    const faqs = buildPropertyPdpFaqs(property).slice(0, 10);
+    const guide = buildPropertyContentGuide(property);
+    const sections = [
+        guide.overview,
+        guide.suitability,
+        guide.pricing,
+        guide.roomTypes,
+        guide.amenities,
+        guide.foodWifiLaundry,
+        guide.safetyAndRules,
+        guide.moveInTerms,
+        guide.availabilityContact,
+    ];
+    const reviews = (property.reviews_list || []).filter((review) => review.comment || review.review_text).slice(0, 4);
 
     return (
         <article
@@ -49,12 +62,47 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
                     ))}
                 </div>
             )}
-            {features.length > 0 && (
+            {sections.map((section) => (
+                <section className="mt-8" key={section.title}>
+                    <h2 className="text-lg font-semibold text-slate-900">{section.title}</h2>
+                    <p className="mt-3 text-sm text-slate-700 leading-relaxed">{section.body}</p>
+                    {section.items && section.items.length > 0 && (
+                        <ul className="mt-3 grid gap-2 text-sm text-slate-700">
+                            {section.items.map((item) => (
+                                <li key={item}>{item}</li>
+                            ))}
+                        </ul>
+                    )}
+                </section>
+            ))}
+            <section className="mt-8">
+                <h2 className="text-lg font-semibold text-slate-900">Local area guide for {guide.locality}</h2>
+                {guide.localityGuide.map((section) => (
+                    <div className="mt-4" key={section.title}>
+                        <h3 className="text-base font-semibold text-slate-900">{section.title}</h3>
+                        <p className="mt-1 text-sm text-slate-700 leading-relaxed">{section.body}</p>
+                    </div>
+                ))}
+            </section>
+            <section className="mt-8">
+                <h2 className="text-lg font-semibold text-slate-900">Commute estimates from {guide.locality}</h2>
+                <ul className="mt-3 grid gap-2 text-sm text-slate-700">
+                    {guide.commute.map((item) => (
+                        <li key={item.destination}>
+                            {item.destination}: {item.note}
+                        </li>
+                    ))}
+                </ul>
+            </section>
+            {reviews.length > 0 && (
                 <section className="mt-8">
-                    <h2 className="text-lg font-semibold text-slate-900">Amenities at {title}</h2>
-                    <ul className="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-700">
-                        {features.map((f) => (
-                            <li key={f}>{f}</li>
+                    <h2 className="text-lg font-semibold text-slate-900">Reviews</h2>
+                    <ul className="mt-3 space-y-3 text-sm text-slate-700">
+                        {reviews.map((review) => (
+                            <li key={review.id}>
+                                {review.rating ? `${review.rating}/5 - ` : ''}
+                                {(review.comment || review.review_text || '').replace(/\s+/g, ' ').trim()}
+                            </li>
                         ))}
                     </ul>
                 </section>
@@ -72,6 +120,18 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
                     </dl>
                 </section>
             )}
+            <nav className="mt-8" aria-label="Related property links">
+                <h2 className="text-lg font-semibold text-slate-900">Related properties and areas</h2>
+                <ul className="mt-3 flex flex-wrap gap-3 text-sm">
+                    {guide.internalLinks.map((link) => (
+                        <li key={link.href}>
+                            <a className="text-brand-red underline-offset-4 hover:underline" href={link.href}>
+                                {link.label}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </nav>
         </article>
     );
 }

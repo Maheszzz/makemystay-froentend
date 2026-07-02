@@ -1,6 +1,15 @@
 import type { Metadata } from 'next';
 import { buildPageSEO, type PageSEOInput } from '@/lib/seo';
-import { SITE_NAME } from '@/lib/siteConfig';
+import {
+    GEO_PLACENAME,
+    GEO_POSITION,
+    GEO_REGION,
+    SITE_AUTHOR,
+    SITE_NAME,
+    SITE_PUBLISHER,
+    THEME_COLOR,
+    TWITTER_SITE_HANDLE,
+} from '@/lib/siteConfig';
 
 export type PageMetadataOptions = {
     openGraphType?: 'website' | 'article';
@@ -14,10 +23,31 @@ export function pageSeoToMetadata(input: PageSEOInput, options?: PageMetadataOpt
         title: { absolute: seo.title },
         description: seo.description,
         keywords: seo.keywords,
+        authors: [{ name: SITE_AUTHOR }],
+        publisher: SITE_PUBLISHER,
+        category: 'real estate',
         alternates: { canonical: seo.canonicalHref },
         robots: seo.noindex
             ? { index: false, follow: true, googleBot: { index: false, follow: true } }
-            : { index: true, follow: true },
+            : {
+                index: true,
+                follow: true,
+                googleBot: {
+                    index: true,
+                    follow: true,
+                    'max-image-preview': 'large',
+                    'max-snippet': -1,
+                    'max-video-preview': -1,
+                },
+            },
+        other: {
+            'theme-color': THEME_COLOR,
+            'geo.region': GEO_REGION,
+            'geo.placename': GEO_PLACENAME,
+            'geo.position': GEO_POSITION,
+            ICBM: GEO_POSITION.replace(';', ', '),
+            language: 'en-IN',
+        },
         openGraph: {
             title: seo.title,
             description: seo.description,
@@ -29,6 +59,7 @@ export function pageSeoToMetadata(input: PageSEOInput, options?: PageMetadataOpt
         },
         twitter: {
             card: 'summary_large_image',
+            site: TWITTER_SITE_HANDLE,
             title: seo.title,
             description: seo.description,
             images: seo.ogImage ? [seo.ogImage] : undefined,

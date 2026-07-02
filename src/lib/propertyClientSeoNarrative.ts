@@ -5,6 +5,7 @@
 
 import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
+import { buildDynamicPropertyFaqs } from '@/lib/propertyContentEngine';
 
 /** Same shape as `FaqItem` in schema (kept local to avoid circular imports). */
 export interface PropertyPdpFaq {
@@ -116,5 +117,13 @@ export function buildPropertyPdpFaqs(property: Property): PropertyPdpFaq[] {
             }
         );
     }
-    return items.slice(0, 10);
+    const seen = new Set<string>();
+    return [...items, ...buildDynamicPropertyFaqs(property)]
+        .filter((item) => {
+            const key = item.question.toLowerCase();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        })
+        .slice(0, 12);
 }
