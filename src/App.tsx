@@ -201,7 +201,7 @@ function App() {
                              <Route path="/buy/in/bangalore" element={<BuyBangaloreHub key="buy-bangalore-hub" />} />
                              <Route path="/buy/in/:city" element={<CityProperties category="buy" />} />
                              <Route path="/schedule-demo" element={<ScheduleDemo />} />
-                             <Route path="/1bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" initialCity="Bangalore" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
+                             <Route path="/1-bhk" element={<Properties key="1bhk" initialTypeFilter="1BHK" initialCity="Bangalore" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />} />
                              <Route path="/2bhk" element={<Properties key="2bhk" initialTypeFilter="2BHK" initialCity="Bangalore" pageTitle="2 BHK Properties in Bangalore" pageSubtitle="Ideal spaces for small families" />} />
                             <Route path="/services/:serviceId" element={<ServiceDetail />} />
                             <Route path="/terms" element={<Terms />} />

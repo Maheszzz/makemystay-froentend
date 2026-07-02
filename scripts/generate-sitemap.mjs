@@ -40,7 +40,7 @@ const STATIC_PATHS = [
     { path: '/how-we-verify', priority: '0.8', changefreq: 'monthly' },
     { path: '/blog', priority: '0.8', changefreq: 'weekly' },
     { path: '/flats-in-bangalore', priority: '0.9', changefreq: 'daily' },
-    { path: '/1bhk', priority: '0.88', changefreq: 'weekly' },
+    { path: '/1-bhk', priority: '0.88', changefreq: 'weekly' },
     { path: '/2bhk', priority: '0.88', changefreq: 'weekly' },
     { path: '/buy/in/bangalore', priority: '0.82', changefreq: 'weekly' },
     { path: '/plots/in/bangalore', priority: '0.82', changefreq: 'weekly' },
@@ -57,6 +57,11 @@ const PG_NEAR_LANDMARK_PATHS = [
     'pg-near-embassy-techvillage',
     'pg-near-ecity-phase-2',
     'pg-near-prestige-tech-park',
+    'pg-near-bagmane-tech-park',
+    'pg-near-christ-university',
+    'pg-near-pes-university',
+    'pg-near-rv-college',
+    'pg-near-jain-university',
 ];
 
 const blogPostsSrc = readFileSync(join(root, 'src/data/blogPosts.ts'), 'utf8');

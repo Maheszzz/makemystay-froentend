@@ -102,12 +102,15 @@ export interface Property {
     slug?: string;
     title: string;
     location: string;
+    city?: string;
     price: string;
     type: string;
     beds: number;
     baths: number;
     sqft: string;
     parking?: boolean;
+    latitude?: number;
+    longitude?: number;
     lift?: boolean;
     area?: number;
     wifi?: boolean;

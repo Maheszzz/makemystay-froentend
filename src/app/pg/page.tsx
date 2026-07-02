@@ -1,6 +1,6 @@
-import { permanentRedirect } from 'next/navigation';
+export const dynamic = 'force-dynamic';
 
-/** Consolidate generic `/pg` into the primary city hub (stronger content, one canonical URL). */
-export default function PgIndexPage() {
-    permanentRedirect('/pg/bangalore');
+import Properties from '@/views/Properties';
+export default function Page() {
+  return <Properties key="pg" initialCategory="pg" initialCity="Bangalore" pageTitle="PG Accommodations" pageSubtitle="Comfortable & verified PG options in Bangalore" />;
 }

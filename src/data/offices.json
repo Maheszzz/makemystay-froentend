@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "embassy-tech-village",
+    "name": "Embassy Tech Village",
+    "lat": 12.9387,
+    "lng": 77.6225
+  },
+  {
+    "slug": "rmz-ecoworld",
+    "name": "RMZ Ecoworld",
+    "lat": 12.9716,
+    "lng": 77.6412
+  },
+  {
+    "slug": "ecospace",
+    "name": "Ecospace",
+    "lat": 12.9538,
+    "lng": 77.7045
+  },
+  {
+    "slug": "bagmane-tech-park",
+    "name": "Bagmane Tech Park",
+    "lat": 12.9454,
+    "lng": 77.6190
+  },
+  {
+    "slug": "prestige-tech-park",
+    "name": "Prestige Tech Park",
+    "lat": 12.9350,
+    "lng": 77.6280
+  },
+  {
+    "slug": "manyata-tech-park",
+    "name": "Manyata Tech Park",
+    "lat": 13.0285,
+    "lng": 77.5585
+  }
+]

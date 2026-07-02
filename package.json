@@ -13,7 +13,7 @@
     "build:vite": "vite build && node scripts/generate-version.js && node scripts/generate-sitemap.mjs",
     "validate:sitemap": "node scripts/validate-sitemap-urls.mjs --sample 100",
     "optimize:hero": "node scripts/optimize-hero-images.mjs",
-    "preview": "next start",
+    "preview": "node .next/standalone/server.js",
     "generate:next-pages": "node scripts/generate-next-pages.mjs",
     "install:next-ec2": "bash scripts/install-next-remote.sh",
     "deploy": "bash deploy.sh",

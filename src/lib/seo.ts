@@ -2,8 +2,6 @@ import { buildPropertyOgImageUrl } from '@/lib/ogImage';
 import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
-import { stripMarkdownLight } from '@/lib/propertySeoUtils';
-import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 
 export interface PageSEOInput {
     title: string;
@@ -46,10 +44,11 @@ export function absoluteUrl(path: string): string {
  */
 export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
     const canonicalHref = input.canonicalUrl ?? absoluteUrl(input.path ?? '/');
-    const title = input.title.includes(SITE_NAME) ? input.title : `${input.title} | ${SITE_NAME}`;
+    const suffix = 'makemystay.ai';
+    const title = input.title.includes(suffix) ? input.title : `${input.title} | ${suffix}`;
     return {
-        title,
-        description: input.description,
+        title: title.slice(0, 70), // Keep it within display limits
+        description: input.description.slice(0, 160),
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
@@ -111,36 +110,22 @@ export function pgLocationSeoWithQuery(
     const price = searchParams.get('price');
     const genderRaw = searchParams.get('gender');
     const gender = genderRaw?.trim().toLowerCase();
-    let title: string;
-
-    // Custom SEO titles for specific localities
-    if (locationName.toLowerCase() === 'whitefield') {
-        title = `PG in Whitefield Bangalore | Starting ₹6,500 | ${SITE_NAME}`;
-    } else if (locationName.toLowerCase() === 'hsr layout') {
-        title = `1 BHK for Rent in HSR Layout Bangalore | ₹25,000 | ${SITE_NAME}`;
-    } else {
-        // Default title for other locations
-        title = `Verified PG in ${locationName} | Zero brokerage · ₹6k–₹18k`;
+    
+    // Primary title structure for Locality pages: 50-60 chars limit
+    let title = `PG in ${locationName} | Best Coliving`;
+    if (wifi || food || ac) {
+        title = `Furnished PG in ${locationName}`;
     }
 
     const tags: string[] = [];
     if (gender === 'male' || gender === 'female') {
-        tags.push(gender === 'male' ? 'boys PG' : 'girls PG');
+        tags.push(gender === 'male' ? 'Boys PG' : 'Girls PG');
     }
-    if (wifi) tags.push('WiFi PGs');
-    if (food) tags.push('food included');
-    if (ac) tags.push('AC rooms');
-    if (price === 'low') tags.push('budget-friendly');
-    if (price === 'mid') tags.push('mid-range');
-    if (price === 'high') tags.push('premium');
     if (tags.length) {
-        title = `Verified PG in ${locationName}: ${tags.join(' · ')} | Zero brokerage`;
+        title = `${tags[0]} in ${locationName}`;
     }
 
-    let description = `Verified PG in ${locationName}, Bangalore — zero brokerage on many listings, real photos, ₹6k–₹18k/mo bands. Compare WiFi, meals & security on ${SITE_NAME}.`;
-    if (tags.length) {
-        description = `PG in ${locationName} — ${tags.join(', ')}. Verified listings, transparent pricing; book visits or pay tokens online where enabled on ${SITE_NAME}.`;
-    }
+    const description = `Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in ${locationName}, Bangalore with makemystay.ai.`;
 
     return {
         title,
@@ -157,8 +142,8 @@ export function pgLocationSeo(locationName: string, slug: string): PageSEOInput 
 /** SEO for `/rent/:slug` locality hub (flats & houses on rent). */
 export function rentLocationHubSeo(locationName: string, slug: string): PageSEOInput {
     return {
-        title: `Verified flats & 1BHK in ${locationName} | Zero brokerage rents`,
-        description: `Browse verified 1BHK, 2BHK & family homes for rent in ${locationName}, Bangalore on ${SITE_NAME} — real photos, transparent rent, zero brokerage on many listings.`,
+        title: `1 BHK for Rent in ${locationName}`,
+        description: `Find verified 1 BHK, 2 BHK, and rental homes in ${locationName}, Bangalore. Zero brokerage, real photos, and transparent pricing on makemystay.ai.`,
         path: `/rent/${slug}`,
     };
 }
@@ -173,8 +158,8 @@ export function pgGenderLocalitySeo(
     const pathPrefix = isMale ? 'pg-for-boys-in' : 'pg-for-girls-in';
     const label = isMale ? 'Boys PG' : 'Girls PG';
     return {
-        title: `Verified ${label} in ${locationName} | Zero brokerage · near IT parks`,
-        description: `Find verified ${label.toLowerCase()} in ${locationName}, Bangalore — WiFi, meals & security on many listings. Zero brokerage on select stays. Browse on ${SITE_NAME}.`,
+        title: `${label} in ${locationName} | Coliving`,
+        description: `Find safe, verified ${label.toLowerCase()} in ${locationName}, Bangalore with WiFi, meals, and security. Zero brokerage on makemystay.ai.`,
         path: `/${pathPrefix}-${slug}`,
     };
 }
@@ -198,60 +183,37 @@ function normalizeLocationForSeo(location: string | undefined): string {
 }
 
 function buildPropertyMetaTitle(property: Property): string {
-    const name = formatPropertyTitle(property.title) || property.title || 'Property';
-    const location = normalizeLocationForSeo(property.location);
+    const location = property.location ? property.location.split(',')[0].trim() : 'Bangalore';
     const typeLower = (property.type || '').toLowerCase();
     const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
     const isPG = property.category === 'pg' || isPgType;
     const bhk = property.type || '1BHK';
 
     if (isPG) {
-        return `Verified PG in ${location} for rent | ${name}`;
+        return `Luxury PG in ${location} | Fully Furnished`;
     }
 
-    // Rental property title pattern: {BHK} Flat for Rent in {Location}
     const rentPrefix = bhk.toLowerCase().includes('bhk') || bhk.toLowerCase().includes('rk') 
-        ? `${bhk} Flat` 
+        ? bhk 
         : 'Flat';
-    return `${rentPrefix} for Rent in ${location} | ${name}`;
+    return `${rentPrefix} for Rent in ${location}`;
 }
 
 function buildPropertyMetaDescription(property: Property): string {
     const name = formatPropertyTitle(property.title) || property.title || 'This property';
     const type = (property.type || 'property').trim();
     const location = normalizeLocationForSeo(property.location);
-    const isRent = property.category === 'rent';
     const price = (property.price || '').trim();
     const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
 
-    const amenityBits = [
-        property.wifi ? 'WiFi' : '',
-        property.food ? 'food' : '',
-        property.housekeeping ? 'housekeeping' : '',
-        property.power_backup ? 'power backup' : '',
-    ].filter(Boolean);
-    const amenityText = amenityBits.length > 0 ? ` Explore ${amenityBits.slice(0, 3).join(', ')}, amenities,` : ' Explore amenities,';
-
-    if (isRent && hasPrice) {
-        return `${name} offers a ${type} for rent in ${location} from ${price}/month. View photos, location highlights,${amenityText} and book a visit online with ${SITE_NAME}.`;
-    }
-
-    if (isRent) {
-        return `${name} offers a ${type} for rent in ${location}. View photos, location highlights,${amenityText} and book a visit online with ${SITE_NAME}.`;
-    }
-
-    return `Explore ${name}, a ${type} in ${location}. View photos, locality details, amenities, pricing guidance, and schedule a site visit with ${SITE_NAME}.`;
+    const priceText = hasPrice ? ` starting from ${price}/month` : '';
+    return `Explore ${name}, a verified ${type} for rent in ${location}${priceText}. View photos, amenities, and book a visit online with makemystay.ai.`;
 }
 
 /** Meta + canonical for detail pages (handled via /pg/ or /rent/ routers). */
 export function propertyDetailPageSeo(property: Property, detailPath: string): PageSEOInput {
     const path = detailPath; // Use the verified path from getPropertyDetailPath
-    const longPlain = stripMarkdownLight(
-        property.seo_about || buildClientSeoAbout(property) || property.description || ''
-    )
-        .replace(/\s+/g, ' ')
-        .trim();
-    const description = buildPropertyMetaDescription(property) || longPlain.slice(0, 160);
+    const description = buildPropertyMetaDescription(property);
     const keywords = [
         formatPropertyTitle(property.title),
         property.type,
@@ -261,7 +223,7 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
         'PG coliving',
         'property visit booking',
         'verified property listing',
-        SITE_NAME,
+        'makemystay.ai',
     ]
         .filter(Boolean)
         .join(', ');
@@ -373,9 +335,9 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals',
+        title: 'PG in Bangalore | Coliving, Rental Homes, 1 BHK & 2 BHK',
         description:
-            'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage. Book a visit in 60 seconds on MakeMyStay.ai.',
+            'Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in Bangalore with makemystay.ai.',
         path: '/',
     };
 }
@@ -444,7 +406,7 @@ export function build1BhkSEO(): PageSEOInput {
         title: '1BHK for Rent in Bangalore — Verified flats | Zero brokerage',
         description:
             'Find verified 1BHK flats for rent in Bangalore with real photos and transparent pricing. Compare localities and book a visit on MakeMyStay.ai.',
-        path: '/1bhk',
+        path: '/1-bhk',
     };
 }
 

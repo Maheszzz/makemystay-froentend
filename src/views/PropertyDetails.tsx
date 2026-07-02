@@ -14,8 +14,7 @@ import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { SEOHead } from '@/components/seo/SEOHead';
-import { JsonLd } from '@/components/seo/JsonLd';
+import { SEO } from '@/components/seo/SEO';
 import { buildPropertyDetailGraph } from '@/lib/schema';
 import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
@@ -36,9 +35,9 @@ import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { AeoSnippet } from '@/components/seo/AeoSnippet';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
 import {
-    buildClientSeoAbout,
     buildPropertyPdpFaqs,
     extractHeroLeadFromNarrative,
+    generatePropertyLongFormContent,
 } from '@/lib/propertyClientSeoNarrative';
 import { findPgLocationForArea } from '@/data/pgLocations';
 import type { Property } from '@/types/api';
@@ -249,7 +248,15 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     if (loading) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-                <SEOHead {...interimHelmet} ogType="article" />
+                <SEO 
+                    title={interimHelmet.title}
+                    description={interimHelmet.description}
+                    keywords={interimHelmet.keywords}
+                    canonical={interimHelmet.canonicalHref}
+                    image={interimHelmet.ogImage}
+                    noindex={interimHelmet.noindex}
+                    type="article"
+                />
                 <Navbar />
                 <main className="flex-grow flex items-center justify-center">
                     <LoadingSpinner message="Loading property details..." />
@@ -262,7 +269,14 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     if (error || !property) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-                <SEOHead {...errorHelmet} />
+                <SEO 
+                    title={errorHelmet.title}
+                    description={errorHelmet.description}
+                    keywords={errorHelmet.keywords}
+                    canonical={errorHelmet.canonicalHref}
+                    image={errorHelmet.ogImage}
+                    noindex={errorHelmet.noindex}
+                />
                 <Navbar />
                 <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4">
                     <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
@@ -320,10 +334,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     const aboutNarrative = property.description?.trim() || desc;
 
     /** Full SEO article moved to "Area Guide" section at the bottom of the page. */
-    const longSeo =
-        property.seo_about && property.seo_about.trim().length > 80
-            ? property.seo_about.trim()
-            : buildClientSeoAbout(property);
+    const longSeo = generatePropertyLongFormContent(property);
 
     const aboutWordCount = aboutNarrative.trim().split(/\s+/).filter((w) => w.length > 0).length;
     const showAboutToggle = aboutWordCount > 200;
@@ -351,8 +362,18 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
     return (
         <Fragment>
-            {detailHelmet && <SEOHead {...detailHelmet} ogType="article" />}
-            {detailJsonLd && <JsonLd id="property-detail-jsonld" data={detailJsonLd} />}
+            {detailHelmet && (
+                <SEO 
+                    title={detailHelmet.title}
+                    description={detailHelmet.description}
+                    keywords={detailHelmet.keywords}
+                    canonical={detailHelmet.canonicalHref}
+                    image={detailHelmet.ogImage}
+                    noindex={detailHelmet.noindex}
+                    type="article"
+                    schema={detailJsonLd || undefined}
+                />
+            )}
             <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
             <Navbar />
 
@@ -783,9 +804,31 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                 </p>
                             </div>
                             <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
-                                {longSeo.split(/\n\n+/).map((block: string, bi: number) => (
-                                    <p key={bi} className="mb-4">{block}</p>
-                                ))}
+                                {longSeo.split(/\n\n+/).map((block: string, bi: number) => {
+                                    if (block.startsWith('## ')) {
+                                        return <h2 key={bi} className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">{block.replace('## ', '')}</h2>;
+                                    }
+                                    if (block.startsWith('- ')) {
+                                        return (
+                                            <ul key={bi} className="list-disc pl-5 mb-4 space-y-1">
+                                                {block.split('\n').map((line, li) => {
+                                                    const cleanLine = line.replace(/^- \**|^\* |^\*+\s*/, '');
+                                                    const parts = cleanLine.split('**');
+                                                    if (parts.length > 2) {
+                                                        return (
+                                                            <li key={li}>
+                                                                <strong className="font-semibold text-slate-900">{parts[1]}</strong>
+                                                                {parts.slice(2).join('')}
+                                                            </li>
+                                                        );
+                                                    }
+                                                    return <li key={li}>{cleanLine}</li>;
+                                                })}
+                                            </ul>
+                                        );
+                                    }
+                                    return <p key={bi} className="mb-4">{block}</p>;
+                                })}
                             </div>
                         </section>
                     )}

@@ -94,7 +94,7 @@ export default function Page() {
   const t = city ? city.charAt(0).toUpperCase() + city.slice(1) : '';
   return <Properties key={\`buy-\${city}\`} initialCategory="buy" initialCity={city} pageTitle={\`Buy in \${t}\`} pageSubtitle={\`Explore verified homes for sale in \${t}\`} />;
 }`);
-write('1bhk/page.tsx', `import Properties from '@/views/Properties';
+write('1-bhk/page.tsx', `import Properties from '@/views/Properties';
 export default function Page() {
   return <Properties key="1bhk" initialTypeFilter="1BHK" initialCity="Bangalore" pageTitle="1 BHK Properties in Bangalore" pageSubtitle="Perfect homes for singles and couples" />;
 }`);
@@ -112,9 +112,23 @@ write('not-found.tsx', exp('views/NotFound'));
 for (const p of [
     'pg-near-ecospace', 'pg-near-rmz-ecoworld', 'pg-near-wipro-ecity', 'pg-near-manyata',
     'pg-near-itpl', 'pg-near-embassy-techvillage', 'pg-near-ecity-phase-2', 'pg-near-prestige-tech-park',
+    'pg-near-bagmane-tech-park', 'pg-near-christ-university', 'pg-near-pes-university',
+    'pg-near-rv-college', 'pg-near-jain-university',
 ]) {
     write(`${p}/page.tsx`, exp('views/PgNearLandmarkPage'));
 }
+
+// Generate Office landing pages dynamically
+import { readFileSync } from 'fs';
+const officesJsonPath = join(root, 'src', 'data', 'offices.json');
+const OFFICES = JSON.parse(readFileSync(officesJsonPath, 'utf-8'));
+
+
+// Generate Office landing pages dynamically
+const officeSlugs = OFFICES.map(o => o.slug);
+officeSlugs.forEach((slug) => {
+  write(`office/${slug}/page.tsx`, exp('views/OfficeLandingPage'));
+});
 
 // Programmatic SEO uses required catch-all `src/app/[...path]/` (see SeoCatchAllClient.tsx).
 // Do not add `[[...path]]` — it conflicts with `[...path]` and with `app/page.tsx` for `/`.

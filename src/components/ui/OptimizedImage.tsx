@@ -7,6 +7,7 @@ import { getOptimizedImageUrl, type ImageSize } from '@/lib/utils/images';
 export type OptimizedImageProps = {
     src: string;
     alt: string;
+    title?: string;
     /** Use with a `position: relative` + explicit height parent */
     fill?: boolean;
     width?: number;
@@ -45,6 +46,7 @@ function isOptimizableSrc(src: string): boolean {
 export function OptimizedImage({
     src,
     alt,
+    title,
     fill,
     width,
     height,
@@ -71,10 +73,13 @@ export function OptimizedImage({
         <Image
             src={resolved}
             alt={ariaHidden ? '' : alt}
+            title={title ?? alt}
             fill={fill}
             width={fill ? undefined : width}
             height={fill ? undefined : height}
             priority={priority}
+            loading={priority ? undefined : 'lazy'}
+            decoding="async"
             quality={quality ?? (priority ? 60 : 75)}
             sizes={sizes ?? (fill ? '(max-width: 768px) 100vw, 33vw' : undefined)}
             className={className}

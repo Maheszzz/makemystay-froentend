@@ -59,6 +59,42 @@ export const PG_NEAR_LANDMARKS: PgNearLandmarkEntry[] = [
         hubSlug: 'marathahalli',
         context: 'Marathahalli–Kundalahalli micro-market; strong PG supply.',
     },
+    {
+        path: 'pg-near-bagmane-tech-park',
+        landmark: 'Bagmane Tech Park',
+        hubSlug: 'marathahalli',
+        context: 'Mahadevapura corridor — great co-living options near CV Raman Nagar.',
+    },
+    {
+        path: 'pg-near-christ-university',
+        landmark: 'Christ University',
+        hubSlug: 'btm',
+        context: 'BTM Layout & Koramangala sectors — highly popular student housing hub.',
+    },
+    {
+        path: 'pg-near-pes-university',
+        landmark: 'PES University',
+        hubSlug: 'jp-nagar',
+        context: 'South Bangalore educational zone — browse private and shared rooms.',
+    },
+    {
+        path: 'pg-near-rv-college',
+        landmark: 'RV College of Engineering',
+        hubSlug: 'jp-nagar',
+        context: 'Mysore Road transit corridor — check transport options and student PGs.',
+    },
+    {
+        path: 'pg-near-jain-university',
+        landmark: 'Jain University',
+        hubSlug: 'jp-nagar',
+        context: 'Jayanagar & JP Nagar blocks — safe and verified boys & girls stays.',
+    },
+    {
+        path: 'pg-near-cmr-university',
+        landmark: 'CMR University',
+        hubSlug: 'hebbal',
+        context: 'North Bangalore corridor — easily accessible student PG rooms.',
+    },
 ];
 
 export function getPgNearLandmarkByPath(pathname: string): PgNearLandmarkEntry | undefined {

@@ -3,10 +3,9 @@
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { JsonLd } from '@/components/seo/JsonLd';
+import { SEO } from '@/components/seo/SEO';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { QuickAnswer } from '@/components/seo/QuickAnswer';
-import { SEOHead } from '@/components/seo/SEOHead';
 import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 import { LOCALITY_CONTENT } from '@/data/localityContent';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
@@ -81,8 +80,15 @@ export default async function PGLocationPage({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEOHead {...helmet} noindex={helmet.noindex} />
-      <JsonLd data={combinedLd} id="pg-location-ld-json" />
+      <SEO 
+        title={helmet.title}
+        description={helmet.description}
+        keywords={helmet.keywords}
+        canonical={helmet.canonicalHref}
+        image={helmet.ogImage}
+        noindex={helmet.noindex}
+        schema={combinedLd}
+      />
       <BreadcrumbSchema items={breadcrumbItems} />
 
       <PlaceSchema name={name} description={profile?.description} />
