@@ -13,7 +13,7 @@ import {
     Zap,
     ShieldCheck,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { Link, useListingFromUrl } from '@/lib/navigation';
 
 import { useWishlist } from '@/context/WishlistContext';
@@ -45,7 +45,7 @@ function getFallbackImageForType(type?: string): string {
     return 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80';
 }
 
-export function PropertyCard({ property }: PropertyCardProps) {
+function PropertyCardComponent({ property }: PropertyCardProps) {
     let listingFrom = '';
     try {
         const urlInfo = useListingFromUrl();
@@ -63,15 +63,16 @@ export function PropertyCard({ property }: PropertyCardProps) {
         // Fallback for SSR when wishlist context is unavailable
     }
 
-    const handleHeartClick = (e: React.MouseEvent) => {
+    const handleHeartClick = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         toggleWishlist(property);
-    };
+    }, [property, toggleWishlist]);
 
     const fallbackImage = useMemo(() => getFallbackImageForType(property.type), [property.type]);
 
-    const getImage = (prop: any) => {
+    const displayImage = useMemo(() => {
+        const prop: any = property;
         const imgs = Array.isArray(prop.images) ? prop.images : [];
         const ph = Array.isArray(prop.photos) ? prop.photos : [];
         
@@ -79,9 +80,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         const parsedPhotos = ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean);
 
         return parsedImages[0] || prop.image || parsedPhotos[0] || fallbackImage || '/default-property.jpg';
-    };
-
-    const displayImage = getImage(property);
+    }, [property, fallbackImage]);
     const typeLower = (property.type || '').toLowerCase();
     const isServiceOriented = typeLower === 'pg' || typeLower === 'hostel';
     const isPlot = typeLower === 'plot';
@@ -96,19 +95,34 @@ export function PropertyCard({ property }: PropertyCardProps) {
         return 'On Request';
     }, [property.area, property.sqft]);
 
-    const amenities: string[] = [];
-    if (property.wifi) amenities.push('WiFi');
-    if (property.power_backup) amenities.push('Backup');
-    if (property.ac) amenities.push('AC');
-    if (property.food) amenities.push('Food');
-    if (property.gym) amenities.push('Gym');
-    if (property.pool) amenities.push('Pool');
-    if (property.geyser) amenities.push('Geyser');
-    if (property.cctv) amenities.push('Security');
+    const amenities = useMemo(() => {
+        const next: string[] = [];
+        if (property.wifi) next.push('WiFi');
+        if (property.power_backup) next.push('Backup');
+        if (property.ac) next.push('AC');
+        if (property.food) next.push('Food');
+        if (property.gym) next.push('Gym');
+        if (property.pool) next.push('Pool');
+        if (property.geyser) next.push('Geyser');
+        if (property.cctv) next.push('Security');
+        return next;
+    }, [
+        property.wifi,
+        property.power_backup,
+        property.ac,
+        property.food,
+        property.gym,
+        property.pool,
+        property.geyser,
+        property.cctv,
+    ]);
 
     const propertyPath = getPropertyDetailPath(property);
     const displayTitle = useMemo(() => formatPropertyTitle(property.title), [property.title]);
-    const waLink = buildPropertyWhatsappUrl(displayTitle || property.title, property.location || '');
+    const waLink = useMemo(
+        () => buildPropertyWhatsappUrl(displayTitle || property.title, property.location || ''),
+        [displayTitle, property.title, property.location],
+    );
     const unitsLeft = typeof property.units_remaining === 'number' && property.units_remaining > 0 ? property.units_remaining : null;
     const hasRating = (property.rating ?? 0) > 0;
     const secondaryBadge = property.listing_badge?.trim() || (property.is_available === false ? 'Fully booked' : '');
@@ -347,3 +361,5 @@ export function PropertyCard({ property }: PropertyCardProps) {
         </Link>
     );
 }
+
+export const PropertyCard = memo(PropertyCardComponent);

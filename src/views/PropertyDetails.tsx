@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment } from 'react';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
@@ -19,23 +20,18 @@ import { buildPropertyDetailGraph } from '@/lib/schema';
 import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
 
-import { ServiceFeeModal, ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
-import { ReviewSection } from '@/components/property/ReviewSection';
+import type { ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { useMemo, useState } from 'react';
 import { useWishlist } from '@/context/WishlistContext';
 import { getAmenityIcon } from '@/lib/amenityIcons';
 import { dedupePropertyFeatures, normalizeFeatureKey } from '@/lib/propertyFeatures';
 import { brandLogoUrl } from '@/lib/brand';
 import { getRazorpayKeyId } from '@/lib/env';
-import { PaymentSuccessModal } from '@/components/modals/PaymentSuccessModal';
-import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
 import { PropertyQuickAnswers } from '@/components/seo/PropertyQuickAnswers';
 import { FreshnessBadge } from '@/components/trust/FreshnessBadge';
 import { getFreshnessBadges } from '@/lib/freshness';
-import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
-import { SafetyPopup } from '@/components/modals/SafetyPopup';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { AeoSnippet } from '@/components/seo/AeoSnippet';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
@@ -46,6 +42,31 @@ import {
 } from '@/lib/propertyClientSeoNarrative';
 import { findPgLocationForArea } from '@/data/pgLocations';
 import type { Property } from '@/types/api';
+
+const ServiceFeeModal = dynamic(
+    () => import('@/components/modals/ServiceFeeModal').then((m) => m.ServiceFeeModal),
+    { ssr: false },
+);
+const ReviewSection = dynamic(
+    () => import('@/components/property/ReviewSection').then((m) => m.ReviewSection),
+    { ssr: false },
+);
+const PaymentSuccessModal = dynamic(
+    () => import('@/components/modals/PaymentSuccessModal').then((m) => m.PaymentSuccessModal),
+    { ssr: false },
+);
+const LeadCaptureModal = dynamic(
+    () => import('@/components/modals/LeadCaptureModal').then((m) => m.LeadCaptureModal),
+    { ssr: false },
+);
+const SimilarPropertiesSection = dynamic(
+    () => import('@/components/property/SimilarPropertiesSection').then((m) => m.SimilarPropertiesSection),
+    { ssr: false },
+);
+const SafetyPopup = dynamic(
+    () => import('@/components/modals/SafetyPopup').then((m) => m.SafetyPopup),
+    { ssr: false },
+);
 
 type PropertyDetailsProps = {
     /** SSR-hydrated listing from the server page (avoids empty HTML for crawlers). */
@@ -69,7 +90,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     const [showServiceFeeModal, setShowServiceFeeModal] = useState(false);
     const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
     const [aboutExpanded, setAboutExpanded] = useState(false);
-    const [copied, setCopied] = useState(false);
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
     const [heroIdx, setHeroIdx] = useState(0);
@@ -116,16 +136,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
         return buildPropertyDetailGraph(property, canonicalDetailPath, undefined, buildPropertyPdpFaqs(property));
     }, [property, canonicalDetailPath]);
 
-    /** Never show fabricated 4.6 / "27 Reviews" — only API-backed rating + review count or review list. */
-    const showListingRating = useMemo(() => {
-        if (!property) return false;
-        const r = property.average_rating ?? property.rating ?? 0;
-        if (r <= 0) return false;
-        const rc = property.review_count ?? property.reviews ?? 0;
-        const rl = property.reviews_list?.length ?? 0;
-        return rc > 0 || rl > 0;
-    }, [property]);
-
     const ratingStarsValue = property ? property.average_rating ?? property.rating ?? 0 : 0;
     const reviewLabelText = property
         ? (property.review_count ?? property.reviews ?? 0) > 0
@@ -167,8 +177,6 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
         } else {
             try {
                 await navigator.clipboard.writeText(productionUrl);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
             } catch { alert('Failed to copy link to clipboard.'); }
         }
     };

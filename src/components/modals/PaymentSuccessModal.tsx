@@ -32,10 +32,8 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
     if (!isOpen) return null;
 
     return (
-        <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <div style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;800&display=swap');
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         .overlay {
@@ -145,13 +143,13 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
         .text-area.show { opacity: 1; transform: translateY(0); }
 
         .headline {
-          font-family: 'Playfair Display', Georgia, serif;
+          font-family: var(--font-playfair), Georgia, serif;
           font-size: 1.875rem; font-weight: 800;
           color: #fff; letter-spacing: -0.02em;
           line-height: 1.1; margin-bottom: 0.625rem;
         }
         .subtext {
-          font-family: 'DM Sans', sans-serif;
+          font-family: var(--font-inter), Inter, sans-serif;
           font-size: 0.8125rem; color: rgba(255,255,255,0.4);
           line-height: 1.6; font-weight: 400;
         }
@@ -176,21 +174,21 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
         }
 
         .label {
-          font-family: 'DM Mono', monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           font-size: 0.625rem; font-weight: 500;
           color: rgba(255,255,255,0.3);
           letter-spacing: 0.15em; text-transform: uppercase;
           margin-bottom: 0.375rem;
         }
         .amount-val {
-          font-family: 'Playfair Display', Georgia, serif;
+          font-family: var(--font-playfair), Georgia, serif;
           font-size: 2.5rem; font-weight: 800;
           color: #fff; letter-spacing: -0.03em;
           display: flex; align-items: baseline; gap: 0.25rem;
           line-height: 1;
         }
         .currency {
-          font-family: 'DM Sans', sans-serif;
+          font-family: var(--font-inter), Inter, sans-serif;
           font-size: 1.125rem; font-weight: 500;
           color: rgba(255,255,255,0.4);
         }
@@ -202,7 +200,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
           display: flex; align-items: center; gap: 0.5rem;
         }
         .txn-id {
-          font-family: 'DM Mono', monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           font-size: 0.6875rem; font-weight: 500;
           color: rgba(255,255,255,0.6);
           background: rgba(255,255,255,0.05);
@@ -226,7 +224,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
           letter-spacing: 0.05em;
           padding: 0.25rem 0.75rem; border-radius: 999px;
           margin-bottom: 1rem;
-          font-family: 'DM Mono', monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
         .status-dot {
           width: 5px; height: 5px; background: #34d399;

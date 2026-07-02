@@ -2,12 +2,12 @@ import type { BlogPost } from '@/data/blogPosts';
 
 /** Local assets — each used at most once on the index grid. */
 const LOCAL = {
-    pgLiving: '/images/blog/pg-living.png',
-    techPark: '/images/blog/tech-park.png',
-    agreement: '/images/blog/agreement.png',
-    safety: '/images/blog/safety.png',
-    ai: '/images/blog/ai.png',
-    hero: '/images/blog/hero.png',
+    pgLiving: '/images/blog/pg-living.webp',
+    techPark: '/images/blog/tech-park.webp',
+    agreement: '/images/blog/agreement.webp',
+    safety: '/images/blog/safety.webp',
+    ai: '/images/blog/ai.webp',
+    hero: '/images/blog/hero.webp',
     heroSunset: '/images/blog/hero-sunset.webp',
 } as const;
 

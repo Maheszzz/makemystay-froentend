@@ -11,7 +11,6 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
 import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import {
@@ -496,9 +495,6 @@ export default function Properties({
         String(initialCity ?? '').toLowerCase() === 'bangalore' &&
         (!hideChrome || embedRentHubUi);
 
-    const showPlotCityHubBlocks =
-        category === 'plot' && initialCity !== 'all' && !hideChrome;
-
     const cityLabelDisplay = useMemo(() => {
         if (locationFilter === 'all') return 'Bangalore';
         const s = String(locationFilter).trim();
@@ -565,19 +561,20 @@ export default function Properties({
                     <section className="relative py-16 md:py-24 bg-brand-charcoal overflow-hidden mb-12">
                         <div className="absolute inset-0 z-0">
                             <img 
-                                src="/images/blog/hero.png" 
+                                src="/images/blog/hero-sunset.avif"
                                 alt="" 
                                 className="w-full h-full object-cover opacity-20 scale-105"
+                                width={1600}
+                                height={900}
+                                loading="eager"
+                                decoding="async"
+                                fetchPriority="high"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal via-brand-charcoal/60 to-transparent" />
                         </div>
                         
                         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6 }}
-                            >
+                            <div className="animate-fade-in-up">
                                 <button
                                     type="button"
                                     onClick={goBack}
@@ -592,7 +589,7 @@ export default function Properties({
                                 <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">
                                     {pageSubtitle}
                                 </p>
-                            </motion.div>
+                            </div>
                         </div>
                     </section>
                 )}
@@ -671,14 +668,8 @@ export default function Properties({
                         </div>
 
                         {/* Expandable Advanced Filters */}
-                        <AnimatePresence>
-                            {showFilters && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                    animate={{ height: 'auto', opacity: 1, marginTop: 24 }}
-                                    exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                    className="overflow-hidden"
-                                >
+                        {showFilters && (
+                            <div className="mt-6 overflow-hidden animate-filter-panel">
                                     <div className="pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                         {/* Sort Options */}
                                         <div className="space-y-2">
@@ -772,9 +763,8 @@ export default function Properties({
                                             Show Results
                                         </button>
                                     </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                            </div>
+                        )}
                     </div>
 
                     {/* 3. Area Chips (Hub context) */}
@@ -855,9 +845,7 @@ export default function Properties({
                         <div className="space-y-12">
                             <div className={showMapPanel ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] items-start' : ''}>
                                 {/* Grid */}
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
+                                <div
                                     className={`grid gap-6 md:gap-8 ${
                                         hideChrome
                                             ? showMapPanel
@@ -870,14 +858,13 @@ export default function Properties({
                                         propertyListOrdered.map((prop, idx) => {
                                             if (!prop || !prop.id) return null;
                                             return (
-                                                <motion.div
+                                                <div
                                                     key={prop.id}
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: Math.min(idx * 0.05, 0.4), duration: 0.5 }}
+                                                    className="animate-card-in"
+                                                    style={{ animationDelay: `${Math.min(idx * 35, 280)}ms` }}
                                                 >
                                                     <PropertyCard property={prop} />
-                                                </motion.div>
+                                                </div>
                                             );
                                         })
                                     ) : (
@@ -905,7 +892,7 @@ export default function Properties({
                                             </div>
                                         </div>
                                     )}
-                                </motion.div>
+                                </div>
 
                                 {showMapPanel && (
                                     <aside className="lg:sticky lg:top-28 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -956,14 +943,8 @@ export default function Properties({
             {!hideChrome && <Footer />}
 
             {/* Floating Wishlist Button (Mobile focused) */}
-            <AnimatePresence>
-                {wishlist.length > 0 && (
-                    <motion.div
-                        initial={{ y: 100, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 100, opacity: 0 }}
-                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm"
-                    >
+            {wishlist.length > 0 && (
+                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm animate-slide-up">
                         <Link 
                             to="/wishlist"
                             className="flex items-center justify-between p-4 bg-brand-charcoal text-white rounded-2xl shadow-2xl border border-white/10 backdrop-blur-md group"
@@ -987,9 +968,8 @@ export default function Properties({
                                 <ArrowRight className="w-3 h-3" />
                             </div>
                         </Link>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                </div>
+            )}
         </div>
     );
 }

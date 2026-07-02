@@ -35,6 +35,22 @@ async function main() {
         const info = await pipeline.toFile(out);
         console.log(`${name}: ${(info.size / 1024).toFixed(1)} KB`);
     }
+
+    const pngCovers = ['pg-living', 'tech-park', 'agreement', 'safety', 'ai', 'hero'];
+    for (const basename of pngCovers) {
+        const source = join(outDir, `${basename}.png`);
+        if (!existsSync(source)) continue;
+        const webp = await sharp(source)
+            .resize(1200, null, { withoutEnlargement: true })
+            .webp({ quality: 72 })
+            .toFile(join(outDir, `${basename}.webp`));
+        const avif = await sharp(source)
+            .resize(1200, null, { withoutEnlargement: true })
+            .avif({ quality: 48 })
+            .toFile(join(outDir, `${basename}.avif`));
+        console.log(`${basename}.webp: ${(webp.size / 1024).toFixed(1)} KB`);
+        console.log(`${basename}.avif: ${(avif.size / 1024).toFixed(1)} KB`);
+    }
     console.log('Done.');
 }
 
