@@ -204,6 +204,14 @@ for (const p of PG_NEAR_LANDMARK_PATHS) {
     staticBody += urlEntry(`${BASE}/${p}`, '0.86', 'weekly');
 }
 
+const CITY_HUB_PATHS = STATIC_PATHS.filter((s) =>
+    /^\/(pg|rent)\/(bangalore|hyderabad|pune)$/.test(s.path),
+);
+let citiesBody = '';
+for (const s of CITY_HUB_PATHS) {
+    citiesBody += urlEntry(`${BASE}${s.path}`, s.priority, s.changefreq);
+}
+
 let localitiesBody = '';
 for (const row of locJson) {
     localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
@@ -256,6 +264,8 @@ const publicDir = join(root, 'public');
 for (const f of files) {
     writeFileSync(join(publicDir, f.name), wrapUrlset(f.body));
 }
+writeFileSync(join(publicDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
+writeFileSync(join(publicDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
 
 const indexEntries = files.map((f) => ({ loc: `${BASE}/${f.name}` }));
 const indexXml = wrapIndex(indexEntries);
@@ -270,6 +280,8 @@ if (existsSync(distDir)) {
     for (const f of files) {
         writeFileSync(join(distDir, f.name), wrapUrlset(f.body));
     }
+    writeFileSync(join(distDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
+    writeFileSync(join(distDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
     writeFileSync(join(distDir, 'sitemap.xml'), indexXml);
 }
 
