@@ -10,6 +10,7 @@ import { PrerenderSafetyTimeout } from '@/components/seo/PrerenderSafetyTimeout'
 import { SkipLink } from '@/components/a11y/SkipLink';
 import { initWebVitalsReporting } from '@/lib/reportWebVitals';
 import { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
 
 const MobileBottomCTA = dynamic(
     () => import('@/components/layout/MobileBottomCTA').then((m) => m.MobileBottomCTA),
@@ -31,18 +32,20 @@ export function Providers({ children }: { children: ReactNode }) {
 
     return (
         <ErrorBoundary>
-            <AuthProvider>
-                <WishlistProvider>
-                    <SkipLink />
-                    <Suspense fallback={null}>
-                        <ScrollToTop />
-                    </Suspense>
-                    <PrerenderSafetyTimeout />
-                    {children}
-                    <MobileBottomCTA />
-                    <WhatsAppWidget />
-                </WishlistProvider>
-            </AuthProvider>
+            <HelmetProvider>
+                <AuthProvider>
+                    <WishlistProvider>
+                        <SkipLink />
+                        <Suspense fallback={null}>
+                            <ScrollToTop />
+                        </Suspense>
+                        <PrerenderSafetyTimeout />
+                        {children}
+                        <MobileBottomCTA />
+                        <WhatsAppWidget />
+                    </WishlistProvider>
+                </AuthProvider>
+            </HelmetProvider>
         </ErrorBoundary>
     );
 }

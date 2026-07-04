@@ -9,8 +9,9 @@ import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
-import { Search, ArrowLeft, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
+import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { PremiumTrustStrip } from '@/components/trust/PremiumTrustStrip';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
 import {
@@ -558,43 +559,37 @@ export default function Properties({
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-20 pb-20 flex-grow'}>
                 {/* 1. Hero Section (Only if not hidden) */}
                 {!hideChrome && (
-                    <section className="relative py-16 md:py-24 bg-brand-charcoal overflow-hidden mb-12">
-                        <div className="absolute inset-0 z-0">
-                            <img 
-                                src="/images/blog/hero-sunset.avif"
-                                alt="" 
-                                className="w-full h-full object-cover opacity-20 scale-105"
-                                width={1600}
-                                height={900}
-                                loading="eager"
-                                decoding="async"
-                                fetchPriority="high"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal via-brand-charcoal/60 to-transparent" />
-                        </div>
-                        
+                    <section className="relative pt-12 md:pt-20 pb-8 bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
                         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <div className="animate-fade-in-up">
-                                <button
-                                    type="button"
-                                    onClick={goBack}
-                                    className="group mb-8 inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 text-xs font-bold text-white/70 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
-                                >
-                                    <ArrowLeft className="h-3.5 w-3.5 transition group-hover:-translate-x-1" />
-                                    Back to Home
-                                </button>
-                                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-tight mb-4">
-                                    {pageTitle}
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight leading-tight mb-4">
+                                    Find Your Perfect Stay
                                 </h1>
-                                <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-                                    {pageSubtitle}
+                                <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium mb-8">
+                                    Verified PG, Coliving & Rental Homes in Bangalore
                                 </p>
+                                
+                                {/* Premium Filter Chips */}
+                                <div className="flex flex-wrap justify-center gap-3">
+                                    {[
+                                        'Verified',
+                                        'Zero Brokerage',
+                                        'Instant Booking',
+                                        'Owner Verified',
+                                        'Ready to Move',
+                                        'Furnished'
+                                    ].map((chip) => (
+                                        <div key={chip} className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:shadow-md cursor-pointer">
+                                            <span className="text-emerald-500 font-bold">✓</span> {chip}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </section>
                 )}
 
-                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-0 md:mt-2' : '-mt-20 md:-mt-24 relative z-20'}`}>
+                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-0 md:mt-2' : 'mt-8 relative z-20'}`}>
                     
                     {/* 2. Floating Filter Bar */}
                     <div className={`bg-white/95 backdrop-blur-xl p-3 md:p-5 rounded-[2rem] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.2)] border border-slate-200/60 mb-16 transition-all ring-1 ring-slate-900/[0.02] ${hideChrome ? 'relative z-10' : 'sticky top-24 z-30'}`}>
@@ -938,6 +933,9 @@ export default function Properties({
                         </div>
                     )}
                 </div>
+                
+                {/* Premium Trust Strip */}
+                <PremiumTrustStrip />
             </main>
 
             {!hideChrome && <Footer />}
