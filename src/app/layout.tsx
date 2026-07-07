@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import Script from 'next/script';
 import { PageRouteFallback } from '@/components/ui/PageRouteFallback';
 import { Providers } from './providers';
+import { buildOrganizationSchema } from '@/lib/schema';
 import '@/globals.css';
 
 const inter = Inter({
@@ -86,6 +87,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     gtag('config', 'AW-17957274528');
                     gtag('config', 'AW-11313350010');
                     `}
+                </Script>
+                <Script id="global-org-schema" type="application/ld+json" strategy="lazyOnload">
+                    {JSON.stringify(buildOrganizationSchema())}
                 </Script>
                 <Providers>
                     <Suspense fallback={<PageRouteFallback />}>{children}</Suspense>

@@ -61,10 +61,10 @@ const nextConfig: NextConfig = {
             { source: '/buy/bangalore', destination: '/buy/in/bangalore', permanent: true },
             { source: '/plot/bangalore', destination: '/plots/in/bangalore', permanent: true },
             { source: '/properties/id/:id', destination: '/properties/:id', permanent: true },
-            // Redirect legacy property URLs to canonical PG format
-            { source: '/property/:slug', destination: '/pg/:slug', permanent: true },
-            { source: '/properties/:type/:slug', destination: '/pg/:slug', permanent: true },
-            { source: '/pg', destination: '/pg/bangalore', permanent: true },
+            // SEO mapping requested by user
+            { source: '/property/:path*', destination: '/rent/:path*', permanent: true },
+            { source: '/properties/:path*', destination: '/rent/:path*', permanent: true },
+            { source: '/pg/:path*', destination: '/rent/:path*', permanent: true },
         ];
     },
     async rewrites() {

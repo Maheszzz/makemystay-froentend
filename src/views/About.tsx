@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { Link } from '@/lib/navigation';
-import { buildBreadcrumbSchema } from '@/lib/schema';
+import { buildBreadcrumbSchema, buildAboutPageSchema } from '@/lib/schema';
 import { buildAboutPageSEO, buildPageSEO } from '@/lib/seo';
 
 export default function About() {
@@ -19,6 +19,7 @@ export default function About() {
         <div className="min-h-screen bg-slate-50 flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd id="about-breadcrumb" data={breadcrumbLd} />
+            <JsonLd id="about-schema" data={buildAboutPageSchema()} />
             <Navbar />
             <main id="main-content" className="flex-grow pt-28 pb-16">
                 <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">

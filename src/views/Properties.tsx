@@ -865,27 +865,68 @@ function PropertiesInner({
                                             );
                                         })
                                     ) : (
-                                        <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
-                                            <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 ring-8 ring-slate-100/50">
-                                                <Search className="w-10 h-10 text-slate-300" />
+                                        <div className="col-span-full space-y-12">
+                                            <div className="py-16 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
+                                                <div className="bg-brand-red/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-brand-red/10">
+                                                    <Search className="w-10 h-10 text-brand-red" />
+                                                </div>
+                                                <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No Exact Matches</h3>
+                                                <p className="text-slate-500 max-w-md mx-auto text-lg mb-8 leading-relaxed font-medium">
+                                                    {`We couldn't find listings matching ${emptyResultsSummary}, but there are great options nearby.`}
+                                                </p>
+                                                <div className="flex flex-wrap items-center justify-center gap-4">
+                                                    <button 
+                                                        onClick={resetFilters} 
+                                                        className="px-6 py-3 bg-brand-red text-white font-bold rounded-xl shadow-glow hover:scale-[1.03] transition-all"
+                                                    >
+                                                        Clear Filters
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => setLocationFilter('all')} 
+                                                        className="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all"
+                                                    >
+                                                        Explore All {cityLabelDisplay}
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No results found</h3>
-                                            <p className="text-slate-500 max-w-md mx-auto text-lg mb-10 leading-relaxed font-medium">
-                                                {`We couldn't find any listings matching ${emptyResultsSummary}.`}
-                                            </p>
-                                            <div className="flex flex-wrap items-center justify-center gap-4">
-                                                <button 
-                                                    onClick={resetFilters} 
-                                                    className="px-8 py-4 bg-brand-red text-white font-bold rounded-2xl shadow-glow hover:scale-[1.03] active:scale-[0.98] transition-all"
-                                                >
-                                                    Reset All Filters
-                                                </button>
-                                                <button 
-                                                    onClick={() => setLocationFilter('all')} 
-                                                    className="px-8 py-4 bg-slate-100 text-slate-700 font-bold rounded-2xl hover:bg-slate-200 transition-all"
-                                                >
-                                                    Explore Entire City
-                                                </button>
+
+                                            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
+                                                <h4 className="text-xl font-bold text-slate-900 mb-6">Popular Locations in Bangalore</h4>
+                                                <div className="flex flex-wrap gap-3">
+                                                    {['Koramangala', 'HSR Layout', 'Indiranagar', 'Whitefield', 'Marathahalli', 'Bellandur', 'Electronic City'].map(loc => (
+                                                        <button 
+                                                            key={loc}
+                                                            onClick={() => { setLocationFilter(loc); window.scrollTo(0, 0); }}
+                                                            className="px-4 py-2 bg-slate-50 border border-slate-200 text-sm font-bold text-slate-700 rounded-xl hover:border-brand-red hover:text-brand-red transition-colors"
+                                                        >
+                                                            {loc}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div className="bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
+                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                        <MapPin className="w-5 h-5 text-brand-red" /> 
+                                                        Nearby Properties
+                                                    </h4>
+                                                    <p className="text-sm text-slate-600 mb-4">Check out premium verified PGs and coliving spaces in adjacent localities with similar rent.</p>
+                                                    <Link to={`/pg/${apiCity}`} className="text-brand-red font-bold text-sm hover:underline flex items-center gap-1">
+                                                        View all in {cityLabelDisplay} <ArrowRight className="w-4 h-4" />
+                                                    </Link>
+                                                </div>
+                                                <div className="bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
+                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                                                        <Search className="w-5 h-5 text-brand-red" /> 
+                                                        Related Searches
+                                                    </h4>
+                                                    <div className="flex flex-col gap-2">
+                                                        <Link to="/pg-for-boys" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Boys PG in {cityLabelDisplay}</Link>
+                                                        <Link to="/pg-for-girls" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Girls PG in {cityLabelDisplay}</Link>
+                                                        <Link to="/pg-single-room" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Single Room PG in {cityLabelDisplay}</Link>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

@@ -72,6 +72,30 @@ export function buildWebSiteSchema() {
     };
 }
 
+/** AboutPage Schema for E-E-A-T */
+export function buildAboutPageSchema() {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        name: `About ${SITE_NAME}`,
+        url: `${SITE_URL}/about`,
+        description: BRAND_EXTENDED,
+        publisher: buildOrganizationSchema(),
+    };
+}
+
+/** WebPage Schema for Trust/Verification */
+export function buildTrustSignalsSchema() {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: `How ${SITE_NAME} Verifies Properties`,
+        url: `${SITE_URL}/how-we-verify`,
+        description: 'Our robust verification process for PGs and rental properties.',
+        publisher: buildOrganizationSchema(),
+    };
+}
+
 /** Organization — brand entity for homepage @graph (SEO audit: sameAs + legal name). */
 export function buildOrganizationSchema() {
     return {

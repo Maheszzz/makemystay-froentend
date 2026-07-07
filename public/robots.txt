@@ -1,7 +1,14 @@
 User-agent: *
 Allow: /
+Allow: /pg
+Allow: /rent
+Allow: /blog
+Allow: /locality
 
-# Conversion / payment / account utility — not primary landing content
+# Disallow private and utility pages
+Disallow: /admin
+Disallow: /login
+Disallow: /api/private
 Disallow: /quick-pay
 Disallow: /wishlist
 Disallow: /schedule-demo

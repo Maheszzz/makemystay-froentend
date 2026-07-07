@@ -6,7 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPageSEO, buildHowWeVerifyPageSEO } from '@/lib/seo';
-import { buildBreadcrumbSchema, buildFaqPageSchema, type FaqItem } from '@/lib/schema';
+import { buildBreadcrumbSchema, buildFaqPageSchema, buildTrustSignalsSchema, type FaqItem } from '@/lib/schema';
 
 const VERIFY_FAQS: FaqItem[] = [
     {
@@ -39,6 +39,7 @@ export default function HowWeVerify() {
             <SEOHead {...helmet} />
             <JsonLd id="how-verify-breadcrumb" data={breadcrumbLd} />
             <JsonLd id="how-verify-faq" data={faqLd} />
+            <JsonLd id="how-verify-trust-signals" data={buildTrustSignalsSchema()} />
             <Navbar />
             <main id="main-content" className="flex-grow pt-28 pb-16">
                 <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">

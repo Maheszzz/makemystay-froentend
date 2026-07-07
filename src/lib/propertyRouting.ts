@@ -93,8 +93,10 @@ export function getPropertyDetailPath(property: Property): string {
     let prefix = '/pg';
     if (category === 'rent' && !isPgType) {
         prefix = '/rent';
-    } else if (category === 'buy' || category === 'plot') {
-        prefix = '/property';
+    } else if (category === 'buy') {
+        prefix = '/buy';
+    } else if (category === 'plot') {
+        prefix = '/plot';
     } else if (isPgType || category === 'pg') {
         prefix = '/pg';
     }

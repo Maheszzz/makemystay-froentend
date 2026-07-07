@@ -76,8 +76,8 @@ export function Hero({
                     <div className="max-w-[34rem] xl:max-w-2xl w-full">
                             {/* Headline */}
                             <h1 className="font-heading font-black text-slate-900 leading-[1.06] tracking-tight mb-5 text-[clamp(2.4rem,4.6vw,4rem)]">
-                                Comfortable <span className="text-brand-red">spaces</span><br />
-                                Hassle-free living
+                                Verified <span className="text-brand-red">PGs & Flats</span><br />
+                                in Bangalore
                             </h1>
 
                             {/* Subtitle */}

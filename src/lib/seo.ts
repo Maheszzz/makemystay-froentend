@@ -47,8 +47,8 @@ export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
     const suffix = 'makemystay.ai';
     const title = input.title.includes(suffix) ? input.title : `${input.title} | ${suffix}`;
     return {
-        title: title.slice(0, 70), // Keep it within display limits
-        description: input.description.slice(0, 160),
+        title: title.slice(0, 60), // Keep it within display limits (approx 60 chars)
+        description: input.description.slice(0, 155), // Max 155 chars for description
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
@@ -143,7 +143,7 @@ export function pgLocationSeo(locationName: string, slug: string): PageSEOInput 
 export function rentLocationHubSeo(locationName: string, slug: string): PageSEOInput {
     return {
         title: `1 BHK for Rent in ${locationName}`,
-        description: `Find verified 1 BHK, 2 BHK, and rental homes in ${locationName}, Bangalore. Zero brokerage, real photos, and transparent pricing on makemystay.ai.`,
+        description: `Find verified 1 BHK, 2 BHK, and rental homes in ${locationName}, Bangalore. Zero brokerage, real photos, and transparent pricing on makemystay.ai.`.slice(0, 155),
         path: `/rent/${slug}`,
     };
 }
@@ -191,13 +191,13 @@ function buildPropertyMetaTitle(property: Property): string {
     const name = formatPropertyTitle(property.title) || property.title || 'Property';
 
     if (isPG) {
-        return `${name} - Luxury PG in ${location} | Fully Furnished`;
+        return `${name} - PG in ${location} | Furnished`.slice(0, 60);
     }
 
     const rentPrefix = bhk.toLowerCase().includes('bhk') || bhk.toLowerCase().includes('rk') 
         ? bhk 
         : 'Flat';
-    return `${name} - ${rentPrefix} for Rent in ${location}`;
+    return `${name} - ${rentPrefix} for Rent in ${location}`.slice(0, 60);
 }
 
 function buildPropertyMetaDescription(property: Property): string {
@@ -208,7 +208,7 @@ function buildPropertyMetaDescription(property: Property): string {
     const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
 
     const priceText = hasPrice ? ` starting from ${price}/month` : '';
-    return `Explore ${name}, a verified ${type} for rent in ${location}${priceText}. View photos, amenities, and book a visit online with makemystay.ai.`;
+    return `Explore ${name}, a verified ${type} for rent in ${location}${priceText}. View photos and book online with makemystay.ai.`.slice(0, 155);
 }
 
 /** Meta + canonical for detail pages (handled via /pg/ or /rent/ routers). */
@@ -240,9 +240,9 @@ export function propertyDetailPageSeo(property: Property, detailPath: string): P
 /** City hub: `/pg/bangalore` — primary “PG in Bangalore” landing. */
 export function pgBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Best PG in Bangalore from ₹6,000 — verified & no brokerage',
+        title: 'PG in Bangalore from ₹6K | Verified Stays',
         description:
-            'Browse verified PGs in Bangalore from ₹6,000/month. Filter by locality, food, AC, sharing. Real photos, transparent pricing, no brokerage on MakeMyStay.ai.',
+            'Browse verified PGs in Bangalore from ₹6,000/mo. Zero brokerage, real photos, and transparent pricing. Book your stay on MakeMyStay.ai today.',
         path: '/pg/bangalore',
         canonicalUrl: 'https://makemystay.ai/pg/bangalore',
     };
@@ -251,9 +251,9 @@ export function pgBangaloreHubSeo(): PageSEOInput {
 /** City hub: `/rent/bangalore` — primary “flats & houses for rent in Bangalore” landing. */
 export function rentBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Flats & Houses for Rent in Bangalore — Zero Brokerage | verified rentals',
+        title: 'Flats & Houses for Rent in Bangalore | Zero Brokerage',
         description:
-            'Browse verified flats and houses for rent in Bangalore with zero brokerage. Compare monthly rent across Koramangala, Whitefield, Bellandur, HSR & more — furnished and unfurnished options on MakeMyStay.ai.',
+            'Browse verified flats and houses for rent in Bangalore with zero brokerage. Compare rent across Koramangala, Whitefield, Bellandur & more.',
         path: '/rent/bangalore',
     };
 }
@@ -261,9 +261,9 @@ export function rentBangaloreHubSeo(): PageSEOInput {
 /** City hub: `/buy/in/bangalore` — primary “buy in Bangalore” landing. */
 export function buyBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Buy Property in Bangalore — Verified Flats & Homes for Sale | MakeMyStay',
+        title: 'Buy Property in Bangalore | Verified Flats & Homes',
         description:
-            'Explore verified apartments, 2BHK/3BHK flats, and homes for sale in Bangalore. Compare prices, book site visits, and shortlist with zero broker bias.',
+            'Explore verified apartments, 2BHK/3BHK flats, and homes for sale in Bangalore. Compare prices and shortlist with zero broker bias.',
         path: '/buy/in/bangalore',
     };
 }
@@ -271,9 +271,9 @@ export function buyBangaloreHubSeo(): PageSEOInput {
 /** City hub: `/plots/in/bangalore` — primary “plots in Bangalore” landing. */
 export function plotBangaloreHubSeo(): PageSEOInput {
     return {
-        title: 'Plots & Land for Sale in Bangalore — Verified Listings | MakeMyStay',
+        title: 'Plots & Land for Sale in Bangalore | Verified Listings',
         description:
-            'Browse verified residential plots and land parcels in Bangalore. Compare sizes, locations, and pricing with transparent listings and zero broker bias.',
+            'Browse verified residential plots and land parcels in Bangalore. Compare sizes, locations, and pricing with transparent listings.',
         path: '/plots/in/bangalore',
     };
 }
@@ -293,16 +293,16 @@ export function pgFeaturePathToKind(pathname: string): 'wifi' | 'food' | 'ac' | 
 
 export function pgFeatureLandingSeo(feature: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'): PageSEOInput {
     const titles = {
-        wifi: 'PG with WiFi in Bangalore | Verified · zero brokerage on many stays',
-        food: 'PG with food in Bangalore | Verified meals-included stays · zero brokerage',
-        ac: 'PG with AC in Bangalore | Verified AC rooms · compare rent bands',
-        girls: 'Girls PG in Bangalore | Verified & safe · zero brokerage options',
-        boys: 'Boys PG in Bangalore | Verified male PG & coliving · zero brokerage',
-        single: 'Single room PG in Bangalore | Verified private rooms · zero brokerage',
+        wifi: 'PG with WiFi in Bangalore | Verified Stays',
+        food: 'PG with Food in Bangalore | Verified Meals',
+        ac: 'PG with AC in Bangalore | Verified AC Rooms',
+        girls: 'Girls PG in Bangalore | Verified & Safe',
+        boys: 'Boys PG in Bangalore | Verified Coliving',
+        single: 'Single Room PG in Bangalore | Private Rooms',
     };
     const desc = {
-        wifi: 'Looking for PG with reliable WiFi in Bangalore? Explore verified paying guest stays with transparent pricing, filters for connectivity, and book online.',
-        food: 'Find PG with meals in Bangalore — veg and non-veg plans vary by operator. Compare verified listings and enquire on MakeMyStay.ai.',
+        wifi: 'Looking for PG with reliable WiFi in Bangalore? Explore verified paying guest stays with transparent pricing and book online.',
+        food: 'Find PG with meals in Bangalore. Compare verified listings and enquire on MakeMyStay.ai today.',
         ac: 'Discover air-conditioned PG rooms in Bangalore. Verified listings with clear amenities — compare rent and book a visit.',
         girls: 'Find safe, verified ladies PG in Bangalore. CCTV, security, and meal inclusive stays for students and working women.',
         boys: 'Search for boys PG in Bangalore. Managed stays with WiFi, food, and housekeeping for early career tech professionals.',
@@ -326,9 +326,9 @@ export function pgFeatureLandingSeo(feature: 'wifi' | 'food' | 'ac' | 'girls' | 
 /** Comparison guide `/pg-vs-flat-bangalore`. */
 export function pgVsFlatBangaloreSeo(): PageSEOInput {
     return {
-        title: 'PG vs flat in Bangalore: cost, flexibility & which is better (2026)',
+        title: 'PG vs Flat in Bangalore: Which is Better? (2026)',
         description:
-            'Compare PG and rented flats in Bangalore — deposits, meals, independence, and who each option suits. Plus FAQs for students and working professionals.',
+            'Compare PG and rented flats in Bangalore — deposits, meals, independence. Plus FAQs for students and working professionals.',
         path: '/pg-vs-flat-bangalore',
     };
 }
@@ -346,9 +346,9 @@ export function buildHomeSEO(): PageSEOInput {
 /** `/about` — trust & E-E-A-T (audit). */
 export function buildAboutPageSEO(): PageSEOInput {
     return {
-        title: 'About MakeMyStay — verified rentals & PG in Bangalore',
+        title: 'About MakeMyStay | Verified Rentals & PG in Bangalore',
         description:
-            'MakeMyStay.ai helps you find verified PGs and rentals in Bangalore without brokers. Learn about our mission and how we keep listings trustworthy.',
+            'MakeMyStay.ai helps you find verified PGs and rentals in Bangalore without brokers. Learn about our mission and how we verify listings.',
         path: '/about',
     };
 }
@@ -356,9 +356,9 @@ export function buildAboutPageSEO(): PageSEOInput {
 /** `/how-we-verify` — verification story (audit). */
 export function buildHowWeVerifyPageSEO(): PageSEOInput {
     return {
-        title: 'How MakeMyStay verifies every property',
+        title: 'How MakeMyStay Verifies Properties | Trust & Safety',
         description:
-            'Our verification process — photo audit, on-site checks, ID and rent benchmarking — so you can shortlist PGs and flats with confidence on MakeMyStay.ai.',
+            'Our verification process — photo audit, on-site checks, ID and rent benchmarking — so you can shortlist PGs with confidence.',
         path: '/how-we-verify',
     };
 }
@@ -366,9 +366,9 @@ export function buildHowWeVerifyPageSEO(): PageSEOInput {
 /** `/contact-us` */
 export function buildContactPageSEO(): PageSEOInput {
     return {
-        title: 'Contact MakeMyStay — PG & rental support in Bangalore',
+        title: 'Contact MakeMyStay | PG & Rental Support Bangalore',
         description:
-            'Reach MakeMyStay at +91 81500 99911 or connect@makemystay.ai for PG and flat enquiries, visit bookings, and operator onboarding. Office: HSR Layout, Bangalore. Response within one business day.',
+            'Reach MakeMyStay at +91 81500 99911 or connect@makemystay.ai for PG enquiries and operator onboarding. Office: HSR Layout.',
         path: '/contact-us',
     };
 }
@@ -377,8 +377,8 @@ export function buildContactPageSEO(): PageSEOInput {
 export function buildBlogIndexSEO(postCount = 0): PageSEOInput {
     const countBit = postCount > 0 ? `${postCount}+ ` : '';
     return {
-        title: 'Guides & Insights — PG, Rent & Bangalore Living (2026)',
-        description: `${countBit}expert guides on PG in Bangalore, area-wise rent, legal checklists, safety, and verified rentals — updated for 2026.`,
+        title: 'Guides & Insights — PG & Rent in Bangalore (2026)',
+        description: `${countBit}expert guides on PG in Bangalore, area-wise rent, legal checklists, and verified rentals — updated for 2026.`,
         path: '/blog',
     };
 }
@@ -386,36 +386,36 @@ export function buildBlogIndexSEO(postCount = 0): PageSEOInput {
 /** `/pg-near-me` */
 export function buildPgNearMeSEO(): PageSEOInput {
     return {
-        title: 'PG Near Me in Bangalore | Top-rated verified PG stays',
+        title: 'PG Near Me in Bangalore | Top-Rated Verified Stays',
         description:
-            'Searching for PG near me? Find verified paying guest accommodations in Bangalore with WiFi, meals, and 24/7 security. Compare top listings in your immediate area.',
+            'Searching for PG near me? Find verified paying guest accommodations in Bangalore with WiFi, meals, and 24/7 security.',
         path: '/pg-near-me',
     };
 }
 
 export function buildFlatsInBangaloreSEO(): PageSEOInput {
     return {
-        title: 'Flats for Rent in Bangalore — Verified 1BHK & 2BHK | Zero brokerage',
+        title: 'Flats for Rent in Bangalore | 1BHK & 2BHK',
         description:
-            'Browse verified flats for rent in Bangalore — Koramangala, Whitefield, HSR, Bellandur and more. Real photos, transparent rent, zero brokerage on MakeMyStay.ai.',
+            'Browse verified flats for rent in Bangalore. Real photos, transparent rent, zero brokerage on MakeMyStay.ai.',
         path: '/flats-in-bangalore',
     };
 }
 
 export function build1BhkSEO(): PageSEOInput {
     return {
-        title: '1BHK for Rent in Bangalore — Verified flats | Zero brokerage',
+        title: '1BHK for Rent in Bangalore | Verified Flats',
         description:
-            'Find verified 1BHK flats for rent in Bangalore with real photos and transparent pricing. Compare localities and book a visit on MakeMyStay.ai.',
+            'Find verified 1BHK flats for rent in Bangalore with real photos and transparent pricing. Compare localities and book a visit.',
         path: '/1-bhk',
     };
 }
 
 export function build2BhkSEO(): PageSEOInput {
     return {
-        title: '2BHK for Rent in Bangalore — Verified family homes | Zero brokerage',
+        title: '2BHK for Rent in Bangalore | Verified Family Homes',
         description:
-            'Browse verified 2BHK flats and homes for rent in Bangalore. Zero brokerage on many listings — compare rent across top localities on MakeMyStay.ai.',
+            'Browse verified 2BHK flats and homes for rent in Bangalore. Zero brokerage on many listings — compare rent across localities.',
         path: '/2bhk',
     };
 }
