@@ -1,4 +1,4 @@
-import { Link, useListingFromUrl } from '@/lib/navigation';
+import { Link } from '@/lib/navigation';
 import { useRef, useState } from 'react';
 import { ArrowRight, BadgeCheck, MapPin, MessageCircle, Star } from 'lucide-react';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
@@ -91,7 +91,7 @@ function SwipeableImageGallery({ images, fallbackImg, title }: { images: string[
 export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselProps) {
     const list = Array.isArray(properties) ? properties : [];
     if (list.length === 0) return null;
-    const { from } = useListingFromUrl();
+    const from = '';
 
     const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
     const [selectedWaLink, setSelectedWaLink] = useState<string>('');

@@ -1,3 +1,13 @@
+import type { Metadata } from 'next';
+import { resolveCityListingsMetadata } from '@/lib/routeMetadata';
+
+type PageProps = { params: Promise<{ city: string }> };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { city } = await params;
+    return resolveCityListingsMetadata(city, 'all');
+}
+
 export const dynamic = 'force-dynamic';
 
 import Properties from '@/views/Properties';

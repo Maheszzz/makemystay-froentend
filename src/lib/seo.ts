@@ -188,15 +188,16 @@ function buildPropertyMetaTitle(property: Property): string {
     const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
     const isPG = property.category === 'pg' || isPgType;
     const bhk = property.type || '1BHK';
+    const name = formatPropertyTitle(property.title) || property.title || 'Property';
 
     if (isPG) {
-        return `Luxury PG in ${location} | Fully Furnished`;
+        return `${name} - Luxury PG in ${location} | Fully Furnished`;
     }
 
     const rentPrefix = bhk.toLowerCase().includes('bhk') || bhk.toLowerCase().includes('rk') 
         ? bhk 
         : 'Flat';
-    return `${rentPrefix} for Rent in ${location}`;
+    return `${name} - ${rentPrefix} for Rent in ${location}`;
 }
 
 function buildPropertyMetaDescription(property: Property): string {

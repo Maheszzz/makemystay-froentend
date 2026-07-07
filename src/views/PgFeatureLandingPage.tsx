@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, Suspense } from 'react';
 import { Link, Navigate, useLocation, useSearchParams } from '@/lib/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -84,7 +84,7 @@ function filtersReady(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'
     return sp.get('beds') === '1' || !!sp.get('sharing')?.includes('Single');
 }
 
-export default function PgFeatureLandingPage() {
+function PgFeatureLandingPageInner() {
     const { pathname } = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     const kind = pgFeaturePathToKind(pathname);
@@ -179,5 +179,13 @@ export default function PgFeatureLandingPage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function PgFeatureLandingPage() {
+    return (
+        <Suspense fallback={null}>
+            <PgFeatureLandingPageInner />
+        </Suspense>
     );
 }

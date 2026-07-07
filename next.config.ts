@@ -65,16 +65,6 @@ const nextConfig: NextConfig = {
             { source: '/property/:slug', destination: '/pg/:slug', permanent: true },
             { source: '/properties/:type/:slug', destination: '/pg/:slug', permanent: true },
             { source: '/pg', destination: '/pg/bangalore', permanent: true },
-            {
-                source: '/pg-for-girls-in-:slug',
-                destination: '/pg/:slug',
-                permanent: true,
-            },
-            {
-                source: '/pg-for-boys-in-:slug',
-                destination: '/pg/:slug',
-                permanent: true,
-            },
         ];
     },
     async rewrites() {

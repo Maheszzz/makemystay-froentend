@@ -17,7 +17,7 @@ import {
 import { useSearchParams } from '@/lib/navigation';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { HomeBelowFold } from '@/views/HomeBelowFold';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
@@ -27,7 +27,7 @@ function scrollToFeaturedListings() {
     });
 }
 
-export default function Home() {
+function HomeInner() {
     const [searchParams, setSearchParams] = useSearchParams();
     const searchQuery = searchParams.get('q') || '';
     const heroTab = parseHomeHeroTab(searchParams.get('cat') ?? searchParams.get('category'));
@@ -170,5 +170,13 @@ export default function Home() {
 
             <Footer />
         </>
+    );
+}
+
+export default function Home() {
+    return (
+        <Suspense fallback={null}>
+            <HomeInner />
+        </Suspense>
     );
 }

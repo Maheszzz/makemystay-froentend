@@ -20,7 +20,7 @@ import {
     Map
 } from 'lucide-react';
 import { memo, useCallback, useMemo, useState } from 'react';
-import { Link, useListingFromUrl } from '@/lib/navigation';
+import { Link } from '@/lib/navigation';
 
 import { useWishlist } from '@/context/WishlistContext';
 import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
@@ -50,12 +50,6 @@ function getFallbackImageForType(type?: string): string {
 
 function PropertyCardComponent({ property }: PropertyCardProps) {
     let listingFrom = '';
-    try {
-        const urlInfo = useListingFromUrl();
-        listingFrom = urlInfo.from;
-    } catch {
-        // Fallback
-    }
     let wishlisted = false;
     let toggleWishlist = (_p: Property) => {};
     try {

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Link, useSearchParams } from '@/lib/navigation';
 
 interface PgFilterQuickLinksProps {
@@ -10,7 +11,7 @@ const chipClass =
 /**
  * Indexable filter shortcuts (wifi / food / AC / price tier) — deep-links preserve existing query from the listing embed.
  */
-export function PgFilterQuickLinks({ slug }: PgFilterQuickLinksProps) {
+function PgFilterQuickLinksInner({ slug }: PgFilterQuickLinksProps) {
     const [searchParams] = useSearchParams();
     const basePath = `/pg/${slug}`;
 
@@ -41,5 +42,13 @@ export function PgFilterQuickLinks({ slug }: PgFilterQuickLinksProps) {
                 Premium (price: high)
             </Link>
         </nav>
+    );
+}
+
+export function PgFilterQuickLinks(props: PgFilterQuickLinksProps) {
+    return (
+        <Suspense fallback={null}>
+            <PgFilterQuickLinksInner {...props} />
+        </Suspense>
     );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
 import { Link, useLocation, useSearchParams } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -78,7 +78,7 @@ interface PropertiesProps {
     showMapPanel?: boolean;
 }
 
-export default function Properties({
+function PropertiesInner({
     initialCategory = 'all',
     initialTypeFilter = 'all',
     initialCity = 'all',
@@ -432,8 +432,10 @@ export default function Properties({
     ]);
 
     useEffect(() => {
+        // Only signal empty results when the API succeeded — never on error/loading state
+        if (error) return;
         onEmptyResultsChange?.(shouldNoindexEmptyResults);
-    }, [onEmptyResultsChange, shouldNoindexEmptyResults]);
+    }, [onEmptyResultsChange, shouldNoindexEmptyResults, error]);
 
     useEffect(() => {
         if (!onDisplayedListingsForSeo) return;
@@ -969,5 +971,13 @@ export default function Properties({
                 </div>
             )}
         </div>
+    );
+}
+
+export default function Properties(props: PropertiesProps) {
+    return (
+        <Suspense fallback={null}>
+            <PropertiesInner {...props} />
+        </Suspense>
     );
 }

@@ -13,6 +13,7 @@ import {
     buildFlatsInBangaloreSEO,
     buildHomeSEO,
     buildHowWeVerifyPageSEO,
+    buildNoindexUtilitySEO,
     buildPgNearMeSEO,
     buildPrivacyPageSEO,
     buildReportsPageSEO,
@@ -38,6 +39,7 @@ import { resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildTextOgImageUrl } from '@/lib/ogImage';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 import { SITE_URL } from '@/lib/siteConfig';
+import { OFFICES } from '@/data/offices';
 
 function pgHyderabadHubSeo(): PageSEOInput {
     return {
@@ -367,4 +369,59 @@ export function resolveStaticPathMetadata(pathname: string): Metadata {
     if (path.startsWith('/pg-near-')) return resolveLandmarkPathMetadata(path);
 
     return resolveCatchAllPathMetadata(path);
+}
+
+/** `/office/:slug` — office hub pages (title/description built from office name, no property fetch). */
+export function resolveOfficeMetadata(slug: string): Metadata {
+    const office = OFFICES.find((o) => o.slug === slug);
+    const name = office?.name ?? slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    return pageSeoToMetadata({
+        title: `PG & Coliving near ${name}, Bangalore | MakeMyStay`,
+        description: `Find verified PGs, coliving spaces, and rentals near ${name} in Bangalore. Compare listings with transparent pricing and zero brokerage on MakeMyStay.ai.`,
+        path: `/office/${slug}`,
+    });
+}
+
+/** `/services/:serviceId` — utility/conversion page, intentionally noindexed. */
+export function resolveServiceMetadata(serviceId: string): Metadata {
+    return pageSeoToMetadata(
+        buildNoindexUtilitySEO(
+            serviceId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+            `/services/${serviceId}`,
+        ),
+    );
+}
+
+/** Dynamic city-level hub pages (`/rent/in/[city]`, `/buy/in/[city]`, `/plots/in/[city]`, `/properties/in/[city]`). */
+export function resolveCityListingsMetadata(
+    city: string,
+    category: 'rent' | 'buy' | 'plot' | 'all',
+): Metadata {
+    const cityLabel = city
+        ? city.charAt(0).toUpperCase() + city.slice(1)
+        : 'Bangalore';
+    const pathname = category === 'rent'
+        ? `/rent/in/${city}`
+        : category === 'buy'
+          ? `/buy/in/${city}`
+          : category === 'plot'
+            ? `/plots/in/${city}`
+            : `/properties/in/${city}`;
+    const titles: Record<string, string> = {
+        rent: `Flats & Houses for Rent in ${cityLabel} — Verified | MakeMyStay`,
+        buy: `Buy Property in ${cityLabel} — Verified Flats & Homes | MakeMyStay`,
+        plot: `Plots & Land for Sale in ${cityLabel} — Verified | MakeMyStay`,
+        all: `Properties in ${cityLabel} — PG, Rent, Buy & Plots | MakeMyStay`,
+    };
+    const descs: Record<string, string> = {
+        rent: `Browse verified flats and houses for rent in ${cityLabel} with real photos and transparent pricing. Zero brokerage on many listings on MakeMyStay.ai.`,
+        buy: `Explore verified apartments and homes for sale in ${cityLabel}. Compare prices and book site visits on MakeMyStay.ai.`,
+        plot: `Browse verified residential plots and land in ${cityLabel}. Compare sizes and pricing on MakeMyStay.ai.`,
+        all: `Search verified PGs, rental homes, and properties for sale in ${cityLabel} on MakeMyStay.ai.`,
+    };
+    return pageSeoToMetadata({
+        title: titles[category],
+        description: descs[category],
+        path: pathname,
+    });
 }

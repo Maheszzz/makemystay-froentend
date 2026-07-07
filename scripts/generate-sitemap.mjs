@@ -78,7 +78,6 @@ const RENT_HUB_LOCATION_SLUGS = [
     'bellandur',
     'hebbal',
     'jp-nagar',
-    'bannerghatta-road',
     'sarjapur-road',
 ];
 

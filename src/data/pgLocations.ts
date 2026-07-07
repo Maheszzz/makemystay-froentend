@@ -23,7 +23,6 @@ export const LEGACY_PG_SLUG_REDIRECTS: Record<string, string> = {
     'hsr-sector-1': 'hsr-layout',
     'hsr-sector-2': 'hsr-layout',
     'hsr-sector-7': 'hsr-layout',
-    'manyata-tech-park': 'hebbal',
     'itpl': 'whitefield',
     kundalahalli: 'marathahalli',
 };
