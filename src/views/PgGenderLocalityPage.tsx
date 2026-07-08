@@ -24,16 +24,16 @@ export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: 
     const loc = getPgLocationBySlug(slug);
 
     const isFemaleHub = /pg-for-(girls|women)-in-/i.test(pathname);
-    const isMenOrWomenAlias = /pg-for-(men|women)-in-/i.test(pathname);
+    const isMenOrWomenAlias = /pg-for-(boys|men)-in-/i.test(pathname);
     const filterGender = isFemaleHub ? ('female' as const) : ('male' as const);
     const audienceLabel = isFemaleHub ? 'Girls PG' : 'Boys PG';
-    const canonicalPath = isFemaleHub ? `/pg-for-women-in-${slug}` : `/pg-for-men-in-${slug}`;
-    const seoVariant = pathname.includes('men') ? ('men' as const) : pathname.includes('women') ? ('women' as const) : filterGender;
+    const canonicalPath = isFemaleHub ? `/pg-for-girls-in-${slug}` : `/pg-for-boys-in-${slug}`;
+    const seoVariant = pathname.includes('boys') || pathname.includes('men') ? ('men' as const) : pathname.includes('girls') || pathname.includes('women') ? ('women' as const) : filterGender;
 
     const [hasEmptyListings, setHasEmptyListings] = useState(false);
 
     if (!loc) {
-        return <Navigate to={isFemaleHub ? '/pg-for-women' : '/pg-for-men'} replace />;
+        return <Navigate to={isFemaleHub ? '/pg-for-girls' : '/pg-for-boys'} replace />;
     }
 
     const { name, slug: locSlug } = loc;

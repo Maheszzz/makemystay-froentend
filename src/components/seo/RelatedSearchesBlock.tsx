@@ -29,8 +29,8 @@ export function RelatedSearchesBlock({ currentSlug, localityName, variant }: Rel
     }
 
     links.push(
-        { label: `Boys PG in ${localityName}`, to: `/pg-for-men-in-${currentSlug}` },
-        { label: `Girls PG in ${localityName}`, to: `/pg-for-women-in-${currentSlug}` },
+        { label: `Boys PG in ${localityName}`, to: `/pg-for-boys-in-${currentSlug}` },
+        { label: `Girls PG in ${localityName}`, to: `/pg-for-girls-in-${currentSlug}` },
         { label: 'PG in Bangalore (hub)', to: '/pg/bangalore' },
         { label: 'Rent in Bangalore (hub)', to: '/rent/bangalore' }
     );

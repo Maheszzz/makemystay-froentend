@@ -84,13 +84,13 @@ export function LocalityInternalLinkHub({ profile }: LocalityInternalLinkHubProp
                     <h3 className="text-sm font-bold text-slate-900 mb-2">By audience</h3>
                     <nav className="flex flex-wrap gap-2">
                         <Link
-                            to={`/pg-for-men-in-${slug}`}
+                            to={`/pg-for-boys-in-${slug}`}
                             className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium hover:text-brand-red"
                         >
                             Boys PG in {name}
                         </Link>
                         <Link
-                            to={`/pg-for-women-in-${slug}`}
+                            to={`/pg-for-girls-in-${slug}`}
                             className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium hover:text-brand-red"
                         >
                             Girls PG in {name}

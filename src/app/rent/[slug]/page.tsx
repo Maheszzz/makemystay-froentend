@@ -8,6 +8,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return resolveRentSlugMetadata(slug);
 }
 
+import { notFound } from 'next/navigation';
+import RentSlugRoute from '@/routes/RentSlugRoute';
+import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
+import { parsePropertySlugParam } from '@/lib/propertyRouting';
+
 export const dynamic = 'force-dynamic';
 
-export { default } from '@/routes/RentSlugRoute';
+export default async function RentSlugPage({ params }: PageProps) {
+    const { slug } = await params;
+    const param = (slug || '').toLowerCase();
+
+    // Soft 404 fix: Pre-fetch property on the server and force 404 if missing/inactive
+    if (/^(\d+)(-|$)/.test(param)) {
+        const id = parsePropertySlugParam(param);
+        if (!id) notFound();
+        const property = await fetchPropertyByIdServer(id);
+        if (!property || property.is_available === false) {
+            notFound();
+        }
+    }
+
+    return <RentSlugRoute />;
+}

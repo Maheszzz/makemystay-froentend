@@ -214,8 +214,8 @@ for (const s of CITY_HUB_PATHS) {
 let localitiesBody = '';
 for (const row of locJson) {
     // localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
-    localitiesBody += urlEntry(`${BASE}/pg-for-men-in-${row.slug}`, '0.84', 'weekly');
-    localitiesBody += urlEntry(`${BASE}/pg-for-women-in-${row.slug}`, '0.84', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
 }
 for (const rentSlug of RENT_HUB_LOCATION_SLUGS) {
     localitiesBody += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');
