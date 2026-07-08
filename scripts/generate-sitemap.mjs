@@ -16,9 +16,6 @@ const STATIC_PATHS = [
     { path: '/', priority: '1.0', changefreq: 'daily' },
     { path: '/contact-us', priority: '0.85', changefreq: 'monthly' },
     { path: '/properties', priority: '0.9', changefreq: 'daily' },
-    { path: '/pg/bangalore', priority: '0.96', changefreq: 'daily' },
-    { path: '/pg/hyderabad', priority: '0.94', changefreq: 'daily' },
-    { path: '/pg/pune', priority: '0.94', changefreq: 'daily' },
     { path: '/pg-with-wifi', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-with-food', priority: '0.82', changefreq: 'weekly' },
     { path: '/pg-with-ac', priority: '0.82', changefreq: 'weekly' },
@@ -130,15 +127,11 @@ function buildPropertyDetailPath(property) {
     const typeLower = (property.property_type || '').toLowerCase();
     const isPgType = ['pg', 'hostel', 'coliving'].some((t) => typeLower.includes(t));
 
-    let prefix = '/pg';
-    if (category === 'rent' && !isPgType) {
-        prefix = '/rent';
-    } else if (category === 'buy') {
+    let prefix = '/rent';
+    if (category === 'buy') {
         prefix = '/buy';
     } else if (category === 'plot') {
         prefix = '/plot';
-    } else if (isPgType || category === 'pg') {
-        prefix = '/pg';
     }
 
     return slug ? `${prefix}/${id}-${slug}` : `${prefix}/${id}`;
@@ -220,9 +213,9 @@ for (const s of CITY_HUB_PATHS) {
 
 let localitiesBody = '';
 for (const row of locJson) {
-    localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
-    localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
-    localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
+    // localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-men-in-${row.slug}`, '0.84', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg-for-women-in-${row.slug}`, '0.84', 'weekly');
 }
 for (const rentSlug of RENT_HUB_LOCATION_SLUGS) {
     localitiesBody += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');

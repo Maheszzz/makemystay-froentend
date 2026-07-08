@@ -1,38 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://makemystay.ai/pg/bangalore</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.96</priority>
-  </url>
-  <url>
-    <loc>https://makemystay.ai/pg/hyderabad</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.94</priority>
-  </url>
-  <url>
-    <loc>https://makemystay.ai/pg/pune</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.94</priority>
-  </url>
-  <url>
     <loc>https://makemystay.ai/rent/bangalore</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
+    <lastmod>2026-07-08T05:11:48.386Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.93</priority>
   </url>
   <url>
     <loc>https://makemystay.ai/rent/hyderabad</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
+    <lastmod>2026-07-08T05:11:48.386Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.92</priority>
   </url>
   <url>
     <loc>https://makemystay.ai/rent/pune</loc>
-    <lastmod>2026-07-07T07:02:26.751Z</lastmod>
+    <lastmod>2026-07-08T05:11:48.386Z</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.92</priority>
   </url>

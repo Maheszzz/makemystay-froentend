@@ -22,18 +22,6 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
-                source: '/sitemap.xml',
-                headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
-            },
-            {
-                source: '/sitemap-:file.xml',
-                headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
-            },
-            {
-                source: '/sitemap-all.xml',
-                headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
-            },
-            {
                 source: '/:path*',
                 headers: [
                     { key: 'X-Content-Type-Options', value: 'nosniff' },

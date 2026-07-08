@@ -43,23 +43,22 @@ export function middleware(request: NextRequest) {
   }
 
   // 4. Legacy PG URL redirect handlers
-  const pgInMatch = pathname.match(/^\/pg-in-(.+)$/i);
-  if (pgInMatch) {
-    const slug = pgInMatch[1].toLowerCase();
-    return NextResponse.redirect(new URL(`/pg/${slug}`, request.url), 301);
-  }
-
+  // Instead of redirecting to /pg/ (which goes to /rent/), we map to canonical PG routes
   const boysMatch = pathname.match(/^\/pg-for-boys-in-(.+)$/i);
   if (boysMatch) {
     const slug = boysMatch[1].toLowerCase();
-    return NextResponse.redirect(new URL(`/pg/${slug}`, request.url), 301);
+    return NextResponse.redirect(new URL(`/pg-for-men-in-${slug}`, request.url), 301);
   }
 
   const girlsMatch = pathname.match(/^\/pg-for-girls-in-(.+)$/i);
   if (girlsMatch) {
     const slug = girlsMatch[1].toLowerCase();
-    return NextResponse.redirect(new URL(`/pg/${slug}`, request.url), 301);
+    return NextResponse.redirect(new URL(`/pg-for-women-in-${slug}`, request.url), 301);
   }
+
+  // Next.js routing will natively handle /pg-in-[slug] in ProgrammaticSeoCatchAll
+  // We no longer redirect it to /pg/[slug]
+
 
   return NextResponse.next();
 }

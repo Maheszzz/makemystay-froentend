@@ -4,11 +4,8 @@ import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
 import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import {
     propertyDetailPageSeo,
-    propertyUnavailableSeo,
 } from '@/lib/seo';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
-import { inferPgLocalityHubFromPropertySlug } from '@/lib/seoPropertyRedirects';
-import { getPgLocationBySlug } from '@/data/pgLocations';
 
 export async function resolvePropertyPageMetadata(slug: string): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
@@ -24,10 +21,7 @@ export async function resolvePropertyPageMetadata(slug: string): Promise<Metadat
     }
 
     if (property!.is_available === false) {
-        const hub = inferPgLocalityHubFromPropertySlug(param);
-        const locName = hub ? getPgLocationBySlug(hub.replace('/pg/', ''))?.name : undefined;
-        const detailPath = getPropertyDetailPath(property!);
-        return pageSeoToMetadata(propertyUnavailableSeo(detailPath, locName));
+        notFound();
     }
 
     const detailPath = getPropertyDetailPath(property!);
