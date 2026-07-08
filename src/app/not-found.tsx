@@ -1,3 +1,7 @@
-export const dynamic = 'force-dynamic';
+import NotFoundView from '@/views/NotFound';
 
-export { default } from '@/views/NotFound';
+export default function NotFound() {
+    return <NotFoundView />;
+}
+
+

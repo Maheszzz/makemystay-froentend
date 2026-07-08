@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat, Playfair_Display } from 'next/font/google';
-import { Suspense } from 'react';
 import Script from 'next/script';
-import { PageRouteFallback } from '@/components/ui/PageRouteFallback';
 import { Providers } from './providers';
 import { buildOrganizationSchema } from '@/lib/schema';
 import '@/globals.css';
@@ -92,7 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     {JSON.stringify(buildOrganizationSchema())}
                 </Script>
                 <Providers>
-                    <Suspense fallback={<PageRouteFallback />}>{children}</Suspense>
+                    {children}
                 </Providers>
             </body>
         </html>
