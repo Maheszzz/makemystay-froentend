@@ -4,6 +4,8 @@ import { BLOG_POSTS, getBlogPost } from '@/data/blogPosts';
 import { getPgNearLandmarkByPath } from '@/data/pgNearLandmarks';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
+import { getTechParkByPath } from '@/data/techParks';
+import { buildTechParkMeta } from '@/lib/techParkContent';
 import { buildNearbyLandmarkSeo } from '@/lib/seoIntentGenerators';
 import {
     buildAboutPageSEO,
@@ -222,6 +224,23 @@ export function resolveBlogSlugMetadata(slug: string): Metadata {
     );
 }
 
+/** `/pg-near-[tech-park]` — rich tech park pillar page metadata. */
+export function resolveTechParkMetadata(pathname: string): Metadata {
+    const seg = pathname.replace(/^\/+|\/+$/g, '');
+    const park = getTechParkByPath(seg);
+    if (park) {
+        const meta = buildTechParkMeta(park);
+        return pageSeoToMetadata({
+            title: meta.title,
+            description: meta.description,
+            path: meta.path,
+            ogImage: meta.ogImage,
+        });
+    }
+    // Fallback to legacy landmark SEO
+    return resolveLandmarkPathMetadata(pathname);
+}
+
 export function resolveLandmarkPathMetadata(pathname: string): Metadata {
     const entry = getPgNearLandmarkByPath(pathname);
     if (!entry) {
@@ -234,6 +253,16 @@ export function resolveLandmarkPathMetadata(pathname: string): Metadata {
     }
     const loc = getPgLocationBySlug(entry.hubSlug);
     const name = loc?.name ?? entry.hubSlug;
+    // Prefer tech park rich metadata if available
+    const park = getTechParkByPath(entry.path);
+    if (park) {
+        const meta = buildTechParkMeta(park);
+        return pageSeoToMetadata({
+            title: meta.title,
+            description: meta.description,
+            path: meta.path,
+        });
+    }
     return pageSeoToMetadata(buildNearbyLandmarkSeo(entry.landmark, name, `/${entry.path}`));
 }
 

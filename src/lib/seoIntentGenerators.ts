@@ -10,7 +10,7 @@ export function buildBudgetSeo(areaName: string, maxInr: number): PageSEOInput {
         path: `/pg-in-${areaName.toLowerCase().replace(/\s+/g, '-')}-under-${maxInr}`,
     };
 }
-
+ 
 export function buildStudentSeo(areaName: string): PageSEOInput {
     return {
         title: `Student PG in ${areaName} | Near colleges & metro`,

@@ -12,6 +12,8 @@ import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
 import { notFound, redirect } from 'next/navigation';
+import { getAuthorityProfile } from '@/data/authority';
+import AuthorityLocalityPage from '@/views/AuthorityLocalityPage';
 
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
 import { PlaceSchema } from '@/components/seo/PlaceSchema';
@@ -35,16 +37,35 @@ import { ChevronRight, MapPin } from 'lucide-react';
  * Fetches the first batch of properties on the server for SEO, then renders the client‑side
  * `Properties` component which handles filtering, pagination and further data fetching.
  */
-export default async function PGLocationPage({ slug }: { slug: string }) {
+export interface PGLocationPageProps {
+    slug?: string;
+    overrideSlug?: string;
+    overrideMaxPrice?: string;
+    overrideGender?: string;
+    overrideFeature?: string;
+}
+
+export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPrice, overrideGender, overrideFeature }: PGLocationPageProps) {
+  const actualSlug = overrideSlug || slug || '';
   // Legacy slug redirects (e.g., old URL formats)
-  const legacyTarget = resolveLegacyPgSlug(slug);
+  const legacyTarget = resolveLegacyPgSlug(actualSlug);
   if (legacyTarget) {
     redirect(`/pg/${legacyTarget}`);
   }
 
-  const loc = getPgLocationBySlug(slug);
+  const loc = getPgLocationBySlug(actualSlug);
   if (!loc) {
     notFound();
+  }
+
+  const authorityProfile = getAuthorityProfile(actualSlug);
+  if (authorityProfile) {
+      return <AuthorityLocalityPage 
+          profile={authorityProfile} 
+          overrideMaxPrice={overrideMaxPrice}
+          overrideGender={overrideGender}
+          overrideFeature={overrideFeature}
+      />;
   }
 
   const { name, slug: locationSlug } = loc;

@@ -66,7 +66,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            <SEOHead {...helmet} noindex={hasEmptyListings} />
+            <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="rent-location-ld-json" />
             {itemListLd ? <JsonLd data={itemListLd} id="rent-location-itemlist-ld-json" /> : null}
             <Navbar />
@@ -126,7 +126,6 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
                         pageTitle={`Rent in ${name}`}
                         pageSubtitle={`Verified flats & houses in ${name} — filter by BHK and budget.`}
                         onDisplayedListingsForSeo={onDisplayedListingsForSeo}
-                        onEmptyResultsChange={setHasEmptyListings}
                     />
                 </div>
 

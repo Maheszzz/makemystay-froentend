@@ -67,7 +67,7 @@ export default function PgNearMe() {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            <SEOHead {...seo} noindex={hasEmptyListings} />
+            <SEOHead {...seo} />
             <JsonLd data={combinedLd} id="pg-near-me-ld-json" />
 
             <Navbar />
@@ -167,7 +167,6 @@ export default function PgNearMe() {
                             initialCategory="pg"
                             pageTitle="PG Accommodations"
                             pageSubtitle="Real-time verified listings across Bangalore"
-                            onEmptyResultsChange={setHasEmptyListings}
                         />
                     </div>
                 </div>

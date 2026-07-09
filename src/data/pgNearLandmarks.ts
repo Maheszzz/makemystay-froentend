@@ -95,6 +95,30 @@ export const PG_NEAR_LANDMARKS: PgNearLandmarkEntry[] = [
         hubSlug: 'hebbal',
         context: 'North Bangalore corridor — easily accessible student PG rooms.',
     },
+    {
+        path: 'pg-near-helios-business-park',
+        landmark: 'Helios Business Park',
+        hubSlug: 'kadubeesanahalli',
+        context: 'ORR corridor between Bellandur and Marathahalli — SAP Labs and Societe Generale hub; compare Kadubeesanahalli and Spice Garden PG options.',
+    },
+    {
+        path: 'pg-near-google-ananta',
+        landmark: 'Google Ananta',
+        hubSlug: 'kadubeesanahalli',
+        context: 'Google India\'s flagship campus on ORR in Kadubeesanahalli — high demand for quality PG; book single rooms early.',
+    },
+    {
+        path: 'pg-near-cessna-business-park',
+        landmark: 'Cessna Business Park',
+        hubSlug: 'marathahalli',
+        context: 'Between Marathahalli and Kadubeesanahalli on ORR — Goldman Sachs and AXA corridor; Kundalahalli and Spice Garden PG options.',
+    },
+    {
+        path: 'pg-near-rmz-infinity',
+        landmark: 'RMZ Infinity',
+        hubSlug: 'mahadevapura',
+        context: 'Old Madras Road, CV Raman Nagar — Dell and Societe Generale campus; quieter east Bangalore locality with competitive PG rents.',
+    },
 ];
 
 export function getPgNearLandmarkByPath(pathname: string): PgNearLandmarkEntry | undefined {

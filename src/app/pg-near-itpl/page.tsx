@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
-import { resolveLandmarkPathMetadata } from '@/lib/routeMetadata';
+import { resolveTechParkMetadata } from '@/lib/routeMetadata';
+import TechParkPillarPage from '@/views/TechParkPillarPage';
 
-export const metadata: Metadata = resolveLandmarkPathMetadata('/pg-near-itpl');
+export const metadata: Metadata = resolveTechParkMetadata('/pg-near-itpl');
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
-export { default } from '@/views/PgNearLandmarkPage';
+export default function Page() {
+    return <TechParkPillarPage parkPath="pg-near-itpl" />;
+}

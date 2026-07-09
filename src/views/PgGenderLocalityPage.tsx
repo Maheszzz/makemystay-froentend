@@ -67,7 +67,7 @@ export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: 
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            <SEOHead {...helmet} noindex={hasEmptyListings} />
+            <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="pg-gender-locality-ld-json" />
             <Navbar />
 
@@ -128,7 +128,6 @@ export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: 
                         pageTitle={`${audienceLabel} in ${name}`}
                         pageSubtitle={`Verified ${audienceLabel.toLowerCase()} — client-filtered for gender cues in listing text.`}
                         forcedGenderFilter={filterGender}
-                        onEmptyResultsChange={setHasEmptyListings}
                     />
                 </div>
 

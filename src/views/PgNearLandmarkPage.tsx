@@ -56,7 +56,7 @@ export default function PgNearLandmarkPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-            <SEOHead {...helmet} noindex={hasEmptyListings} />
+            <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="pg-near-landmark-jsonld" />
             <Navbar />
 
@@ -98,7 +98,6 @@ export default function PgNearLandmarkPage() {
                         initialCity={name}
                         pageTitle={`PG near ${entry.landmark}`}
                         pageSubtitle={`Verified PG inventory around ${name} for ${entry.landmark} commuters.`}
-                        onEmptyResultsChange={setHasEmptyListings}
                     />
                 </div>
 

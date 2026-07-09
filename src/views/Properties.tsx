@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
-import { Link, useLocation, useSearchParams } from '@/lib/navigation';
+import { Link, useLocation, useSearchParams, useNavigate } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
@@ -23,6 +23,7 @@ import { buildPageSEO, isValidListingPageParam, listingsPageSeo } from '@/lib/se
 import {
     normalizeCitySlug,
     pathnameToActiveListingsTab,
+    listingsHubTabNavigateUrl,
 } from '@/lib/listingsCategoryHubs';
 import {
     computeRentPlotStatsFromListings,
@@ -97,6 +98,7 @@ function PropertiesInner({
     showMapPanel = false,
 }: PropertiesProps) {
     const location = useLocation();
+    const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const goBack = useSmartBack({ fallback: '/' });
     const { wishlist } = useWishlist();
@@ -396,13 +398,6 @@ function PropertiesInner({
         onPlotHubInventoryRange(inventoryStats.plotSqftMin, inventoryStats.plotSqftMax);
     }, [embedPlotHubUi, onPlotHubInventoryRange, inventoryStats.plotSqftMin, inventoryStats.plotSqftMax]);
 
-    const shouldNoindexEmptyResults = !loading && !error && propertyListOrdered.length === 0;
-    const shouldNoindexThinCategory =
-        !loading &&
-        !error &&
-        typeof totalCount === 'number' &&
-        ((category === 'buy' && totalCount < 10) || (category === 'plot' && totalCount < 3));
-
     const listingsHelmet = useMemo(() => {
         if (hideChrome) return null;
         const page = listingsPageSeo({
@@ -416,7 +411,7 @@ function PropertiesInner({
         });
         return buildPageSEO({
             ...page,
-            noindex: Boolean(page.noindex) || shouldNoindexEmptyResults || shouldNoindexThinCategory,
+            noindex: Boolean(page.noindex),
         });
     }, [
         hideChrome,
@@ -426,16 +421,15 @@ function PropertiesInner({
         category,
         locationFilter,
         totalCount,
-        shouldNoindexEmptyResults,
-        shouldNoindexThinCategory,
         listingPageNum,
     ]);
 
     useEffect(() => {
         // Only signal empty results when the API succeeded — never on error/loading state
         if (error) return;
+        const shouldNoindexEmptyResults = !loading && !error && propertyListOrdered.length === 0;
         onEmptyResultsChange?.(shouldNoindexEmptyResults);
-    }, [onEmptyResultsChange, shouldNoindexEmptyResults, error]);
+    }, [onEmptyResultsChange, loading, propertyListOrdered.length, error]);
 
     useEffect(() => {
         if (!onDisplayedListingsForSeo) return;
@@ -476,21 +470,10 @@ function PropertiesInner({
 
     const handleCategoryTab = useCallback(
         (cat: CategoryKey) => {
-            setCategory(cat);
-            setTypeFilter('all');
-            setSearchParams(
-                (prev) => {
-                    const next = new URLSearchParams(prev);
-                    if (cat === 'all') next.delete('cat');
-                    else next.set('cat', cat);
-                    next.delete('type');
-                    next.delete('page');
-                    return next;
-                },
-                { replace: true }
-            );
+            const url = listingsHubTabNavigateUrl(cat, apiCity, searchQuery);
+            navigate(url);
         },
-        [setSearchParams]
+        [apiCity, searchQuery, navigate]
     );
 
     const showRentBangaloreHubBlocks =

@@ -131,7 +131,6 @@ export function pgLocationSeoWithQuery(
         title,
         description,
         path,
-        noindex: dirty,
     };
 }
 
@@ -575,6 +574,6 @@ export function listingsPageSeo(input: ListingsPageSeoInput): PageSEOInput {
         title,
         description,
         path,
-        noindex: input.noindex || (lp != null && lp > 50),
+        noindex: input.noindex,
     };
 }

@@ -11,9 +11,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export const dynamic = 'force-dynamic';
 
 import Properties from '@/views/Properties';
-import { useParams } from '@/lib/navigation';
-export default function Page() {
-  const { city } = useParams();
+export default async function Page({ params }: PageProps) {
+  const { city } = await params;
   const t = city ? city.charAt(0).toUpperCase() + city.slice(1) : '';
   return <Properties key={`all-${city}`} initialCategory="all" initialCity={city} pageTitle={`Properties in ${t}`} pageSubtitle={`Explore verified homes in ${t}`} />;
 }

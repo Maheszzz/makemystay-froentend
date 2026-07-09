@@ -3,7 +3,7 @@
 import { notFound } from 'next/navigation';
 import { Navigate } from '@/lib/navigation';
 import PGLocationPage from '@/views/PGLocationPage';
-import PgGenderLocalityPage from '@/views/PgGenderLocalityPage';
+
 import PgNearLandmarkPage from '@/views/PgNearLandmarkPage';
 import RentLocationPage from '@/views/RentLocationPage';
 import { PG_NEAR_LANDMARKS } from '@/data/pgNearLandmarks';
@@ -37,21 +37,27 @@ export default function ProgrammaticSeoCatchAll({ pathKey }: { pathKey: string }
     }
 
     const boys = path.match(/^pg-for-boys-in-(.+)$/);
-    if (boys) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(boys[1])} />;
+    if (boys) return <PGLocationPage overrideSlug={hubSlugToPgSlug(boys[1])} overrideGender="male" />;
 
     const girls = path.match(/^pg-for-girls-in-(.+)$/);
-    if (girls) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(girls[1])} />;
+    if (girls) return <PGLocationPage overrideSlug={hubSlugToPgSlug(girls[1])} overrideGender="female" />;
 
     const men = path.match(/^pg-for-men-in-(.+)$/);
-    if (men) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(men[1])} />;
+    if (men) return <PGLocationPage overrideSlug={hubSlugToPgSlug(men[1])} overrideGender="male" />;
 
     const women = path.match(/^pg-for-women-in-(.+)$/);
-    if (women) return <PgGenderLocalityPage overrideSlug={hubSlugToPgSlug(women[1])} />;
+    if (women) return <PGLocationPage overrideSlug={hubSlugToPgSlug(women[1])} overrideGender="female" />;
 
     const priceTier = path.match(/^pg-in-(.+)-under-(\d+)$/);
     if (priceTier) {
         const baseSlug = hubSlugToPgSlug(priceTier[1]);
         return <PGLocationPage overrideSlug={baseSlug} overrideMaxPrice={priceTier[2]} />;
+    }
+
+    const featureMatch = path.match(/^pg-in-(.+)-with-(food|ac)$/);
+    if (featureMatch) {
+        const baseSlug = hubSlugToPgSlug(featureMatch[1]);
+        return <PGLocationPage overrideSlug={baseSlug} overrideFeature={featureMatch[2]} />;
     }
 
     const pgIn = path.match(/^pg-in-(.+)$/);
