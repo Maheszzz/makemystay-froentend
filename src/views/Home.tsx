@@ -14,10 +14,11 @@ import {
     type HomeHeroNavigateTab,
     type ListingsCategoryKey,
 } from '@/lib/listingsCategoryHubs';
-import { useSearchParams } from '@/lib/navigation';
+import { useSearchParams, useNavigate } from '@/lib/navigation';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { HomeBelowFold } from '@/views/HomeBelowFold';
 import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
+import { homeHeroSearchUrl } from '@/lib/listingsCategoryHubs';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
@@ -29,6 +30,7 @@ function scrollToFeaturedListings() {
 
 function HomeInner() {
     const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
     const searchQuery = searchParams.get('q') || '';
     const heroTab = parseHomeHeroTab(searchParams.get('cat') ?? searchParams.get('category'));
     const listingsCategory = useMemo(() => homeHeroTabToListingsCategory(heroTab), [heroTab]);
@@ -125,13 +127,19 @@ function HomeInner() {
         [setHeroTab]
     );
 
+    const handleListingsNavigate = useCallback(
+        (tab: HomeHeroNavigateTab, query: string) => {
+            const url = homeHeroSearchUrl(tab, query);
+            navigate(url);
+        },
+        [navigate]
+    );
+
     const handleFilterSearch = useCallback(
         (tab: HomeHeroNavigateTab, query: string) => {
-            setHeroTab(tab);
-            setSearchQuery(query);
-            scrollToFeaturedListings();
+            // Unused since we are using listingsNavigate now
         },
-        [setHeroTab, setSearchQuery]
+        []
     );
 
     return (
@@ -148,10 +156,9 @@ function HomeInner() {
                         setSearchQuery={setSearchQuery}
                         filters={heroFilters}
                         setFilters={setHeroFilters}
-                        filterTabsInPlace
+                        listingsNavigate={handleListingsNavigate}
                         activeHubTab={heroTab}
                         onHubTabChange={handleHubTabChange}
-                        onFilterSearch={handleFilterSearch}
                     />
 
                 </section>

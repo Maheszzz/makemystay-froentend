@@ -15,6 +15,7 @@ import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEOHead } from '@/components/seo/SEOHead';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
 import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
@@ -362,17 +363,17 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     return (
         <Fragment>
             {detailHelmet && (
-                <SEO 
+                <SEOHead 
                     title={detailHelmet.title}
                     description={detailHelmet.description}
                     keywords={detailHelmet.keywords}
                     canonical={detailHelmet.canonicalHref}
                     image={detailHelmet.ogImage}
                     noindex={detailHelmet.noindex}
-                    type="article"
-                    schema={detailJsonLd || undefined}
+                    ogType="article"
                 />
             )}
+            {detailJsonLd && <JsonLd data={detailJsonLd} id="property-detail-schema" />}
             <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
             <Navbar />
 
