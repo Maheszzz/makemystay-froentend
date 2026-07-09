@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { SEO } from '@/components/seo/SEO';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { PlaceSchema } from '@/components/seo/PlaceSchema';
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
 
@@ -81,7 +81,7 @@ export default async function OfficeLandingPage({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEO
+      <SEOHead
         title={seoInput.title}
         description={seoInput.description}
         keywords={seoInput.keywords}

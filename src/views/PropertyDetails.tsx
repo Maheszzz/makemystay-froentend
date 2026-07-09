@@ -14,7 +14,7 @@ import { paymentApi } from '@/lib/api';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
-import { SEO } from '@/components/seo/SEO';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { buildPropertyDetailGraph } from '@/lib/schema';
 import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
@@ -248,14 +248,13 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     if (loading) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-                <SEO 
+                <SEOHead 
                     title={interimHelmet.title}
                     description={interimHelmet.description}
                     keywords={interimHelmet.keywords}
                     canonical={interimHelmet.canonicalHref}
                     image={interimHelmet.ogImage}
                     noindex={interimHelmet.noindex}
-                    type="article"
                 />
                 <Navbar />
                 <main className="flex-grow flex items-center justify-center">
@@ -269,7 +268,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     if (error || !property) {
         return (
             <div className="bg-slate-50 min-h-screen font-sans flex flex-col">
-                <SEO 
+                <SEOHead 
                     title={errorHelmet.title}
                     description={errorHelmet.description}
                     keywords={errorHelmet.keywords}

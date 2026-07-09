@@ -3,7 +3,7 @@
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { SEO } from '@/components/seo/SEO';
+import { SEOHead } from '@/components/seo/SEOHead';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { QuickAnswer } from '@/components/seo/QuickAnswer';
 import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
@@ -101,7 +101,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEO 
+      <SEOHead 
         title={helmet.title}
         description={helmet.description}
         keywords={helmet.keywords}

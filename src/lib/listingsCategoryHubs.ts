@@ -88,8 +88,8 @@ export function listingsHubTabNavigateUrl(
     return s ? `${pathname}?${s}` : pathname;
   };
 
-  if (cat === 'all')  return build(city ? `/properties/in/${city}` : '/properties', {});
-  if (cat === 'pg')   return build(city ? `/pg/${city}` : '/pg', {});
+  if (cat === 'all')  return build(city ? `/properties/in/${city}` : '/properties', { _v: '1' });
+  if (cat === 'pg')   return build(city ? `/pg/${city}` : '/pg', { _v: '1' });
   if (cat === 'rent') return build(listingsCategoryHubPath('rent', city), city ? { city } : {});
   if (cat === 'buy')  return build(listingsCategoryHubPath('buy',  city), city ? { city } : {});
                       return build(listingsCategoryHubPath('plot', city), city ? { city } : {});
