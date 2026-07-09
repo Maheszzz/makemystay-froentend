@@ -159,7 +159,28 @@ function PropertiesInner({
             }
         }, 400);
 
-        return () => clearTimeout(timer);
+        const typeOptions = useMemo(() => {
+        switch (category) {
+            case 'pg':
+                return [{ id: 'all', label: 'All Types' }, { id: 'PG', label: 'PG / Hostel' }, { id: 'Co-living', label: 'Co-living' }];
+            case 'plot':
+                return [{ id: 'all', label: 'All Types' }, { id: 'Plot', label: 'Plots / Land' }];
+            case 'all':
+            default:
+                return [
+                    { id: 'all', label: 'All Types' },
+                    { id: '1RK', label: 'Studio (1 RK)' },
+                    { id: '1BHK', label: '1 BHK' },
+                    { id: '2BHK', label: '2 BHK' },
+                    { id: '3BHK', label: '3 BHK' },
+                    { id: 'Villa', label: 'Villa / Row House' },
+                    { id: 'PG', label: 'PG / Hostel' },
+                    { id: 'Plot', label: 'Plots / Land' }
+                ];
+        }
+    }, [category]);
+
+    return () => clearTimeout(timer);
     }, [
         category,
         location.pathname,
@@ -255,7 +276,7 @@ function PropertiesInner({
         if (category === 'all') {
             return { ...base, property_type: typeFilter === 'all' ? undefined : typeFilter };
         }
-        return { ...base, category };
+        return { ...base, category, property_type: typeFilter === 'all' ? undefined : typeFilter };
     }, [category, searchQuery, typeFilter, minPrice, maxPrice, apiCity, sortBy, priceTier]);
 
     const PAGE_SIZE = 24;
@@ -717,12 +738,9 @@ function PropertiesInner({
                                                     onChange={(e) => setTypeFilter(e.target.value)}
                                                     className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
                                                 >
-                                                    <option value="all">All Types</option>
-                                                    <option value="1RK">Studio (1 RK)</option>
-                                                    <option value="1BHK">1 BHK</option>
-                                                    <option value="2BHK">2 BHK</option>
-                                                    <option value="3BHK">3 BHK</option>
-                                                    <option value="Villa">Villa / Row House</option>
+                                                    {typeOptions.map(opt => (
+                                                        <option key={opt.id} value={opt.id}>{opt.label}</option>
+                                                    ))}
                                                 </select>
                                                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                                             </div>

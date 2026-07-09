@@ -177,9 +177,6 @@ export function SmartSearchBar({
         }
         if (hubMode && listingsNavigate) {
             listingsNavigate(effectiveHubTab, merged);
-            if (merged !== (searchQuery || '').trim()) {
-                setSearchQuery?.(merged);
-            }
             setInputValue('');
             setShowSuggestions(false);
             return;

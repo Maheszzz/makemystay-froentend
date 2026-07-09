@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { resolveCatchAllPathMetadata } from '@/lib/routeMetadata';
-import SeoCatchAllClient from './SeoCatchAllClient';
+import ProgrammaticSeoCatchAll from '@/routes/ProgrammaticSeoCatchAll';
 
 type PageProps = { params: Promise<{ path: string[] }> };
 
@@ -19,5 +19,5 @@ export default async function SeoCatchAllPage({ params }: PageProps) {
   // Call metadata resolver to trigger notFound() if the route is invalid
   resolveCatchAllPathMetadata(pathKey);
 
-  return <SeoCatchAllClient />;
+  return <ProgrammaticSeoCatchAll pathKey={pathKey} />;
 }

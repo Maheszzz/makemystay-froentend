@@ -241,11 +241,12 @@ export function useProperty(
     useEffect(() => {
         if (initialProperty && String(initialProperty.id) === String(id)) {
             setProperty(initialProperty);
+            setError(null);
             setLoading(false);
             return;
         }
         void fetchProperty();
-    }, [id]);
+    }, [id, initialProperty]);
 
     return {
         property,
@@ -306,8 +307,16 @@ export function usePropertyBySlug(
     };
 
     useEffect(() => {
-        void fetchProperty();
-    }, [type, slug]);
+        if (initialProperty && initialProperty.slug === slug) {
+            setProperty(initialProperty);
+            setError(null);
+            setLoading(false);
+            return;
+        }
+        if (slug && type) {
+            void fetchProperty();
+        }
+    }, [type, slug, initialProperty]);
 
     return {
         property,

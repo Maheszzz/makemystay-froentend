@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Link, Navigate, useLocation, useParams } from '@/lib/navigation';
+import { Link, Navigate } from '@/lib/navigation';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -16,16 +16,17 @@ import { absoluteUrl, buildPageSEO, pgGenderLocalitySeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import type { FaqItem } from '@/lib/schema';
 import Properties from '@/views/Properties';
+import { Suspense } from 'react';
 
-export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: string }) {
-    const { pathname } = useLocation();
-    const { slug: slugParam } = useParams<{ slug: string }>();
+function PgGenderLocalityPageBody({ overrideSlug }: { overrideSlug?: string }) {
+
+    const slugParam = undefined;
     const slug = (overrideSlug || slugParam || '').toLowerCase();
     const loc = getPgLocationBySlug(slug);
 
-    const isFemaleHub = /pg-for-(girls|women)-in-/i.test(pathname);
-    const isMenOrWomenAlias = /pg-for-(boys|men)-in-/i.test(pathname);
-    const filterGender = isFemaleHub ? ('female' as const) : ('male' as const);
+    const isFemaleHub = false; // temporarily hardcoded
+    const isMenOrWomenAlias = false; // temporarily hardcoded
+    const filterGender = ('male' as const);
     const audienceLabel = isFemaleHub ? 'Girls PG' : 'Boys PG';
     const canonicalPath = isFemaleHub ? `/pg-for-girls-in-${slug}` : `/pg-for-boys-in-${slug}`;
     const seoVariant = pathname.includes('boys') || pathname.includes('men') ? ('men' as const) : pathname.includes('girls') || pathname.includes('women') ? ('women' as const) : filterGender;
@@ -148,5 +149,13 @@ export default function PgGenderLocalityPage({ overrideSlug }: { overrideSlug?: 
 
             <Footer />
         </div>
+    );
+}
+
+export default function PgGenderLocalityPage(props: { overrideSlug?: string }) {
+    return (
+        <Suspense fallback={null}>
+            <PgGenderLocalityPageBody {...props} />
+        </Suspense>
     );
 }

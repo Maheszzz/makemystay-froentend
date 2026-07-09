@@ -12,6 +12,7 @@ import { notFound } from 'next/navigation';
 import RentSlugRoute from '@/routes/RentSlugRoute';
 import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
 import { parsePropertySlugParam } from '@/lib/propertyRouting';
+import PropertyDetails from '@/views/PropertyDetails';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +28,7 @@ export default async function RentSlugPage({ params }: PageProps) {
         if (!property || property.is_available === false) {
             notFound();
         }
+        return <PropertyDetails initialProperty={property} slug={param} />;
     }
 
     return <RentSlugRoute />;

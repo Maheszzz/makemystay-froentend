@@ -10,22 +10,23 @@ import { pageSeoToMetadata } from '@/lib/nextMetadata';
 export async function resolvePropertyPageMetadata(slug: string): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
     const id = parsePropertySlugParam(param);
-    if (!id) {
-        // Invalid slug, trigger 404
+    
+    let property = null;
+    
+    if (id) {
+        property = await fetchPropertyByIdServer(id);
+    } else {
+        // Fallback to legacy slug search for backward compatibility
+        const { fetchPropertyBySlugServer } = await import('@/lib/server/fetchPropertyById');
+        property = await fetchPropertyBySlugServer('plot', param);
+    }
+
+    if (!property || property.is_available === false) {
         notFound();
     }
 
-    const property = await fetchPropertyByIdServer(id!);
-    if (!property) {
-        notFound();
-    }
-
-    if (property!.is_available === false) {
-        notFound();
-    }
-
-    const detailPath = getPropertyDetailPath(property!);
-    return pageSeoToMetadata(propertyDetailPageSeo(property!, detailPath));
+    const detailPath = getPropertyDetailPath(property);
+    return pageSeoToMetadata(propertyDetailPageSeo(property, detailPath));
 }
 
 export function isPropertySlugParam(slug: string): boolean {
