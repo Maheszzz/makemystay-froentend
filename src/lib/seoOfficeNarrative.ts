@@ -4,15 +4,14 @@
 // by scanning the full property list.
 
 import type { Property } from '@/types/api';
-import { formatPropertyTitle } from '@/lib/utils';
+import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
 import { buildPropertyPdpFaqs } from '@/lib/propertyClientSeoNarrative';
-import { getAllProperties } from '@/data/propertyData'; // hypothetical helper returning all properties
 
 /**
  * Derive office context (nearest locality, metro, etc.) based on a property list.
  * The function looks for properties whose location includes the office name.
  */
-function deriveOfficeContext(officeName: string): {
+function deriveOfficeContext(officeName: string, properties: Property[] = []): {
   locality: string;
   metro: string;
   itParks: string[];
@@ -21,7 +20,7 @@ function deriveOfficeContext(officeName: string): {
   restaurants: string[];
   busStops: string[];
 } {
-  const all = getAllProperties();
+  const all = properties;
   // Find first property that mentions the office name – fallback to generic values.
   const match = all.find((p) => p.location?.toLowerCase().includes(officeName.toLowerCase()));
   if (!match) {
@@ -53,9 +52,9 @@ function deriveOfficeContext(officeName: string): {
  * The content is assembled from generic sections – each section references the office name
  * to keep the copy unique across offices.
  */
-export function generateOfficeLongFormContent(property: Property, officeSlug: string): string {
+export function generateOfficeLongFormContent(property: Property, officeSlug: string, allProperties: Property[] = []): string {
   const officeName = formatPropertyTitle(officeSlug.replace(/-/g, ' ')) || officeSlug;
-  const { locality, metro, itParks, schools, hospitals, restaurants, busStops } = deriveOfficeContext(officeName);
+  const { locality, metro, itParks, schools, hospitals, restaurants, busStops } = deriveOfficeContext(officeName, allProperties);
   const amenitiesList = [
     property.wifi ? 'High‑Speed Wi‑Fi connectivity' : 'Reliable Wi‑Fi connection',
     property.food ? 'Nutritious veg & non‑veg meals' : 'Optional daily meals service',

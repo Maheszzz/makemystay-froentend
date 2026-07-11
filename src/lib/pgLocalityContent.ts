@@ -18,6 +18,7 @@ function schemaNodeWithoutContext(schema: Record<string, unknown>) {
 
 function fallbackProfile(slug: string, name: string): PgLocalityDeepProfile {
     return {
+        description: undefined,
         slug,
         name,
         quickAnswer: `${name} is a well-known Bangalore locality for verified PG and coliving stays with transparent rent (typically ₹6,000–₹18,000/mo), meal plans, and security features on professional operators. Compare live listings on ${SITE_NAME} before you pay a token.`,

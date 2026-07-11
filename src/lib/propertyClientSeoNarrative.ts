@@ -133,7 +133,6 @@ export function generatePropertyLongFormContent(property: Property): string {
     const loc = property.location?.split(',')[0].trim() || 'Bangalore';
     const locLower = loc.toLowerCase();
     const type = property.type || 'Property';
-    const category = property.category || 'rent';
     const price = property.price || 'affordable rates';
     
     // Locality specific landmarks data

@@ -103,11 +103,9 @@ export function pgLocationSeoWithQuery(
     searchParams: URLSearchParams
 ): PageSEOInput {
     const path = stablePgListingCanonical(slug, searchParams);
-    const dirty = !pgListingQueryIsClean(searchParams);
     const wifi = searchParams.get('wifi') === 'true';
     const food = searchParams.get('food') === 'true';
     const ac = searchParams.get('ac') === 'true';
-    const price = searchParams.get('price');
     const genderRaw = searchParams.get('gender');
     const gender = genderRaw?.trim().toLowerCase();
     
@@ -163,17 +161,6 @@ export function pgGenderLocalitySeo(
     };
 }
 
-function ogImageFromProperty(property: Property): string | undefined {
-    let raw: string | undefined = property.image;
-    if (Array.isArray(property.images) && property.images.length > 0) {
-        const first = property.images[0];
-        raw = typeof first === 'string' ? first : undefined;
-    }
-    if (!raw?.trim()) return undefined;
-    const u = raw.trim();
-    if (u.startsWith('http://') || u.startsWith('https://')) return u;
-    return absoluteUrl(u.startsWith('/') ? u : `/${u}`);
-}
 
 function normalizeLocationForSeo(location: string | undefined): string {
     const raw = (location || '').replace(/\s+/g, ' ').trim();

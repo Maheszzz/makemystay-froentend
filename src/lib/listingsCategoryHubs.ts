@@ -97,9 +97,10 @@ export function listingsHubTabNavigateUrl(
 
 // Home hero delegates to the shared helper with a fixed default city
 export function homeHeroSearchUrl(
-  cat: ListingsCategoryKey,
+  tab: HomeHeroNavigateTab,
   qRaw: string
 ): string {
+  const cat = homeHeroTabToListingsCategory(tab);
   return listingsHubTabNavigateUrl(cat, HOME_HERO_DEFAULT_CITY, qRaw);
 }
 

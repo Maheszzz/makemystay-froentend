@@ -22,11 +22,6 @@ import { homeHeroSearchUrl } from '@/lib/listingsCategoryHubs';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
-function scrollToFeaturedListings() {
-    requestAnimationFrame(() => {
-        document.getElementById('featured-listings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-}
 
 function HomeInner() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -135,12 +130,6 @@ function HomeInner() {
         [navigate]
     );
 
-    const handleFilterSearch = useCallback(
-        (tab: HomeHeroNavigateTab, query: string) => {
-            // Unused since we are using listingsNavigate now
-        },
-        []
-    );
 
     return (
         <>
