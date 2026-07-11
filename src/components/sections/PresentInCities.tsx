@@ -118,7 +118,7 @@ export function PresentInCities({ hideSectionLabel = false }: PresentInCitiesPro
                                             return (
                                                 <Link
                                                     key={area}
-                                                    to={`${city.href}?search=${encodeURIComponent(area)}`}
+                                                    to={`${city.href}?q=${encodeURIComponent(area)}`}
                                                     className="px-2.5 py-1 text-[10px] font-semibold bg-slate-100 text-slate-600 rounded-md hover:bg-brand-red hover:text-white transition-colors z-20 relative shadow-sm"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >

@@ -159,7 +159,24 @@ function PropertiesInner({
             }
         }, 400);
 
-        const typeOptions = useMemo(() => {
+        return () => clearTimeout(timer);
+    }, [
+        category,
+        location.pathname,
+        locationFilter,
+        typeFilter,
+        minPrice,
+        maxPrice,
+        sortBy,
+        searchQuery,
+        hideChrome,
+        initialCity,
+        setSearchParams,
+        searchParams,
+        pageQueryParam,
+    ]);
+
+    const typeOptions = useMemo(() => {
         switch (category) {
             case 'pg':
                 return [{ id: 'all', label: 'All Types' }, { id: 'PG', label: 'PG / Hostel' }, { id: 'Co-living', label: 'Co-living' }];
@@ -180,22 +197,6 @@ function PropertiesInner({
         }
     }, [category]);
 
-    return () => clearTimeout(timer);
-    }, [
-        category,
-        location.pathname,
-        locationFilter,
-        typeFilter,
-        minPrice,
-        maxPrice,
-        sortBy,
-        searchQuery,
-        hideChrome,
-        initialCity,
-        setSearchParams,
-        searchParams,
-        pageQueryParam,
-    ]);
 
     // Update state if category props change (from App.tsx routes)
     useEffect(() => {
@@ -382,6 +383,9 @@ function PropertiesInner({
     const propertyListOrdered = useMemo(() => {
         try {
             const list = [...propertyListFiltered];
+            // If there is a search query, trust the backend's exact-match relevance sorting completely.
+            if (searchQuery) return list;
+            
             if (sortBy === 'review_count_desc') {
                 return list.sort((a, b) => {
                     const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
