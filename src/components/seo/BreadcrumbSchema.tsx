@@ -14,7 +14,10 @@ export function BreadcrumbSchema({ items }: { items: BreadcrumbItem[] }) {
       '@type': 'ListItem',
       position: idx + 1,
       name: item.name,
-      item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://makemystay.ai'}${item.path}`,
+      item: {
+        '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://makemystay.ai'}${item.path}`,
+        name: item.name,
+      },
     })),
   };
   return <JsonLd data={data} id="breadcrumb-ld" />;

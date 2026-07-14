@@ -52,7 +52,10 @@ export function buildBreadcrumbSchema(items: { name: string; path: string }[]) {
             '@type': 'ListItem',
             position: i + 1,
             name: it.name,
-            item: `${SITE_URL}${it.path.startsWith('/') ? it.path : `/${it.path}`}`,
+            item: {
+                '@id': `${SITE_URL}${it.path.startsWith('/') ? it.path : `/${it.path}`}`,
+                name: it.name,
+            },
         })),
     };
 }
@@ -143,7 +146,7 @@ export function buildLocalBusinessSchema() {
             'Bellandur',
             'Sarjapur Road',
             'Bangalore',
-        ],
+        ].map((name) => ({ '@type': 'Place', name })),
         priceRange: '₹6000 - ₹25000',
         sameAs: [...BRAND_SAME_AS],
     };
@@ -399,9 +402,9 @@ export function buildPropertyDetailGraph(
         name: SITE_NAME,
         url: SITE_URL,
         image: DEFAULT_OG_IMAGE,
-        areaServed: property.location
+        areaServed: (property.location
             ? [`${property.location}, Bangalore`, 'Bangalore']
-            : ['Bangalore'],
+            : ['Bangalore']).map((name) => ({ '@type': 'Place', name })),
         address: {
             '@type': 'PostalAddress',
             addressLocality: 'Bangalore',

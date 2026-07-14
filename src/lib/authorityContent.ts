@@ -50,7 +50,10 @@ export function buildAuthorityGraph(profile: LocalityAuthorityProfile, canonical
             '@type': 'ListItem',
             position: i + 1,
             name: c.name,
-            item: `${SITE_URL}${c.path}`,
+            item: {
+                '@id': `${SITE_URL}${c.path}`,
+                name: c.name,
+            },
         })),
     };
     
@@ -78,7 +81,7 @@ export function buildAuthorityGraph(profile: LocalityAuthorityProfile, canonical
         '@id': `${SITE_URL}/#localbusiness`,
         name: SITE_NAME,
         url: SITE_URL,
-        areaServed: [profile.name, 'Bangalore'],
+        areaServed: [profile.name, 'Bangalore'].map((name) => ({ '@type': 'Place', name })),
         ...(profile.aggregateRating ? {
             aggregateRating: {
                 '@type': 'AggregateRating',
