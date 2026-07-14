@@ -271,6 +271,10 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
     const path = pathKey.startsWith('/') ? pathKey : `/${pathKey}`;
     const seg = path.replace(/^\//, '');
 
+    if (seg === '404') {
+        notFound();
+    }
+
     const rentIn = seg.match(/^rent-in-(.+)$/);
     if (rentIn) {
         const slug = hubSlugToPgSlug(rentIn[1]);

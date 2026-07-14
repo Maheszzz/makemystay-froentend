@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
 import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
-import { parsePropertySlugParam } from '@/lib/propertyRouting';
-import { notFound } from 'next/navigation';
+import { parsePropertySlugParam, getPropertyDetailPath } from '@/lib/propertyRouting';
+import { notFound, permanentRedirect } from 'next/navigation';
 import PropertyDetails from '@/views/PropertyDetails';
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -28,6 +28,11 @@ export default async function PropertyPage({ params }: PageProps) {
     }
 
     if (!property || property.is_available === false) notFound();
+
+    const canonicalPath = getPropertyDetailPath(property);
+    if (`/properties/${param}` !== canonicalPath) {
+        permanentRedirect(canonicalPath);
+    }
 
     return <PropertyDetails initialProperty={property} slug={param} />;
 }

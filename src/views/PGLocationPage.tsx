@@ -97,12 +97,15 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     // Continue with empty properties list to avoid 5xx
   }
 
+  const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
+  const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
+
   const pageTitle = `PG in ${name}`;
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEOHead {...helmet} />
+      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
 

@@ -22,6 +22,18 @@ const nextConfig: NextConfig = {
     async headers() {
         return [
             {
+                source: '/_next/static/:path*',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+            },
+            {
+                source: '/manifest.json',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+            },
+            {
+                source: '/sitemap(.*).xml',
+                headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+            },
+            {
                 source: '/:path*',
                 headers: [
                     { key: 'X-Content-Type-Options', value: 'nosniff' },

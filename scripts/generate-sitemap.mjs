@@ -127,11 +127,15 @@ function buildPropertyDetailPath(property) {
     const typeLower = (property.property_type || '').toLowerCase();
     const isPgType = ['pg', 'hostel', 'coliving'].some((t) => typeLower.includes(t));
 
-    let prefix = '/rent';
-    if (category === 'buy') {
+    let prefix = '/pg';
+    if (category === 'rent' && !isPgType) {
+        prefix = '/rent';
+    } else if (category === 'buy') {
         prefix = '/buy';
     } else if (category === 'plot') {
         prefix = '/plot';
+    } else if (isPgType || category === 'pg') {
+        prefix = '/pg';
     }
 
     return slug ? `${prefix}/${id}-${slug}` : `${prefix}/${id}`;

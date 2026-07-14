@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { resolvePgSlugMetadata } from '@/lib/routeMetadata';
 import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
-import { parsePropertySlugParam } from '@/lib/propertyRouting';
+import { parsePropertySlugParam, getPropertyDetailPath } from '@/lib/propertyRouting';
 import { getStaticPgPropertyRedirect } from '@/lib/seoPropertyRedirects';
 import PropertyDetails from '@/views/PropertyDetails';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -25,7 +25,6 @@ export default async function Page({ params }: PageProps) {
     if (/^(\d+)(-|$)/.test(param)) {
         const staticTo = getStaticPgPropertyRedirect(param);
         if (staticTo) {
-            const { permanentRedirect } = await import('next/navigation');
             permanentRedirect(staticTo);
         }
 
@@ -33,6 +32,12 @@ export default async function Page({ params }: PageProps) {
         if (!id) notFound();
         const property = await fetchPropertyByIdServer(id);
         if (!property || property.is_available === false) notFound();
+
+        const canonicalPath = getPropertyDetailPath(property);
+        if (`/pg/${param}` !== canonicalPath) {
+            permanentRedirect(canonicalPath);
+        }
+
         return <PropertyDetails initialProperty={property} slug={param} />;
     }
 
