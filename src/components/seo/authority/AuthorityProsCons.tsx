@@ -3,7 +3,7 @@ import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 export function AuthorityProsCons({ pros, cons }: { pros: string[]; cons: string[] }) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
             <div className="rounded-2xl border border-green-200 bg-green-50/50 p-6">
                 <h3 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
                     <ThumbsUp className="w-5 h-5 text-green-600" />
