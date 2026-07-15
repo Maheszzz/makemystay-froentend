@@ -8,7 +8,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
+import { useProperties, useListingLocalityOptions } from '@/hooks';
 import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { PremiumTrustStrip } from '@/components/trust/PremiumTrustStrip';
@@ -100,7 +100,6 @@ function PropertiesInner({
     const location = useLocation();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const goBack = useSmartBack({ fallback: '/' });
     const { wishlist } = useWishlist();
 
     // 1. Initialize state from URL or Props
@@ -861,7 +860,7 @@ function PropertiesInner({
                                             if (!prop || !prop.id) return null;
                                             return (
                                                 <div
-                                                    key={prop.id}
+                                                    key={`${prop.id}-${idx}`}
                                                     className="animate-card-in"
                                                     style={{ animationDelay: `${Math.min(idx * 35, 280)}ms` }}
                                                 >

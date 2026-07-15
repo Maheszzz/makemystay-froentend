@@ -113,9 +113,9 @@ export function PropertyGrid({
         move_in: '',
     };
 
-    const handleExplore = () => {
+    const handleExplore = (overrideFilters?: Partial<HeroSearchFilters>) => {
         const path = buildFeaturedExploreUrl(
-            activeFilters,
+            { ...activeFilters, ...overrideFilters },
             searchQuery,
             category === 'all' ? 'all' : 'pg'
         );

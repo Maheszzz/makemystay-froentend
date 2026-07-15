@@ -25,6 +25,8 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
+    "@studio-freight/lenis": "^1.0.42",
+    "@studio-freight/react-lenis": "^0.0.47",
     "axios": "^1.13.4",
     "framer-motion": "^12.29.2",
     "lucide-react": "^0.563.0",

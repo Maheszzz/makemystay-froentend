@@ -10,7 +10,7 @@ import { ArrowRight, Calendar, ChevronDown, MapPin, SlidersHorizontal } from 'lu
 interface FeaturedPropertyFiltersBarProps {
     filters: HeroSearchFilters;
     onFiltersChange: (next: HeroSearchFilters) => void;
-    onExplore: () => void;
+    onExplore: (overrideFilters?: Partial<HeroSearchFilters>) => void;
 }
 
 function FilterSelect({
@@ -64,7 +64,10 @@ export function FeaturedPropertyFiltersBar({
                     <button
                         key={tab.key}
                         type="button"
-                        onClick={() => patch({ city: tab.key })}
+                        onClick={() => {
+                            patch({ city: tab.key });
+                            onExplore({ city: tab.key });
+                        }}
                         className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold transition-all ${
                             active
                                 ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
@@ -139,7 +142,7 @@ export function FeaturedPropertyFiltersBar({
 
             <button
                 type="button"
-                onClick={onExplore}
+                onClick={() => onExplore()}
                 className="w-full sm:w-auto sm:ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-bold text-white hover:bg-slate-800 transition-colors shadow-sm"
             >
                 Explore Properties

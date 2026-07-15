@@ -253,11 +253,11 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={interimHelmet.title}
                     description={interimHelmet.description}
                     keywords={interimHelmet.keywords}
-                    canonical={interimHelmet.canonicalHref}
-                    image={interimHelmet.ogImage}
+                    canonicalHref={interimHelmet.canonicalHref}
+                    ogImage={interimHelmet.ogImage}
                     noindex={interimHelmet.noindex}
                 />
-                <Navbar />
+                <Navbar city={property?.city} />
                 <main className="flex-grow flex items-center justify-center">
                     <LoadingSpinner message="Loading property details..." />
                 </main>
@@ -273,11 +273,11 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={errorHelmet.title}
                     description={errorHelmet.description}
                     keywords={errorHelmet.keywords}
-                    canonical={errorHelmet.canonicalHref}
-                    image={errorHelmet.ogImage}
+                    canonicalHref={errorHelmet.canonicalHref}
+                    ogImage={errorHelmet.ogImage}
                     noindex={errorHelmet.noindex}
                 />
-                <Navbar />
+                <Navbar city={property?.city} />
                 <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4">
                     <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
                         <ErrorMessage
@@ -342,12 +342,13 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     const seoHeading = buildPropertySeoHeading(property);
     const heroLead =
         extractHeroLeadFromNarrative(longSeo, 520) || buildPropertyHeroIntro(property);
+    const propertyCity = property?.city || 'Bangalore';
     const crumbLabel = seoHeading.trim();
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
         ...(isPG
             ? [
-                  { name: 'PG in Bangalore', path: '/pg/bangalore' },
+                  { name: `PG in ${propertyCity}`, path: `/pg/${propertyCity.toLowerCase()}` },
                   ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
               ]
             : [{ name: 'Listings', path: '/properties' }]),
@@ -367,15 +368,15 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={detailHelmet.title}
                     description={detailHelmet.description}
                     keywords={detailHelmet.keywords}
-                    canonical={detailHelmet.canonicalHref}
-                    image={detailHelmet.ogImage}
+                    canonicalHref={detailHelmet.canonicalHref}
+                    ogImage={detailHelmet.ogImage}
                     noindex={detailHelmet.noindex}
                     ogType="article"
                 />
             )}
             {detailJsonLd && <JsonLd data={detailJsonLd} id="property-detail-schema" />}
             <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
-            <Navbar />
+            <Navbar city={property?.city} />
 
             <main id="main-content" className="pb-20 md:pb-24 flex-grow">
 
