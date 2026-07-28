@@ -52,3 +52,24 @@ export async function fetchPropertyBySlugServer(type: string, slug: string): Pro
         return null;
     }
 }
+
+/** Server-only property fetch by public slug using Sprint 10 unified public endpoint. */
+export async function fetchPublicPropertyBySlugServer(slug: string): Promise<Property | null> {
+    const trimmedSlug = slug.trim();
+    if (!trimmedSlug) return null;
+    const base = resolveServerApiBase();
+    const url = `${base}/public/properties/${encodeURIComponent(trimmedSlug)}`;
+    try {
+        const res = await fetch(url, {
+            headers: { Accept: 'application/json' },
+            next: { revalidate: 3600 },
+        });
+        if (!res.ok) return null;
+        const payload = await res.json();
+        const row = unwrapApiPayload<RealtyProperty>(payload);
+        if (!row?.id) return null;
+        return mapRealtyToProperty(row);
+    } catch {
+        return null;
+    }
+}

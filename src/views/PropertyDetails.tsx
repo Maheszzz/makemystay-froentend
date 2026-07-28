@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle } from 'lucide-react';
+import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle, Download, FileText, ExternalLink, Clock } from 'lucide-react';
 import { Link, useParams, useLocation } from '@/lib/navigation';
 import { usePropertyFromRoute, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -182,6 +182,65 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     };
 
     const handleBack = goBack;
+
+    const allSalesKitDocuments = useMemo(() => {
+        const list: { id: string; title: string; document_type: string; url: string; file_size?: string }[] = [];
+        const salesKit = (property as any)?.metadata?.sales_kit || {};
+
+        const titlesMap: Record<string, { title: string; type: string }> = {
+            brochure: { title: 'Brochure PDF', type: 'Full High-Resolution Property Brochure' },
+            pricing: { title: 'Pricing PDF', type: 'Detailed Rate Card & Fee Breakdown' },
+            album: { title: 'Photo Album PDF', type: 'Printable Photo Gallery Booklet' },
+            wap: { title: 'WAP PDF', type: 'Welcome Pack & Tenant Guidelines' },
+        };
+
+        Object.keys(titlesMap).forEach((key) => {
+            if (salesKit[key]) {
+                list.push({
+                    id: key,
+                    title: titlesMap[key].title,
+                    document_type: titlesMap[key].type,
+                    url: salesKit[key],
+                });
+            }
+        });
+
+        if (property?.documents && Array.isArray(property.documents)) {
+            property.documents.forEach((doc, idx) => {
+                if (doc.document_url && !list.some((i) => i.url === doc.document_url)) {
+                    list.push({
+                        id: `doc_${idx}`,
+                        title: doc.title || `Document ${idx + 1}`,
+                        document_type: doc.document_type || 'PDF Document',
+                        url: doc.document_url,
+                        file_size: doc.file_size,
+                    });
+                }
+            });
+        }
+
+        return list;
+    }, [property]);
+
+    const handleDownloadAllBrochures = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (allSalesKitDocuments.length > 0) {
+            allSalesKitDocuments.forEach((doc, idx) => {
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = doc.url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.download = `${doc.title.replace(/\s+/g, '_')}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, idx * 450);
+            });
+        } else {
+            alert('No Sales Kit PDFs (Brochure, Pricing, Photo Album, WAP) have been uploaded for this property yet. Please upload them in Step 6 of the Admin Dashboard Add/Edit Property wizard.');
+        }
+    };
 
     const handleHeroImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.currentTarget;
@@ -414,6 +473,15 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </button>
 
                                     <div className="flex items-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={handleDownloadAllBrochures}
+                                            className="inline-flex items-center gap-2 bg-brand-red/90 hover:bg-brand-red text-white px-4 py-2.5 rounded-full border border-brand-red/30 hover:border-white/30 transition-all shadow-lg text-xs font-bold tracking-wide group"
+                                            title="Download All 4 Sales Kit PDFs (Brochure, Pricing, Album, WAP)"
+                                        >
+                                            <Download className="w-3.5 h-3.5 text-white group-hover:scale-110 transition-transform" />
+                                            <span>Download Brochure</span>
+                                        </button>
                                         <button
                                             onClick={handleShare}
                                             className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center shadow-lg"
@@ -685,6 +753,133 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </div>
                                 </section>
                             )}
+                            {/* Sales Kit Downloads Section */}
+                            {allSalesKitDocuments.length > 0 && (
+                                <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">Downloads</p>
+                                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sales Kit & Brochures</h2>
+                                            <p className="text-sm text-slate-500 mt-1">Download official brochures, pricing schedules, photo album, and welcome packs.</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleDownloadAllBrochures}
+                                            className="px-5 py-3 bg-brand-red hover:bg-red-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
+                                        >
+                                            <Download className="w-4 h-4" /> Download All 4 PDFs
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {allSalesKitDocuments.map((doc, idx) => (
+                                            <div
+                                                key={doc.id || idx}
+                                                className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-brand-red/30 transition-all group"
+                                            >
+                                                <div className="flex items-center gap-4 min-w-0">
+                                                    <div className="w-12 h-12 rounded-xl bg-red-50 text-brand-red flex items-center justify-center shrink-0">
+                                                        <FileText className="w-6 h-6" />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-brand-red transition-colors">
+                                                            {doc.title}
+                                                        </h4>
+                                                        <p className="text-xs text-slate-400 uppercase font-semibold truncate">
+                                                            {doc.document_type || 'PDF Document'} {doc.file_size ? `• ${doc.file_size}` : ''}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <a
+                                                    href={doc.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    download={`${doc.title.replace(/\s+/g, '_')}.pdf`}
+                                                    className="px-4 py-2 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors shrink-0 shadow-sm"
+                                                >
+                                                    <Download className="w-3.5 h-3.5" /> Download
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Property Location & Interactive Map Section */}
+                            <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">Location & Map</p>
+                                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Explore Property Location</h2>
+                                        <p className="text-sm text-slate-500 mt-1">
+                                            Located in <span className="font-semibold text-slate-800">{property.location || property.city || 'Bangalore'}</span> — view interactive neighborhood map below.
+                                        </p>
+                                    </div>
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-5 py-3 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
+                                    >
+                                        <MapPin className="w-4 h-4 text-brand-red" /> Open in Google Maps
+                                    </a>
+                                </div>
+
+                                {/* Interactive Google Maps Embed */}
+                                <div className="relative w-full h-[400px] rounded-3xl overflow-hidden border border-slate-200 shadow-md bg-slate-100">
+                                    <iframe
+                                        title="Property Location Map"
+                                        src={`https://maps.google.com/maps?q=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                                        className="w-full h-full border-0"
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                </div>
+
+                                {property.nearby_places && property.nearby_places.length > 0 && (
+                                    <div className="mt-8 pt-8 border-t border-slate-100">
+                                        <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
+                                            Key Landmarks Nearby
+                                        </h4>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {property.nearby_places.map((place, idx) => (
+                                                <div
+                                                    key={place.id || idx}
+                                                    className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-4"
+                                                >
+                                                    <div className="flex items-center gap-3.5 min-w-0">
+                                                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-bold text-xs">
+                                                            {place.category === 'Metro' ? '🚇' : place.category === 'IT Park' ? '🏢' : place.category === 'Hospital' ? '🏥' : '📍'}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <h4 className="text-sm font-bold text-slate-900 truncate">{place.name}</h4>
+                                                            <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+                                                                <span className="font-semibold text-brand-red">{place.distance}</span>
+                                                                {place.travel_time && (
+                                                                    <span className="inline-flex items-center gap-1">
+                                                                        • <Clock className="w-3 h-3 text-slate-400" /> {place.travel_time}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {place.map_link && (
+                                                        <a
+                                                            href={place.map_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 bg-white hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors shrink-0"
+                                                            title="View on Google Maps"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </section>
 
                             <SimilarPropertiesSection current={property} />
 

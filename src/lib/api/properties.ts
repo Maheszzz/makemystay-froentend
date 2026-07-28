@@ -288,7 +288,12 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,
-        is_available: item.is_available ?? true
+        is_available: item.is_available ?? true,
+        documents: (item as any).documents,
+        videos: (item as any).videos,
+        nearby_places: (item as any).nearby_places,
+        seo: (item as any).seo,
+        share: (item as any).share,
     };
 }
 

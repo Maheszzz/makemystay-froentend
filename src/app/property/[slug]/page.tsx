@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
-import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
 import { parsePropertySlugParam, getPropertyDetailPath } from '@/lib/propertyRouting';
 import { notFound, permanentRedirect } from 'next/navigation';
 import PropertyDetails from '@/views/PropertyDetails';
@@ -19,11 +18,12 @@ export default async function PropertyPage({ params }: PageProps) {
     const param = (slug || '').toLowerCase();
     const id = parsePropertySlugParam(param);
     
-    let property = null;
-    if (id) {
+    const { fetchPublicPropertyBySlugServer, fetchPropertyByIdServer, fetchPropertyBySlugServer } = await import('@/lib/server/fetchPropertyById');
+    let property = await fetchPublicPropertyBySlugServer(param);
+    if (!property && id) {
         property = await fetchPropertyByIdServer(id);
-    } else {
-        const { fetchPropertyBySlugServer } = await import('@/lib/server/fetchPropertyById');
+    }
+    if (!property) {
         property = await fetchPropertyBySlugServer('plot', param);
     }
 

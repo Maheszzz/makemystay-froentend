@@ -122,7 +122,7 @@ function PropertiesInner({
     }, [pageQueryParam]);
 
     const [showFilters, setShowFilters] = useState(false);
-
+ 
     // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
     useEffect(() => {
         const timer = setTimeout(() => {
