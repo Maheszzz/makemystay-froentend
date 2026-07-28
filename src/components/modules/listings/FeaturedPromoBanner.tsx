@@ -51,7 +51,7 @@ const PROMO_SLIDES: PromoSlide[] = [
         location: 'HSR Layout & Chikkakannalli, Bangalore',
         highlights: ['✓ No Brokerage', '✓ Fully Furnished', '✓ Move Today'],
         image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85',
-        fallbackId: 298,
+        fallbackId: 299,
     },
     {
         id: 'signature',
@@ -121,7 +121,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
     const ektaTitle = launchProperty?.title || 'Ekta – Infinity';
     const ektaLocation = launchProperty?.location || 'HSR Layout, Bangalore';
     const ektaWaUrl = buildPropertyWhatsappUrl(ektaTitle, ektaLocation);
-    const ektaPath = launchProperty ? getPropertyDetailPath(launchProperty) : '/properties/298';
+    const ektaPath = launchProperty ? getPropertyDetailPath(launchProperty) : '/properties/299';
 
     const handlePrev = () => {
         setCurrentSlide((prev) => (prev - 1 + PROMO_SLIDES.length) % PROMO_SLIDES.length);

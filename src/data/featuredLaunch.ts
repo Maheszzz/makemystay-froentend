@@ -3,9 +3,9 @@
  * Matched by id/slug/title from API; fetched by id if not in the current list.
  */
 export const FEATURED_LAUNCH = {
-    propertyId: 298,
+    propertyId: 299,
     listingType: 'rent' as const,
-    slug: 'ekta-homes-1-1bhk-chikkakannalli',
+    slug: 'ekta-infinity-apartments-2bhk-chikkakannalli',
     titleIncludes: 'ekta',
     locationIncludes: 'chikkakannalli',
     badge: 'New launch',
