@@ -1,7 +1,6 @@
 import { FeaturedProjectCard } from '@/components/modules/listings/FeaturedProjectCard';
 import { FeaturedPropertyFiltersBar } from '@/components/modules/listings/FeaturedPropertyFiltersBar';
 import { LaunchTrustBar } from '@/components/modules/listings/LaunchTrustBar';
-import { NewLaunchSpotlight } from '@/components/modules/listings/NewLaunchSpotlight';
 import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
@@ -9,6 +8,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { FEATURED_LAUNCH } from '@/data/featuredLaunch';
 import { useProperties, useProperty } from '@/hooks';
 import { buildFeaturedCarouselRows, findFeaturedLaunchProperty } from '@/lib/featuredLaunch';
+import { sortPropertiesByPriorityAndRating } from '@/lib/propertyRanking';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { buildFeaturedExploreUrl, heroFiltersToApiParams } from '@/lib/heroFilterUtils';
 import type { PaginationParams } from '@/types/api';
@@ -49,11 +49,7 @@ export function PropertyGrid({
     
     // Client-side sort fallback for 'review_count_desc' (matching Properties.tsx logic)
     const sortedProperties = useMemo(() => {
-        return [...safeProperties].sort((a, b) => {
-            const ca = (a.reviews ?? a.review_count ?? 0) || 0;
-            const cb = (b.reviews ?? b.review_count ?? 0) || 0;
-            return cb - ca;
-        });
+        return sortPropertiesByPriorityAndRating(safeProperties);
     }, [safeProperties]);
 
     const amenityGenderFiltered = useMemo(() => {
@@ -164,10 +160,6 @@ export function PropertyGrid({
                         onFiltersChange={setFilters}
                         onExplore={handleExplore}
                     />
-                )}
-
-                {cardVariant === 'project' && launchProperty && (
-                    <NewLaunchSpotlight property={launchProperty} />
                 )}
 
                 {cardVariant === 'project' && <LaunchTrustBar />}

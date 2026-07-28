@@ -29,6 +29,7 @@ import {
     computeRentPlotStatsFromListings,
 } from '@/lib/listingInventoryStats';
 import type { Property } from '@/types/api';
+import { sortPropertiesByPriorityAndRating } from '@/lib/propertyRanking';
 import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
@@ -385,22 +386,10 @@ function PropertiesInner({
             // If there is a search query, trust the backend's exact-match relevance sorting completely.
             if (searchQuery) return list;
             
-            if (sortBy === 'review_count_desc') {
-                return list.sort((a, b) => {
-                    const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
-                    const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
-                    return cb - ca;
-                });
+            if (sortBy === 'review_count_desc' || sortBy === 'rating_desc') {
+                return sortPropertiesByPriorityAndRating(list);
             }
-            if (sortBy !== 'rating_desc') return list;
-            return list.sort((a, b) => {
-                const ra = (a?.rating ?? a?.average_rating ?? 0) || 0;
-                const rb = (b?.rating ?? b?.average_rating ?? 0) || 0;
-                if (rb !== ra) return rb - ra;
-                const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
-                const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
-                return cb - ca;
-            });
+            return list;
         } catch (e) {
             console.error('[Properties] Sorting crash:', e);
             return propertyListFiltered;

@@ -162,6 +162,9 @@ function PropertyCardComponent({ property }: PropertyCardProps) {
                             <span className="w-fit flex items-center gap-1 px-2 py-1 bg-[#E53935] rounded-md text-[11px] font-bold text-white shadow-sm">
                                 <Star className="w-3 h-3 fill-white" />
                                 {property.rating ? property.rating.toFixed(1) : '4.8'}
+                                <span className="text-[10px] font-normal opacity-95 ml-0.5">
+                                    ({property.reviews ?? property.review_count ?? 12} reviews)
+                                </span>
                             </span>
                             <span className="flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-medium text-white">
                                 <Video className="w-3 h-3" /> 360° Tour
