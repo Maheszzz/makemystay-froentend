@@ -80,16 +80,6 @@ function PropertyCardComponent({ property }: PropertyCardProps) {
     const typeLower = (property.type || '').toLowerCase();
     const isServiceOriented = typeLower === 'pg' || typeLower === 'hostel';
 
-    const amenities = useMemo(() => {
-        const next: string[] = [];
-        if (property.wifi) next.push('WiFi');
-        if (property.ac) next.push('AC');
-        if (property.power_backup) next.push('Power Backup');
-        if (property.food) next.push('Food Included');
-        if (property.gym) next.push('Gym');
-        if (property.cctv) next.push('Security');
-        return next;
-    }, [property]);
 
     const propertyPath = getPropertyDetailPath(property);
     const displayTitle = useMemo(() => formatPropertyTitle(property.title), [property.title]);

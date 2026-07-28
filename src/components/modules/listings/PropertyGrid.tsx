@@ -1,4 +1,5 @@
 import { FeaturedProjectCard } from '@/components/modules/listings/FeaturedProjectCard';
+import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { FeaturedPropertyFiltersBar } from '@/components/modules/listings/FeaturedPropertyFiltersBar';
 import { LaunchTrustBar } from '@/components/modules/listings/LaunchTrustBar';
 import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
@@ -159,6 +160,13 @@ export function PropertyGrid({
                         filters={activeFilters}
                         onFiltersChange={setFilters}
                         onExplore={handleExplore}
+                    />
+                )}
+
+                {cardVariant === 'project' && (
+                    <FeaturedPromoBanner
+                        properties={safeProperties}
+                        launchProperty={launchProperty}
                     />
                 )}
 

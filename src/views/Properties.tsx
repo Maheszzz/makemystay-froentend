@@ -11,6 +11,7 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useListingLocalityOptions } from '@/hooks';
 import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { PremiumTrustStrip } from '@/components/trust/PremiumTrustStrip';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
@@ -821,6 +822,11 @@ function PropertiesInner({
                             </label>
                         )}
                     </div>
+
+                    {/* Featured Promotion Banner (Auto Slider + High Demand Ekta Infinity) */}
+                    {!loading && propertyListOrdered.length > 0 && !hideChrome && (
+                        <FeaturedPromoBanner properties={propertyListOrdered} />
+                    )}
 
                     {/* 5. Main Content Grid */}
                     {loading && propertyListOrdered.length === 0 ? (
