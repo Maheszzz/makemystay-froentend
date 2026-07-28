@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle, Download, FileText, ExternalLink, Clock } from 'lucide-react';
+import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle, Download, FileText, ExternalLink, Clock, Video } from 'lucide-react';
 import { Link, useParams, useLocation } from '@/lib/navigation';
 import { usePropertyFromRoute, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -367,6 +367,45 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
     const heroImage = allImages[heroIdx] || null;
 
+    // Build the videos list from all possible fields (videos, metadata.youtube_videos, metadata.youtube_url, etc.)
+    const allVideos: { title: string; url: string; is_short?: boolean }[] = [];
+    const pushVideo = (title: string, url: string, is_short?: boolean) => {
+        if (!url || typeof url !== 'string') return;
+        if (!allVideos.some((v) => v.url === url)) {
+            allVideos.push({ title: title || 'Property Walkthrough Video', url, is_short });
+        }
+    };
+    if (Array.isArray(property.videos)) {
+        property.videos.forEach((v: any) => {
+            const url = typeof v === 'string' ? v : v?.video_url || v?.url;
+            if (url) pushVideo(v.title || 'Video Tour', url, v.is_short);
+        });
+    }
+    const meta = (property as any).metadata || {};
+    if (Array.isArray(meta.youtube_videos)) {
+        meta.youtube_videos.forEach((v: any) => {
+            if (v?.url) pushVideo(v.title || 'Video Visit', v.url, v.is_short);
+        });
+    }
+    if (Array.isArray(meta.videos)) {
+        meta.videos.forEach((v: any) => {
+            const url = typeof v === 'string' ? v : v?.url || v?.video_url;
+            if (url) pushVideo(v.title || 'Video Visit', url, v.is_short);
+        });
+    }
+    if (meta.youtube_url) pushVideo('YouTube Walkthrough', meta.youtube_url);
+    if (meta.video_url) pushVideo('Video Walkthrough', meta.video_url);
+    if (meta.virtual_tour_url) pushVideo('Virtual Video Visit', meta.virtual_tour_url);
+    if ((property as any).video_url) pushVideo('Property Video Tour', (property as any).video_url);
+
+    const getYouTubeEmbedUrl = (url: string): string | null => {
+        if (!url || typeof url !== 'string') return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+        const match = url.match(regExp);
+        const id = match && match[2].length === 11 ? match[2] : null;
+        return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+    };
+
     // Build display features (non-array truthy `{}` must not reach .map)
     let displayFeatures = Array.isArray(property.features) ? [...property.features] : [];
     if (isPG) {
@@ -723,6 +762,75 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Video Visit / Video Walkthrough */}
+                            {allVideos.length > 0 && (
+                                <section className="bg-slate-50/50 rounded-[3rem] p-8 md:p-12 border border-slate-100">
+                                    <div className="flex items-center justify-between gap-4 mb-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-8 bg-brand-red rounded-full" />
+                                            <div>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-1">Virtual Walkthrough</p>
+                                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Video Visit</h2>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{allVideos.length} {allVideos.length === 1 ? 'Video' : 'Videos'}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {allVideos.map((v, idx) => {
+                                            const ytEmbedUrl = getYouTubeEmbedUrl(v.url);
+                                            const isMp4 = !ytEmbedUrl && (v.url.endsWith('.mp4') || v.url.endsWith('.webm') || v.url.includes('cloudinary') || v.url.includes('.mp4?'));
+                                            return (
+                                                <div
+                                                    key={idx}
+                                                    className={`bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm flex flex-col ${
+                                                        allVideos.length === 1 ? 'md:col-span-2 max-w-4xl' : ''
+                                                    }`}
+                                                >
+                                                    <div className={`relative w-full bg-black ${v.is_short ? 'aspect-[9/16] max-w-xs mx-auto' : 'aspect-video'}`}>
+                                                        {ytEmbedUrl ? (
+                                                            <iframe
+                                                                src={ytEmbedUrl}
+                                                                title={v.title || `Video Visit ${idx + 1}`}
+                                                                className="w-full h-full border-0"
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                allowFullScreen
+                                                            />
+                                                        ) : isMp4 ? (
+                                                            <video
+                                                                src={v.url}
+                                                                controls
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-white bg-slate-900">
+                                                                <Video className="w-12 h-12 text-brand-red mb-3" />
+                                                                <p className="font-bold text-sm mb-2">{v.title}</p>
+                                                                <a
+                                                                    href={v.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-red text-white font-bold text-xs hover:bg-brand-red/90 transition"
+                                                                >
+                                                                    Watch Video <ExternalLink className="w-3.5 h-3.5" />
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {v.title && (
+                                                        <div className="p-4 flex items-center justify-between border-t border-slate-100">
+                                                            <span className="text-sm font-bold text-slate-800">{v.title}</span>
+                                                            <span className="text-[10px] font-black uppercase px-2 py-1 bg-red-50 text-brand-red rounded-md">
+                                                                {v.is_short ? 'Shorts' : 'Tour'}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </section>
                             )}
