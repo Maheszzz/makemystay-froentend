@@ -3,18 +3,20 @@
  * Order here dictates the exact display priority order on the website/app.
  */
 export const FEATURED_PROPERTIES = [
-    'infinity',
+    'signature luxury colive',
     'signature',
     'cozy colive',
-    'cozy',
     'hive colive',
     'hive',
     'orchid house',
     'orchid',
     'cherry blossom',
+    'cherry blosem',
+    'your shell',
+    'your schell',
+    'infinity',
     'nesto hsr',
     'nesto',
-    'your shell',
     'daisy crest',
     'sc ladies',
     'halo colive',

@@ -72,9 +72,14 @@ function PropertyCardComponent({ property }: PropertyCardProps) {
         const prop: any = property;
         const imgs = Array.isArray(prop.images) ? prop.images : [];
         const ph = Array.isArray(prop.photos) ? prop.photos : [];
-        const parsedImages = imgs.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean);
-        const parsedPhotos = ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean);
-        return parsedImages[0] || prop.image || parsedPhotos[0] || fallbackImage || '/default-property.jpg';
+        const primaryImgObj = imgs.find((img: any) => img && typeof img === 'object' && (img.is_primary || img.isPrimary || img.is_cover)) ||
+            ph.find((img: any) => img && typeof img === 'object' && (img.is_primary || img.isPrimary || img.is_cover));
+        if (primaryImgObj && (primaryImgObj.image_url || primaryImgObj.url || primaryImgObj.src)) {
+            return primaryImgObj.image_url || primaryImgObj.url || primaryImgObj.src;
+        }
+        const parsedImages = imgs.map((img: any) => (typeof img === 'string' ? img : img?.image_url || img?.url || img?.src)).filter(Boolean);
+        const parsedPhotos = ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url || img?.url || img?.src)).filter(Boolean);
+        return prop.image || parsedImages[0] || parsedPhotos[0] || fallbackImage || '/default-property.jpg';
     }, [property, fallbackImage]);
 
     const typeLower = (property.type || '').toLowerCase();

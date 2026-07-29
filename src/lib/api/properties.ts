@@ -186,6 +186,9 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
     // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
     const rawImages = Array.isArray(item.images) ? item.images : [];
     const sortedImages = [...rawImages].sort((a: any, b: any) => {
+        const aPrimary = a && typeof a === 'object' && ('is_primary' in a || 'isPrimary' in a) && (a.is_primary === true || a.isPrimary === true) ? -1 : 0;
+        const bPrimary = b && typeof b === 'object' && ('is_primary' in b || 'isPrimary' in b) && (b.is_primary === true || b.isPrimary === true) ? -1 : 0;
+        if (aPrimary !== bPrimary) return aPrimary - bPrimary;
         const ao = a && typeof a === 'object' && 'sort_order' in a ? a.sort_order ?? 0 : 0;
         const bo = b && typeof b === 'object' && 'sort_order' in b ? b.sort_order ?? 0 : 0;
         return ao - bo;
