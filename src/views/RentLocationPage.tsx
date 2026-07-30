@@ -62,7 +62,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
         [hubListingsForSeo, name]
     );
 
-    const [hasEmptyListings, setHasEmptyListings] = useState(false);
+    const [] = useState(false);
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">

@@ -28,25 +28,20 @@ export function middleware(request: NextRequest) {
   }
 
   const url = request.nextUrl.clone();
-  const host = request.headers.get('host') || '';
-  const protocol = request.headers.get('x-forwarded-proto') || 'http';
+  const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host;
+  const cleanHost = forwardedHost.split(':')[0]; // Strip any internal port (e.g. :3000)
+  url.host = cleanHost;
+  url.port = ''; // Clear internal port so redirects never point to localhost:3000
 
   let shouldRedirect = false;
 
-  // 1. Force HTTPS in production (assuming 'x-forwarded-proto' is set by the proxy)
-  if (process.env.NODE_ENV === 'production' && protocol === 'http') {
-    url.protocol = 'https:';
+  // 1. Strip 'www.' from the hostname
+  if (cleanHost.startsWith('www.')) {
+    url.host = cleanHost.replace('www.', '');
     shouldRedirect = true;
   }
 
-  // 2. Strip 'www.' from the hostname
-  if (host.startsWith('www.')) {
-    const newHost = host.replace('www.', '');
-    url.host = newHost;
-    shouldRedirect = true;
-  }
-
-  // 3. Force lowercase URLs (skip api, _next, static files)
+  // 2. Force lowercase URLs (skip api, _next, static files)
   if (
     !pathname.startsWith('/api') &&
     !pathname.startsWith('/_next') &&
