@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { resolvePgSlugMetadata } from '@/lib/routeMetadata';
-import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
-import { parsePropertySlugParam, getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { getStaticPgPropertyRedirect } from '@/lib/seoPropertyRedirects';
 import PropertyDetails from '@/views/PropertyDetails';
 import { notFound, permanentRedirect } from 'next/navigation';
@@ -22,32 +21,33 @@ export default async function Page({ params }: PageProps) {
     const { slug } = await params;
     const param = (slug || '').toLowerCase();
 
-    if (/^(\d+)(-|$)/.test(param)) {
-        const staticTo = getStaticPgPropertyRedirect(param);
-        if (staticTo) {
-            permanentRedirect(staticTo);
-        }
-
-        const id = parsePropertySlugParam(param);
-        if (!id) notFound();
-        const property = await fetchPropertyByIdServer(id);
-        if (!property || property.is_available === false) notFound();
-
-        const canonicalPath = getPropertyDetailPath(property);
-        if (`/pg/${param}` !== canonicalPath) {
-            permanentRedirect(canonicalPath);
-        }
-
-        return <PropertyDetails initialProperty={property} slug={param} />;
+    const staticTo = getStaticPgPropertyRedirect(param);
+    if (staticTo) {
+        permanentRedirect(staticTo);
     }
 
-    // Map hubs and features to the client-side PgSlugRoute
     if (['bangalore', 'hyderabad', 'pune'].includes(param) ||
         ['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param) ||
         param === 'pg-vs-flat-bangalore') {
         return <PgSlugRoute />;
     }
 
-    // Map locality pages to the server-side PGLocationPage
-    return <PGLocationPage slug={param} />;
+    const { getPgLocationBySlug, resolveLegacyPgSlug } = await import('@/data/pgLocations');
+    const legacy = resolveLegacyPgSlug(param);
+    if (getPgLocationBySlug(param) || (legacy && getPgLocationBySlug(legacy))) {
+        return <PGLocationPage slug={param} />;
+    }
+
+    const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
+    const property = await fetchPropertyAnySlugServer(param);
+    if (!property || property.is_available === false) {
+        notFound();
+    }
+
+    const canonicalPath = getPropertyDetailPath(property);
+    if (`/pg/${param}` !== canonicalPath) {
+        permanentRedirect(canonicalPath);
+    }
+
+    return <PropertyDetails initialProperty={property} slug={param} />;
 }

@@ -257,7 +257,7 @@ function PropertiesInner({
      */
     const apiCity = useMemo(() => {
         if (locationFilter === 'all') return defaultMetroSlug;
-        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase();
+        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     }, [locationFilter, defaultMetroSlug]);
 
     // 4. API Parameters (Derived from URL/State)

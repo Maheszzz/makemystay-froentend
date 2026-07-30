@@ -81,16 +81,9 @@ export function pgListingQueryIsClean(searchParams: URLSearchParams): boolean {
     return true;
 }
 
-/** Stable path for canonical + sharing (sorted keys). */
-export function stablePgListingCanonical(slug: string, searchParams: URLSearchParams): string {
-    const keys = [...searchParams.keys()].filter((k) => PG_LISTING_QUERY_KEYS.has(k)).sort();
-    if (keys.length === 0) return `/pg/${slug}`;
-    const q = new URLSearchParams();
-    for (const k of keys) {
-        const v = searchParams.get(k);
-        if (v !== null && v !== '') q.set(k, v);
-    }
-    return `/pg/${slug}?${q.toString()}`;
+/** Stable path for canonical + sharing (always canonicalize locality pages to clean URL without filter query params). */
+export function stablePgListingCanonical(slug: string, _searchParams?: URLSearchParams): string {
+    return `/pg/${slug}`;
 }
 
 /**

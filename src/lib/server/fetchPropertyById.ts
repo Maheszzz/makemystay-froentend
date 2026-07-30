@@ -73,3 +73,27 @@ export async function fetchPublicPropertyBySlugServer(slug: string): Promise<Pro
         return null;
     }
 }
+
+/** Server-only comprehensive property lookup: tries ID, unified public slug endpoint, and category fallback endpoints. */
+export async function fetchPropertyAnySlugServer(param: string): Promise<Property | null> {
+    const slug = param?.trim().toLowerCase() || '';
+    if (!slug) return null;
+
+    if (/^(\d+)(-|$)/.test(slug)) {
+        const idMatch = slug.match(/^(\d+)/);
+        if (idMatch?.[1]) {
+            const pId = await fetchPropertyByIdServer(idMatch[1]);
+            if (pId) return pId;
+        }
+    }
+
+    const pPublic = await fetchPublicPropertyBySlugServer(slug);
+    if (pPublic) return pPublic;
+
+    for (const type of ['rent', 'pg', 'plot', 'commercial', 'flat']) {
+        const pType = await fetchPropertyBySlugServer(type, slug);
+        if (pType) return pType;
+    }
+
+    return null;
+}

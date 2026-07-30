@@ -14,6 +14,7 @@ import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthorityProfile } from '@/data/authority';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import AuthorityLocalityPage from '@/views/AuthorityLocalityPage';
 
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
@@ -110,7 +111,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       <BreadcrumbSchema items={breadcrumbItems} />
 
       <PlaceSchema name={name} description={profile?.description} />
-      <ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
+      <ItemListSchema items={initialProperties.map(p => ({ url: getPropertyDetailPath(p), name: p.title }))} />
 
 
       <Navbar />

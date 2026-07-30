@@ -27,8 +27,12 @@ export function homeHeroTabToListingsCategory(tab: HomeHeroNavigateTab): Listing
 /** Normalized slug for URLs (undefined = no city / all-India listing index). */
 export function normalizeCitySlug(city: string | undefined | null): string | undefined {
     if (city == null || typeof city !== 'string') return undefined;
-    const s = city.trim().toLowerCase();
-    if (!s || s === 'all') return undefined;
+    const s = city
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    if (!s || s === 'all' || s === 'undefined' || s === 'null') return undefined;
     return s;
 }
 
