@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import {
     propertyDetailPageSeo,
@@ -13,7 +12,10 @@ export async function resolvePropertyPageMetadata(slug: string): Promise<Metadat
     const property = await fetchPropertyAnySlugServer(param);
 
     if (!property || property.is_available === false) {
-        notFound();
+        return {
+            title: 'Not Found | MakeMyStay',
+            robots: { index: false, follow: false },
+        };
     }
 
     const detailPath = getPropertyDetailPath(property);

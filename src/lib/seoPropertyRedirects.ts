@@ -4,6 +4,27 @@ import pgLocations from '@/data/pg-locations.json';
 const PG_LOCALITY_SLUGS = [...pgLocations.map((r) => r.slug)].sort((a, b) => b.length - a.length);
 
 /**
+ * Static 301 Permanent Redirect map for known removed/renamed property URLs.
+ * Populate this from your SEO audit CSV for Priority 1 & Priority 2 URLs.
+ */
+export const STATIC_301_REDIRECTS: Record<string, string> = {
+    // Example old property / plot URLs
+    '68-premium-residential-plot-upcoming-development-area-bangalore': '/properties/bangalore',
+    'pro4-laavish': '/pg/bangalore',
+    'silver-storm': '/pg/whitefield',
+    'pg-for-boys-in-magadi-road': '/pg/rajajinagar',
+};
+
+/**
+ * Static 410 Gone set for truly deleted/invalid URLs.
+ * Populate this from your SEO audit CSV for Priority 4 removed pages.
+ */
+export const STATIC_410_GONE_PATHS: Set<string> = new Set([
+    '/rent/undefined',
+    '/undefined',
+]);
+
+/**
  * Infer `/pg/{locality}` hub from a property slug segment (e.g. `202-foo-pg-marathahalli`).
  */
 export function inferPgLocalityHubFromPropertySlug(slugParam: string | undefined): string | null {
@@ -19,9 +40,30 @@ export function inferPgLocalityHubFromPropertySlug(slugParam: string | undefined
 }
 
 /** Static 301 map for known removed listings (extend as needed). */
-const STATIC_PG_PROPERTY_REDIRECTS: Record<string, string> = {};
-
 export function getStaticPgPropertyRedirect(slugParam: string): string | null {
     const key = slugParam.toLowerCase();
-    return STATIC_PG_PROPERTY_REDIRECTS[key] ?? null;
+    return STATIC_301_REDIRECTS[key] ?? null;
 }
+
+/**
+ * Smart redirect resolver for missing or removed properties.
+ * Returns a 301 replacement destination ONLY when there is a clear equivalent replacement
+ * (e.g. same property moved, category renamed, or explicit map entry).
+ * Returns `null` if no meaningful replacement exists, allowing 410 Gone / 404 handling.
+ */
+export function resolveMissingPropertyRedirect(
+    _category: 'pg' | 'rent' | 'property' | 'properties',
+    slugParam: string
+): string | null {
+    const key = (slugParam || '').toLowerCase().trim();
+
+    // 1. Check explicit static 301 map (e.g., property moved, category renamed, locality renamed)
+    const explicit = STATIC_301_REDIRECTS[key];
+    if (explicit) return explicit;
+
+    // 2. We do NOT automatically redirect missing properties to broad city hubs (/properties/bangalore)
+    // to avoid soft 404s. If no explicit replacement exists, return null so the system
+    // can return 410 Gone (if in STATIC_410_GONE_PATHS) or 404 Not Found.
+    return null;
+}
+

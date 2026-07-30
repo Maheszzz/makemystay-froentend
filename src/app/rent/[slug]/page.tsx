@@ -31,6 +31,11 @@ export default async function RentSlugPage({ params }: PageProps) {
     const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
     const property = await fetchPropertyAnySlugServer(param);
     if (!property || property.is_available === false) {
+        const { resolveMissingPropertyRedirect } = await import('@/lib/seoPropertyRedirects');
+        const target = resolveMissingPropertyRedirect('rent', param);
+        if (target) {
+            permanentRedirect(target);
+        }
         notFound();
     }
 
