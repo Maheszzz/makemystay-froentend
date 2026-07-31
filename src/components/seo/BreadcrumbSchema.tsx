@@ -1,4 +1,5 @@
 import { JsonLd } from '@/components/seo/JsonLd';
+import { buildBreadcrumbSchema } from '@/lib/schema';
 
 export interface BreadcrumbItem {
   name: string;
@@ -7,18 +8,7 @@ export interface BreadcrumbItem {
 
 /** Render JSON‑LD BreadcrumbList */
 export function BreadcrumbSchema({ items }: { items: BreadcrumbItem[] }) {
-  const data = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: items.map((item, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      name: item.name,
-      item: {
-        '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://makemystay.ai'}${item.path}`,
-        name: item.name,
-      },
-    })),
-  };
+  const data = buildBreadcrumbSchema(items);
   return <JsonLd data={data} id="breadcrumb-ld" />;
 }
+

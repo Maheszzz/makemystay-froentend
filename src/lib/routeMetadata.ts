@@ -5,6 +5,9 @@ import { getPgNearLandmarkByPath } from '@/data/pgNearLandmarks';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
 import { getTechParkByPath } from '@/data/techParks';
+import { generateTechParkLandingProfile } from '@/lib/landing';
+import { generateProgrammaticBlogPost } from '@/lib/blog';
+import { getLocalitySeoProfile } from '@/lib/locality';
 import { buildTechParkMeta } from '@/lib/techParkContent';
 import { buildNearbyLandmarkSeo } from '@/lib/seoIntentGenerators';
 import {
@@ -132,6 +135,9 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
 
     const legacy = resolveLegacyPgSlug(param);
     if (legacy) {
+        const legacySeoProfile = getLocalitySeoProfile(legacy);
+        if (legacySeoProfile) return legacySeoProfile.metadata;
+
         const loc = getPgLocationBySlug(legacy);
         if (loc) {
             const seo = pgLocationSeo(loc.name, loc.slug);
@@ -144,6 +150,11 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
                 }),
             });
         }
+    }
+
+    const localitySeoProfile = getLocalitySeoProfile(param);
+    if (localitySeoProfile) {
+        return localitySeoProfile.metadata;
     }
 
     const loc = getPgLocationBySlug(param);
@@ -195,6 +206,10 @@ export function resolvePgGenderLocalityMetadata(
 }
 
 export function resolveBlogSlugMetadata(slug: string): Metadata {
+    const profile = generateProgrammaticBlogPost(slug);
+    if (profile) {
+        return profile.metadata;
+    }
     const post = getBlogPost(slug);
     if (!post) {
         return pageSeoToMetadata({
@@ -222,7 +237,11 @@ export function resolveBlogSlugMetadata(slug: string): Metadata {
 
 /** `/pg-near-[tech-park]` — rich tech park pillar page metadata. */
 export function resolveTechParkMetadata(pathname: string): Metadata {
-    const seg = pathname.replace(/^\/+|\/+$/g, '');
+    const seg = pathname.replace(/^\/+|\/+$/g, '').replace(/^pg-near\//, '');
+    const profile = generateTechParkLandingProfile(seg);
+    if (profile) {
+        return profile.metadata;
+    }
     const park = getTechParkByPath(seg);
     if (park) {
         const meta = buildTechParkMeta(park);

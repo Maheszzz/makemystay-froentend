@@ -12,7 +12,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return resolvePgSlugMetadata(slug);
 }
 
-export const dynamic = 'force-dynamic';
+import { getLocalitySlugs } from '@/lib/locality';
+
+export async function generateStaticParams() {
+    return getLocalitySlugs().map((slug) => ({ slug }));
+}
+
+export const dynamicParams = true;
 
 import PgSlugRoute from '@/routes/PgSlugRoute';
 import PGLocationPage from '@/views/PGLocationPage';

@@ -1216,3 +1216,201 @@ export function getTechParkByPath(path: string): TechParkEntry | undefined {
 export function getTechParkPaths(): string[] {
     return TECH_PARKS.map((tp) => tp.path);
 }
+
+// ─── Central SEO Data Layer: Tech Parks ───────────────────────────────────────
+// Reusable strongly typed interface and normalized dataset powering localities,
+// internal linking, FAQs, AI content generation, schema, and sitemap generation.
+
+export interface TechPark {
+    /** Unique internal identifier */
+    id: string;
+    /** URL-friendly slug */
+    slug: string;
+    /** Display name of the tech park */
+    name: string;
+    /** Primary locality slug where the park is situated */
+    locality: string;
+    /** WGS84 coordinates */
+    coordinates: {
+        latitude: number;
+        longitude: number;
+    };
+    /** Names/slugs of major corporate tenants inside the tech park */
+    companies: string[];
+    /** Detailed SEO description of the tech park */
+    description: string;
+    /** Relevant SEO search keywords */
+    keywords: string[];
+}
+
+export const SEO_TECH_PARKS: TechPark[] = [
+    {
+        id: 'tp-itpl',
+        slug: 'itpl',
+        name: 'International Tech Park Bangalore (ITPL)',
+        locality: 'whitefield',
+        coordinates: { latitude: 12.9868, longitude: 77.7378 },
+        companies: ['TCS', 'Capgemini', 'SAP Labs', 'General Motors', 'Applied Materials', 'Qualcomm'],
+        description: 'India pioneering 72-acre integrated IT park in Whitefield housing over 60 global tech corporations and 50,000 IT professionals.',
+        keywords: ['PG near ITPL Whitefield', 'PG near ITPL Bangalore', 'coliving near ITPL gate', 'walking distance PG ITPL']
+    },
+    {
+        id: 'tp-embassy-techvillage',
+        slug: 'embassy-techvillage',
+        name: 'Embassy TechVillage (ETV)',
+        locality: 'bellandur',
+        coordinates: { latitude: 12.9295, longitude: 77.6843 },
+        companies: ['Flipkart HQ', 'Cisco Systems', 'Wells Fargo', 'Sony', 'WeWork', 'Honeywell'],
+        description: '105-acre mega integrated business park on Outer Ring Road in Bellandur / Kadubeesanahalli hosting major engineering centers.',
+        keywords: ['PG near Embassy TechVillage', 'PG near ETV Bellandur', 'PG near Flipkart HQ Bangalore', 'coliving near Embassy Tech Village']
+    },
+    {
+        id: 'tp-ecospace',
+        slug: 'ecospace',
+        name: 'RMZ Ecospace',
+        locality: 'bellandur',
+        coordinates: { latitude: 12.9248, longitude: 77.6815 },
+        companies: ['Accenture', 'Intel India', 'Bosch', 'Shell', 'LTIMindtree', 'Micron'],
+        description: 'Prime Grade-A tech park on Outer Ring Road in Bellandur known as one of Bangalore largest employment hubs.',
+        keywords: ['PG near RMZ Ecospace Bellandur', 'PG near Ecospace ORR', 'coliving near RMZ Ecospace', 'PG near Intel Bellandur']
+    },
+    {
+        id: 'tp-rmz-ecoworld',
+        slug: 'rmz-ecoworld',
+        name: 'RMZ Ecoworld',
+        locality: 'bellandur',
+        coordinates: { latitude: 12.9221, longitude: 77.6865 },
+        companies: ['Google', 'Honeywell', 'Morgan Stanley', 'KPMG', 'Capgemini', 'Standard Chartered'],
+        description: 'Sustainable 80-acre business park on Outer Ring Road in Bellandur featuring global banking and technology campuses.',
+        keywords: ['PG near RMZ Ecoworld', 'PG near Google Ecoworld Bangalore', 'PG near Ecoworld Bellandur', 'luxury PG RMZ Ecoworld']
+    },
+    {
+        id: 'tp-bagmane',
+        slug: 'bagmane-tech-park',
+        name: 'Bagmane Tech Park',
+        locality: 'kr-puram',
+        coordinates: { latitude: 12.9815, longitude: 77.6642 },
+        companies: ['Google', 'Boeing', 'Dell', 'Motorola', 'Oracle', 'Volvo', 'Texas Instruments'],
+        description: 'Prestigious lakeside tech park in CV Raman Nagar near KR Puram and Mahadevapura with high-density corporate employment.',
+        keywords: ['PG near Bagmane Tech Park', 'PG near Bagmane CV Raman Nagar', 'PG near Bagmane KR Puram', 'coliving Bagmane Tech Park']
+    },
+    {
+        id: 'tp-helios',
+        slug: 'helios-business-park',
+        name: 'Helios Business Park',
+        locality: 'kadubeesanahalli',
+        coordinates: { latitude: 12.9365, longitude: 77.6912 },
+        companies: ['Goldman Sachs', 'LinkedIn', 'SanDisk'],
+        description: 'Grade-A corporate campus in Kadubeesanahalli on Outer Ring Road housing Goldman Sachs India headquarters.',
+        keywords: ['PG near Helios Business Park', 'PG near Goldman Sachs Bangalore', 'PG near Kadubeesanahalli tech parks']
+    },
+    {
+        id: 'tp-prestige-tech-park',
+        slug: 'prestige-tech-park',
+        name: 'Prestige Tech Park',
+        locality: 'marathahalli',
+        coordinates: { latitude: 12.9432, longitude: 77.6965 },
+        companies: ['JPMorgan Chase', 'Adobe', 'Juniper Networks', 'Oracle', 'Caterpillar'],
+        description: 'Major IT campus located along Outer Ring Road between Kadubeesanahalli and Marathahalli.',
+        keywords: ['PG near Prestige Tech Park', 'PG near JP Morgan Marathahalli', 'coliving near Prestige Tech Park']
+    },
+    {
+        id: 'tp-cessna',
+        slug: 'cessna-business-park',
+        name: 'Cessna Business Park',
+        locality: 'kadubeesanahalli',
+        coordinates: { latitude: 12.9378, longitude: 77.6981 },
+        companies: ['Cisco Systems', 'LG Electronics', 'Informatica', 'Accolite'],
+        description: 'Exclusive IT SEZ park in Kadubeesanahalli housing the massive Cisco India R&D campus.',
+        keywords: ['PG near Cessna Business Park', 'PG near Cisco Kadubeesanahalli', 'stay near Cessna tech park']
+    },
+    {
+        id: 'tp-manyata',
+        slug: 'manyata-tech-park',
+        name: 'Embassy Manyata Business Park',
+        locality: 'hebbal',
+        coordinates: { latitude: 13.0475, longitude: 77.6189 },
+        companies: ['IBM', 'Cognizant', 'Nvidia', 'Target', 'Rolls Royce', 'Lowe India'],
+        description: 'North Bangalore largest operational tech park spanning 300 acres in Hebbal / Nagavara with over 150,000 professionals.',
+        keywords: ['PG near Manyata Tech Park', 'PG near Manyata Embassy', 'coliving near Manyata Tech Park']
+    },
+    {
+        id: 'tp-rmz-infinity',
+        slug: 'rmz-infinity',
+        name: 'RMZ Infinity',
+        locality: 'kr-puram',
+        coordinates: { latitude: 12.995, longitude: 77.661 },
+        companies: ['Dell Technologies', 'Societe Generale', 'NCR Corporation', 'Amdocs', 'Synopsys'],
+        description: 'Prominent IT park on Old Madras Road near Baiyappanahalli Metro and KR Puram.',
+        keywords: ['PG near RMZ Infinity', 'PG near Old Madras Road tech park', 'PG near Dell RMZ Infinity']
+    },
+    {
+        id: 'tp-kalyani',
+        slug: 'kalyani-tech-park',
+        name: 'Kalyani Tech Park',
+        locality: 'brookefield',
+        coordinates: { latitude: 12.9721, longitude: 77.7152 },
+        companies: ['Oracle', 'VMware', 'LTIMindtree', 'Firstsource'],
+        description: 'Modern IT campus located in Brookefield along the Whitefield main road tech corridor.',
+        keywords: ['PG near Kalyani Tech Park', 'PG near Kalyani Brookefield', 'coliving near Oracle Brookefield']
+    },
+    {
+        id: 'tp-ecity-phase1',
+        slug: 'electronic-city-phase-1',
+        name: 'Electronic City Phase 1 IT Corridor',
+        locality: 'electronic-city',
+        coordinates: { latitude: 12.8458, longitude: 77.6698 },
+        companies: ['Infosys', 'Wipro', 'Siemens', 'HP', '3M India', 'Tech Mahindra'],
+        description: 'India pioneering electronics and IT industrial park in South Bangalore hosting Infosys and Wipro global campuses.',
+        keywords: ['PG in Electronic City Phase 1', 'PG near Infosys Electronic City', 'PG near Wipro EC Phase 1']
+    },
+    {
+        id: 'tp-rga-tech-park',
+        slug: 'rga-tech-park',
+        name: 'RGA Tech Park',
+        locality: 'sarjapur-road',
+        coordinates: { latitude: 12.9065, longitude: 77.7012 },
+        companies: ['PayPal', 'Uber India', 'Cisco', 'Amazon'],
+        description: 'Premium Grade-A office park located on Sarjapur Road near Carmelaram and Chikkakannalli.',
+        keywords: ['PG near RGA Tech Park Sarjapur Road', 'PG near PayPal Sarjapur Road', 'PG near RGA Tech Park']
+    },
+    {
+        id: 'tp-wipro-sarjapur',
+        slug: 'wipro-sarjapur-campus',
+        name: 'Wipro Sarjapur Corporate Headquarters',
+        locality: 'sarjapur-road',
+        coordinates: { latitude: 12.9158, longitude: 77.6845 },
+        companies: ['Wipro Limited HQ'],
+        description: 'Sprawling corporate headquarters of Wipro on Sarjapur Main Road.',
+        keywords: ['PG near Wipro Sarjapur Road', 'PG near Wipro HQ Bangalore', 'coliving near Wipro Sarjapur']
+    }
+];
+
+/**
+ * Get an SEO tech park by its slug.
+ */
+export function getSeoTechParkBySlug(slug: string): TechPark | undefined {
+    return SEO_TECH_PARKS.find((tp) => tp.slug === slug);
+}
+
+/**
+ * Get an SEO tech park by its ID.
+ */
+export function getSeoTechParkById(id: string): TechPark | undefined {
+    return SEO_TECH_PARKS.find((tp) => tp.id === id);
+}
+
+/**
+ * Get SEO tech parks by locality slug.
+ */
+export function getSeoTechParksByLocality(localitySlug: string): TechPark[] {
+    return SEO_TECH_PARKS.filter((tp) => tp.locality === localitySlug);
+}
+
+/**
+ * Get all SEO tech parks in the central data layer.
+ */
+export function getAllSeoTechParks(): TechPark[] {
+    return SEO_TECH_PARKS;
+}
+

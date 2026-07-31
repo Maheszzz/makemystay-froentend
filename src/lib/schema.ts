@@ -60,6 +60,44 @@ export function buildBreadcrumbSchema(items: { name: string; path: string }[]) {
     };
 }
 
+/** Generic ItemList JSON-LD for a list of URLs/names. */
+export function buildItemListSchema(items: { url: string; name: string }[]) {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: items.map((item, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            url: item.url,
+            name: item.name,
+        })),
+    };
+}
+
+/** Place JSON-LD schema. */
+export function buildPlaceSchema(options: {
+    name: string;
+    description?: string;
+    address?: string;
+    geo?: { latitude: string; longitude: string };
+}) {
+    const node: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'Place',
+        name: options.name,
+    };
+    if (options.description) node.description = options.description;
+    if (options.address) node.address = options.address;
+    if (options.geo) {
+        node.geo = {
+            '@type': 'GeoCoordinates',
+            latitude: options.geo.latitude,
+            longitude: options.geo.longitude,
+        };
+    }
+    return node;
+}
+
 /** WebSite + SearchAction for homepage rich results. */
 export function buildWebSiteSchema() {
     return {
@@ -432,3 +470,7 @@ export function buildPropertyDetailGraph(
         '@graph': graph,
     };
 }
+
+export * from '@/lib/imageSeoEngine';
+export * from '@/lib/imageSitemapEngine';
+
