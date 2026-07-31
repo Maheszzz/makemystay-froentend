@@ -44,11 +44,11 @@ export function absoluteUrl(path: string): string {
  */
 export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
     const canonicalHref = input.canonicalUrl ?? absoluteUrl(input.path ?? '/');
-    const suffix = 'makemystay.ai';
-    const title = input.title.includes(suffix) ? input.title : `${input.title} | ${suffix}`;
+    const hasBrandSuffix = /makemystay/i.test(input.title);
+    const title = hasBrandSuffix ? input.title : `${input.title} | MakeMyStay`;
     return {
-        title: title.slice(0, 60), // Keep it within display limits (approx 60 chars)
-        description: input.description.slice(0, 155), // Max 155 chars for description
+        title: title.slice(0, 75), // Keep full title without truncating brand suffix
+        description: input.description.slice(0, 165), // Allow full 150-160 char SEO descriptions
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
