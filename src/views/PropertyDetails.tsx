@@ -186,6 +186,17 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     const allSalesKitDocuments = useMemo(() => {
         const list: { id: string; title: string; document_type: string; url: string; file_size?: string }[] = [];
         const salesKit = (property as any)?.metadata?.sales_kit || {};
+        const metaObj = (property as any)?.metadata || {};
+        const masterDriveLink = salesKit.drive_link || salesKit.brochure || metaObj.drive_link || metaObj.brochure_url;
+
+        if (masterDriveLink && typeof masterDriveLink === 'string' && masterDriveLink.trim()) {
+            list.push({
+                id: 'master_drive_link',
+                title: 'Property Brochure & Sales Kit (Google Drive)',
+                document_type: 'Complete Google Drive Folder & Brochures',
+                url: masterDriveLink.trim(),
+            });
+        }
 
         const titlesMap: Record<string, { title: string; type: string }> = {
             brochure: { title: 'Brochure PDF', type: 'Full High-Resolution Property Brochure' },
@@ -195,7 +206,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
         };
 
         Object.keys(titlesMap).forEach((key) => {
-            if (salesKit[key]) {
+            if (salesKit[key] && !list.some((i) => i.url === salesKit[key])) {
                 list.push({
                     id: key,
                     title: titlesMap[key].title,
@@ -222,23 +233,30 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
         return list;
     }, [property]);
 
+    const primaryBrochureOrDriveLink = useMemo(() => {
+        const salesKit = (property as any)?.metadata?.sales_kit || {};
+        const metaObj = (property as any)?.metadata || {};
+        return (
+            salesKit.drive_link ||
+            salesKit.brochure ||
+            metaObj.drive_link ||
+            metaObj.brochure_url ||
+            salesKit.pricing ||
+            salesKit.album ||
+            salesKit.wap ||
+            (allSalesKitDocuments.length > 0 ? allSalesKitDocuments[0].url : null)
+        );
+    }, [property, allSalesKitDocuments]);
+
     const handleDownloadAllBrochures = (e: React.MouseEvent) => {
         e.preventDefault();
-        if (allSalesKitDocuments.length > 0) {
-            allSalesKitDocuments.forEach((doc, idx) => {
-                setTimeout(() => {
-                    const link = document.createElement('a');
-                    link.href = doc.url;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.download = `${doc.title.replace(/\s+/g, '_')}.pdf`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }, idx * 450);
-            });
+        const targetUrl = primaryBrochureOrDriveLink;
+        if (targetUrl) {
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        } else if (allSalesKitDocuments.length > 0) {
+            window.open(allSalesKitDocuments[0].url, '_blank', 'noopener,noreferrer');
         } else {
-            alert('No Sales Kit PDFs (Brochure, Pricing, Photo Album, WAP) have been uploaded for this property yet. Please upload them in Step 6 of the Admin Dashboard Add/Edit Property wizard.');
+            alert('The Google Drive Sales Kit / Brochure link has not been attached for this property yet. Please add your Drive link in Step 6 (Sales Kit) of the Admin Dashboard.');
         }
     };
 
@@ -381,7 +399,13 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
             if (url) pushVideo(v.title || 'Video Tour', url, v.is_short);
         });
     }
-    const meta = (property as any).metadata || {};
+    const meta = (() => {
+        const m = (property as any).metadata || (property as any).metadata_json;
+        if (typeof m === 'string') {
+            try { return JSON.parse(m); } catch { return {}; }
+        }
+        return m || {};
+    })();
     if (Array.isArray(meta.youtube_videos)) {
         meta.youtube_videos.forEach((v: any) => {
             if (v?.url) pushVideo(v.title || 'Video Visit', v.url, v.is_short);
@@ -396,14 +420,28 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     if (meta.youtube_url) pushVideo('YouTube Walkthrough', meta.youtube_url);
     if (meta.video_url) pushVideo('Video Walkthrough', meta.video_url);
     if (meta.virtual_tour_url) pushVideo('Virtual Video Visit', meta.virtual_tour_url);
+    if (meta.property_walkthrough) pushVideo('Property Walkthrough', meta.property_walkthrough);
+    if (meta.drone_video) pushVideo('Drone Video Tour', meta.drone_video);
+    if (meta.instagram_reel) pushVideo('Instagram Reel', meta.instagram_reel);
+    if (meta.virtual_tour) pushVideo('Virtual Tour', meta.virtual_tour);
     if ((property as any).video_url) pushVideo('Property Video Tour', (property as any).video_url);
 
-    const getYouTubeEmbedUrl = (url: string): string | null => {
-        if (!url || typeof url !== 'string') return null;
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+    const getYouTubeEmbedUrl = (inputUrl: string): string | null => {
+        if (!inputUrl || typeof inputUrl !== 'string') return null;
+        let url = inputUrl.trim();
+        const iframeSrcMatch = url.match(/src=["'](.*?)["']/);
+        if (iframeSrcMatch) {
+            url = iframeSrcMatch[1];
+        }
+        const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|watch|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
         const match = url.match(regExp);
-        const id = match && match[2].length === 11 ? match[2] : null;
-        return id ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+        if (match && match[1]) {
+            return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1`;
+        }
+        if (url.includes('youtube.com/embed/') || url.includes('youtube-nocookie.com/embed/')) {
+            return url;
+        }
+        return null;
     };
 
     // Build display features (non-array truthy `{}` must not reach .map)
@@ -787,7 +825,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                                 <div
                                                     key={idx}
                                                     className={`bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm flex flex-col ${
-                                                        allVideos.length === 1 ? 'md:col-span-2 max-w-4xl' : ''
+                                                        allVideos.length === 1 ? 'md:col-span-2 max-w-4xl mx-auto w-full' : ''
                                                     }`}
                                                 >
                                                     <div className={`relative w-full bg-black ${v.is_short ? 'aspect-[9/16] max-w-xs mx-auto' : 'aspect-video'}`}>
@@ -875,7 +913,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                             onClick={handleDownloadAllBrochures}
                                             className="px-5 py-3 bg-brand-red hover:bg-red-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
                                         >
-                                            <Download className="w-4 h-4" /> Download All 4 PDFs
+                                            <Download className="w-4 h-4" /> Open Brochure / Google Drive
                                         </button>
                                     </div>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -901,10 +939,9 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                                     href={doc.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    download={`${doc.title.replace(/\s+/g, '_')}.pdf`}
                                                     className="px-4 py-2 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors shrink-0 shadow-sm"
                                                 >
-                                                    <Download className="w-3.5 h-3.5" /> Download
+                                                    <Download className="w-3.5 h-3.5" /> Open / Download
                                                 </a>
                                             </div>
                                         ))}

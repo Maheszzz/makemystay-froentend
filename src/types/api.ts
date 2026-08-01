@@ -41,7 +41,7 @@ export interface RealtyProperty {
     last_verified_at?: string;
     last_booked_at?: string;
     last_review_at?: string;
-    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK' | '4BHK' | 'Villa' | 'Plot'; // Extended list
+    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '1 & 2 BHK' | '3BHK' | '4BHK' | 'Villa' | 'Plot'; // Extended list
     furnishing: 'fully_furnished' | 'semi_furnished' | 'unfurnished';
     private_price?: number;
     single_price?: number;
@@ -66,6 +66,8 @@ export interface RealtyProperty {
     units_remaining?: number | null;
     /** UI tab from API (pg | rent | buy | plot); matches backend PropertyListItem.derive_category. */
     category?: 'pg' | 'rent' | 'buy' | 'plot' | string;
+    metadata?: Record<string, any>;
+    metadata_json?: Record<string, any>;
 }
 
 export type ReviewStatus = 'pending' | 'approved' | 'rejected';
@@ -206,6 +208,7 @@ export interface Property {
         qr_code_url?: string;
         share_text?: string;
     };
+    metadata?: Record<string, any>;
 }
 
 // API Response Types

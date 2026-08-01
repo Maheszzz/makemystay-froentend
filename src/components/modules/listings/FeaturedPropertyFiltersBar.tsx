@@ -110,6 +110,7 @@ export function FeaturedPropertyFiltersBar({
                 <option value="1RK">1RK</option>
                 <option value="1BHK">1BHK</option>
                 <option value="2BHK">2BHK</option>
+                <option value="1 & 2 BHK">1 & 2 BHK</option>
                 <option value="3BHK">3BHK</option>
             </FilterSelect>
 
@@ -187,6 +188,7 @@ export function FeaturedPropertyFiltersBar({
                         <option value="1RK">1RK</option>
                         <option value="1BHK">1BHK</option>
                         <option value="2BHK">2BHK</option>
+                        <option value="1 & 2 BHK">1 & 2 BHK</option>
                         <option value="3BHK">3BHK</option>
                     </select>
                     <select

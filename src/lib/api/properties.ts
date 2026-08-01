@@ -293,10 +293,39 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         contact_phone: item.phone,
         is_available: item.is_available ?? true,
         documents: (item as any).documents,
-        videos: (item as any).videos,
+        videos: (() => {
+            const rawVideos: any[] = Array.isArray((item as any).videos) ? [...(item as any).videos] : [];
+            const meta = (item as any).metadata || (item as any).metadata_json || {};
+            const metaObj = typeof meta === 'string' ? (() => { try { return JSON.parse(meta); } catch { return {}; } })() : (meta || {});
+            const pushYt = (title: string, url: string, isShort = false) => {
+                if (url && typeof url === 'string' && !rawVideos.some((v: any) => (v.video_url === url || v.url === url))) {
+                    rawVideos.push({
+                        title: title || 'Property Video Tour',
+                        video_url: url,
+                        is_short: isShort,
+                    });
+                }
+            };
+            if (metaObj.youtube_url) pushYt('YouTube Video Tour', metaObj.youtube_url);
+            if (metaObj.video_url) pushYt('Video Tour', metaObj.video_url);
+            if (metaObj.property_walkthrough) pushYt('Walkthrough Video', metaObj.property_walkthrough);
+            if (Array.isArray(metaObj.youtube_videos)) {
+                for (const v of metaObj.youtube_videos) {
+                    if (v?.url) pushYt(v.title || 'YouTube Video Tour', v.url, !!v.is_short);
+                }
+            }
+            return rawVideos;
+        })(),
         nearby_places: (item as any).nearby_places,
         seo: (item as any).seo,
         share: (item as any).share,
+        metadata: (() => {
+            const m = (item as any).metadata || (item as any).metadata_json;
+            if (typeof m === 'string') {
+                try { return JSON.parse(m); } catch { return {}; }
+            }
+            return m || {};
+        })(),
     };
 }
 

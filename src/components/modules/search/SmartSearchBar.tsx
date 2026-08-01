@@ -26,7 +26,7 @@ export interface SmartSearchBarProps {
 
 export interface HeroSearchFilters {
     city: 'bangalore' | 'pune' | 'hyderabad';
-    property_type: '' | 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK';
+    property_type: '' | 'PG' | '1RK' | '1BHK' | '2BHK' | '1 & 2 BHK' | '3BHK';
     min_price?: number;
     max_price?: number;
     amenity: '' | 'wifi' | 'food' | 'ac' | 'parking';
@@ -406,6 +406,7 @@ export function SmartSearchBar({
                             <option value="1RK">1RK</option>
                             <option value="1BHK">1BHK</option>
                             <option value="2BHK">2BHK</option>
+                            <option value="1 & 2 BHK">1 & 2 BHK</option>
                             <option value="3BHK">3BHK</option>
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />

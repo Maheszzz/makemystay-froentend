@@ -190,6 +190,7 @@ function PropertiesInner({
                     { id: '1RK', label: 'Studio (1 RK)' },
                     { id: '1BHK', label: '1 BHK' },
                     { id: '2BHK', label: '2 BHK' },
+                    { id: '1 & 2 BHK', label: '1 & 2 BHK' },
                     { id: '3BHK', label: '3 BHK' },
                     { id: 'Villa', label: 'Villa / Row House' },
                     { id: 'PG', label: 'PG / Hostel' },
@@ -373,12 +374,29 @@ function PropertiesInner({
                 list = list.filter((p) => p.category === category);
             }
 
+            if (typeFilter && typeFilter !== 'all') {
+                list = list.filter((p) => {
+                    const pt = (p.type || '').toUpperCase().trim();
+                    const target = typeFilter.toUpperCase().trim();
+                    if (target === '1 & 2 BHK') {
+                        return pt === '1BHK' || pt === '2BHK' || pt === '1 & 2 BHK' || pt === '1_2_BHK' || pt === '1RK';
+                    }
+                    if (target === '1BHK') {
+                        return pt === '1BHK' || pt === '1RK' || pt === '1 & 2 BHK' || pt === '1_2_BHK';
+                    }
+                    if (target === '2BHK') {
+                        return pt === '2BHK' || pt === '1 & 2 BHK' || pt === '1_2_BHK';
+                    }
+                    return pt === target;
+                });
+            }
+
             return list;
         } catch (e) {
             console.error('[Properties] Filtering crash:', e);
             return [];
         }
-    }, [properties, wifiOn, foodOn, acOn, category, genderFilter]);
+    }, [properties, wifiOn, foodOn, acOn, category, genderFilter, typeFilter]);
 
     /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
