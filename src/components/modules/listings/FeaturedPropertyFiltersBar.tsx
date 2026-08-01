@@ -57,28 +57,30 @@ export function FeaturedPropertyFiltersBar({
     const patch = (next: Partial<HeroSearchFilters>) => onFiltersChange({ ...filters, ...next });
 
     return (
-        <div className="flex flex-wrap items-center gap-2 mb-6 md:mb-8">
-            {HERO_CITY_TABS.map((tab) => {
-                const active = tab.key === filters.city;
-                return (
-                    <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => {
-                            patch({ city: tab.key });
-                            onExplore({ city: tab.key });
-                        }}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold transition-all ${
-                            active
-                                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
-                        }`}
-                    >
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        {tab.label}
-                    </button>
-                );
-            })}
+        <div className="flex flex-wrap items-center gap-2 mb-6 md:mb-8 pt-4 sm:pt-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0 md:flex-wrap">
+                {HERO_CITY_TABS.map((tab) => {
+                    const active = tab.key === filters.city;
+                    return (
+                        <button
+                            key={tab.key}
+                            type="button"
+                            onClick={() => {
+                                patch({ city: tab.key });
+                                onExplore({ city: tab.key });
+                            }}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all ${
+                                active
+                                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                                    : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
+                            }`}
+                        >
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </div>
 
             <div className="hidden md:block h-7 w-px bg-slate-200 mx-1" />
 

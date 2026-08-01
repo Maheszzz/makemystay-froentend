@@ -273,8 +273,8 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
             {/* ========================================================
                SECTION 2: HIGH DEMAND FEATURED SPOTLIGHT (Ekta Infinity)
                ======================================================== */}
-            <div className="relative overflow-hidden rounded-2xl border border-red-200/80 bg-gradient-to-r from-red-50/90 via-white to-white p-5 sm:p-6 shadow-md transition-all hover:shadow-lg">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="relative overflow-hidden rounded-2xl border border-red-200/80 bg-gradient-to-r from-red-50/90 via-white to-white p-5 sm:p-6 shadow-md transition-all hover:shadow-lg mb-4 sm:mb-0">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
                     {/* Left: Badge & High Demand Copy */}
                     <div className="space-y-2.5 max-w-2xl">
                         <div className="flex flex-wrap items-center gap-2">
@@ -313,32 +313,32 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                     </div>
 
                     {/* Right: Pricing & Quick Actions */}
-                    <div className="flex flex-col sm:flex-row lg:flex-col sm:items-center lg:items-end justify-between gap-4 shrink-0 border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-200">
+                    <div className="flex flex-col sm:flex-row lg:flex-col sm:items-center lg:items-end justify-between gap-3.5 sm:gap-4 shrink-0 border-t lg:border-t-0 pt-3.5 lg:pt-0 border-slate-200">
                         <div className="text-left lg:text-right">
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                                 Monthly Rent
                             </p>
-                            <p className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                            <p className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-snug">
                                 {FEATURED_LAUNCH.priceFromLabel}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                             <Link
                                 to={ektaPath}
-                                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1.5"
+                                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-1.5 shrink-0"
                             >
                                 <span>Explore Ekta Infinity</span>
-                                <ArrowRight className="w-3.5 h-3.5" />
+                                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                             </Link>
 
                             <a
                                 href={ektaWaUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+                                className="px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
                             >
-                                <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                                <MessageCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                                 <span>Inquire</span>
                             </a>
                         </div>
