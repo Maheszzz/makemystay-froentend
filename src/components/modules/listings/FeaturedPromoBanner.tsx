@@ -1,5 +1,5 @@
 'use client';
-
+  
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     ArrowRight,
@@ -12,6 +12,7 @@ import {
     MessageCircle,
     Flame
 } from 'lucide-react';
+
 import { Link } from '@/lib/navigation';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
@@ -152,26 +153,26 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                 </div>
 
                 {/* Slider Content */}
-                <div className="relative z-10 px-6 py-8 sm:px-8 sm:py-10 md:px-12 md:py-12 lg:py-14 max-w-3xl flex flex-col justify-between min-h-[380px] sm:min-h-[400px] lg:min-h-[420px]">
+                <div className="relative z-10 px-5 pt-6 pb-16 sm:px-8 sm:py-10 md:px-12 md:py-12 lg:py-14 max-w-3xl flex flex-col justify-between min-h-[390px] sm:min-h-[400px] lg:min-h-[420px]">
                     <div>
                         {/* Top Badge & Rating Strip */}
-                        <div className="flex flex-wrap items-center gap-2.5 mb-4 sm:mb-5">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 sm:mb-5 pr-20 sm:pr-0">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red text-white text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-md">
-                                <Sparkles className="w-3.5 h-3.5" />
+                                <Sparkles className="w-3.5 h-3.5 shrink-0" />
                                 {activeSlide.badge}
                             </span>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold">
-                                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
                                 <span>{activeSlide.realRating.toFixed(1)}</span>
                                 <span className="text-white/60">• {activeSlide.realReviews}</span>
                             </span>
                         </div>
 
                         {/* Property Title & Subtitle */}
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold text-white leading-[1.15] tracking-tight mb-2.5 font-luxury">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-extrabold text-white leading-[1.15] tracking-tight mb-2 font-luxury">
                             {activeSlide.title}
                         </h2>
-                        <p className="text-sm sm:text-base md:text-lg text-slate-200/90 font-medium max-w-xl mb-4 sm:mb-6">
+                        <p className="text-sm sm:text-base md:text-lg text-slate-200/90 font-medium max-w-xl mb-4 sm:mb-6 leading-relaxed">
                             {activeSlide.subtitle}
                         </p>
 
@@ -182,7 +183,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                         </div>
 
                         {/* Highlights List */}
-                        <div className="flex flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8">
+                        <div className="flex flex-wrap gap-1.5 sm:gap-4 mb-6 sm:mb-8">
                             {activeSlide.highlights.map((item, idx) => (
                                 <div
                                     key={idx}
@@ -195,7 +196,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                     </div>
 
                     {/* Bottom CTA Button Group & Price */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/15">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 pt-4 border-t border-white/15">
                         <div>
                             <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-0.5">
                                 Limited Offer Price
@@ -205,22 +206,22 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-2.5">
+                        <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                             <Link
                                 to={activeSlide.detailPath}
-                                className="px-5 py-3 rounded-xl bg-brand-red hover:bg-red-600 text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                                className="flex-1 sm:flex-initial justify-center px-4 py-3 rounded-xl bg-brand-red hover:bg-red-600 text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-1.5 shrink-0"
                             >
                                 <span>Book a Visit</span>
-                                <ArrowRight className="w-4 h-4" />
+                                <ArrowRight className="w-4 h-4 shrink-0" />
                             </Link>
 
                             <a
                                 href={waUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="px-4 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-2"
+                                className="flex-1 sm:flex-initial justify-center px-4 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shrink-0"
                             >
-                                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                                <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0" />
                                 <span>WhatsApp</span>
                             </a>
                         </div>
@@ -248,7 +249,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                 </div>
 
                 {/* Interactive Slide Indicator Pills (Infinity • Signature • Cozy Colive) */}
-                <div className="absolute left-6 bottom-3 sm:left-8 sm:bottom-4 z-20 flex items-center gap-2">
+                <div className="absolute left-5 bottom-3.5 sm:left-8 sm:bottom-4 z-20 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar max-w-[calc(100%-24px)] sm:max-w-none">
                     {PROMO_SLIDES.map((slide, idx) => {
                         const active = idx === currentSlide;
                         return (
@@ -257,7 +258,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 type="button"
                                 onClick={() => setCurrentSlide(idx)}
                                 aria-label={`Go to slide ${slide.title}`}
-                                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all ${
+                                className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-all whitespace-nowrap shrink-0 ${
                                     active
                                         ? 'bg-brand-red text-white shadow-md scale-105'
                                         : 'bg-black/40 hover:bg-black/60 text-white/70 border border-white/10'
