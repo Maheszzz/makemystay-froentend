@@ -19,7 +19,7 @@ export async function fetchPropertyByIdServer(id: string): Promise<Property | nu
     try {
         const res = await fetch(url, {
             headers: { Accept: 'application/json' },
-            next: { revalidate: 3600 },
+            next: { revalidate: 3600, tags: ['properties-list', 'properties', `property-${trimmed}`] },
         });
         if (!res.ok) return null;
         const payload = await res.json();
@@ -41,7 +41,7 @@ export async function fetchPropertyBySlugServer(type: string, slug: string): Pro
     try {
         const res = await fetch(url, {
             headers: { Accept: 'application/json' },
-            next: { revalidate: 3600 },
+            next: { revalidate: 3600, tags: ['properties-list', 'properties', `property-${trimmedSlug}`] },
         });
         if (!res.ok) return null;
         const payload = await res.json();
@@ -62,7 +62,7 @@ export async function fetchPublicPropertyBySlugServer(slug: string): Promise<Pro
     try {
         const res = await fetch(url, {
             headers: { Accept: 'application/json' },
-            next: { revalidate: 3600 },
+            next: { revalidate: 3600, tags: ['properties-list', 'properties', `property-${trimmedSlug}`] },
         });
         if (!res.ok) return null;
         const payload = await res.json();
