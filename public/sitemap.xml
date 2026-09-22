@@ -2,18 +2,22 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://makemystay.ai/sitemap-static.xml</loc>
-    <lastmod>2026-09-19T10:56:17.699Z</lastmod>
+    <lastmod>2026-09-20T06:49:08.600Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://makemystay.ai/sitemap-localities.xml</loc>
-    <lastmod>2026-09-19T10:56:17.699Z</lastmod>
+    <lastmod>2026-09-20T06:49:08.600Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://makemystay.ai/sitemap-blog.xml</loc>
-    <lastmod>2026-09-19T10:56:17.699Z</lastmod>
+    <lastmod>2026-09-20T06:49:08.600Z</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://makemystay.ai/sitemap-properties.xml</loc>
-    <lastmod>2026-09-19T10:56:17.699Z</lastmod>
+    <lastmod>2026-09-20T06:49:08.600Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://makemystay.ai/sitemap-images.xml</loc>
+    <lastmod>2026-09-20T06:49:08.600Z</lastmod>
   </sitemap>
 </sitemapindex>

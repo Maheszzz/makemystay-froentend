@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { FEATURED_LAUNCH } from '@/data/featuredLaunch';
 import { useProperties, useProperty } from '@/hooks';
 import { buildFeaturedCarouselRows, findFeaturedLaunchProperty } from '@/lib/featuredLaunch';
-import { sortPropertiesByPriorityAndRating } from '@/lib/propertyRanking';
+
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { buildFeaturedExploreUrl, heroFiltersToApiParams } from '@/lib/heroFilterUtils';
 import type { PaginationParams } from '@/types/api';
@@ -48,9 +48,20 @@ export function PropertyGrid({
 
     const safeProperties = Array.isArray(properties) ? properties : [];
     
-    // Client-side sort fallback for 'review_count_desc' (matching Properties.tsx logic)
     const sortedProperties = useMemo(() => {
-        return sortPropertiesByPriorityAndRating(safeProperties);
+        const priorityIds = [239, 272, 286, 218];
+        const priorityProperties = priorityIds
+            .map(id => safeProperties.find(property => Number(property.id) === id))
+            .filter(Boolean) as typeof safeProperties;
+        
+        const remainingProperties = safeProperties.filter(
+            property => !priorityIds.includes(Number(property.id))
+        );
+        
+        return [
+            ...priorityProperties,
+            ...remainingProperties,
+        ];
     }, [safeProperties]);
 
     const amenityGenderFiltered = useMemo(() => {

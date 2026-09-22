@@ -30,7 +30,7 @@ import {
     computeRentPlotStatsFromListings,
 } from '@/lib/listingInventoryStats';
 import type { Property } from '@/types/api';
-import { sortPropertiesByPriorityAndRating } from '@/lib/propertyRanking';
+
 import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
@@ -406,7 +406,7 @@ function PropertiesInner({
             if (searchQuery) return list;
             
             if (sortBy === 'review_count_desc' || sortBy === 'rating_desc') {
-                return sortPropertiesByPriorityAndRating(list);
+                return list; // The backend already includes priority sorting before these sorts.
             }
             return list;
         } catch (e) {
