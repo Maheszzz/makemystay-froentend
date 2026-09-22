@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { Mail, Phone } from 'lucide-react';
 import { Link } from '@/lib/navigation';
-import { LeadCaptureModal } from '../modals/LeadCaptureModal';
 
 /** Official-style WhatsApp mark (matches WhatsAppWidget). */
 function WhatsAppMark({ className }: { className?: string }) {
@@ -19,7 +17,6 @@ function WhatsAppMark({ className }: { className?: string }) {
 }
 
 export function MobileBottomCTA() {
-    const [showLeadModal, setShowLeadModal] = useState(false);
     const whatsappMessage = "Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?";
     const whatsappUrl = `https://wa.me/918150099911?text=${encodeURIComponent(whatsappMessage)}`;
 
@@ -65,7 +62,10 @@ export function MobileBottomCTA() {
                         onClick={(e) => {
                             e.preventDefault();
                             console.log('[TRACK] Mobile Bottom WhatsApp clicked');
-                            setShowLeadModal(true);
+                            const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+                            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                                window.location.href = whatsappUrl;
+                            }
                         }}
                         className="flex flex-col items-center justify-center gap-0.5 px-1.5 h-11 rounded-xl active:scale-95 transition-all"
                         style={{
@@ -106,15 +106,6 @@ export function MobileBottomCTA() {
                     </Link>
                 </div>
             </div>
-
-            <LeadCaptureModal
-                isOpen={showLeadModal}
-                onClose={() => setShowLeadModal(false)}
-                title="Talk to us on WhatsApp"
-                subtitle="We typically respond in 5 minutes."
-                source="Website - Mobile Bottom CTA"
-                whatsappUrl={whatsappUrl}
-            />
         </>
     );
 }
