@@ -375,8 +375,14 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     // Build the images list
     const allImages: string[] = [];
     if (Array.isArray(property.images) && property.images.length > 0) {
-        property.images.forEach((img: any) => {
-            const url = typeof img === 'string' ? img : img?.image_url;
+        const sortedImages = [...property.images].sort((a: any, b: any) => {
+            const aPrimary = (a && typeof a === 'object' && (a.is_primary || a.isPrimary || a.is_cover)) ? 1 : 0;
+            const bPrimary = (b && typeof b === 'object' && (b.is_primary || b.isPrimary || b.is_cover)) ? 1 : 0;
+            return bPrimary - aPrimary;
+        });
+
+        sortedImages.forEach((img: any) => {
+            const url = typeof img === 'string' ? img : img?.image_url || img?.url || img?.src;
             if (url) allImages.push(url);
         });
     } else if (property.image) {
