@@ -1155,26 +1155,28 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     if (block.startsWith('## ')) {
                                         return <h2 key={bi} className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">{block.replace('## ', '')}</h2>;
                                     }
+
+                                    const renderTextWithBold = (text: string) => {
+                                        const parts = text.split(/(\*\*.*?\*\*)/g);
+                                        return parts.map((part, i) => {
+                                            if (part.startsWith('**') && part.endsWith('**')) {
+                                                return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+                                            }
+                                            return part;
+                                        });
+                                    };
+
                                     if (block.startsWith('- ')) {
                                         return (
                                             <ul key={bi} className="list-disc pl-5 mb-4 space-y-1">
-                                                {block.split('\n').map((line, li) => {
-                                                    const cleanLine = line.replace(/^- \**|^\* |^\*+\s*/, '');
-                                                    const parts = cleanLine.split('**');
-                                                    if (parts.length > 2) {
-                                                        return (
-                                                            <li key={li}>
-                                                                <strong className="font-semibold text-slate-900">{parts[1]}</strong>
-                                                                {parts.slice(2).join('')}
-                                                            </li>
-                                                        );
-                                                    }
-                                                    return <li key={li}>{cleanLine}</li>;
-                                                })}
+                                                {block.split('\n').filter(Boolean).map((line, li) => (
+                                                    <li key={li}>{renderTextWithBold(line.replace(/^- /, '').trim())}</li>
+                                                ))}
                                             </ul>
                                         );
                                     }
-                                    return <p key={bi} className="mb-4">{block}</p>;
+
+                                    return <p key={bi} className="mb-4 whitespace-pre-line">{renderTextWithBold(block)}</p>;
                                 })}
                             </div>
                         </section>
