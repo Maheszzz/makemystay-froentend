@@ -12,6 +12,7 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import locJson from '@/data/pg-locations.json';
 import { getPgLocationBySlug } from '@/data/pgLocations';
+import { getLocalitySeoProfile } from '@/lib/locality';
 import { buildRentLocationFaqs } from '@/lib/rentLocalityFaqs';
 import { buildPageSEO, rentLocationHubSeo } from '@/lib/seo';
 import { buildPgHubItemListSchema, buildPgLocationCombinedGraph } from '@/lib/schema';
@@ -21,7 +22,7 @@ import Properties from '@/views/Properties';
 export default function RentLocationPage({ overrideSlug }: { overrideSlug?: string } = {}) {
     const { slug: locationParam } = useParams<{ slug: string }>();
     const param = (overrideSlug || locationParam || '').toLowerCase();
-    const loc = getPgLocationBySlug(param);
+    const loc = getPgLocationBySlug(param) ?? getLocalitySeoProfile(param)?.locality;
 
     if (!loc) {
         return (

@@ -154,6 +154,7 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
     }
     for (const loc of PG_LOCATIONS) {
         registerEntry(`/pg/${loc.slug}`, 'locality');
+        registerEntry(`/rent/${loc.slug}`, 'rent');
         registerEntry(`/pg-for-boys-in-${loc.slug}`, 'locality');
         registerEntry(`/pg-for-girls-in-${loc.slug}`, 'locality');
     }

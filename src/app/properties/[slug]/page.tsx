@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return resolvePropertyPageMetadata(slug);
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function PropertyPage({ params }: PageProps) {
     const { slug } = await params;

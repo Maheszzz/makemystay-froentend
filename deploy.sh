@@ -135,6 +135,9 @@ for HOST in "${HOSTS[@]}"; do
 
     cd $DEPLOY_PATH
 
+    # Remove any legacy static sitemap*.xml files so Next.js dynamic /sitemap.xml is always served
+    rm -f public/sitemap*.xml dist/public/sitemap*.xml 2>/dev/null || true
+
     echo "🔁 Restarting Next.js app..."
     if systemctl list-unit-files makemystay-next.service >/dev/null 2>&1; then
       sudo systemctl restart makemystay-next

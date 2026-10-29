@@ -58,11 +58,6 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     redirect(`/pg/${legacyTarget}`);
   }
 
-  const loc = getPgLocationBySlug(actualSlug);
-  if (!loc) {
-    notFound();
-  }
-
   const authorityProfile = getAuthorityProfile(actualSlug);
   if (authorityProfile) {
       return <AuthorityLocalityPage 
@@ -77,7 +72,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   if (localitySeoProfile) {
     const { items: initialProperties } = await fetchPropertiesServer({
       category: 'pg',
-      city: localitySeoProfile.slug,
+      city: localitySeoProfile.locality.name,
       is_available: true,
       limit: 20,
     });
@@ -181,6 +176,11 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     );
   }
 
+  const loc = getPgLocationBySlug(actualSlug);
+  if (!loc) {
+    notFound();
+  }
+
   const { name, slug: locationSlug } = loc;
   const searchParams = new URLSearchParams(); // Empty – client‑side filters will update URL later
   const seoInput = pgLocationSeoWithQuery(name, locationSlug, searchParams);
@@ -198,7 +198,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
   const { items: initialProperties } = await fetchPropertiesServer({
     category: 'pg',
-    city: locationSlug,
+    city: name,
     is_available: true,
     limit: 20,
   });

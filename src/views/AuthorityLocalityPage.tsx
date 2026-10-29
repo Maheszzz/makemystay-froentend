@@ -53,7 +53,7 @@ export default async function AuthorityLocalityPage({
     overrideFeature 
 }: AuthorityLocalityPageProps) {
     let programmaticModifier = '';
-    let filterObj: any = { category: 'pg', city: profile.slug, is_available: true, limit: 8 };
+    let filterObj: any = { category: 'pg', city: profile.name, is_available: true, limit: 8 };
     
     if (overrideMaxPrice) {
         programmaticModifier = ` under ₹${overrideMaxPrice}`;

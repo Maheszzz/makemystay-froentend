@@ -13,7 +13,7 @@ import RentSlugRoute from '@/routes/RentSlugRoute';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import PropertyDetails from '@/views/PropertyDetails';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function RentSlugPage({ params }: PageProps) {
     const { slug } = await params;
@@ -24,7 +24,8 @@ export default async function RentSlugPage({ params }: PageProps) {
     }
 
     const { getPgLocationBySlug } = await import('@/data/pgLocations');
-    if (getPgLocationBySlug(param)) {
+    const { getLocalitySeoProfile } = await import('@/lib/locality');
+    if (getPgLocationBySlug(param) || getLocalitySeoProfile(param)) {
         return <RentSlugRoute />;
     }
 

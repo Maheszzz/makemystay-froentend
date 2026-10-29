@@ -19,6 +19,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = true;
+export const revalidate = 3600;
 
 import PgSlugRoute from '@/routes/PgSlugRoute';
 import PGLocationPage from '@/views/PGLocationPage';
@@ -40,8 +41,9 @@ export default async function Page({ params }: PageProps) {
     }
 
     const { getPgLocationBySlug, resolveLegacyPgSlug } = await import('@/data/pgLocations');
+    const { getLocalitySeoProfile } = await import('@/lib/locality');
     const legacy = resolveLegacyPgSlug(param);
-    if (getPgLocationBySlug(param) || (legacy && getPgLocationBySlug(legacy))) {
+    if (getPgLocationBySlug(param) || getLocalitySeoProfile(param) || (legacy && getPgLocationBySlug(legacy))) {
         return <PGLocationPage slug={param} />;
     }
 

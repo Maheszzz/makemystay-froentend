@@ -2,7 +2,7 @@
  * After `next build`, assemble a deployable `dist/` folder for EC2 rsync + Node.
  * Run: node scripts/prepare-next-deploy.mjs
  */
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 const root = process.cwd();
@@ -20,6 +20,17 @@ mkdirSync(out, { recursive: true });
 cpSync(standalone, out, { recursive: true });
 cpSync(join(root, '.next/static'), join(out, '.next/static'), { recursive: true });
 cpSync(join(root, 'public'), join(out, 'public'), { recursive: true });
+
+// Ensure no legacy static sitemap*.xml files exist in public/ or dist/public/ so Next's dynamic /sitemap.xml is served
+for (const dir of [join(root, 'public'), join(out, 'public')]) {
+    if (existsSync(dir)) {
+        for (const f of readdirSync(dir)) {
+            if (/^sitemap.*\.xml$/i.test(f)) {
+                rmSync(join(dir, f), { force: true });
+            }
+        }
+    }
+}
 
 const heroAvif = join(out, 'public/images/blog/hero-sunset.avif');
 if (!existsSync(heroAvif)) {

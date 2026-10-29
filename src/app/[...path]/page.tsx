@@ -10,14 +10,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return resolveCatchAllPathMetadata(pathKey);
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function SeoCatchAllPage({ params }: PageProps) {
   const { path } = await params;
   const pathKey = '/' + (path ?? []).join('/');
   
   // Call metadata resolver to trigger notFound() if the route is invalid
-  resolveCatchAllPathMetadata(pathKey);
+  await resolveCatchAllPathMetadata(pathKey);
 
   return <ProgrammaticSeoCatchAll pathKey={pathKey} />;
 }
