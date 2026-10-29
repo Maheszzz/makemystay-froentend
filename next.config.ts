@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     output: 'standalone',
     reactStrictMode: true,
     eslint: { ignoreDuringBuilds: true },
-    typescript: { ignoreBuildErrors: true },
+    typescript: { ignoreBuildErrors: false },
     images: {
         formats: ['image/avif', 'image/webp'],
         deviceSizes: [640, 828, 1080, 1200, 1920],

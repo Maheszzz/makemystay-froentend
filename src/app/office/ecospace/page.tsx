@@ -7,4 +7,8 @@ export function generateMetadata(): Metadata {
 
 export const dynamic = 'force-dynamic';
 
-export { default } from '@/views/OfficeLandingPage';
+import OfficeLandingPage from '@/views/OfficeLandingPage';
+
+export default function Page() {
+    return <OfficeLandingPage slug="ecospace" />;
+}

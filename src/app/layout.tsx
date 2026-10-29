@@ -28,7 +28,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
     metadataBase: new URL('https://makemystay.ai'),
     title: {
-        default: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals | MakeMyStay.ai',
+        default: 'Verified PGs & Flats in Bangalore | MakeMyStay.ai',
         template: '%s | MakeMyStay.ai',
     },
     description:
@@ -38,12 +38,12 @@ export const metadata: Metadata = {
         locale: 'en_IN',
         siteName: 'MakeMyStay.ai',
         url: 'https://makemystay.ai',
-        title: 'Verified PG & 1BHK/2BHK in Bangalore | Zero brokerage rentals | MakeMyStay.ai',
+        title: 'Verified PGs & Flats in Bangalore | MakeMyStay.ai',
         description:
             'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage.',
         images: [
             {
-                url: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&h=630&q=80',
+                url: 'https://makemystay.ai/og-image.jpg',
                 width: 1200,
                 height: 630,
             },
@@ -69,7 +69,7 @@ export const revalidate = 3600;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className={`${inter.variable} ${montserrat.variable} ${playfair.variable}`}>
+        <html lang="en-IN" className={`${inter.variable} ${montserrat.variable} ${playfair.variable}`}>
             <body className="antialiased font-sans">
                 <Script
                     src="https://cdn-in.pagesense.io/js/60068323066/7e76ea503238457e82afc5266e8977c1.js"
@@ -86,9 +86,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     gtag('config', 'AW-11313350010');
                     `}
                 </Script>
-                <Script id="global-org-schema" type="application/ld+json" strategy="lazyOnload">
-                    {JSON.stringify(buildOrganizationSchema())}
-                </Script>
+                <script
+                    id="global-org-schema"
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrganizationSchema()) }}
+                />
                 <Providers>
                     {children}
                 </Providers>

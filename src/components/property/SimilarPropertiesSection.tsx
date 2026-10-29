@@ -7,14 +7,18 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface SimilarPropertiesSectionProps {
     current: Property;
+    initialSimilar?: Property[];
 }
 
-export function SimilarPropertiesSection({ current }: SimilarPropertiesSectionProps) {
+export function SimilarPropertiesSection({ current, initialSimilar }: SimilarPropertiesSectionProps) {
     const city = current.location?.trim() || undefined;
     const pgLoc = findPgLocationForArea(current.location);
     const isPg = current.type?.toLowerCase() === 'pg';
 
-    const { properties: similar, loading, error } = useSimilarProperties(current.id, { limit: 6 });
+    const { properties: similar, loading, error } = useSimilarProperties(current.id, {
+        limit: 6,
+        initialProperties: initialSimilar,
+    });
 
     if (!loading && (error || similar.length === 0)) {
         return null;

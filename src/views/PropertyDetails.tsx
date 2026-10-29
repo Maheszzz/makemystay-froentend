@@ -17,7 +17,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
-import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
+import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo, propertyUnavailableSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
 
 import type { ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
@@ -43,6 +43,8 @@ import {
 import { findPgLocationForArea } from '@/data/pgLocations';
 import type { Property } from '@/types/api';
 
+import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
+
 const ServiceFeeModal = dynamic(
     () => import('@/components/modals/ServiceFeeModal').then((m) => m.ServiceFeeModal),
     { ssr: false },
@@ -59,10 +61,6 @@ const LeadCaptureModal = dynamic(
     () => import('@/components/modals/LeadCaptureModal').then((m) => m.LeadCaptureModal),
     { ssr: false },
 );
-const SimilarPropertiesSection = dynamic(
-    () => import('@/components/property/SimilarPropertiesSection').then((m) => m.SimilarPropertiesSection),
-    { ssr: false },
-);
 const SafetyPopup = dynamic(
     () => import('@/components/modals/SafetyPopup').then((m) => m.SafetyPopup),
     { ssr: false },
@@ -71,10 +69,12 @@ const SafetyPopup = dynamic(
 type PropertyDetailsProps = {
     /** SSR-hydrated listing from the server page (avoids empty HTML for crawlers). */
     initialProperty?: Property;
+    /** SSR-hydrated similar listings. */
+    initialSimilar?: Property[];
     slug?: string;
 };
 
-export default function PropertyDetails({ initialProperty, slug: slugProp }: PropertyDetailsProps = {}) {
+export default function PropertyDetails({ initialProperty, initialSimilar, slug: slugProp }: PropertyDetailsProps = {}) {
     const { slug: slugFromParams } = useParams<{ slug: string }>();
     const slugParam = slugProp ?? slugFromParams;
     const location = useLocation();
@@ -124,6 +124,9 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
     const detailHelmet = useMemo(() => {
         if (!property) return null;
+        if (property.is_available === false) {
+            return buildPageSEO(propertyUnavailableSeo(canonicalDetailPath, property.location));
+        }
         return buildPageSEO(propertyDetailPageSeo(property, canonicalDetailPath));
     }, [property, canonicalDetailPath]);
     const interimHelmet = useMemo(
@@ -521,6 +524,30 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
             <Navbar city={property?.city} />
 
             <main id="main-content" className="pb-20 md:pb-24 flex-grow">
+                {property.is_available === false && (
+                    <div
+                        role="status"
+                        data-testid="property-unavailable-banner"
+                        className="bg-amber-50 border-b border-amber-200 pt-20 pb-4 px-4 sm:px-6 lg:px-8"
+                    >
+                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <p className="text-sm sm:text-base font-bold text-amber-900">
+                                    This property is no longer available
+                                </p>
+                                <p className="text-xs sm:text-sm text-amber-800">
+                                    This listing in {property.location || 'Bangalore'} is currently rented out or paused. Browse verified similar stays below.
+                                </p>
+                            </div>
+                            <Link
+                                to={pgLoc ? `/pg/${pgLoc.slug}` : '/properties'}
+                                className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-amber-900 text-white text-xs font-bold hover:bg-amber-800 transition-colors shrink-0"
+                            >
+                                {pgLoc ? `Browse available PGs in ${pgLoc.name}` : 'Browse available properties'}
+                            </Link>
+                        </div>
+                    </div>
+                )}
 
                 {/* ─── Cinematic Hero Section ─── */}
                 <section className="relative bg-[#0a0a0b] overflow-hidden group">
@@ -1032,7 +1059,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                 )}
                             </section>
 
-                            <SimilarPropertiesSection current={property} />
+                            <SimilarPropertiesSection current={property} initialSimilar={initialSimilar} />
 
                             {/* Reviews */}
                             <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">

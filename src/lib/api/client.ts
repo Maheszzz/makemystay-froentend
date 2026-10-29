@@ -83,6 +83,9 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth tokens if needed in the future
 apiClient.interceptors.request.use(
     (config) => {
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env['SERVER_API_BASE_URL']) {
+            config.baseURL = process.env['SERVER_API_BASE_URL'].replace(/\/+$/, '');
+        }
         const token = getLocalItem('admin_token');
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;

@@ -8,7 +8,7 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { Link } from '@/lib/navigation';
 import { buildAuthorityGraph, buildAuthorityBreadcrumbs, getAuthorityFaqs } from '@/lib/authorityContent';
-import { propertyApi } from '@/lib/api/properties';
+import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import { AuthorityIntro } from '@/components/seo/authority/AuthorityIntro';
 import { AuthorityCommuteTable } from '@/components/seo/authority/AuthorityCommuteTable';
 import { AuthorityRentTable } from '@/components/seo/authority/AuthorityRentTable';
@@ -53,11 +53,11 @@ export default async function AuthorityLocalityPage({
     overrideFeature 
 }: AuthorityLocalityPageProps) {
     let programmaticModifier = '';
-    let filterObj: any = { city: profile.slug, limit: 8 };
+    let filterObj: any = { category: 'pg', city: profile.slug, is_available: true, limit: 8 };
     
     if (overrideMaxPrice) {
         programmaticModifier = ` under ₹${overrideMaxPrice}`;
-        filterObj.maxPrice = overrideMaxPrice;
+        filterObj.max_price = Number(overrideMaxPrice) || undefined;
     } else if (overrideGender) {
         programmaticModifier = ` for ${overrideGender}`;
         filterObj.gender = overrideGender.toLowerCase();
@@ -96,13 +96,7 @@ export default async function AuthorityLocalityPage({
     
     const faqs = getAuthorityFaqs(profile);
 
-    let initialProperties: any[] = [];
-    try {
-        const result = await propertyApi.getAll(filterObj);
-        initialProperties = result.items ?? [];
-    } catch {
-        // Fallback
-    }
+    const { items: initialProperties } = await fetchPropertiesServer(filterObj);
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">

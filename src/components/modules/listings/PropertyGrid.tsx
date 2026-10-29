@@ -12,7 +12,7 @@ import { buildFeaturedCarouselRows, findFeaturedLaunchProperty } from '@/lib/fea
 
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { buildFeaturedExploreUrl, heroFiltersToApiParams } from '@/lib/heroFilterUtils';
-import type { PaginationParams } from '@/types/api';
+import type { PaginationParams, Property } from '@/types/api';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, IndianRupee, ShieldCheck } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { Link, useNavigate } from '@/lib/navigation';
@@ -23,6 +23,7 @@ interface PropertyGridProps {
     cardVariant?: 'default' | 'project';
     filters?: HeroSearchFilters;
     setFilters?: (next: HeroSearchFilters) => void;
+    initialProperties?: Property[];
 }
 
 export function PropertyGrid({
@@ -31,6 +32,7 @@ export function PropertyGrid({
     cardVariant = 'default',
     filters,
     setFilters,
+    initialProperties,
 }: PropertyGridProps) {
     const navigate = useNavigate();
     const sliderRef = useRef<HTMLDivElement | null>(null);
@@ -44,7 +46,7 @@ export function PropertyGrid({
         return apiBase as PaginationParams;
     }, [category, searchQuery, filters, cardVariant]);
 
-    const { properties, loading, error } = useProperties(params);
+    const { properties, loading, error } = useProperties(params, { initialProperties });
 
     const safeProperties = Array.isArray(properties) ? properties : [];
     
@@ -99,7 +101,7 @@ export function PropertyGrid({
     const projectDisplayRows = useMemo(() => {
         if (cardVariant !== 'project') return [];
         const base = amenityGenderFiltered.length ? amenityGenderFiltered : [];
-        return buildFeaturedCarouselRows(base, launchProperty, 8);
+        return buildFeaturedCarouselRows(base, launchProperty, 24);
     }, [cardVariant, amenityGenderFiltered, launchProperty]);
 
     // Filter for the home page (limit to 4)

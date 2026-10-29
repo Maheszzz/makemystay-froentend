@@ -31,7 +31,7 @@ import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySec
 import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
-import { propertyApi } from '@/lib/api/properties';
+import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import { Link } from '@/lib/navigation';
 import Properties from '@/views/Properties';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -48,6 +48,7 @@ export interface PGLocationPageProps {
     overrideGender?: string;
     overrideFeature?: string;
 }
+
 
 export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPrice, overrideGender, overrideFeature }: PGLocationPageProps) {
   const actualSlug = overrideSlug || slug || '';
@@ -74,21 +75,21 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
   const localitySeoProfile = getLocalitySeoProfile(actualSlug);
   if (localitySeoProfile) {
-    let initialProperties: any[] = [];
-    try {
-      const result = await propertyApi.getAll({ city: localitySeoProfile.locality.name, limit: 20 });
-      initialProperties = result.items ?? [];
-    } catch (error) {
-      console.warn('[SSR] propertyApi.getAll failed for', localitySeoProfile.slug, error);
-    }
+    const { items: initialProperties } = await fetchPropertiesServer({
+      category: 'pg',
+      city: localitySeoProfile.slug,
+      is_available: true,
+      limit: 20,
+    });
 
     const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality);
     const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
     const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
+    const isEmptyLocality = initialProperties.length === 0;
 
     return (
       <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-        <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage} />
+        <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
         <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
 
         <Navbar />
@@ -195,28 +196,23 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   ];
   const combinedLd = buildLocalityAeoGraph(profile, faqs, breadcrumbItems, canonicalListingPath);
 
-  // Fetch initial properties for SSR (no limit – fetch all for full SEO as per user decision)
-  // Debug logging for SSR fetch
-  console.log('[SSR] propertyApi.getAll called with', { city: locationSlug, limit: 20, baseUrl: process.env.API_BASE_URL });
-  let initialProperties: any[] = [];
-  try {
-    const result = await propertyApi.getAll({ city: locationSlug, limit: 20 });
-    initialProperties = result.items ?? [];
-    console.log('[SSR] propertyApi.getAll response - count:', initialProperties.length, 'first item:', initialProperties[0]);
-  } catch (error) {
-    console.warn('[SSR] propertyApi.getAll failed for', locationSlug, error);
-    // Continue with empty properties list to avoid 5xx
-  }
+  const { items: initialProperties } = await fetchPropertiesServer({
+    category: 'pg',
+    city: locationSlug,
+    is_available: true,
+    limit: 20,
+  });
 
   const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
   const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
+  const isEmptyLocality = initialProperties.length === 0;
 
   const pageTitle = `PG in ${name}`;
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage} />
+      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
 

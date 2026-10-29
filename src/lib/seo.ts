@@ -44,8 +44,11 @@ export function absoluteUrl(path: string): string {
  */
 export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
     const canonicalHref = input.canonicalUrl ?? absoluteUrl(input.path ?? '/');
-    const hasBrandSuffix = /makemystay/i.test(input.title);
-    const title = hasBrandSuffix ? input.title : `${input.title} | MakeMyStay`;
+    const stripped = input.title
+        .replace(/(\s*[|–—-]\s*MakeMyStay(?:\.ai)?)+$/i, '')
+        .trim();
+    const hasBrandSuffix = /makemystay/i.test(stripped);
+    const title = hasBrandSuffix ? stripped : `${stripped} | MakeMyStay`;
     return {
         title: title.slice(0, 75), // Keep full title without truncating brand suffix
         description: input.description.slice(0, 165), // Allow full 150-160 char SEO descriptions
@@ -315,7 +318,7 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'PG in Bangalore | Coliving, Rental Homes, 1 BHK & 2 BHK',
+        title: 'Verified PGs & Flats in Bangalore',
         description:
             'Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in Bangalore with makemystay.ai.',
         path: '/',

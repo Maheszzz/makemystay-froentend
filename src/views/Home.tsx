@@ -1,7 +1,7 @@
 'use client';
 
-
-
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
@@ -9,47 +9,33 @@ import { Hero } from '@/components/sections/Hero';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { HOME_PG_FAQS } from '@/data/homePgSeo';
 import {
+    homeHeroSearchUrl,
     homeHeroTabToListingsCategory,
     parseHomeHeroTab,
     type HomeHeroNavigateTab,
     type ListingsCategoryKey,
 } from '@/lib/listingsCategoryHubs';
-import { useSearchParams, useNavigate } from '@/lib/navigation';
+import { useSearchParams } from '@/lib/navigation';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { HomeBelowFold } from '@/views/HomeBelowFold';
-import { useCallback, useEffect, useMemo, useState, Suspense } from 'react';
-import { homeHeroSearchUrl } from '@/lib/listingsCategoryHubs';
+import type { Property } from '@/types/api';
 
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
-
-function HomeInner() {
+/**
+ * Isolated leaf component to read URL search parameters.
+ * Only this tiny child bails out in Suspense, preserving static/ISR HTML for the rest of the page.
+ */
+function HomeUrlSync({ onChange }: { onChange: (q: string, cat: string | null) => void }) {
     const [searchParams, setSearchParams] = useSearchParams();
-    const navigate = useNavigate();
-    const searchQuery = searchParams.get('q') || '';
-    const heroTab = parseHomeHeroTab(searchParams.get('cat') ?? searchParams.get('category'));
-    const listingsCategory = useMemo(() => homeHeroTabToListingsCategory(heroTab), [heroTab]);
-
-    const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
-    const [heroFilters, setHeroFilters] = useState<HeroSearchFilters>({
-        city: 'bangalore',
-        property_type: '',
-        min_price: undefined,
-        max_price: undefined,
-        amenity: '',
-        gender: '',
-        move_in: '',
-    });
+    const q = searchParams.get('q') || '';
+    const cat = searchParams.get('cat') ?? searchParams.get('category');
 
     useEffect(() => {
-        const hasShownHomeSafety = sessionStorage.getItem('hasShownHomeSafety');
-        if (!hasShownHomeSafety) {
-            setIsSafetyPopupOpen(true);
-            sessionStorage.setItem('hasShownHomeSafety', 'true');
-        }
-    }, []);
+        onChange(q, cat);
+    }, [q, cat, onChange]);
 
-    // Legacy `/?category=rent` → `/?cat=rent` on homepage (no redirect to hub pages).
+    // Legacy `/?category=rent` → `/?cat=rent` cleanup in leaf
     useEffect(() => {
         const legacy = searchParams.get('category');
         if (!legacy) return;
@@ -79,60 +65,98 @@ function HomeInner() {
         );
     }, [searchParams, setSearchParams]);
 
-    const setSearchQuery = useCallback(
-        (newQuery: string) => {
-            setSearchParams(
-                (prev) => {
-                    const next = new URLSearchParams(prev);
-                    if (newQuery) {
-                        next.set('q', newQuery);
-                    } else {
-                        next.delete('q');
-                    }
-                    return next;
-                },
-                { replace: true }
-            );
-        },
-        [setSearchParams]
-    );
+    return null;
+}
 
-    const setHeroTab = useCallback(
-        (tab: HomeHeroNavigateTab) => {
-            setSearchParams(
-                (prev) => {
-                    const next = new URLSearchParams(prev);
-                    if (tab === 'pg') {
-                        next.delete('cat');
-                    } else {
-                        next.set('cat', tab);
-                    }
-                    return next;
-                },
-                { replace: true }
-            );
+function HomeInner({ initialProperties }: { initialProperties?: Property[] }) {
+    const router = useRouter();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [catParam, setCatParam] = useState<string | null>(null);
+
+    const heroTab = parseHomeHeroTab(catParam);
+    const listingsCategory = useMemo(() => homeHeroTabToListingsCategory(heroTab), [heroTab]);
+
+    const handleUrlChange = useCallback((q: string, c: string | null) => {
+        setSearchQuery(q);
+        setCatParam(c);
+    }, []);
+
+    const [isSafetyPopupOpen, setIsSafetyPopupOpen] = useState(false);
+    const [heroFilters, setHeroFilters] = useState<HeroSearchFilters>({
+        city: 'bangalore',
+        property_type: '',
+        min_price: undefined,
+        max_price: undefined,
+        amenity: '',
+        gender: '',
+        move_in: '',
+    });
+
+    const isDefaultPgFilter =
+        listingsCategory === 'pg' &&
+        !searchQuery.trim() &&
+        heroFilters.city === 'bangalore' &&
+        !heroFilters.property_type &&
+        heroFilters.min_price === undefined &&
+        heroFilters.max_price === undefined &&
+        !heroFilters.amenity &&
+        !heroFilters.gender &&
+        !heroFilters.move_in;
+    const seededProperties = isDefaultPgFilter ? initialProperties : undefined;
+
+    useEffect(() => {
+        const hasShownHomeSafety = sessionStorage.getItem('hasShownHomeSafety');
+        if (!hasShownHomeSafety) {
+            setIsSafetyPopupOpen(true);
+            sessionStorage.setItem('hasShownHomeSafety', 'true');
+        }
+    }, []);
+
+    const handleSearchQueryChange = useCallback(
+        (newQuery: string) => {
+            setSearchQuery(newQuery);
+            const currentParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+            if (newQuery) {
+                currentParams.set('q', newQuery);
+            } else {
+                currentParams.delete('q');
+            }
+            const qs = currentParams.toString();
+            const href = qs ? `/?${qs}` : '/';
+            router.replace(href, { scroll: false });
         },
-        [setSearchParams]
+        [router]
     );
 
     const handleHubTabChange = useCallback(
         (tab: HomeHeroNavigateTab) => {
-            setHeroTab(tab);
+            setCatParam(tab === 'pg' ? null : tab);
+            const currentParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+            if (tab === 'pg') {
+                currentParams.delete('cat');
+            } else {
+                currentParams.set('cat', tab);
+            }
+            const qs = currentParams.toString();
+            const href = qs ? `/?${qs}` : '/';
+            router.replace(href, { scroll: false });
         },
-        [setHeroTab]
+        [router]
     );
 
     const handleListingsNavigate = useCallback(
         (tab: HomeHeroNavigateTab, query: string) => {
             const url = homeHeroSearchUrl(tab, query);
-            navigate(url);
+            router.push(url);
         },
-        [navigate]
+        [router]
     );
-
 
     return (
         <>
+            <Suspense fallback={null}>
+                <HomeUrlSync onChange={handleUrlChange} />
+            </Suspense>
             <JsonLd data={buildFaqPageSchema(HOME_PG_FAQS)} id="home-faq-schema" />
             <JsonLd data={buildHomeOrganizationLocalWebGraph()} id="home-org-local-website-schema" />
 
@@ -142,16 +166,14 @@ function HomeInner() {
                     <Hero
                         category={listingsCategory}
                         searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
+                        setSearchQuery={handleSearchQueryChange}
                         filters={heroFilters}
                         setFilters={setHeroFilters}
                         listingsNavigate={handleListingsNavigate}
                         activeHubTab={heroTab}
                         onHubTabChange={handleHubTabChange}
                     />
-
                 </section>
-
 
                 <HomeBelowFold
                     listingsCategory={listingsCategory}
@@ -161,6 +183,7 @@ function HomeInner() {
                     isSafetyPopupOpen={isSafetyPopupOpen}
                     onSafetyClose={() => setIsSafetyPopupOpen(false)}
                     homeFaqs={HOME_PG_FAQS}
+                    initialProperties={seededProperties}
                 />
             </main>
 
@@ -169,10 +192,6 @@ function HomeInner() {
     );
 }
 
-export default function Home() {
-    return (
-        <Suspense fallback={null}>
-            <HomeInner />
-        </Suspense>
-    );
+export default function Home(props: { initialProperties?: Property[] }) {
+    return <HomeInner {...props} />;
 }

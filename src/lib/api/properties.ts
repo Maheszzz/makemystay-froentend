@@ -9,7 +9,7 @@ import type {
     Review,
 } from '@/types/api';
 
-const REALTY_PATH = '/realty/properties';
+export const REALTY_PATH = '/realty/properties';
 
 /** HTTPS placeholders only — `data:` URIs are often blocked by CSP `img-src`, so cards looked blank while detail pages used real URLs. */
 const PLACEHOLDER_GENERIC =
@@ -25,7 +25,7 @@ const PLACEHOLDER_VILLA =
  * Unwrap list endpoints that may return a bare array, paginated `{ items, total }`,
  * or alternate keys — always coerce to an array so `.map` never runs on a non-array.
  */
-function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
+export function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
     console.log('[normalize] response type:', typeof response);
     console.log('[normalize] keys:', response && typeof response === 'object' ? Object.keys(response as object) : []);
     // 1. Array-first handling: if it's already a bare array, return it directly.

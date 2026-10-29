@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
+import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { buildNoindexUtilitySEO } from '@/lib/seo';
 
-export const metadata: Metadata = {
-    title: 'Wishlist | MakeMyStay',
-    robots: {
-        index: false,
-        follow: false,
-    },
-};
+export const metadata: Metadata = pageSeoToMetadata(
+    buildNoindexUtilitySEO('Wishlist', '/wishlist'),
+);
 
 export const dynamic = 'force-dynamic';
 

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import {
     propertyDetailPageSeo,
+    propertyErrorSeo,
+    propertyUnavailableSeo,
 } from '@/lib/seo';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 
@@ -11,14 +13,15 @@ export async function resolvePropertyPageMetadata(slug: string): Promise<Metadat
     const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
     const property = await fetchPropertyAnySlugServer(param);
 
-    if (!property || property.is_available === false) {
-        return {
-            title: 'Not Found | MakeMyStay',
-            robots: { index: false, follow: false },
-        };
+    if (!property) {
+        return pageSeoToMetadata(propertyErrorSeo(`/property/${param}`));
     }
 
     const detailPath = getPropertyDetailPath(property);
+    if (property.is_available === false) {
+        return pageSeoToMetadata(propertyUnavailableSeo(detailPath, property.location));
+    }
+
     return pageSeoToMetadata(propertyDetailPageSeo(property, detailPath));
 }
 

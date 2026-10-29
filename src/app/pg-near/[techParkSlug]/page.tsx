@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const profile = generateTechParkLandingProfile(techParkSlug);
     if (!profile) {
         return {
-            title: 'PG near Tech Park — MakeMyStay.ai',
+            title: 'PG near Tech Park',
             description: 'Find verified paying guest accommodations near top tech parks in Bangalore.'
         };
     }

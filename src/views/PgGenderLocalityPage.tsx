@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Link, Navigate } from '@/lib/navigation';
+import { useMemo } from 'react';
+import { Link, Navigate, useLocation } from '@/lib/navigation';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -19,7 +19,7 @@ import Properties from '@/views/Properties';
 import { Suspense } from 'react';
 
 function PgGenderLocalityPageBody({ overrideSlug }: { overrideSlug?: string }) {
-
+    const { pathname } = useLocation();
     const slugParam = undefined;
     const slug = (overrideSlug || slugParam || '').toLowerCase();
     const loc = getPgLocationBySlug(slug);
@@ -30,8 +30,6 @@ function PgGenderLocalityPageBody({ overrideSlug }: { overrideSlug?: string }) {
     const audienceLabel = isFemaleHub ? 'Girls PG' : 'Boys PG';
     const canonicalPath = isFemaleHub ? `/pg-for-girls-in-${slug}` : `/pg-for-boys-in-${slug}`;
     const seoVariant = pathname.includes('boys') || pathname.includes('men') ? ('men' as const) : pathname.includes('girls') || pathname.includes('women') ? ('women' as const) : filterGender;
-
-    const [hasEmptyListings, setHasEmptyListings] = useState(false);
 
     if (!loc) {
         return <Navigate to={isFemaleHub ? '/pg-for-girls' : '/pg-for-boys'} replace />;

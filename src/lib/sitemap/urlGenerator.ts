@@ -7,12 +7,12 @@
 
 import { SITE_URL } from '@/lib/siteConfig';
 import { SEO_LOCALITIES } from '@/data/localities';
+import { PG_LOCATIONS } from '@/data/pgLocations';
 import { TECH_PARKS } from '@/data/techParks';
 import { OFFICES } from '@/data/offices';
+import { BLOG_POSTS } from '@/data/blogPosts';
 import { getProgrammaticBlogSlugs } from '@/lib/blog';
 import { getGlobalTopicGraph } from '@/lib/topicGraph';
-import { FEATURED_PROPERTIES } from '@/config/featuredProperties';
-import { titleToSlug } from '@/lib/propertyRouting';
 import { resolveChangeFrequency, type ChangeFreq, type SitemapCategory } from './changeFrequency';
 import { resolvePriority } from './priority';
 
@@ -27,8 +27,8 @@ export interface SitemapImageEntry {
 export interface SitemapUrlEntry {
     /** Absolute canonical URL e.g. "https://makemystay.ai/pg/whitefield" */
     loc: string;
-    /** ISO 8601 date string e.g. "2026-05-15" */
-    lastmod: string;
+    /** Optional ISO 8601 date string (only set when a real timestamp exists) */
+    lastmod?: string;
     /** Change frequency classification */
     changefreq: ChangeFreq;
     /** Priority score (0.0 to 1.0) */
@@ -47,6 +47,8 @@ export function isCanonicalIndexablePath(path: string): boolean {
     if (!path) return false;
     if (path.includes('?') || path.includes('#') || path.includes('=')) return false;
     if (path.startsWith('/pg-in-')) return false; // Non-canonical duplicate of /pg/*
+    if (path.startsWith('/property/')) return false; // Non-canonical redirect to /pg/:id-:slug or /rent/:id-:slug
+    if (path.startsWith('/buy/') && !path.startsWith('/buy/in/')) return false; // Only /buy/in/[city] exists
     if (path.startsWith('/api') || path.startsWith('/_next') || path.startsWith('/admin')) return false;
     return true;
 }
@@ -69,7 +71,7 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
     const registerEntry = (
         path: string,
         category: SitemapCategory,
-        lastmod = '2026-05-15',
+        lastmod?: string,
         images?: SitemapImageEntry[]
     ) => {
         if (!isCanonicalIndexablePath(path)) return;
@@ -82,7 +84,7 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
 
         entries.push({
             loc,
-            lastmod,
+            ...(lastmod ? { lastmod } : {}),
             changefreq,
             priority,
             category,
@@ -91,9 +93,9 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
     };
 
     // 1. Home
-    registerEntry('/', 'home', '2026-05-15', [
+    registerEntry('/', 'home', undefined, [
         {
-            loc: `${SITE_URL}/images/og-default.jpg`,
+            loc: `${SITE_URL}/og-image.jpg`,
             title: 'MakeMyStay Bangalore Coliving & PG Rentals',
             caption: 'Verified Paying Guest stays across Bangalore'
         }
@@ -102,14 +104,25 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
     // 2. Static Core & Category Pages
     const staticPaths = [
         { path: '/properties', category: 'static' as const },
+        { path: '/pg', category: 'static' as const },
+        { path: '/rent', category: 'static' as const },
         { path: '/contact-us', category: 'static' as const },
         { path: '/about', category: 'static' as const },
         { path: '/faq', category: 'static' as const },
         { path: '/how-we-verify', category: 'static' as const },
+        { path: '/research', category: 'static' as const },
+        { path: '/reports', category: 'static' as const },
+        { path: '/statistics', category: 'static' as const },
+        { path: '/pg-vs-flat-bangalore', category: 'static' as const },
         { path: '/flats-in-bangalore', category: 'static' as const },
         { path: '/pg/bangalore', category: 'locality' as const },
+        { path: '/pg/hyderabad', category: 'locality' as const },
+        { path: '/pg/pune', category: 'locality' as const },
         { path: '/rent/bangalore', category: 'rent' as const },
+        { path: '/rent/hyderabad', category: 'rent' as const },
+        { path: '/rent/pune', category: 'rent' as const },
         { path: '/buy/in/bangalore', category: 'buy' as const },
+        { path: '/plots/in/bangalore', category: 'static' as const },
         { path: '/blog', category: 'blog' as const }
     ];
     for (const item of staticPaths) {
@@ -128,9 +141,9 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         registerEntry(p, 'category');
     }
 
-    // 3. Locality, Rent Hubs & Buy Hubs
+    // 3. Locality & Rent Hubs
     for (const loc of SEO_LOCALITIES) {
-        registerEntry(`/pg/${loc.slug}`, 'locality', '2026-05-15', [
+        registerEntry(`/pg/${loc.slug}`, 'locality', undefined, [
             {
                 loc: `${SITE_URL}/images/localities/${loc.slug}.jpg`,
                 title: `PG in ${loc.name}`,
@@ -138,12 +151,16 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
             }
         ]);
         registerEntry(`/rent/${loc.slug}`, 'rent');
-        registerEntry(`/buy/${loc.slug}`, 'buy');
+    }
+    for (const loc of PG_LOCATIONS) {
+        registerEntry(`/pg/${loc.slug}`, 'locality');
+        registerEntry(`/pg-for-boys-in-${loc.slug}`, 'locality');
+        registerEntry(`/pg-for-girls-in-${loc.slug}`, 'locality');
     }
 
     // 4. Tech Park Landing Pages
     for (const tp of TECH_PARKS) {
-        registerEntry(`/${tp.path}`, 'landing', '2026-05-15', [
+        registerEntry(`/${tp.path}`, 'landing', undefined, [
             {
                 loc: `${SITE_URL}/images/tech-parks/${tp.path}.jpg`,
                 title: `PG near ${tp.name}`,
@@ -157,10 +174,13 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         registerEntry(`/office/${off.slug}`, 'office');
     }
 
-    // 6. Programmatic Blog Articles
+    // 6. Blog Articles (Editorial + Programmatic)
+    for (const post of BLOG_POSTS) {
+        registerEntry(`/blog/${post.slug}`, 'blog');
+    }
     const blogSlugs = getProgrammaticBlogSlugs();
     for (const slug of blogSlugs) {
-        registerEntry(`/blog/${slug}`, 'blog', '2026-05-15', [
+        registerEntry(`/blog/${slug}`, 'blog', undefined, [
             {
                 loc: `${SITE_URL}/images/blog/${slug}.jpg`,
                 title: `${slug.replace(/-/g, ' ')}`,
@@ -169,24 +189,15 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         ]);
     }
 
-    // 7. Featured & Existing Properties
-    for (const propTitle of FEATURED_PROPERTIES) {
-        const slug = titleToSlug(propTitle);
-        if (slug) {
-            registerEntry(`/property/${slug}`, 'property');
-        }
-    }
-
-    // 8. Auto-discover from Topic Graph (future-proofing)
+    // 7. Auto-discover from Topic Graph (excluding non-canonical /property/* and /buy/:slug)
     const graph = getGlobalTopicGraph();
     for (const node of graph.getAllNodes()) {
+        if (node.type === 'property' || node.type === 'buy_page') continue;
         const categoryMap: Record<string, SitemapCategory> = {
             locality: 'locality',
             tech_park: 'landing',
             rent_page: 'rent',
-            buy_page: 'buy',
             office_page: 'office',
-            property: 'property',
             blog: 'blog'
         };
         const mappedCat = categoryMap[node.type] || 'static';

@@ -25,6 +25,10 @@ const STATIC_PATHS = [
     { path: '/compare/whitefield-vs-marathahalli', priority: '0.78', changefreq: 'monthly' },
     { path: '/compare/koramangala-vs-indiranagar', priority: '0.78', changefreq: 'monthly' },
     { path: '/pg-near-me', priority: '0.84', changefreq: 'weekly' },
+    { path: '/pg', priority: '0.9', changefreq: 'daily' },
+    { path: '/pg/bangalore', priority: '0.95', changefreq: 'daily' },
+    { path: '/pg/hyderabad', priority: '0.92', changefreq: 'daily' },
+    { path: '/pg/pune', priority: '0.92', changefreq: 'daily' },
     { path: '/rent', priority: '0.85', changefreq: 'daily' },
     { path: '/rent/bangalore', priority: '0.93', changefreq: 'daily' },
     { path: '/rent/hyderabad', priority: '0.92', changefreq: 'daily' },
@@ -203,7 +207,7 @@ async function fetchAllProperties() {
     let total = Infinity;
 
     while (skip < total) {
-        const url = `${apiBase}/realty/properties?skip=${skip}&limit=${limit}&sort_by=newest`;
+        const url = `${apiBase}/realty/properties?skip=${skip}&limit=${limit}&is_available=true&sort_by=newest`;
         const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) {
             throw new Error(`Failed to fetch property sitemap rows from ${url}: ${response.status}`);
@@ -238,7 +242,7 @@ for (const s of CITY_HUB_PATHS) {
 
 let localitiesBody = '';
 for (const row of locJson) {
-    // localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
 }
@@ -336,6 +340,18 @@ if (existsSync(distDir)) {
     writeFileSync(join(distDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
     writeFileSync(join(distDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
     writeFileSync(join(distDir, 'sitemap.xml'), indexXml);
+    writeFileSync(join(distDir, 'sitemap-all.xml'), wrapUrlset(combinedBody));
+
+    const distPublicDir = join(distDir, 'public');
+    if (existsSync(distPublicDir)) {
+        for (const f of files) {
+            writeFileSync(join(distPublicDir, f.name), wrapUrlset(f.body));
+        }
+        writeFileSync(join(distPublicDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
+        writeFileSync(join(distPublicDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
+        writeFileSync(join(distPublicDir, 'sitemap.xml'), indexXml);
+        writeFileSync(join(distPublicDir, 'sitemap-all.xml'), wrapUrlset(combinedBody));
+    }
 }
 
 const n =

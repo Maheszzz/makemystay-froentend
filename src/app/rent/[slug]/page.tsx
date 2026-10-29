@@ -30,7 +30,7 @@ export default async function RentSlugPage({ params }: PageProps) {
 
     const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
     const property = await fetchPropertyAnySlugServer(param);
-    if (!property || property.is_available === false) {
+    if (!property) {
         const { resolveMissingPropertyRedirect } = await import('@/lib/seoPropertyRedirects');
         const target = resolveMissingPropertyRedirect('rent', param);
         if (target) {
@@ -44,5 +44,21 @@ export default async function RentSlugPage({ params }: PageProps) {
         permanentRedirect(canonicalPath);
     }
 
-    return <PropertyDetails initialProperty={property} slug={param} />;
+    let initialSimilar;
+    if (property.is_available === false) {
+        try {
+            const { fetchPropertiesServer } = await import('@/lib/server/fetchPropertiesServer');
+            const { items } = await fetchPropertiesServer({
+                city: 'bangalore',
+                is_available: true,
+                limit: 6,
+                sort_by: 'review_count_desc',
+            });
+            initialSimilar = items.filter((p) => String(p.id) !== String(property.id)).slice(0, 6);
+        } catch {
+            // Non-blocking fallback for similar properties
+        }
+    }
+
+    return <PropertyDetails initialProperty={property} initialSimilar={initialSimilar} slug={param} />;
 }

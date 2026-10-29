@@ -43,8 +43,29 @@ import { getLocalityComparison } from '@/data/localityComparisons';
 import { resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildTextOgImageUrl } from '@/lib/ogImage';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import { SITE_URL } from '@/lib/siteConfig';
 import { OFFICES } from '@/data/offices';
+
+async function applyNoindexIfEmptyLocality(
+    meta: Metadata,
+    citySlug: string,
+    category: 'pg' | 'rent' = 'pg',
+): Promise<Metadata> {
+    const { items } = await fetchPropertiesServer({
+        category,
+        city: citySlug,
+        is_available: true,
+        limit: 1,
+    });
+    if (items.length === 0) {
+        return {
+            ...meta,
+            robots: { index: false, follow: true },
+        };
+    }
+    return meta;
+}
 
 function pgHyderabadHubSeo(): PageSEOInput {
     return {
@@ -136,12 +157,14 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
     const legacy = resolveLegacyPgSlug(param);
     if (legacy) {
         const legacySeoProfile = getLocalitySeoProfile(legacy);
-        if (legacySeoProfile) return legacySeoProfile.metadata;
+        if (legacySeoProfile) {
+            return applyNoindexIfEmptyLocality(legacySeoProfile.metadata, legacy, 'pg');
+        }
 
         const loc = getPgLocationBySlug(legacy);
         if (loc) {
             const seo = pgLocationSeo(loc.name, loc.slug);
-            return pageSeoToMetadata({
+            const meta = pageSeoToMetadata({
                 ...seo,
                 ogImage: buildTextOgImageUrl({
                     title: seo.title,
@@ -149,19 +172,20 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
                     type: 'PG in Bangalore',
                 }),
             });
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
         }
     }
 
     const localitySeoProfile = getLocalitySeoProfile(param);
     if (localitySeoProfile) {
-        return localitySeoProfile.metadata;
+        return applyNoindexIfEmptyLocality(localitySeoProfile.metadata, param, 'pg');
     }
 
     const loc = getPgLocationBySlug(param);
     if (loc) {
         const profile = resolveLocalityProfile(loc.slug);
         const seo = pgLocationSeo(loc.name, loc.slug);
-        return pageSeoToMetadata({
+        const meta = pageSeoToMetadata({
             ...seo,
             description: profile.quickAnswer.slice(0, 160),
             ogImage: buildTextOgImageUrl({
@@ -170,6 +194,7 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
                 type: 'PG in Bangalore',
             }),
         });
+        return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
     }
 
     return resolvePropertyPageMetadata(param);
@@ -188,7 +213,10 @@ export async function resolveRentSlugMetadata(slug: string): Promise<Metadata> {
     if (param === 'pune') return pageSeoToMetadata(rentPuneHubSeo());
 
     const loc = getPgLocationBySlug(param);
-    if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+    if (loc) {
+        const meta = pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+        return applyNoindexIfEmptyLocality(meta, loc.slug, 'rent');
+    }
 
     return resolvePropertyPageMetadata(param);
 }

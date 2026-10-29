@@ -55,6 +55,9 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
                 <img
                     src={image}
                     alt={title}
+                    width={400}
+                    height={250}
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                     loading="lazy"
                 />

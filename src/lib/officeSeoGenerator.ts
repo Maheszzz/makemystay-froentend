@@ -39,7 +39,7 @@ function computeOfficeStats(properties: Property[]): OfficeStats {
 export function generateOfficeSeoInput(
   officeSlug: string,
   nearbyProperties: Property[]
-): PageSEOInput {
+) {
   const office = OFFICES.find((o) => o.slug === officeSlug);
   const name = office?.name ?? officeSlug.replace(/-/g, ' ');
   const stats = computeOfficeStats(nearbyProperties);

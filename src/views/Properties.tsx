@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link, useLocation, useSearchParams, useNavigate } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -79,14 +80,25 @@ interface PropertiesProps {
     forcedGenderFilter?: 'male' | 'female';
     /** Locality hubs can show a map alongside listings above the fold. */
     showMapPanel?: boolean;
+    /** SSR-seeded properties to render listing cards in static HTML. */
+    initialProperties?: Property[];
+}
+
+function PropertiesUrlSync({ onSync }: { onSync: (qs: string) => void }) {
+    const [searchParams] = useSearchParams();
+    const qs = searchParams.toString();
+    useEffect(() => {
+        onSync(qs);
+    }, [qs, onSync]);
+    return null;
 }
 
 function PropertiesInner({
     initialCategory = 'all',
     initialTypeFilter = 'all',
     initialCity = 'all',
-    pageTitle = 'Find Your Perfect Home',
-    pageSubtitle = 'Browse Professional & Verified Listings',
+    pageTitle = 'Find Your Perfect Stay',
+    pageSubtitle = 'Verified PG, Coliving & Rental Homes in Bangalore',
     hideChrome = false,
     embedRentHubUi = false,
     embedPlotHubUi = false,
@@ -98,22 +110,72 @@ function PropertiesInner({
     onDisplayedListingsForSeo,
     forcedGenderFilter,
     showMapPanel = false,
+    initialProperties,
 }: PropertiesProps) {
+    const router = useRouter();
     const location = useLocation();
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [urlQueryString, setUrlQueryString] = useState('');
+    const searchParams = useMemo(() => new URLSearchParams(urlQueryString), [urlQueryString]);
     const { wishlist } = useWishlist();
 
-    // 1. Initialize state from URL or Props
-    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(
-        (searchParams.get('cat') as any) || initialCategory
+    // 1. Initialize state from Props (URL synced on client via PropertiesUrlSync leaf)
+    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(initialCategory);
+    const [locationFilter, setLocationFilter] = useState(initialCity);
+    const [typeFilter, setTypeFilter] = useState(initialTypeFilter);
+    const [minPrice, setMinPrice] = useState(initialMinPrice);
+    const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
+    const [sortBy, setSortBy] = useState('review_count_desc');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleUrlSync = useCallback(
+        (qs: string) => {
+            setUrlQueryString(qs);
+            const sp = new URLSearchParams(qs);
+            const cat = sp.get('cat') as 'all' | 'pg' | 'rent' | 'buy' | 'plot' | null;
+            if (cat) setCategory(cat);
+            const city = sp.get('city');
+            if (city) setLocationFilter(city);
+            const type = sp.get('type');
+            if (type) setTypeFilter(type);
+            const min = sp.get('min');
+            if (min !== null) setMinPrice(min);
+            const max = sp.get('max');
+            if (max !== null) setMaxPrice(max);
+            const sort = sp.get('sort');
+            if (sort) setSortBy(sort);
+            const q = sp.get('q');
+            if (q !== null) setSearchQuery(q);
+        },
+        [],
     );
-    const [locationFilter, setLocationFilter] = useState(searchParams.get('city') || initialCity);
-    const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || initialTypeFilter);
-    const [minPrice, setMinPrice] = useState(searchParams.get('min') || initialMinPrice);
-    const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || initialMaxPrice);
-    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'review_count_desc');
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+    const setSearchParams = useCallback(
+        (
+            next: URLSearchParams | Record<string, string> | ((prev: URLSearchParams) => URLSearchParams),
+            options?: { replace?: boolean },
+        ) => {
+            const currentQs = typeof window !== 'undefined' ? window.location.search.replace(/^\?/, '') : urlQueryString;
+            let params: URLSearchParams;
+            if (typeof next === 'function') {
+                params = next(new URLSearchParams(currentQs));
+            } else if (next instanceof URLSearchParams) {
+                params = next;
+            } else {
+                params = new URLSearchParams();
+                for (const [k, v] of Object.entries(next)) {
+                    if (v !== undefined && v !== '') params.set(k, v);
+                }
+            }
+            const qs = params.toString();
+            setUrlQueryString(qs);
+            const pathname = location.pathname || '/properties';
+            const href = qs ? `${pathname}?${qs}` : pathname;
+            if (options?.replace) router.replace(href, { scroll: false });
+            else router.push(href, { scroll: false });
+        },
+        [router, location.pathname, urlQueryString],
+    );
     
     const pageQueryParam = searchParams.get('page');
     const listingPageNum = useMemo(() => {
@@ -282,6 +344,17 @@ function PropertiesInner({
         return { ...base, category, property_type: typeFilter === 'all' ? undefined : typeFilter };
     }, [category, searchQuery, typeFilter, minPrice, maxPrice, apiCity, sortBy, priceTier]);
 
+    const isDefaultSeededState =
+        category === initialCategory &&
+        locationFilter === initialCity &&
+        typeFilter === initialTypeFilter &&
+        minPrice === initialMinPrice &&
+        maxPrice === initialMaxPrice &&
+        sortBy === 'review_count_desc' &&
+        !searchQuery.trim() &&
+        listingPageNum === 1 &&
+        !priceTier;
+
     const PAGE_SIZE = 24;
     const {
         properties,
@@ -297,6 +370,7 @@ function PropertiesInner({
         infiniteScroll: true,
         pageSize: PAGE_SIZE,
         initialListingPage: listingPageNum,
+        initialProperties: isDefaultSeededState ? initialProperties : undefined,
     });
 
     const genderFilter = useMemo(() => {
@@ -371,7 +445,10 @@ function PropertiesInner({
             }
 
             if (category !== 'all') {
-                list = list.filter((p) => p.category === category);
+                const byCategory = list.filter((p) => p.category === category);
+                if (byCategory.length > 0 || category !== 'rent') {
+                    list = byCategory;
+                }
             }
 
             if (typeFilter && typeFilter !== 'all') {
@@ -569,6 +646,9 @@ function PropertiesInner({
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
+            <Suspense fallback={null}>
+                <PropertiesUrlSync onSync={handleUrlSync} />
+            </Suspense>
             {listingsHelmet && <SEOHead {...listingsHelmet} />}
             <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
@@ -580,10 +660,10 @@ function PropertiesInner({
                         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <div className="animate-fade-in-up">
                                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight leading-tight mb-4">
-                                    Find Your Perfect Stay
+                                    {pageTitle}
                                 </h1>
                                 <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium mb-8">
-                                    Verified PG, Coliving & Rental Homes in Bangalore
+                                    {pageSubtitle}
                                 </p>
                                 
                                 {/* Premium Filter Chips */}
@@ -1033,9 +1113,5 @@ function PropertiesInner({
 }
 
 export default function Properties(props: PropertiesProps) {
-    return (
-        <Suspense fallback={null}>
-            <PropertiesInner {...props} />
-        </Suspense>
-    );
+    return <PropertiesInner {...props} />;
 }

@@ -25,7 +25,7 @@ import type { Property } from '@/types/api';
  * Server component that renders the office hub page.
  * It fetches a list of nearby properties, builds SEO metadata, and composes UI sections.
  */
-export default async function OfficeLandingPage({ slug }: { slug: string }) {
+export default async function OfficeLandingPage({ slug = '' }: { slug?: string } = {}) {
   // Find office metadata
   const office = OFFICES.find((o) => o.slug === slug);
   if (!office) {
@@ -85,8 +85,8 @@ export default async function OfficeLandingPage({ slug }: { slug: string }) {
         title={seoInput.title}
         description={seoInput.description}
         keywords={seoInput.keywords}
-        canonical={seoInput.canonicalUrl}
-        image={seoInput.ogImage}
+        canonicalHref={seoInput.canonicalHref}
+        ogImage={seoInput.ogImage}
         noindex={seoInput.noindex}
       />
       <BreadcrumbSchema items={breadcrumbItems} />

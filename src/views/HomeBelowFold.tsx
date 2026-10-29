@@ -1,44 +1,19 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
+import { ServicesGrid } from '@/components/modules/services/ServicesGrid';
+import { InvestmentCalculator } from '@/components/modules/calculator/InvestmentCalculator';
+import { About } from '@/components/sections/About';
+import { Problem } from '@/components/sections/Problem';
+import { Solution } from '@/components/sections/Solution';
+import { Comparison } from '@/components/sections/Comparison';
+import { CaseStudy } from '@/components/sections/CaseStudy';
+import { CTA } from '@/components/sections/CTA';
+import { FaqSection } from '@/components/seo/FaqSection';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import type { ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
-
-function SectionFallback({ label }: { label?: string }) {
-    return (
-        <div className="flex justify-center py-16" aria-busy="true" aria-label={label ?? 'Loading section'}>
-            <LoadingSpinner />
-        </div>
-    );
-}
-
-const PropertyGrid = dynamic(
-    () => import('@/components/modules/listings/PropertyGrid').then((m) => ({ default: m.PropertyGrid })),
-    { loading: () => <SectionFallback label="Loading listings" /> },
-);
-
-const ServicesGrid = dynamic(
-    () => import('@/components/modules/services/ServicesGrid').then((m) => ({ default: m.ServicesGrid })),
-    { loading: () => <SectionFallback label="Loading services" /> },
-);
-
-const InvestmentCalculator = dynamic(
-    () => import('@/components/modules/calculator/InvestmentCalculator').then((m) => ({ default: m.InvestmentCalculator })),
-    { loading: () => <SectionFallback /> },
-);
-
-const About = dynamic(() => import('@/components/sections/About').then((m) => ({ default: m.About })));
-const Problem = dynamic(() => import('@/components/sections/Problem').then((m) => ({ default: m.Problem })));
-const Solution = dynamic(() => import('@/components/sections/Solution').then((m) => ({ default: m.Solution })));
-const Comparison = dynamic(() => import('@/components/sections/Comparison').then((m) => ({ default: m.Comparison })));
-const CaseStudy = dynamic(() => import('@/components/sections/CaseStudy').then((m) => ({ default: m.CaseStudy })));
-const CTA = dynamic(() => import('@/components/sections/CTA').then((m) => ({ default: m.CTA })));
-
-const FaqSection = dynamic(
-    () => import('@/components/seo/FaqSection').then((m) => ({ default: m.FaqSection })),
-    { loading: () => <SectionFallback label="Loading FAQ" /> },
-);
+import type { Property } from '@/types/api';
 
 const SafetyPopup = dynamic(
     () => import('@/components/modals/SafetyPopup').then((m) => ({ default: m.SafetyPopup })),
@@ -53,6 +28,7 @@ interface HomeBelowFoldProps {
     isSafetyPopupOpen: boolean;
     onSafetyClose: () => void;
     homeFaqs: { question: string; answer: string }[];
+    initialProperties?: Property[];
 }
 
 export function HomeBelowFold({
@@ -63,6 +39,7 @@ export function HomeBelowFold({
     isSafetyPopupOpen,
     onSafetyClose,
     homeFaqs,
+    initialProperties,
 }: HomeBelowFoldProps) {
     return (
         <>
@@ -72,6 +49,7 @@ export function HomeBelowFold({
                 cardVariant="project"
                 filters={heroFilters}
                 setFilters={setHeroFilters}
+                initialProperties={initialProperties}
             />
 
             <section id="services" className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
