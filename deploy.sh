@@ -6,15 +6,23 @@ set -e
 # ENVIRONMENT SELECTION
 # -----------------------------
 ENV=${1:-production}
-ENV_FILE=".env.$ENV"
+if [[ "$ENV" == "production" ]]; then
+  DEPLOY_ENV_FILE=".deploy.env"
+else
+  DEPLOY_ENV_FILE=".deploy.$ENV.env"
+fi
 
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "❌ Environment file $ENV_FILE not found"
+if [[ ! -f "$DEPLOY_ENV_FILE" ]]; then
+  echo "❌ Deployment config file $DEPLOY_ENV_FILE not found"
+  echo "   Create $DEPLOY_ENV_FILE with DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, and PEM_KEY."
   exit 1
 fi
 
-# Load env file
-export $(grep -v '^#' "$ENV_FILE" | xargs)
+# Load deployment settings (never bundled into Next.js or dist/)
+set -a
+# shellcheck source=/dev/null
+source "$DEPLOY_ENV_FILE"
+set +a
 
 # -----------------------------
 # DEFAULTS
@@ -79,6 +87,8 @@ if [[ "$DEPLOY_SOURCE" != "." && ! -d "$DEPLOY_SOURCE" ]]; then
 fi
 
 if [[ "$DEPLOY_SOURCE" != "." ]]; then
+  # Safety check: never sync env or deploy credential files to web root
+  rm -f "${DEPLOY_SOURCE}"/.env* "${DEPLOY_SOURCE}"/.deploy.env* 2>/dev/null || true
   for hero_asset in hero-sunset.avif hero-sunset-mobile.avif; do
     if [[ ! -f "${DEPLOY_SOURCE}/public/images/blog/${hero_asset}" ]]; then
       echo "❌ Missing ${DEPLOY_SOURCE}/public/images/blog/${hero_asset}"

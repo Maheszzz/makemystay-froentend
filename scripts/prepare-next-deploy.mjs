@@ -21,6 +21,15 @@ cpSync(standalone, out, { recursive: true });
 cpSync(join(root, '.next/static'), join(out, '.next/static'), { recursive: true });
 cpSync(join(root, 'public'), join(out, 'public'), { recursive: true });
 
+// Ensure no env or deploy config files copied by Next standalone tracing leak into dist/ or .next/standalone/
+for (const dir of [out, standalone]) {
+    for (const f of readdirSync(dir)) {
+        if (/^\.(deploy\.)?env/i.test(f)) {
+            rmSync(join(dir, f), { force: true });
+        }
+    }
+}
+
 // Ensure no legacy static sitemap*.xml files exist in public/ or dist/public/ so Next's dynamic /sitemap.xml is served
 for (const dir of [join(root, 'public'), join(out, 'public')]) {
     if (existsSync(dir)) {

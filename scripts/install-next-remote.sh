@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-# Install makemystay-next.service on all production hosts from .env.production
+# Install makemystay-next.service on all production hosts from .deploy.env
 set -e
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-ENV_FILE=".env.production"
-[[ -f "$ENV_FILE" ]] || { echo "Missing $ENV_FILE"; exit 1; }
-export $(grep -v '^#' "$ENV_FILE" | xargs)
+DEPLOY_ENV_FILE=".deploy.env"
+[[ -f "$DEPLOY_ENV_FILE" ]] || { echo "Missing $DEPLOY_ENV_FILE"; exit 1; }
+set -a
+# shellcheck source=/dev/null
+source "$DEPLOY_ENV_FILE"
+set +a
 
-PEM_KEY="${PEM_KEY:?Set PEM_KEY in .env.production}"
-DEPLOY_HOST="${DEPLOY_HOST:?Set DEPLOY_HOST in .env.production}"
+PEM_KEY="${PEM_KEY:?Set PEM_KEY in .deploy.env}"
+DEPLOY_HOST="${DEPLOY_HOST:?Set DEPLOY_HOST in .deploy.env}"
 DEPLOY_USER="${DEPLOY_USER:-ubuntu}"
 APP_DIR="${DEPLOY_PATH:-/var/www/react-app}"
 

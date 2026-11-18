@@ -290,7 +290,7 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
             const isLoaded = await loadRazorpay();
             if (!isLoaded) { alert("Razorpay SDK failed to load. Are you online?"); setIsPaymentProcessing(false); return; }
             const key = getRazorpayKeyId();
-            if (!key) { alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env.local."); setIsPaymentProcessing(false); return; }
+            if (!key) { alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env."); setIsPaymentProcessing(false); return; }
             const order = await paymentApi.createOrder({ amount: option.amount * 100, currency: "INR", payment_type: "booking", payer_name: "Guest User", payer_email: "guest@example.com", payer_phone: "9999999999" });
             const options = {
                 key,

@@ -2,8 +2,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
-const FRONTEND_ROOT = '/Users/maheswaranm/make-my-stay';
-const ENV_LOCAL_PATH = path.join(FRONTEND_ROOT, '.env.local');
+const FRONTEND_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ENV_PATHS = [path.join(FRONTEND_ROOT, '.env'), path.join(FRONTEND_ROOT, '.env.local')];
 
 function parseDotEnvLine(line) {
     const trimmed = line.trim();
@@ -15,17 +15,20 @@ function parseDotEnvLine(line) {
     return [key, value];
 }
 
-async function readEnvLocal() {
-    try {
-        const raw = await readFile(ENV_LOCAL_PATH, 'utf8');
-        const entries = raw
-            .split('\n')
-            .map(parseDotEnvLine)
-            .filter(Boolean);
-        return Object.fromEntries(entries);
-    } catch {
-        return {};
+async function readLocalEnv() {
+    for (const envPath of ENV_PATHS) {
+        try {
+            const raw = await readFile(envPath, 'utf8');
+            const entries = raw
+                .split('\n')
+                .map(parseDotEnvLine)
+                .filter(Boolean);
+            return Object.fromEntries(entries);
+        } catch {
+            // Try next candidate
+        }
     }
+    return {};
 }
 
 async function fetchJson(url) {
@@ -50,10 +53,14 @@ function logSection(title) {
 }
 
 async function main() {
-    const envLocal = await readEnvLocal();
+    const envLocal = await readLocalEnv();
     const configuredBase =
+        process.env.NEXT_PUBLIC_API_BASE_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
         process.env.VITE_API_BASE_URL ||
         process.env.VITE_API_URL ||
+        envLocal.NEXT_PUBLIC_API_BASE_URL ||
+        envLocal.NEXT_PUBLIC_API_URL ||
         envLocal.VITE_API_BASE_URL ||
         envLocal.VITE_API_URL ||
         'http://localhost:8000/api/v1';
