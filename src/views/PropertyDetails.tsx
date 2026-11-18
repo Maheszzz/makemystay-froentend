@@ -35,10 +35,10 @@ import { getFreshnessBadges } from '@/lib/freshness';
 import { PeopleAlsoAsk } from '@/components/seo/PeopleAlsoAsk';
 import { AeoSnippet } from '@/components/seo/AeoSnippet';
 import { buildPropertyHeroIntro, buildPropertySeoHeading } from '@/lib/propertyDetailCopy';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
 import {
     buildPropertyPdpFaqs,
     extractHeroLeadFromNarrative,
-    generatePropertyLongFormContent,
 } from '@/lib/propertyClientSeoNarrative';
 import { findPgLocationForArea } from '@/data/pgLocations';
 import type { Property } from '@/types/api';
@@ -139,14 +139,10 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
         return buildPropertyDetailGraph(property, canonicalDetailPath, undefined, buildPropertyPdpFaqs(property));
     }, [property, canonicalDetailPath]);
 
-    const ratingStarsValue = property ? property.average_rating ?? property.rating ?? 0 : 0;
-    const reviewLabelText = property
-        ? (property.review_count ?? property.reviews ?? 0) > 0
-            ? reviewsLabel(property.review_count ?? property.reviews ?? 0)
-            : property.reviews_list && property.reviews_list.length > 0
-              ? `${property.reviews_list.length} reviews`
-              : ''
-        : '';
+    const ratingSummary = getQualifiedRatingSummary(property, { requireReviewsList: true });
+    const showQualifiedRating = ratingSummary.showRating;
+    const ratingStarsValue = ratingSummary.rating;
+    const reviewLabelText = ratingSummary.showRating ? reviewsLabel(ratingSummary.reviewCount) : '';
 
     const freshnessBadges = useMemo(
         () =>
@@ -453,40 +449,75 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
         return null;
     };
 
-    // Build display features (non-array truthy `{}` must not reach .map)
-    let displayFeatures = Array.isArray(property.features) ? [...property.features] : [];
-    if (isPG) {
-        const standardAmenities = [
-            'High-Speed WiFi',
-            'Nutritious Food',
-            'Daily Housekeeping',
-            'Power Backup',
-            '24/7 Security',
-            'Washing Machine',
-            'Refrigerator',
-            'RO Water Purifier',
-        ];
-        displayFeatures = [...displayFeatures, ...standardAmenities];
-    }
-    displayFeatures = dedupePropertyFeatures(displayFeatures);
+    // Build display features from real API features & explicit boolean flags only (no invented defaults)
+    const rawDisplayFeatures: string[] = Array.isArray(property.features) ? [...property.features] : [];
+    if (property.wifi) rawDisplayFeatures.push('High-speed WiFi');
+    if (property.food) rawDisplayFeatures.push('Food available');
+    if (property.housekeeping) rawDisplayFeatures.push('Housekeeping');
+    if (property.power_backup) rawDisplayFeatures.push('Power backup');
+    if (property.parking) rawDisplayFeatures.push('Parking');
+    if (property.lift) rawDisplayFeatures.push('Lift');
+    if (property.cctv) rawDisplayFeatures.push('CCTV security');
+    if (property.washing_machine) rawDisplayFeatures.push('Washing machine');
+    if (property.geyser) rawDisplayFeatures.push('Geyser');
+    if (property.gym) rawDisplayFeatures.push('Gym');
+    const displayFeatures = dedupePropertyFeatures(rawDisplayFeatures);
 
-    // Description
-    const desc = property.description && property.description.length > 50
-        ? property.description
-        : `Experience premium living at **${displayTitle}** in the heart of **${property.location}**. This luxury ${property.type} offers a perfect blend of comfort and convenience, designed for modern professionals and students.\n\nEnjoy a hassle-free lifestyle with top-tier amenities including high-speed WiFi, nutritious food, and daily housekeeping. The property features spacious rooms with ample natural light, ensuring a pleasant stay. Located close to major tech parks and educational institutions, it provides easy access to public transport and local markets.\n\nBook your slot today and upgrade your living experience with MakeMyStay.`;
+    /** Real API description only — omit when empty rather than inventing copy. */
+    const aboutNarrative = property.description?.trim() || '';
 
-    /** Short description shown in the "About this property" card (2-3 paragraphs max). */
-    const aboutNarrative = property.description?.trim() || desc;
+    /** Real backend-authored SEO narrative (`seo_about`) only — no templated fallback. */
+    const longSeo = property.seo_about?.trim() || '';
 
-    /** Full SEO article moved to "Area Guide" section at the bottom of the page. */
-    const longSeo = generatePropertyLongFormContent(property);
-
-    const aboutWordCount = aboutNarrative.trim().split(/\s+/).filter((w) => w.length > 0).length;
+    const aboutWordCount = aboutNarrative ? aboutNarrative.split(/\s+/).filter((w) => w.length > 0).length : 0;
     const showAboutToggle = aboutWordCount > 200;
 
     const seoHeading = buildPropertySeoHeading(property);
     const heroLead =
-        extractHeroLeadFromNarrative(longSeo, 520) || buildPropertyHeroIntro(property);
+        (aboutNarrative ? extractHeroLeadFromNarrative(aboutNarrative, 320) : '') ||
+        buildPropertyHeroIntro(property);
+
+    const isMonthlyListing =
+        property.category === 'pg' ||
+        property.category === 'rent' ||
+        isPG;
+    const hasNumericPrice = Boolean(property.price && !/request|negotiable/i.test(property.price));
+    const priceLabelTitle =
+        property.category === 'buy'
+            ? 'Sale price'
+            : property.category === 'plot'
+              ? 'Plot price'
+              : 'Rent per month';
+
+    const sharingRows = [
+        { label: 'Single Sharing', price: property.single_price },
+        { label: 'Double Sharing', price: property.double_price },
+        { label: 'Triple Sharing', price: property.triple_price },
+        { label: 'Private Room', price: property.private_price },
+    ].filter((row): row is { label: string; price: number } => typeof row.price === 'number' && row.price > 0);
+
+    const lastVerifiedLabel = (() => {
+        if (!property.last_verified_at) return null;
+        const d = new Date(property.last_verified_at);
+        if (Number.isNaN(d.getTime())) return null;
+        return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    })();
+
+    const depositDisplay = (() => {
+        if (property.deposit_amount !== null && property.deposit_amount !== undefined && property.deposit_amount !== '') {
+            return typeof property.deposit_amount === 'number'
+                ? `₹${property.deposit_amount.toLocaleString('en-IN')}`
+                : String(property.deposit_amount);
+        }
+        return 'Ask for deposit details';
+    })();
+
+    const maintenanceDisplay =
+        typeof meta?.maintenance === 'string' && meta.maintenance.trim()
+            ? meta.maintenance.trim()
+            : typeof meta?.maintenance === 'number'
+              ? `₹${meta.maintenance.toLocaleString('en-IN')}`
+              : null;
     const propertyCity = property?.city || 'Bangalore';
     const crumbLabel = seoHeading.trim();
     const breadcrumbItems = [
@@ -680,13 +711,26 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                             {/* Right: Property Intro Meta */}
                             <div className="w-full lg:w-1/3 xl:w-[38%] text-left">
                                 <div className="flex flex-wrap gap-2 mb-6">
-                                    <span className="px-3 py-1 rounded-lg bg-brand-red text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-brand-red/30">
-                                        {property.tag || (property.is_available ? 'Verified' : 'Limited')}
+                                    <span
+                                        className={`px-3 py-1 rounded-lg text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-lg ${
+                                            property.is_available === false
+                                                ? 'bg-slate-700 shadow-slate-900/30'
+                                                : 'bg-brand-red shadow-brand-red/30'
+                                        }`}
+                                    >
+                                        {property.is_available === false ? 'Fully Booked' : 'Available'}
                                     </span>
-                                    <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] border border-emerald-500/30 flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                        High Demand
-                                    </span>
+                                    {typeof property.units_remaining === 'number' && property.units_remaining > 0 && (
+                                        <span className="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-[0.2em] border border-amber-500/30">
+                                            {property.units_remaining}{' '}
+                                            {property.units_remaining === 1 ? 'unit' : 'units'} left
+                                        </span>
+                                    )}
+                                    {lastVerifiedLabel && (
+                                        <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-[0.2em] border border-emerald-500/30">
+                                            Last verified: {lastVerifiedLabel}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <h1 data-seo="pdp-h1" className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tighter mb-6">
@@ -712,19 +756,25 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                 <div className="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
                                     <div className="flex items-end justify-between gap-4">
                                         <div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Investment / Rent</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">
+                                                {priceLabelTitle}
+                                            </p>
                                             <div className="flex items-baseline gap-2">
                                                 <span className="text-4xl font-black text-white tracking-tighter">{property.price}</span>
-                                                {property.category === 'rent' && <span className="text-lg font-bold text-white/40">/mo</span>}
+                                                {isMonthlyListing && hasNumericPrice && (
+                                                    <span className="text-lg font-bold text-white/50">/mo</span>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-end">
-                                            <div className="flex items-center gap-1.5 text-amber-400 mb-1">
-                                                <Star className="w-4 h-4 fill-amber-400" />
-                                                <span className="text-lg font-black">{ratingStarsValue.toFixed(1)}</span>
+                                        {showQualifiedRating && (
+                                            <div className="flex flex-col items-end">
+                                                <div className="flex items-center gap-1.5 text-amber-400 mb-1">
+                                                    <Star className="w-4 h-4 fill-amber-400" />
+                                                    <span className="text-lg font-black">{ratingStarsValue.toFixed(1)}</span>
+                                                </div>
+                                                <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest">{reviewLabelText}</p>
                                             </div>
-                                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{reviewLabelText}</p>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -753,55 +803,139 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                 <PropertyQuickAnswers property={property} />
                             </section>
 
-                            {/* About Section */}
-                            <section className="relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-brand-red/10 to-amber-500/10 rounded-[3rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                                <div className="relative bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_60px_-25px_rgba(15,23,42,0.1)] overflow-hidden">
-                                    <div className="p-8 md:p-12">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-2xl bg-brand-red/5 flex items-center justify-center">
-                                                    <CalendarDays className="w-6 h-6 text-brand-red" />
-                                                </div>
-                                                <div>
-                                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">About this property</h2>
-                                                    <p className="text-slate-400 text-sm font-medium mt-0.5">Verified & Managed Listing</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2">
-                                                {['Move-in ready', 'No brokerage'].map(tag => (
-                                                    <span key={tag} className="px-3 py-1.5 rounded-xl bg-slate-50 text-slate-500 text-[10px] font-black uppercase tracking-widest border border-slate-100">
-                                                        {tag}
-                                                    </span>
+                            {/* Price by Sharing Table (only when real sharing prices exist) */}
+                            {sharingRows.length > 0 && (
+                                <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-1.5 h-7 bg-brand-red rounded-full" />
+                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                                            Price by sharing
+                                        </h2>
+                                    </div>
+                                    <div className="overflow-hidden rounded-2xl border border-slate-100">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr className="bg-slate-50 border-b border-slate-100">
+                                                    <th className="py-3.5 px-5 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                                                        Room Type
+                                                    </th>
+                                                    <th className="py-3.5 px-5 text-[11px] font-black uppercase tracking-wider text-slate-500 text-right">
+                                                        Monthly Rent
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {sharingRows.map((row) => (
+                                                    <tr key={row.label} className="bg-white">
+                                                        <td className="py-4 px-5 text-sm font-bold text-slate-800">
+                                                            {row.label}
+                                                        </td>
+                                                        <td className="py-4 px-5 text-sm font-black text-slate-900 text-right">
+                                                            ₹{row.price.toLocaleString('en-IN')}
+                                                            <span className="text-xs font-semibold text-slate-500"> /mo</span>
+                                                        </td>
+                                                    </tr>
                                                 ))}
-                                            </div>
-                                        </div>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                            )}
 
-                                        <div className="prose prose-slate max-w-none">
-                                            <div
-                                                className={`text-slate-600 leading-relaxed text-base md:text-lg space-y-6 ${!aboutExpanded && showAboutToggle ? 'max-h-[300px] overflow-hidden' : ''}`}
-                                            >
-                                                {aboutNarrative.split(/\n\n+/).map((block: string, bi: number) => (
-                                                    <p key={bi}>{block}</p>
-                                                ))}
+                            {/* About Section (shown only when real description exists) */}
+                            {aboutNarrative.length > 0 && (
+                                <section className="relative group">
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-brand-red/10 to-amber-500/10 rounded-[3rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                                    <div className="relative bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_60px_-25px_rgba(15,23,42,0.1)] overflow-hidden">
+                                        <div className="p-8 md:p-12">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-2xl bg-brand-red/5 flex items-center justify-center">
+                                                        <CalendarDays className="w-6 h-6 text-brand-red" />
+                                                    </div>
+                                                    <div>
+                                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">About this property</h2>
+                                                        {lastVerifiedLabel && (
+                                                            <p className="text-slate-500 text-sm font-medium mt-0.5">
+                                                                Last verified: {lastVerifiedLabel}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    <span className="px-3 py-1.5 rounded-xl bg-slate-50 text-slate-600 text-[10px] font-black uppercase tracking-widest border border-slate-100">
+                                                        No brokerage
+                                                    </span>
+                                                </div>
                                             </div>
-                                            
-                                            {!aboutExpanded && showAboutToggle && (
-                                                <div className="absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+
+                                            <div className="prose prose-slate max-w-none">
+                                                <div
+                                                    className={`text-slate-600 leading-relaxed text-base md:text-lg space-y-6 ${!aboutExpanded && showAboutToggle ? 'max-h-[300px] overflow-hidden' : ''}`}
+                                                >
+                                                    {aboutNarrative.split(/\n\n+/).map((block: string, bi: number) => (
+                                                        <p key={bi}>{block}</p>
+                                                    ))}
+                                                </div>
+
+                                                {!aboutExpanded && showAboutToggle && (
+                                                    <div className="absolute bottom-32 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                                                )}
+                                            </div>
+
+                                            {showAboutToggle && (
+                                                <button
+                                                    onClick={() => setAboutExpanded(!aboutExpanded)}
+                                                    className="mt-8 px-8 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-brand-red transition-all shadow-lg shadow-slate-900/10"
+                                                >
+                                                    {aboutExpanded ? 'Read less' : 'Read full description'}
+                                                </button>
                                             )}
                                         </div>
-
-                                        {showAboutToggle && (
-                                            <button
-                                                onClick={() => setAboutExpanded(!aboutExpanded)}
-                                                className="mt-8 px-8 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-brand-red transition-all shadow-lg shadow-slate-900/10"
-                                            >
-                                                {aboutExpanded ? 'Read less' : 'Read full description'}
-                                            </button>
-                                        )}
                                     </div>
-                                </div>
-                            </section>
+                                </section>
+                            )}
+
+                            {/* House Rules (hidden until populated by backend) */}
+                            {property.house_rules && property.house_rules.length > 0 && (
+                                <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-5">House Rules</h2>
+                                    <ul className="grid sm:grid-cols-2 gap-3 text-sm text-slate-700 font-medium">
+                                        {property.house_rules.map((rule) => (
+                                            <li
+                                                key={rule}
+                                                className="flex items-start gap-2.5 p-3.5 rounded-xl bg-slate-50 border border-slate-100"
+                                            >
+                                                <span className="w-1.5 h-1.5 rounded-full bg-brand-red mt-2 shrink-0" />
+                                                <span>{rule}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </section>
+                            )}
+
+                            {/* Food Menu (hidden until populated by backend) */}
+                            {property.food_menu && (
+                                <section className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm">
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-5">Food Menu</h2>
+                                    {typeof property.food_menu === 'string' ? (
+                                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                                            {property.food_menu}
+                                        </p>
+                                    ) : (
+                                        <dl className="grid sm:grid-cols-2 gap-3">
+                                            {Object.entries(property.food_menu).map(([day, menu]) => (
+                                                <div key={day} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                                                    <dt className="text-xs font-black uppercase tracking-wider text-slate-500 mb-1">
+                                                        {day}
+                                                    </dt>
+                                                    <dd className="text-sm font-medium text-slate-800">{menu}</dd>
+                                                </div>
+                                            ))}
+                                        </dl>
+                                    )}
+                                </section>
+                            )}
 
                             {/* Visual Tour */}
                             {allImages.length > 0 && (
@@ -993,7 +1127,10 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                         </p>
                                     </div>
                                     <a
-                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}`}
+                                        href={
+                                            property.map_link ||
+                                            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}`
+                                        }
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="px-5 py-3 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
@@ -1080,26 +1217,52 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                     <div className="p-8 space-y-8">
                                         <div className="flex items-center justify-between gap-4">
                                             <div>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Starting from</p>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
+                                                    {priceLabelTitle}
+                                                </p>
                                                 <div className="flex items-baseline gap-1.5">
                                                     <span className="text-4xl font-black text-slate-900 tracking-tighter leading-none">{property.price}</span>
-                                                    {property.category === 'rent' && <span className="text-sm font-bold text-slate-400">/mo</span>}
+                                                    {isMonthlyListing && hasNumericPrice && (
+                                                        <span className="text-sm font-bold text-slate-500">/mo</span>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div className="px-3 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100 shrink-0">
-                                                Verified
+                                            <div className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-xl border border-emerald-100 shrink-0">
+                                                {property.is_available === false ? 'Full' : 'Available'}
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                                <span className="text-sm font-bold text-slate-500">Maintenance</span>
-                                                <span className="text-sm font-black text-emerald-600 uppercase tracking-widest">Included</span>
-                                            </div>
-                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
                                                 <span className="text-sm font-bold text-slate-500">Security Deposit</span>
-                                                <span className="text-sm font-black text-slate-900">1 Month</span>
+                                                <span className="text-sm font-bold text-slate-900 text-right">{depositDisplay}</span>
                                             </div>
+                                            {maintenanceDisplay && (
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
+                                                    <span className="text-sm font-bold text-slate-500">Maintenance</span>
+                                                    <span className="text-sm font-bold text-slate-900 text-right">{maintenanceDisplay}</span>
+                                                </div>
+                                            )}
+                                            {property.notice_period_days !== null && property.notice_period_days !== undefined && (
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
+                                                    <span className="text-sm font-bold text-slate-500">Notice Period</span>
+                                                    <span className="text-sm font-bold text-slate-900 text-right">
+                                                        {property.notice_period_days} days
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {property.gender && (
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
+                                                    <span className="text-sm font-bold text-slate-500">Suitable For</span>
+                                                    <span className="text-sm font-bold text-slate-900 text-right">{property.gender}</span>
+                                                </div>
+                                            )}
+                                            {lastVerifiedLabel && (
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 gap-3">
+                                                    <span className="text-sm font-bold text-slate-500">Last Verified</span>
+                                                    <span className="text-sm font-bold text-slate-900 text-right">{lastVerifiedLabel}</span>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="space-y-4">
@@ -1111,8 +1274,8 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                             >
                                                 {isPaymentProcessing ? 'Processing...' : 'Secure this room now'}
                                             </Button>
-                                            <p className="text-[10px] text-center text-slate-400 font-bold uppercase tracking-widest">
-                                                Instant Confirmation • No Hidden Charges
+                                            <p className="text-[10px] text-center text-slate-500 font-bold uppercase tracking-widest">
+                                                Zero Brokerage • Confirm terms before paying
                                             </p>
                                         </div>
 
@@ -1146,10 +1309,10 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                                 <div className="p-6 rounded-[2rem] bg-amber-50 border border-amber-100">
                                     <div className="flex gap-4">
                                         <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0">
-                                            <Star className="w-5 h-5 text-amber-600 fill-amber-600" />
+                                            <MapPin className="w-5 h-5 text-amber-700" />
                                         </div>
                                         <p className="text-xs font-bold text-amber-900 leading-relaxed">
-                                            This property is a top-rated choice in {property.location} with verified listings and zero brokerage.
+                                            Schedule a direct visit in {property.location} with zero tenant brokerage.
                                         </p>
                                     </div>
                                 </div>
@@ -1163,48 +1326,66 @@ export default function PropertyDetails({ initialProperty, initialSimilar, slug:
                     <BreadcrumbNav items={breadcrumbItems} />
                     <AeoSnippet property={property} />
 
-                    {/* Area Guide & Locality Information — full SEO article, below the fold */}
+                    {/* Backend-authored Area / Property Narrative — only shown when API provides real `seo_about` */}
                     {longSeo && longSeo.trim().length > 80 && (
                         <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
                             <div className="mb-8">
                                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">
-                                    Area Guide
+                                    Property &amp; Locality Details
                                 </p>
                                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                                    Area Guide &amp; Locality Information
+                                    More about {displayTitle}
                                 </h2>
-                                <p className="text-slate-400 text-sm font-medium mt-1">
-                                    Everything you need to know about living in {property.location}
-                                </p>
                             </div>
                             <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
-                                {longSeo.split(/\n\n+/).map((block: string, bi: number) => {
-                                    if (block.startsWith('## ')) {
-                                        return <h2 key={bi} className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">{block.replace('## ', '')}</h2>;
-                                    }
-
-                                    const renderTextWithBold = (text: string) => {
-                                        const parts = text.split(/(\*\*.*?\*\*)/g);
-                                        return parts.map((part, i) => {
-                                            if (part.startsWith('**') && part.endsWith('**')) {
-                                                return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+                                {longSeo
+                                    .replace(/\\(#{1,6})/g, '$1')
+                                    .split(/\n\n+/)
+                                    .map((block: string, bi: number) => {
+                                        const trimmed = block.trim();
+                                        if (/^#{1,6}\s+/.test(trimmed)) {
+                                            const firstNewline = trimmed.indexOf('\n');
+                                            if (firstNewline === -1) {
+                                                return (
+                                                    <h2 key={bi} className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">
+                                                        {trimmed.replace(/^#{1,6}\s+/, '')}
+                                                    </h2>
+                                                );
                                             }
-                                            return part;
-                                        });
-                                    };
+                                            const headingText = trimmed.slice(0, firstNewline).replace(/^#{1,6}\s+/, '');
+                                            const restText = trimmed.slice(firstNewline + 1).trim();
+                                            return (
+                                                <div key={bi}>
+                                                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">
+                                                        {headingText}
+                                                    </h2>
+                                                    {restText && <p className="mb-4 whitespace-pre-line">{restText}</p>}
+                                                </div>
+                                            );
+                                        }
 
-                                    if (block.startsWith('- ')) {
-                                        return (
-                                            <ul key={bi} className="list-disc pl-5 mb-4 space-y-1">
-                                                {block.split('\n').filter(Boolean).map((line, li) => (
-                                                    <li key={li}>{renderTextWithBold(line.replace(/^- /, '').trim())}</li>
-                                                ))}
-                                            </ul>
-                                        );
-                                    }
+                                        const renderTextWithBold = (text: string) => {
+                                            const parts = text.split(/(\*\*.*?\*\*)/g);
+                                            return parts.map((part, i) => {
+                                                if (part.startsWith('**') && part.endsWith('**')) {
+                                                    return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+                                                }
+                                                return part;
+                                            });
+                                        };
 
-                                    return <p key={bi} className="mb-4 whitespace-pre-line">{renderTextWithBold(block)}</p>;
-                                })}
+                                        if (trimmed.startsWith('- ')) {
+                                            return (
+                                                <ul key={bi} className="list-disc pl-5 mb-4 space-y-1">
+                                                    {trimmed.split('\n').filter(Boolean).map((line, li) => (
+                                                        <li key={li}>{renderTextWithBold(line.replace(/^- /, '').trim())}</li>
+                                                    ))}
+                                                </ul>
+                                            );
+                                        }
+
+                                        return <p key={bi} className="mb-4 whitespace-pre-line">{renderTextWithBold(trimmed)}</p>;
+                                    })}
                             </div>
                         </section>
                     )}

@@ -1,22 +1,22 @@
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
-import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
-import { getPropertyDetailPath } from '@/lib/propertyRouting';
-import { propertyDetailPageSeo } from '@/lib/seo';
-import { buildPropertyPdpFaqs } from '@/lib/propertyClientSeoNarrative';
+import { buildClientSeoAbout, buildPropertyPdpFaqs } from '@/lib/propertyClientSeoNarrative';
 import { buildPropertyContentGuide } from '@/lib/propertyContentEngine';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
+import { propertyDetailPageSeo } from '@/lib/seo';
 import type { Property } from '@/types/api';
 
 function plainText(md: string): string {
     return md
         .replace(/\*\*([^*]+)\*\*/g, '$1')
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/#{1,6}\s/g, '')
+        .replace(/^\\?#{1,6}\s*/gm, '')
         .replace(/\s+/g, ' ')
         .trim();
 }
 
 /**
- * Crawler-visible PDP copy (SSR). Interactive UI hydrates in PropertyDetails on top.
+ * Crawler-visible PDP copy (SSR). Uses real property fields only; omits empty sections.
  */
 export function PropertyPdpSeoHtml({ property }: { property: Property }) {
     const path = getPropertyDetailPath(property);
@@ -29,16 +29,16 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
     const guide = buildPropertyContentGuide(property);
     const sections = [
         guide.overview,
-        guide.suitability,
         guide.pricing,
         guide.roomTypes,
         guide.amenities,
-        guide.foodWifiLaundry,
-        guide.safetyAndRules,
-        guide.moveInTerms,
         guide.availabilityContact,
-    ];
-    const reviews = (property.reviews_list || []).filter((review) => review.comment || review.review_text).slice(0, 4);
+    ].filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+    const ratingSummary = getQualifiedRatingSummary(property, { requireReviewsList: true });
+    const reviews = ratingSummary.approvedReviews
+        .filter((review) => review.comment || review.review_text)
+        .slice(0, 6);
 
     return (
         <article
@@ -50,16 +50,19 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
             <p className="mt-2 text-sm text-slate-500">
                 {property.type} · {property.location} · {property.price}
             </p>
-            {about.length > 120 && (
+            {about.length > 40 && (
                 <div className="mt-6 space-y-3 text-slate-700 leading-relaxed text-base">
-                    {about.split(/(?<=[.!?])\s+/).reduce<string[]>((acc, sentence) => {
-                        const last = acc[acc.length - 1];
-                        if (!last || last.length > 400) acc.push(sentence);
-                        else acc[acc.length - 1] = `${last} ${sentence}`;
-                        return acc;
-                    }, []).map((para) => (
-                        <p key={para.slice(0, 48)}>{para}</p>
-                    ))}
+                    {about
+                        .split(/(?<=[.!?])\s+/)
+                        .reduce<string[]>((acc, sentence) => {
+                            const last = acc[acc.length - 1];
+                            if (!last || last.length > 400) acc.push(sentence);
+                            else acc[acc.length - 1] = `${last} ${sentence}`;
+                            return acc;
+                        }, [])
+                        .map((para) => (
+                            <p key={para.slice(0, 48)}>{para}</p>
+                        ))}
                 </div>
             )}
             {sections.map((section) => (
@@ -75,28 +78,22 @@ export function PropertyPdpSeoHtml({ property }: { property: Property }) {
                     )}
                 </section>
             ))}
-            <section className="mt-8">
-                <h2 className="text-lg font-semibold text-slate-900">Local area guide for {guide.locality}</h2>
-                {guide.localityGuide.map((section) => (
-                    <div className="mt-4" key={section.title}>
-                        <h3 className="text-base font-semibold text-slate-900">{section.title}</h3>
-                        <p className="mt-1 text-sm text-slate-700 leading-relaxed">{section.body}</p>
-                    </div>
-                ))}
-            </section>
-            <section className="mt-8">
-                <h2 className="text-lg font-semibold text-slate-900">Commute estimates from {guide.locality}</h2>
-                <ul className="mt-3 grid gap-2 text-sm text-slate-700">
-                    {guide.commute.map((item) => (
-                        <li key={item.destination}>
-                            {item.destination}: {item.note}
-                        </li>
-                    ))}
-                </ul>
-            </section>
+            {guide.nearbyPlaces.length > 0 && (
+                <section className="mt-8">
+                    <h2 className="text-lg font-semibold text-slate-900">Nearby places</h2>
+                    <ul className="mt-3 grid gap-2 text-sm text-slate-700">
+                        {guide.nearbyPlaces.map((place, idx) => (
+                            <li key={place.id || `${place.name}-${idx}`}>
+                                {place.name} ({place.category}) — {place.distance}
+                                {place.travel_time ? ` · ${place.travel_time}` : ''}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
             {reviews.length > 0 && (
                 <section className="mt-8">
-                    <h2 className="text-lg font-semibold text-slate-900">Reviews</h2>
+                    <h2 className="text-lg font-semibold text-slate-900">Tenant reviews</h2>
                     <ul className="mt-3 space-y-3 text-sm text-slate-700">
                         {reviews.map((review) => (
                             <li key={review.id}>

@@ -3,20 +3,20 @@
  * Handles snake_case, casing drift, and common synonyms.
  */
 
-/** Lowercase, underscores → spaces, collapse whitespace */
+/** Lowercase, hyphens & underscores → spaces, collapse whitespace */
 export function normalizeFeatureKey(raw: string): string {
     return raw
         .trim()
         .toLowerCase()
-        .replace(/_/g, ' ')
+        .replace(/[-_]+/g, ' ')
         .replace(/\s+/g, ' ');
 }
 
 /** Preferred display copy when multiple raw strings collapse to one key */
 const PREFERRED_LABEL: Record<string, string> = {
-    'high-speed wifi': 'High-speed WiFi',
+    'high speed wifi': 'High-speed WiFi',
     wifi: 'High-speed WiFi',
-    'wi-fi': 'High-speed WiFi',
+    'wi fi': 'High-speed WiFi',
     'ro water purifier': 'RO water purifier',
     'ro water': 'RO water purifier',
     'power backup': 'Power backup',
@@ -40,8 +40,8 @@ const PREFERRED_LABEL: Record<string, string> = {
  * Keys must already be normalized with normalizeFeatureKey.
  */
 const GENERIC_WHEN_SPECIFIC: [string, string][] = [
-    ['wifi', 'high-speed wifi'],
-    ['wi fi', 'high-speed wifi'],
+    ['wifi', 'high speed wifi'],
+    ['wi fi', 'high speed wifi'],
     ['ro water', 'ro water purifier'],
     ['water purifier', 'ro water purifier'],
     ['security', '24/7 security'],

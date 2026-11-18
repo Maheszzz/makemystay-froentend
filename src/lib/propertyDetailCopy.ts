@@ -28,21 +28,30 @@ export function buildPropertySeoHeading(property: Property): string {
     return `${title} — ${type} in ${locPhrase}`.replace(/\s+/g, ' ').trim();
 }
 
-/** Short intro under H1 (above the fold), ~320 chars max. */
+/** Short factual intro under H1 (above the fold), ~320 chars max. */
 export function buildPropertyHeroIntro(property: Property): string {
     const name = formatPropertyTitle(property.title) || property.title;
     const loc = property.location?.trim() || 'Bangalore';
-    const wifi = property.wifi ? 'WiFi, ' : '';
-    const food = property.food ? 'food options, ' : '';
+    const type = property.type || 'Listing';
+    const furnishing = property.furnishing
+        ? `${property.furnishing.replace(/_/g, ' ')} `
+        : '';
+    const highlights = [
+        property.wifi ? 'WiFi' : '',
+        property.food ? 'food options' : '',
+        property.housekeeping ? 'housekeeping' : '',
+    ].filter(Boolean);
+    const amenitiesText =
+        highlights.length > 0 ? ` Listed features include ${highlights.join(', ')}.` : '';
     const avail =
         property.is_available === false
-            ? 'Limited availability — enquire for current openings.'
-            : 'Book a visit or enquire online.';
+            ? 'Currently booked — enquire for waitlist or nearby alternatives.'
+            : 'Book a direct visit or enquire online.';
 
-    return `${name} in ${loc} offers fully furnished stays with ${wifi}${food}housekeeping, and 24/7 security. Ideal for working professionals and students seeking affordable comfort in Bangalore. ${avail}`.slice(
-        0,
-        320
-    );
+    return `${name} is a ${furnishing}${type} in ${loc}.${amenitiesText} ${avail}`
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 320);
 }
 
 /** Browser tab / OG title: keep readable if the SEO heading is very long. */
