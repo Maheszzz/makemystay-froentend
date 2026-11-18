@@ -66,6 +66,14 @@ export interface RealtyProperty {
     units_remaining?: number | null;
     /** UI tab from API (pg | rent | buy | plot); matches backend PropertyListItem.derive_category. */
     category?: 'pg' | 'rent' | 'buy' | 'plot' | string;
+    /** Optional backend PG / rental policy & pricing breakdown fields (hidden in UI until populated). */
+    gender?: 'male' | 'female' | 'unisex' | 'boys' | 'girls' | 'coed' | string | null;
+    deposit_amount?: number | string | null;
+    notice_period_days?: number | null;
+    house_rules?: string[] | string | null;
+    food_menu?: string | Record<string, string> | null;
+    created_at?: string;
+    updated_at?: string;
     metadata?: Record<string, any>;
     metadata_json?: Record<string, any>;
 }
@@ -154,7 +162,17 @@ export interface Property {
     postedDate?: string;
 
     sharing?: string[];
+    single_price?: number;
+    double_price?: number;
+    triple_price?: number;
+    private_price?: number;
+    starting_price?: number;
     food?: boolean;
+    gender?: string;
+    deposit_amount?: number | string | null;
+    notice_period_days?: number | null;
+    house_rules?: string[];
+    food_menu?: string | Record<string, string>;
 
     // Original Realty fields preserved for reference
     map_link?: string;
@@ -271,11 +289,20 @@ export interface ContactUpdateRequest {
 export interface PropertyCreateRequest {
     title: string;
     location: string;
-    // ... simpler to keep as is for now until we build admin
+    gender?: string | null;
+    deposit_amount?: number | string | null;
+    notice_period_days?: number | null;
+    house_rules?: string[] | string | null;
+    food_menu?: string | Record<string, string> | null;
     [key: string]: any;
 }
 
 export interface PropertyUpdateRequest {
+    gender?: string | null;
+    deposit_amount?: number | string | null;
+    notice_period_days?: number | null;
+    house_rules?: string[] | string | null;
+    food_menu?: string | Record<string, string> | null;
     [key: string]: any;
 }
 

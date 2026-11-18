@@ -235,6 +235,51 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
             ? item.units_remaining
             : null;
 
+    const metaObj = (() => {
+        const m = (item as any).metadata || (item as any).metadata_json;
+        if (typeof m === 'string') {
+            try { return JSON.parse(m); } catch { return {}; }
+        }
+        return m || {};
+    })();
+
+    const positivePrice = (val: unknown): number | undefined =>
+        typeof val === 'number' && Number.isFinite(val) && val > 0 ? val : undefined;
+
+    const rawGender = item.gender ?? metaObj.gender;
+    const normalizedGender =
+        typeof rawGender === 'string' && rawGender.trim() ? rawGender.trim() : undefined;
+
+    const rawDeposit = item.deposit_amount ?? metaObj.deposit_amount ?? metaObj.deposit;
+    const normalizedDeposit =
+        typeof rawDeposit === 'number' && Number.isFinite(rawDeposit) && rawDeposit >= 0
+            ? rawDeposit
+            : typeof rawDeposit === 'string' && rawDeposit.trim()
+              ? rawDeposit.trim()
+              : null;
+
+    const rawNotice = item.notice_period_days ?? metaObj.notice_period_days;
+    const normalizedNotice =
+        typeof rawNotice === 'number' && Number.isFinite(rawNotice) && rawNotice >= 0
+            ? rawNotice
+            : null;
+
+    const rawRules = item.house_rules ?? metaObj.house_rules;
+    const normalizedHouseRules = Array.isArray(rawRules)
+        ? rawRules.map((r) => String(r).trim()).filter(Boolean)
+        : typeof rawRules === 'string' && rawRules.trim()
+          ? rawRules
+                .split(/\r?\n|;/)
+                .map((r) => r.trim())
+                .filter(Boolean)
+          : undefined;
+
+    const rawFoodMenu = item.food_menu ?? metaObj.food_menu;
+    const normalizedFoodMenu =
+        rawFoodMenu && (typeof rawFoodMenu === 'string' ? rawFoodMenu.trim() : Object.keys(rawFoodMenu).length > 0)
+            ? rawFoodMenu
+            : undefined;
+
     return {
         id: item.id,
         slug: item.slug || '',
@@ -270,11 +315,21 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         listing_badge: listingBadge,
         units_remaining: unitsRemaining,
         category: category,
-        description: item.description || `A premium ${item.property_type} property in ${item.location}.`,
+        description: item.description?.trim() || '',
         seo_about: typeof item.seo_about === 'string' && item.seo_about.trim() ? item.seo_about.trim() : undefined,
         sharing: sharingOptions,
+        single_price: positivePrice(item.single_price),
+        double_price: positivePrice(item.double_price),
+        triple_price: positivePrice(item.triple_price),
+        private_price: positivePrice(item.private_price),
+        starting_price: positivePrice(item.starting_price),
         food: item.property_type === 'PG' || featuresList.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
-        features: featuresList.length > 0 ? featuresList : [item.furnishing?.replace('_', ' ') || '', item.property_type].filter(Boolean),
+        gender: normalizedGender,
+        deposit_amount: normalizedDeposit,
+        notice_period_days: normalizedNotice,
+        house_rules: normalizedHouseRules && normalizedHouseRules.length > 0 ? normalizedHouseRules : undefined,
+        food_menu: normalizedFoodMenu,
+        features: featuresList,
         rating: item.average_rating || 0,
         reviews: item.review_count || 0,
         average_rating: item.average_rating,
@@ -288,6 +343,8 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         last_verified_at: item.last_verified_at,
         last_booked_at: item.last_booked_at,
         last_review_at: item.last_review_at,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,
@@ -295,8 +352,6 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         documents: (item as any).documents,
         videos: (() => {
             const rawVideos: any[] = Array.isArray((item as any).videos) ? [...(item as any).videos] : [];
-            const meta = (item as any).metadata || (item as any).metadata_json || {};
-            const metaObj = typeof meta === 'string' ? (() => { try { return JSON.parse(meta); } catch { return {}; } })() : (meta || {});
             const pushYt = (title: string, url: string, isShort = false) => {
                 if (url && typeof url === 'string' && !rawVideos.some((v: any) => (v.video_url === url || v.url === url))) {
                     rawVideos.push({
@@ -319,13 +374,7 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         nearby_places: (item as any).nearby_places,
         seo: (item as any).seo,
         share: (item as any).share,
-        metadata: (() => {
-            const m = (item as any).metadata || (item as any).metadata_json;
-            if (typeof m === 'string') {
-                try { return JSON.parse(m); } catch { return {}; }
-            }
-            return m || {};
-        })(),
+        metadata: metaObj,
     };
 }
 
