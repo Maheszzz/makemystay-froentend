@@ -15,6 +15,7 @@ import {
     type HomeHeroNavigateTab,
     type ListingsCategoryKey,
 } from '@/lib/listingsCategoryHubs';
+import { useScrollMemory } from '@/hooks';
 import { useSearchParams } from '@/lib/navigation';
 import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/schema';
 import { HomeBelowFold } from '@/views/HomeBelowFold';
@@ -70,6 +71,7 @@ function HomeUrlSync({ onChange }: { onChange: (q: string, cat: string | null) =
 
 function HomeInner({ initialProperties }: { initialProperties?: Property[] }) {
     const router = useRouter();
+    useScrollMemory(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [catParam, setCatParam] = useState<string | null>(null);
 

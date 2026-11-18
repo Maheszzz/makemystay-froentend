@@ -56,8 +56,8 @@ export function useSearchParams(): [
             }
             const qs = params.toString();
             const href = qs ? `${pathname}?${qs}` : pathname;
-            if (options?.replace) router.replace(href);
-            else router.push(href);
+            if (options?.replace) router.replace(href, { scroll: false });
+            else router.push(href, { scroll: false });
         },
         [pathname, router, nextParams],
     );

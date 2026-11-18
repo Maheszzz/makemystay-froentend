@@ -8,6 +8,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
     output: 'standalone',
     reactStrictMode: true,
+    experimental: {
+        scrollRestoration: true,
+    },
     eslint: { ignoreDuringBuilds: true },
     typescript: { ignoreBuildErrors: false },
     images: {

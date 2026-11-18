@@ -11,3 +11,4 @@ export { useContacts, useContact } from './useContacts';
 export { useSmartBack } from './useSmartBack';
 export { useSafeReplace } from './useSafeReplace';
 export { usePrerenderReady } from './usePrerenderReady';
+export { useScrollMemory } from './useScrollMemory';

@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useLocation, useNavigate } from '@/lib/navigation';
+import { canGoBackInApp } from '@/lib/scrollNavigation';
 
 type SmartBackOptions = {
     fallback: string;
@@ -13,7 +14,8 @@ type SmartBackOptions = {
 /**
  * Consistent back navigation:
  * - If `location.state[fromKey]` exists (string), navigate to it (replace).
- * - Else if SPA history index > 0, navigate(-1).
+ * - Else if there is in-app / same-origin browser history, go back (`history.back()`)
+ *   so native `popstate` and scroll restoration run cleanly.
  * - Else navigate to fallback (replace).
  */
 export function useSmartBack({ fallback, fromKey = 'from' }: SmartBackOptions) {
@@ -30,12 +32,16 @@ export function useSmartBack({ fallback, fromKey = 'from' }: SmartBackOptions) {
         }
 
         const idx =
-            window.history.state && typeof window.history.state.idx === 'number'
+            typeof window !== 'undefined' &&
+            window.history.state &&
+            typeof window.history.state.idx === 'number'
                 ? window.history.state.idx
                 : 0;
 
-        if (idx > 0) navigate(-1);
-        else navigate(fallback, { replace: true });
+        if (idx > 0 || canGoBackInApp()) {
+            navigate(-1);
+        } else {
+            navigate(fallback, { replace: true });
+        }
     }, [fallback, fromKey, location.state, navigate]);
 }
-

@@ -1,48 +1,86 @@
-import { useEffect, useRef } from "react";
+'use client';
+
+import { useEffect, useRef } from 'react';
 import { useLocation } from '@/lib/navigation';
+import { isPopNavigationForUrl } from '@/lib/scrollNavigation';
+
+function scrollToHashElement(hash: string): () => void {
+    const id = hash.replace(/^#/, '');
+    if (!id) return () => {};
+
+    let cancelled = false;
+    let rafId = 0;
+
+    const tryScroll = (attempt = 0) => {
+        if (cancelled) return;
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempt < 15) {
+            rafId = window.requestAnimationFrame(() => tryScroll(attempt + 1));
+        }
+    };
+
+    const tid = window.setTimeout(() => tryScroll(), 50);
+    return () => {
+        cancelled = true;
+        window.clearTimeout(tid);
+        if (rafId) window.cancelAnimationFrame(rafId);
+    };
+}
 
 export default function ScrollToTop() {
-    const { pathname, hash } = useLocation();
+    const { pathname } = useLocation();
+    const isInitialMount = useRef(true);
     const prevPathname = useRef(pathname);
 
     useEffect(() => {
-        // Only act on actual route changes or initial mount
-        if (hash) {
-            // Hash-based smooth scroll (e.g. /#services)
-            const id = hash.replace('#', '');
-            const tryScroll = (attempt = 0) => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else if (attempt < 10) {
-                    // Retry until element is rendered (Suspense / lazy load)
-                    requestAnimationFrame(() => tryScroll(attempt + 1));
-                }
-            };
-            // Small delay for route transition to complete
-            setTimeout(() => tryScroll(), 50);
-        } else {
-            // Normal page navigation — instant scroll to top
-            window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+        if (typeof window === 'undefined') return;
+        const hash = window.location.hash;
 
-            // Fallback: ensure scroll after Suspense resolves
-            requestAnimationFrame(() => {
-                window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-            });
-
-            // Double fallback for heavy pages
-            const tid = setTimeout(() => {
-                if (window.scrollY > 0) {
-                    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
-                }
-            }, 200);
-
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
             prevPathname.current = pathname;
-            return () => clearTimeout(tid);
+            if (hash) {
+                return scrollToHashElement(hash);
+            }
+            return;
         }
 
+        if (prevPathname.current === pathname) {
+            return;
+        }
         prevPathname.current = pathname;
-    }, [pathname, hash]);
+
+        // Preserve scroll position on browser Back / Forward (`popstate`) navigations.
+        if (isPopNavigationForUrl()) {
+            return;
+        }
+
+        if (hash) {
+            return scrollToHashElement(hash);
+        }
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    }, [pathname]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        let cleanupHashScroll: (() => void) | undefined;
+
+        const onHashChange = () => {
+            cleanupHashScroll?.();
+            if (window.location.hash) {
+                cleanupHashScroll = scrollToHashElement(window.location.hash);
+            }
+        };
+
+        window.addEventListener('hashchange', onHashChange);
+        return () => {
+            cleanupHashScroll?.();
+            window.removeEventListener('hashchange', onHashChange);
+        };
+    }, []);
 
     return null;
 }

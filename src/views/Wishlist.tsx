@@ -1,37 +1,17 @@
 'use client';
 
-import { Link, useLocation } from '@/lib/navigation';
+import { Link } from '@/lib/navigation';
 import { Heart, ArrowLeft, Trash2, TrendingUp } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { useWishlist } from '@/context/WishlistContext';
-import { useEffect } from 'react';
-import { useSmartBack } from '@/hooks';
+import { useScrollMemory, useSmartBack } from '@/hooks';
 
 export default function Wishlist() {
     const { wishlist, clearWishlist } = useWishlist();
-    const location = useLocation();
     const goBack = useSmartBack({ fallback: '/properties' });
-    // Minimal scroll restore for back/forward navigations
-    useEffect(() => {
-        const saved = sessionStorage.getItem(`scroll:${location.key}`);
-        if (!saved) return;
-        const y = Number(saved);
-        if (!Number.isFinite(y)) return;
-        requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'auto' }));
-    }, [location.key]);
-
-    useEffect(() => {
-        const key = location.key;
-        return () => {
-            try {
-                sessionStorage.setItem(`scroll:${key}`, String(window.scrollY || 0));
-            } catch {
-                // ignore
-            }
-        };
-    }, [location.key]);
+    useScrollMemory(true);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col font-sans">

@@ -1,13 +1,63 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { propertyApi } from '@/lib/api';
 import { inferPropertyTypeFromPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import type { Property, PropertyId, ApiError, PaginationParams } from '@/types/api';
 
-/** Stable key for filters (excludes pagination). */
+/** Stable, key-sorted serialization for filters (excludes pagination). */
 function filterKeyFromParams(params?: PaginationParams): string {
-    if (!params) return '';
-    const { skip, limit, page, page_size, ...rest } = params as Record<string, any>;
-    return JSON.stringify(rest);
+    if (!params) return '{}';
+    const record = params as Record<string, unknown>;
+    const sortedEntries = Object.keys(record)
+        .filter((k) => k !== 'skip' && k !== 'limit' && k !== 'page' && k !== 'page_size' && record[k] !== undefined)
+        .sort()
+        .map((k) => [k, record[k]]);
+    return JSON.stringify(Object.fromEntries(sortedEntries));
+}
+
+function toApiError(err: unknown, fallbackMessage: string): ApiError | null {
+    if (!err) return null;
+    if (typeof err === 'object' && 'message' in err) {
+        return err as ApiError;
+    }
+    return { message: fallbackMessage, status: 0, detail: String(err) };
+}
+
+interface PropertiesPagePayload {
+    items: Property[];
+    total?: number;
+    propertyCounts?: Record<string, number>;
+    skip: number;
+}
+
+async function fetchPropertiesPage(
+    params: PaginationParams,
+    skip: number,
+    limit: number,
+): Promise<PropertiesPagePayload> {
+    const response = (await propertyApi.getAll({
+        ...params,
+        skip,
+        limit,
+    })) as unknown;
+
+    const list = Array.isArray(response)
+        ? response
+        : response && typeof response === 'object' && Array.isArray((response as any).items)
+          ? ((response as any).items as Property[])
+          : [];
+
+    const total =
+        !Array.isArray(response) && response && typeof (response as any).total === 'number'
+            ? ((response as any).total as number)
+            : undefined;
+
+    const propertyCounts =
+        !Array.isArray(response) && response && (response as any).property_counts
+            ? ((response as any).property_counts as Record<string, number>)
+            : undefined;
+
+    return { items: list, total, propertyCounts, skip };
 }
 
 export interface UsePropertiesOptions {
@@ -36,183 +86,122 @@ export interface UsePropertiesResult {
 const DEFAULT_PAGE_SIZE = 24;
 
 /**
- * Custom hook to fetch properties from the API with support for advanced filtering, sorting, and infinite scroll.
+ * Custom hook to fetch and cache properties with React Query, supporting filtering, sorting, and infinite scroll.
  */
 export function useProperties(
     params: PaginationParams = {},
-    options: UsePropertiesOptions = {}
+    options: UsePropertiesOptions = {},
 ): UsePropertiesResult {
-    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE, initialListingPage = 1, initialProperties } = options;
+    const {
+        infiniteScroll = false,
+        pageSize = DEFAULT_PAGE_SIZE,
+        initialListingPage = 1,
+        initialProperties,
+    } = options;
     const startPage = Math.max(1, Math.min(500, initialListingPage || 1));
 
     const hasInitialData = Boolean(initialProperties && initialProperties.length > 0);
-    const [properties, setProperties] = useState<Property[]>(initialProperties || []);
-    const [totalCount, setTotalCount] = useState<number>(initialProperties?.length || 0);
-    const [propertyCounts, setPropertyCounts] = useState<Record<string, number> | undefined>(undefined);
-    const [loading, setLoading] = useState<boolean>(!hasInitialData);
-    const [loadingMore, setLoadingMore] = useState<boolean>(false);
-    const [error, setError] = useState<ApiError | null>(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const filterKey = useMemo(() => filterKeyFromParams(params), [params]);
 
-    // Stabilize params by stringifying them as the dependency
-    const paramsString = JSON.stringify(params);
-    const filterKey = useMemo(() => filterKeyFromParams(params), [paramsString]);
-    const seededFilterKeyRef = useRef<string | null>(hasInitialData ? filterKey : null);
+    const queryKey = useMemo(
+        () => ['properties', infiniteScroll ? 'infinite' : 'single', filterKey, pageSize, startPage] as const,
+        [infiniteScroll, filterKey, pageSize, startPage],
+    );
 
-    // Initial fetch and reset when filters change
-    useEffect(() => {
-        if (
-            seededFilterKeyRef.current !== null &&
-            seededFilterKeyRef.current === filterKey &&
-            hasInitialData &&
-            startPage === 1
-        ) {
-            seededFilterKeyRef.current = null;
-            return;
-        }
-        seededFilterKeyRef.current = null;
+    const initialData = useMemo(() => {
+        if (!hasInitialData || startPage !== 1 || !initialProperties) return undefined;
+        return {
+            pages: [
+                {
+                    items: initialProperties,
+                    // If SSR returned a full page without explicit total, allow Load More to probe page 2.
+                    total: initialProperties.length >= pageSize ? undefined : initialProperties.length,
+                    propertyCounts: undefined,
+                    skip: 0,
+                } satisfies PropertiesPagePayload,
+            ],
+            pageParams: [1],
+        };
+    }, [hasInitialData, startPage, initialProperties, pageSize]);
 
-        let isMounted = true;
+    const {
+        data,
+        isLoading,
+        isFetchingNextPage,
+        hasNextPage,
+        fetchNextPage,
+        refetch: queryRefetch,
+        error: queryError,
+    } = useInfiniteQuery({
+        queryKey,
+        initialPageParam: startPage,
+        queryFn: async ({ pageParam }) => {
+            const skip = infiniteScroll ? (pageParam - 1) * pageSize : 0;
+            return fetchPropertiesPage(params, skip, pageSize);
+        },
+        getNextPageParam: (lastPage, allPages) => {
+            if (!infiniteScroll) return undefined;
+            if (lastPage.items.length < pageSize) return undefined;
+            const totalLoaded =
+                (startPage - 1) * pageSize + allPages.reduce((sum, page) => sum + page.items.length, 0);
+            if (typeof lastPage.total === 'number') {
+                return totalLoaded < lastPage.total ? startPage + allPages.length : undefined;
+            }
+            return startPage + allPages.length;
+        },
+        initialData,
+    });
 
-        const fetchInitial = async () => {
-            setLoading(true);
-            setError(null);
-            const initialSkip = infiniteScroll ? (startPage - 1) * pageSize : 0;
-            setPage(infiniteScroll ? startPage : 1);
+    const properties = useMemo(
+        () => data?.pages.flatMap((page) => page.items) ?? [],
+        [data],
+    );
 
-            try {
-                const response = await propertyApi.getAll({
-                    ...params,
-                    skip: initialSkip,
-                    limit: pageSize,
-                }) as any;
-
-                if (isMounted) {
-                    // Hardened: Support both bare array and { items, total, property_counts } format
-                    const list = Array.isArray(response) 
-                        ? response 
-                        : (response && Array.isArray(response.items) ? response.items : []);
-                    
-                    const total = (!Array.isArray(response) && typeof response?.total === 'number')
-                        ? response.total
-                        : list.length;
-
-                    const counts = (!Array.isArray(response) && response?.property_counts)
-                        ? response.property_counts
-                        : undefined;
-
-                    setProperties(list);
-                    setTotalCount(total);
-                    setPropertyCounts(counts);
-                    setHasMore(initialSkip + list.length < total);
-                }
-            } catch (err: unknown) {
-                if (isMounted) {
-                    // Coerce any thrown value into a clean ApiError
-                    const apiErr: ApiError = (
-                        err && typeof err === 'object' && 'message' in err
-                    ) ? (err as ApiError)
-                      : { message: 'Failed to load properties', status: 0, detail: String(err) };
-                    setError(apiErr);
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
+    const totalCount = useMemo(() => {
+        const pages = data?.pages;
+        if (pages) {
+            for (let i = pages.length - 1; i >= 0; i--) {
+                if (typeof pages[i].total === 'number') {
+                    return pages[i].total as number;
                 }
             }
-        };
+        }
+        return properties.length;
+    }, [data, properties.length]);
 
-        void fetchInitial();
-        return () => { isMounted = false; };
-    }, [filterKey, pageSize, startPage, infiniteScroll, hasInitialData]);
+    const propertyCounts = useMemo(() => {
+        const pages = data?.pages;
+        if (!pages) return undefined;
+        for (let i = pages.length - 1; i >= 0; i--) {
+            if (pages[i].propertyCounts) return pages[i].propertyCounts;
+        }
+        return undefined;
+    }, [data]);
 
     const loadMore = useCallback(async () => {
-        if (loading || loadingMore || !hasMore) return;
-
-        setLoadingMore(true);
-        const nextPage = page + 1;
-
+        if (!infiniteScroll || isLoading || isFetchingNextPage || !hasNextPage) return;
         try {
-            const response = await propertyApi.getAll({
-                ...params,
-                skip: (nextPage - 1) * pageSize,
-                limit: pageSize,
-            }) as any;
-
-            // Hardened: Support both bare array and { items, total } format
-            const pageItems = Array.isArray(response) 
-                ? response 
-                : (response && Array.isArray(response.items) ? response.items : []);
-            
-            const total = (!Array.isArray(response) && typeof response?.total === 'number')
-                ? response.total
-                : properties.length + pageItems.length;
-
-            setProperties(prev => [...prev, ...pageItems]);
-            setPage(nextPage);
-            setHasMore((properties.length + pageItems.length) < total);
-            setTotalCount(total);
-            
-            if (!Array.isArray(response) && response?.property_counts) {
-                setPropertyCounts(response.property_counts);
-            }
+            await fetchNextPage();
         } catch (err) {
             console.error('Failed to load more properties:', err);
-        } finally {
-            setLoadingMore(false);
         }
-    }, [loading, loadingMore, hasMore, page, pageSize, params, properties.length]);
+    }, [infiniteScroll, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage]);
 
     const refetch = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-        setPage(1);
-        try {
-            const response = await propertyApi.getAll({
-                ...params,
-                skip: 0,
-                limit: pageSize,
-            }) as any;
-            // Hardened: Support both bare array and { items, total } format
-            const list = Array.isArray(response) 
-                ? response 
-                : (response && Array.isArray(response.items) ? response.items : []);
-            
-            const total = (!Array.isArray(response) && typeof response?.total === 'number')
-                ? response.total
-                : list.length;
-
-            const counts = (!Array.isArray(response) && response?.property_counts)
-                ? response.property_counts
-                : undefined;
-
-            setProperties(list);
-            setTotalCount(total);
-            setPropertyCounts(counts);
-            setHasMore(list.length < total);
-        } catch (err: unknown) {
-            const apiErr: ApiError = (
-                err && typeof err === 'object' && 'message' in err
-            ) ? (err as ApiError)
-              : { message: 'Failed to load properties', status: 0, detail: String(err) };
-            setError(apiErr);
-        } finally {
-            setLoading(false);
-        }
-    }, [params, pageSize]);
+        await queryRefetch();
+    }, [queryRefetch]);
 
     return {
         properties,
         totalCount,
         propertyCounts,
         shownCount: properties.length,
-        loading,
-        loadingMore,
-        error,
-        hasMore,
+        loading: isLoading,
+        loadingMore: isFetchingNextPage,
+        error: toApiError(queryError, 'Failed to load properties'),
+        hasMore: infiniteScroll ? Boolean(hasNextPage) : false,
         loadMore,
-        refetch
+        refetch,
     };
 }
 
@@ -224,56 +213,40 @@ export interface UsePropertyResult {
 }
 
 /**
- * Custom hook to fetch a single property by ID
+ * Custom hook to fetch and cache a single property by ID.
  */
 export function useProperty(
     id: number | string | null | undefined,
     initialProperty?: Property | null,
 ): UsePropertyResult {
-    const [property, setProperty] = useState<Property | null>(initialProperty ?? null);
-    const [loading, setLoading] = useState<boolean>(!initialProperty && Boolean(id));
-    const [error, setError] = useState<ApiError | null>(null);
+    const idKey = id !== null && id !== undefined ? String(id) : '';
+    const matchesInitial = Boolean(initialProperty && idKey && String(initialProperty.id) === idKey);
 
-    const fetchProperty = async () => {
-        if (!id) {
-            setLoading(false);
-            return;
-        }
+    const {
+        data,
+        isLoading,
+        error: queryError,
+        refetch: queryRefetch,
+    } = useQuery({
+        queryKey: ['property', 'id', idKey],
+        queryFn: () => propertyApi.getById(id as number | string),
+        enabled: Boolean(idKey),
+        initialData: matchesInitial ? (initialProperty as Property) : undefined,
+    });
 
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await propertyApi.getById(id);
-            setProperty(data);
-        } catch (err) {
-            setError(err as ApiError);
-            console.error(`Error fetching property ${id}:`, err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (initialProperty && String(initialProperty.id) === String(id)) {
-            setProperty(initialProperty);
-            setError(null);
-            setLoading(false);
-            return;
-        }
-        void fetchProperty();
-    }, [id, initialProperty]);
+    const refetch = useCallback(async () => {
+        if (!idKey) return;
+        await queryRefetch();
+    }, [idKey, queryRefetch]);
 
     return {
-        property,
-        loading,
-        error,
-        refetch: fetchProperty,
+        property: data ?? null,
+        loading: Boolean(idKey) && isLoading,
+        error: toApiError(queryError, 'Failed to load property'),
+        refetch,
     };
 }
 
-/**
- * Custom hook to fetch a single property by type and slug
- */
 /**
  * Resolve PDP data from `/pg|rent|property|properties/:slug` (numeric id or legacy slug-only).
  */
@@ -298,46 +271,30 @@ export function usePropertyBySlug(
     slug: string | undefined,
     initialProperty?: Property | null,
 ): UsePropertyResult {
-    const [property, setProperty] = useState<Property | null>(initialProperty ?? null);
-    const [loading, setLoading] = useState<boolean>(!initialProperty && Boolean(type && slug));
-    const [error, setError] = useState<ApiError | null>(null);
+    const matchesInitial = Boolean(initialProperty && slug && initialProperty.slug === slug);
 
-    const fetchProperty = async () => {
-        if (!type || !slug) {
-            setLoading(false);
-            return;
-        }
+    const {
+        data,
+        isLoading,
+        error: queryError,
+        refetch: queryRefetch,
+    } = useQuery({
+        queryKey: ['property', 'slug', type ?? '', slug ?? ''],
+        queryFn: () => propertyApi.getBySlug(type as string, slug as string),
+        enabled: Boolean(type && slug),
+        initialData: matchesInitial ? (initialProperty as Property) : undefined,
+    });
 
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await propertyApi.getBySlug(type, slug);
-            setProperty(data);
-        } catch (err) {
-            setError(err as ApiError);
-            console.error(`Error fetching property ${type}/${slug}:`, err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (initialProperty && initialProperty.slug === slug) {
-            setProperty(initialProperty);
-            setError(null);
-            setLoading(false);
-            return;
-        }
-        if (slug && type) {
-            void fetchProperty();
-        }
-    }, [type, slug, initialProperty]);
+    const refetch = useCallback(async () => {
+        if (!type || !slug) return;
+        await queryRefetch();
+    }, [type, slug, queryRefetch]);
 
     return {
-        property,
-        loading,
-        error,
-        refetch: fetchProperty,
+        property: data ?? null,
+        loading: Boolean(type && slug) && isLoading,
+        error: toApiError(queryError, 'Failed to load property'),
+        refetch,
     };
 }
 
@@ -353,46 +310,40 @@ export interface UseSimilarPropertiesResult {
  */
 export function useSimilarProperties(
     propertyId: PropertyId | null | undefined,
-    options: { limit?: number; initialProperties?: Property[] } = {}
+    options: { limit?: number; initialProperties?: Property[] } = {},
 ): UseSimilarPropertiesResult {
     const { limit = 6, initialProperties } = options;
     const hasInitial = Boolean(initialProperties && initialProperties.length > 0);
-    const [properties, setProperties] = useState<Property[]>(initialProperties || []);
-    const [loading, setLoading] = useState(!hasInitial);
-    const [error, setError] = useState<ApiError | null>(null);
+    const idKey = propertyId !== null && propertyId !== undefined ? String(propertyId) : '';
+
+    const {
+        data,
+        isLoading,
+        error: queryError,
+        refetch: queryRefetch,
+    } = useQuery({
+        queryKey: ['property', 'similar', idKey, limit],
+        queryFn: async () => {
+            const res = (await propertyApi.getSimilar(propertyId as PropertyId, { limit })) as unknown;
+            if (Array.isArray(res)) return res as Property[];
+            if (res && typeof res === 'object' && Array.isArray((res as any).items)) {
+                return (res as any).items as Property[];
+            }
+            return [] as Property[];
+        },
+        enabled: Boolean(idKey),
+        initialData: hasInitial ? initialProperties : undefined,
+    });
 
     const refetch = useCallback(async () => {
-        if (propertyId === null || propertyId === undefined) {
-            setProperties([]);
-            setLoading(false);
-            setError(null);
-            return;
-        }
-        setLoading(true);
-        setError(null);
-        try {
-            const res = await propertyApi.getSimilar(propertyId, { limit });
-            // Hardened: Support both bare array and { items, total } format
-            if (Array.isArray(res)) {
-                setProperties(res);
-            } else if (res && Array.isArray(res.items)) {
-                setProperties(res.items);
-            } else {
-                setProperties([]);
-            }
-        } catch (err: any) {
-            setError(err as ApiError);
-            setProperties([]);
-            console.error(`Error fetching similar properties for ${propertyId}:`, err);
-        } finally {
-            setLoading(false);
-        }
-    }, [propertyId, limit]);
+        if (!idKey) return;
+        await queryRefetch();
+    }, [idKey, queryRefetch]);
 
-    useEffect(() => {
-        if (hasInitial) return;
-        void refetch();
-    }, [refetch, hasInitial]);
-
-    return { properties, loading, error, refetch };
+    return {
+        properties: data ?? [],
+        loading: Boolean(idKey) && isLoading,
+        error: toApiError(queryError, 'Failed to load similar properties'),
+        refetch,
+    };
 }

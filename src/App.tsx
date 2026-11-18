@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from '@/lib/navigation';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { MobileBottomCTA } from './components/layout/MobileBottomCTA';
@@ -147,8 +148,20 @@ function CityProperties({ category, title, subtitle }: { category: any, title?: 
     />;
 }
 
+const appQueryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 30 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
+
 function App() {
     return (
+        <QueryClientProvider client={appQueryClient}>
         <Router>
             <AuthProvider>
                 <WishlistProvider>
@@ -245,6 +258,7 @@ function App() {
                 </WishlistProvider>
             </AuthProvider>
         </Router>
+        </QueryClientProvider>
     );
 }
 

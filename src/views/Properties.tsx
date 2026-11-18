@@ -7,9 +7,8 @@ import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties, useListingLocalityOptions } from '@/hooks';
+import { useProperties, useListingLocalityOptions, useScrollMemory } from '@/hooks';
 import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
@@ -116,6 +115,7 @@ function PropertiesInner({
     const location = useLocation();
     const navigate = useNavigate();
     const [urlQueryString, setUrlQueryString] = useState('');
+    const [hasUrlSynced, setHasUrlSynced] = useState(false);
     const searchParams = useMemo(() => new URLSearchParams(urlQueryString), [urlQueryString]);
     const { wishlist } = useWishlist();
 
@@ -133,21 +133,16 @@ function PropertiesInner({
             setUrlQueryString(qs);
             const sp = new URLSearchParams(qs);
             const cat = sp.get('cat') as 'all' | 'pg' | 'rent' | 'buy' | 'plot' | null;
-            if (cat) setCategory(cat);
-            const city = sp.get('city');
-            if (city) setLocationFilter(city);
-            const type = sp.get('type');
-            if (type) setTypeFilter(type);
-            const min = sp.get('min');
-            if (min !== null) setMinPrice(min);
-            const max = sp.get('max');
-            if (max !== null) setMaxPrice(max);
-            const sort = sp.get('sort');
-            if (sort) setSortBy(sort);
-            const q = sp.get('q');
-            if (q !== null) setSearchQuery(q);
+            setCategory(cat ?? initialCategory);
+            setLocationFilter(sp.get('city') ?? initialCity);
+            setTypeFilter(sp.get('type') ?? initialTypeFilter);
+            setMinPrice(sp.get('min') ?? initialMinPrice);
+            setMaxPrice(sp.get('max') ?? initialMaxPrice);
+            setSortBy(sp.get('sort') ?? 'review_count_desc');
+            setSearchQuery(sp.get('q') ?? '');
+            setHasUrlSynced(true);
         },
-        [],
+        [initialCategory, initialCity, initialTypeFilter, initialMinPrice, initialMaxPrice],
     );
 
     const setSearchParams = useCallback(
@@ -189,6 +184,7 @@ function PropertiesInner({
  
     // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
     useEffect(() => {
+        if (!hasUrlSynced) return;
         const timer = setTimeout(() => {
             const params: Record<string, string> = {};
             const onPropertiesIndex = location.pathname === '/properties';
@@ -234,6 +230,7 @@ function PropertiesInner({
         searchQuery,
         hideChrome,
         initialCity,
+        hasUrlSynced,
         setSearchParams,
         searchParams,
         pageQueryParam,
@@ -268,25 +265,6 @@ function PropertiesInner({
             setCategory(initialCategory);
         }
     }, [initialCategory]);
-
-    // 3. Restore scroll position
-    useEffect(() => {
-        const key = location.key;
-        const saved = sessionStorage.getItem(`scroll:${key}`);
-        if (!saved) return;
-        const y = Number(saved);
-        if (Number.isFinite(y)) {
-            requestAnimationFrame(() => window.scrollTo({ top: y, behavior: 'auto' }));
-        }
-    }, [location.key]);
-
-    // Save scroll position
-    useEffect(() => {
-        const key = location.key;
-        return () => {
-            sessionStorage.setItem(`scroll:${key}`, String(window.scrollY || 0));
-        };
-    }, [location.key]);
 
     /** Metro slug when "Entire Bangalore" / hub default applies (not all-India). */
     const defaultMetroSlug = useMemo(() => {
@@ -372,6 +350,11 @@ function PropertiesInner({
         initialListingPage: listingPageNum,
         initialProperties: isDefaultSeededState ? initialProperties : undefined,
     });
+
+    const syncedFullUrl = urlQueryString
+        ? `${location.pathname}?${urlQueryString}`
+        : location.pathname;
+    useScrollMemory(hasUrlSynced && !loading, { urlKey: syncedFullUrl });
 
     const genderFilter = useMemo(() => {
         if (forcedGenderFilter) return forcedGenderFilter;
@@ -928,8 +911,38 @@ function PropertiesInner({
 
                     {/* 5. Main Content Grid */}
                     {loading && propertyListOrdered.length === 0 ? (
-                        <div className="py-32 text-center">
-                            <LoadingSpinner size={48} message="Fetching verified listings..." />
+                        <div
+                            className={`grid gap-6 md:gap-8 ${
+                                hideChrome
+                                    ? showMapPanel
+                                        ? 'md:grid-cols-2'
+                                        : 'md:grid-cols-2 xl:grid-cols-3'
+                                    : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                            }`}
+                            aria-busy="true"
+                            aria-label="Loading properties"
+                        >
+                            {Array.from({ length: 8 }).map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className="bg-white rounded-[24px] border border-gray-200 overflow-hidden flex flex-col animate-pulse"
+                                >
+                                    <div className="w-full aspect-[16/10] bg-slate-200" />
+                                    <div className="p-5 flex flex-col gap-3">
+                                        <div className="h-3 w-24 bg-slate-200 rounded" />
+                                        <div className="h-5 w-3/4 bg-slate-200 rounded" />
+                                        <div className="h-3.5 w-1/2 bg-slate-100 rounded" />
+                                        <div className="flex gap-2 mt-1">
+                                            <div className="h-6 w-16 bg-slate-100 rounded-md" />
+                                            <div className="h-6 w-20 bg-slate-100 rounded-md" />
+                                        </div>
+                                        <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between">
+                                            <div className="h-6 w-20 bg-slate-200 rounded" />
+                                            <div className="h-9 w-28 bg-slate-200 rounded-full" />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : error ? (
                         <div className="py-20">
