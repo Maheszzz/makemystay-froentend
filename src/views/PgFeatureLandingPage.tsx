@@ -7,7 +7,6 @@ import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { buildPageSEO, pgFeatureLandingSeo, pgFeaturePathToKind } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/views/Properties';
@@ -74,23 +73,10 @@ function featureIntro(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single'
     return { h1: titles[kind], lead: leads[kind], body: bodies[kind] };
 }
 
-function filtersReady(kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single', sp: URLSearchParams): boolean {
-    if (sp.get('cat') !== 'pg' || sp.get('city') !== 'Bangalore') return false;
-    if (kind === 'wifi') return sp.get('wifi') === 'true';
-    if (kind === 'food') return sp.get('food') === 'true';
-    if (kind === 'ac') return sp.get('ac') === 'true';
-    if (kind === 'girls') return sp.get('gender') === 'female' || sp.get('gender') === 'Female';
-    if (kind === 'boys') return sp.get('gender') === 'male' || sp.get('gender') === 'Male';
-    return sp.get('beds') === '1' || !!sp.get('sharing')?.includes('Single');
-}
-
-function PgFeatureLandingPageInner() {
-    const { pathname } = useLocation();
-    const [searchParams, setSearchParams] = useSearchParams();
-    const kind = pgFeaturePathToKind(pathname);
+function PgFeatureUrlSync({ kind }: { kind: 'wifi' | 'food' | 'ac' | 'girls' | 'boys' | 'single' }) {
+    const [, setSearchParams] = useSearchParams();
 
     useLayoutEffect(() => {
-        if (!kind) return;
         const params: Record<string, string> = { cat: 'pg', city: 'Bangalore' };
         if (kind === 'wifi') params.wifi = 'true';
         if (kind === 'food') params.food = 'true';
@@ -101,22 +87,15 @@ function PgFeatureLandingPageInner() {
         setSearchParams(params, { replace: true });
     }, [kind, setSearchParams]);
 
+    return null;
+}
+
+export default function PgFeatureLandingPage() {
+    const { pathname } = useLocation();
+    const kind = pgFeaturePathToKind(pathname);
+
     if (!kind) {
         return <Navigate to="/pg" replace />;
-    }
-
-    const ready = filtersReady(kind, searchParams);
-
-    if (!ready) {
-        return (
-            <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-                <Navbar />
-                <div className="flex-grow flex items-center justify-center pt-24 pb-32">
-                    <LoadingSpinner message="Applying filters for your search…" />
-                </div>
-                <Footer />
-            </div>
-        );
     }
 
     const seo = pgFeatureLandingSeo(kind);
@@ -140,6 +119,9 @@ function PgFeatureLandingPageInner() {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+            <Suspense fallback={null}>
+                <PgFeatureUrlSync kind={kind} />
+            </Suspense>
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id={`pg-feature-${kind}-json`} />
 
@@ -202,13 +184,5 @@ function PgFeatureLandingPageInner() {
 
             <Footer />
         </div>
-    );
-}
-
-export default function PgFeatureLandingPage() {
-    return (
-        <Suspense fallback={null}>
-            <PgFeatureLandingPageInner />
-        </Suspense>
     );
 }

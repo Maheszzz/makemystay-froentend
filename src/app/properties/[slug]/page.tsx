@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
-import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
-import { parsePropertySlugParam, getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { notFound, permanentRedirect } from 'next/navigation';
 import PropertyDetails from '@/views/PropertyDetails';
 
@@ -12,22 +11,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return resolvePropertyPageMetadata(slug);
 }
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function PropertyPage({ params }: PageProps) {
     const { slug } = await params;
     const param = (slug || '').toLowerCase();
-    const id = parsePropertySlugParam(param);
     
-    let property = null;
-    if (id) {
-        property = await fetchPropertyByIdServer(id);
-    } else {
-        const { fetchPropertyBySlugServer } = await import('@/lib/server/fetchPropertyById');
-        property = await fetchPropertyBySlugServer('plot', param);
-    }
+    const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
+    const property = await fetchPropertyAnySlugServer(param);
 
-    if (!property || property.is_available === false) notFound();
+    if (!property) {
+        const { resolveMissingPropertyRedirect } = await import('@/lib/seoPropertyRedirects');
+        const target = resolveMissingPropertyRedirect('properties', param);
+        if (target) {
+            permanentRedirect(target);
+        }
+        notFound();
+    }
 
     const canonicalPath = getPropertyDetailPath(property);
     if (`/properties/${param}` !== canonicalPath) {

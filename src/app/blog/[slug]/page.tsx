@@ -1,12 +1,29 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getProgrammaticBlogSlugs } from '@/lib/blog';
 import { resolveBlogSlugMetadata } from '@/lib/routeMetadata';
+import BlogPostView from '@/views/BlogPost';
 
 type PageProps = { params: Promise<{ slug: string }> };
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-    return resolveBlogSlugMetadata(params.slug);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
+    return resolveBlogSlugMetadata(slug);
 }
 
-export const dynamic = 'force-dynamic';
+export async function generateStaticParams() {
+    const slugs = getProgrammaticBlogSlugs();
+    return slugs.map((slug) => ({
+        slug,
+    }));
+}
 
-export { default } from '@/views/BlogPost';
+export const dynamicParams = true;
+export const revalidate = 3600;
+
+export default async function Page({ params }: PageProps) {
+    const { slug } = await params;
+    if (!slug) notFound();
+
+    return <BlogPostView slug={slug} />;
+}

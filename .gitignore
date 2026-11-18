@@ -7,18 +7,26 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies & Build Outputs
 node_modules
 .next
 dist
 dist-ssr
-*.local
-.env*
 build
+tsconfig.tsbuildinfo
+
+# Environment Files (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+.deploy.env
+.deploy.env.*
+*.local
 
 # Cursor / Claude local worktrees (nested git repos)
 .claude/
 
-# Editor directories and files
+# Editor & OS files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -29,8 +37,13 @@ build
 *.sln
 *.sw?
 
-# SSH keys and sensitive files
+# SSH keys, certificates, and server secret snippets
 *.pem
 *.key
+*.crt
+*.p12
 coworker_key
 coworker_key.pub
+deploy/keys/coworker_key*
+deploy/prerender_token.conf
+!deploy/prerender_token.conf.example

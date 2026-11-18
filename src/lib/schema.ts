@@ -60,13 +60,56 @@ export function buildBreadcrumbSchema(items: { name: string; path: string }[]) {
     };
 }
 
+/** Generic ItemList JSON-LD for a list of URLs/names. */
+export function buildItemListSchema(items: { url: string; name: string }[]) {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: items.map((item, idx) => ({
+            '@type': 'ListItem',
+            position: idx + 1,
+            url: item.url,
+            name: item.name,
+        })),
+    };
+}
+
+/** Place JSON-LD schema. */
+export function buildPlaceSchema(options: {
+    name: string;
+    description?: string;
+    address?: string;
+    geo?: { latitude: string; longitude: string };
+}) {
+    const node: Record<string, unknown> = {
+        '@context': 'https://schema.org',
+        '@type': 'Place',
+        name: options.name,
+    };
+    if (options.description) node.description = options.description;
+    if (options.address) node.address = options.address;
+    if (options.geo) {
+        node.geo = {
+            '@type': 'GeoCoordinates',
+            latitude: options.geo.latitude,
+            longitude: options.geo.longitude,
+        };
+    }
+    return node;
+}
+
+export const ORGANIZATION_SCHEMA_ID = `${SITE_URL}/#organization`;
+export const WEBSITE_SCHEMA_ID = `${SITE_URL}/#website`;
+
 /** WebSite + SearchAction for homepage rich results. */
 export function buildWebSiteSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
+        '@id': WEBSITE_SCHEMA_ID,
         name: SITE_NAME,
         url: SITE_URL,
+        publisher: { '@id': ORGANIZATION_SCHEMA_ID },
         potentialAction: {
             '@type': 'SearchAction',
             target: `${SITE_URL}/properties?q={search_term_string}`,
@@ -83,7 +126,7 @@ export function buildAboutPageSchema() {
         name: `About ${SITE_NAME}`,
         url: `${SITE_URL}/about`,
         description: BRAND_EXTENDED,
-        publisher: buildOrganizationSchema(),
+        publisher: { '@id': ORGANIZATION_SCHEMA_ID },
     };
 }
 
@@ -95,15 +138,16 @@ export function buildTrustSignalsSchema() {
         name: `How ${SITE_NAME} Verifies Properties`,
         url: `${SITE_URL}/how-we-verify`,
         description: 'Our robust verification process for PGs and rental properties.',
-        publisher: buildOrganizationSchema(),
+        publisher: { '@id': ORGANIZATION_SCHEMA_ID },
     };
 }
 
-/** Organization — brand entity for homepage @graph (SEO audit: sameAs + legal name). */
+/** Organization — brand entity for layout/homepage @graph (SEO audit: sameAs + legal name + stable @id). */
 export function buildOrganizationSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
+        '@id': ORGANIZATION_SCHEMA_ID,
         name: 'MakeMyStay',
         alternateName: 'MakeMyStay Realty',
         url: SITE_URL,
@@ -118,9 +162,11 @@ export function buildLocalBusinessSchema() {
     return {
         '@context': 'https://schema.org',
         '@type': ['LocalBusiness', 'RealEstateAgent'],
+        '@id': `${SITE_URL}/#localbusiness`,
         name: 'MakeMyStay',
         alternateName: 'MakeMyStay Realty',
         url: SITE_URL,
+        parentOrganization: { '@id': ORGANIZATION_SCHEMA_ID },
         logo: `${SITE_URL}/logo.svg`,
         image: DEFAULT_OG_IMAGE,
         description: BRAND_EXTENDED,
@@ -152,12 +198,11 @@ export function buildLocalBusinessSchema() {
     };
 }
 
-/** Organization + WebSite + LocalBusiness in one graph for the homepage. */
+/** WebSite + LocalBusiness in one graph for the homepage (references Organization by @id). */
 export function buildHomeOrganizationLocalWebGraph() {
     return {
         '@context': 'https://schema.org',
         '@graph': [
-            schemaNodeWithoutContext(buildOrganizationSchema() as Record<string, unknown>),
             schemaNodeWithoutContext(buildWebSiteSchema() as Record<string, unknown>),
             schemaNodeWithoutContext(buildLocalBusinessSchema() as Record<string, unknown>),
         ],
@@ -432,3 +477,7 @@ export function buildPropertyDetailGraph(
         '@graph': graph,
     };
 }
+
+export * from '@/lib/imageSeoEngine';
+export * from '@/lib/imageSitemapEngine';
+

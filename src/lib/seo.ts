@@ -44,11 +44,14 @@ export function absoluteUrl(path: string): string {
  */
 export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
     const canonicalHref = input.canonicalUrl ?? absoluteUrl(input.path ?? '/');
-    const suffix = 'makemystay.ai';
-    const title = input.title.includes(suffix) ? input.title : `${input.title} | ${suffix}`;
+    const stripped = input.title
+        .replace(/(\s*[|–—-]\s*MakeMyStay(?:\.ai)?)+$/i, '')
+        .trim();
+    const hasBrandSuffix = /makemystay/i.test(stripped);
+    const title = hasBrandSuffix ? stripped : `${stripped} | MakeMyStay`;
     return {
-        title: title.slice(0, 60), // Keep it within display limits (approx 60 chars)
-        description: input.description.slice(0, 155), // Max 155 chars for description
+        title: title.slice(0, 75), // Keep full title without truncating brand suffix
+        description: input.description.slice(0, 165), // Allow full 150-160 char SEO descriptions
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
@@ -81,16 +84,9 @@ export function pgListingQueryIsClean(searchParams: URLSearchParams): boolean {
     return true;
 }
 
-/** Stable path for canonical + sharing (sorted keys). */
-export function stablePgListingCanonical(slug: string, searchParams: URLSearchParams): string {
-    const keys = [...searchParams.keys()].filter((k) => PG_LISTING_QUERY_KEYS.has(k)).sort();
-    if (keys.length === 0) return `/pg/${slug}`;
-    const q = new URLSearchParams();
-    for (const k of keys) {
-        const v = searchParams.get(k);
-        if (v !== null && v !== '') q.set(k, v);
-    }
-    return `/pg/${slug}?${q.toString()}`;
+/** Stable path for canonical + sharing (always canonicalize locality pages to clean URL without filter query params). */
+export function stablePgListingCanonical(slug: string, _searchParams?: URLSearchParams): string {
+    return `/pg/${slug}`;
 }
 
 /**
@@ -322,7 +318,7 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'PG in Bangalore | Coliving, Rental Homes, 1 BHK & 2 BHK',
+        title: 'Verified PGs & Flats in Bangalore',
         description:
             'Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in Bangalore with makemystay.ai.',
         path: '/',

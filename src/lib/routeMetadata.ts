@@ -5,6 +5,9 @@ import { getPgNearLandmarkByPath } from '@/data/pgNearLandmarks';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
 import { getTechParkByPath } from '@/data/techParks';
+import { generateTechParkLandingProfile } from '@/lib/landing';
+import { generateProgrammaticBlogPost } from '@/lib/blog';
+import { getLocalitySeoProfile } from '@/lib/locality';
 import { buildTechParkMeta } from '@/lib/techParkContent';
 import { buildNearbyLandmarkSeo } from '@/lib/seoIntentGenerators';
 import {
@@ -40,6 +43,7 @@ import { getLocalityComparison } from '@/data/localityComparisons';
 import { resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildTextOgImageUrl } from '@/lib/ogImage';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { applyNoindexIfEmptyLocality } from '@/lib/server/localityInventory';
 import { SITE_URL } from '@/lib/siteConfig';
 import { OFFICES } from '@/data/offices';
 
@@ -132,10 +136,15 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
 
     const legacy = resolveLegacyPgSlug(param);
     if (legacy) {
+        const legacySeoProfile = getLocalitySeoProfile(legacy);
+        if (legacySeoProfile) {
+            return applyNoindexIfEmptyLocality(legacySeoProfile.metadata, legacy, 'pg');
+        }
+
         const loc = getPgLocationBySlug(legacy);
         if (loc) {
             const seo = pgLocationSeo(loc.name, loc.slug);
-            return pageSeoToMetadata({
+            const meta = pageSeoToMetadata({
                 ...seo,
                 ogImage: buildTextOgImageUrl({
                     title: seo.title,
@@ -143,14 +152,20 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
                     type: 'PG in Bangalore',
                 }),
             });
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
         }
+    }
+
+    const localitySeoProfile = getLocalitySeoProfile(param);
+    if (localitySeoProfile) {
+        return applyNoindexIfEmptyLocality(localitySeoProfile.metadata, param, 'pg');
     }
 
     const loc = getPgLocationBySlug(param);
     if (loc) {
         const profile = resolveLocalityProfile(loc.slug);
         const seo = pgLocationSeo(loc.name, loc.slug);
-        return pageSeoToMetadata({
+        const meta = pageSeoToMetadata({
             ...seo,
             description: profile.quickAnswer.slice(0, 160),
             ogImage: buildTextOgImageUrl({
@@ -159,11 +174,10 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
                 type: 'PG in Bangalore',
             }),
         });
+        return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
     }
 
-    notFound();
-    // Unreachable return to satisfy TypeScript
-    return pageSeoToMetadata({ title: 'Area not found', description: '', path: `/pg/${param}` });
+    return resolvePropertyPageMetadata(param);
 }
 
 /** `/rent/:slug` — mirrors `RentSlugRoute` + `RentLocationPage`. */
@@ -178,27 +192,34 @@ export async function resolveRentSlugMetadata(slug: string): Promise<Metadata> {
     if (param === 'hyderabad') return pageSeoToMetadata(rentHyderabadHubSeo());
     if (param === 'pune') return pageSeoToMetadata(rentPuneHubSeo());
 
-    const loc = getPgLocationBySlug(param);
-    if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+    const loc = getPgLocationBySlug(param) ?? getLocalitySeoProfile(param)?.locality;
+    if (loc) {
+        const meta = pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+        return applyNoindexIfEmptyLocality(meta, loc.slug, 'rent');
+    }
 
-    notFound();
-    // Unreachable return for type safety
-    return pageSeoToMetadata({ title: 'Rent not found', description: '', path: `/rent/${param}` });
+    return resolvePropertyPageMetadata(param);
 }
 
-export function resolvePgGenderLocalityMetadata(
+export async function resolvePgGenderLocalityMetadata(
     slug: string,
     variant: 'boys' | 'girls' | 'men' | 'women',
-): Metadata {
+): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
-    const loc = getPgLocationBySlug(param);
-    const name = loc?.name ?? param.replace(/-/g, ' ');
+    const canonicalSlug = resolveLegacyPgSlug(param) ?? param;
+    const loc = getPgLocationBySlug(canonicalSlug) ?? getLocalitySeoProfile(canonicalSlug)?.locality;
+    const name = loc?.name ?? canonicalSlug.replace(/-/g, ' ');
     const gender =
         variant === 'men' ? 'men' : variant === 'women' ? 'women' : variant === 'boys' ? 'male' : 'female';
-    return pageSeoToMetadata(pgGenderLocalitySeo(name, param, gender));
+    const meta = pageSeoToMetadata(pgGenderLocalitySeo(name, param, gender));
+    return applyNoindexIfEmptyLocality(meta, canonicalSlug, 'pg');
 }
 
 export function resolveBlogSlugMetadata(slug: string): Metadata {
+    const profile = generateProgrammaticBlogPost(slug);
+    if (profile) {
+        return profile.metadata;
+    }
     const post = getBlogPost(slug);
     if (!post) {
         return pageSeoToMetadata({
@@ -226,7 +247,11 @@ export function resolveBlogSlugMetadata(slug: string): Metadata {
 
 /** `/pg-near-[tech-park]` — rich tech park pillar page metadata. */
 export function resolveTechParkMetadata(pathname: string): Metadata {
-    const seg = pathname.replace(/^\/+|\/+$/g, '');
+    const seg = pathname.replace(/^\/+|\/+$/g, '').replace(/^pg-near\//, '');
+    const profile = generateTechParkLandingProfile(seg);
+    if (profile) {
+        return profile.metadata;
+    }
     const park = getTechParkByPath(seg);
     if (park) {
         const meta = buildTechParkMeta(park);
@@ -267,7 +292,7 @@ export function resolveLandmarkPathMetadata(pathname: string): Metadata {
 }
 
 /** Flat SEO URLs handled by `[...path]` catch-all. */
-export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
+export async function resolveCatchAllPathMetadata(pathKey: string): Promise<Metadata> {
     const path = pathKey.startsWith('/') ? pathKey : `/${pathKey}`;
     const seg = path.replace(/^\//, '');
 
@@ -278,15 +303,21 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
     const rentIn = seg.match(/^rent-in-(.+)$/);
     if (rentIn) {
         const slug = hubSlugToPgSlug(rentIn[1]);
-        const loc = getPgLocationBySlug(slug);
-        if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+        const loc = getPgLocationBySlug(slug) ?? getLocalitySeoProfile(slug)?.locality;
+        if (loc) {
+            const meta = pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'rent');
+        }
     }
 
     const flatsForRentIn = seg.match(/^flats-for-rent-in-(.+)$/);
     if (flatsForRentIn) {
         const slug = hubSlugToPgSlug(flatsForRentIn[1]);
-        const loc = getPgLocationBySlug(slug);
-        if (loc) return pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+        const loc = getPgLocationBySlug(slug) ?? getLocalitySeoProfile(slug)?.locality;
+        if (loc) {
+            const meta = pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'rent');
+        }
     }
 
     const near = getPgNearLandmarkByPath(path);
@@ -304,10 +335,10 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
     const priceTier = seg.match(/^pg-in-(.+)-under-(\d+)$/);
     if (priceTier) {
         const baseSlug = hubSlugToPgSlug(priceTier[1]);
-        const loc = getPgLocationBySlug(baseSlug);
+        const loc = getPgLocationBySlug(baseSlug) ?? getLocalitySeoProfile(baseSlug)?.locality;
         if (loc) {
             const seo = pgLocationSeo(loc.name, loc.slug);
-            return pageSeoToMetadata({
+            const meta = pageSeoToMetadata({
                 ...seo,
                 ogImage: buildTextOgImageUrl({
                     title: seo.title,
@@ -315,16 +346,17 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
                     type: 'PG in Bangalore',
                 }),
             });
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
         }
     }
 
     const pgIn = seg.match(/^pg-in-(.+)$/);
     if (pgIn) {
         const baseSlug = hubSlugToPgSlug(pgIn[1]);
-        const loc = getPgLocationBySlug(baseSlug);
+        const loc = getPgLocationBySlug(baseSlug) ?? getLocalitySeoProfile(baseSlug)?.locality;
         if (loc) {
             const seo = pgLocationSeo(loc.name, loc.slug);
-            return pageSeoToMetadata({
+            const meta = pageSeoToMetadata({
                 ...seo,
                 ogImage: buildTextOgImageUrl({
                     title: seo.title,
@@ -332,6 +364,7 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
                     type: 'PG in Bangalore',
                 }),
             });
+            return applyNoindexIfEmptyLocality(meta, loc.slug, 'pg');
         }
     }
 
@@ -344,7 +377,7 @@ export function resolveCatchAllPathMetadata(pathKey: string): Metadata {
 }
 
 /** Known static app routes (pathname without query). */
-export function resolveStaticPathMetadata(pathname: string): Metadata {
+export async function resolveStaticPathMetadata(pathname: string): Promise<Metadata> {
     const path = pathname.split('?')[0] || '/';
     const map: Record<string, PageSEOInput | (() => PageSEOInput)> = {
         '/': buildHomeSEO,

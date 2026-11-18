@@ -12,6 +12,7 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import locJson from '@/data/pg-locations.json';
 import { getPgLocationBySlug } from '@/data/pgLocations';
+import { getLocalitySeoProfile } from '@/lib/locality';
 import { buildRentLocationFaqs } from '@/lib/rentLocalityFaqs';
 import { buildPageSEO, rentLocationHubSeo } from '@/lib/seo';
 import { buildPgHubItemListSchema, buildPgLocationCombinedGraph } from '@/lib/schema';
@@ -21,7 +22,7 @@ import Properties from '@/views/Properties';
 export default function RentLocationPage({ overrideSlug }: { overrideSlug?: string } = {}) {
     const { slug: locationParam } = useParams<{ slug: string }>();
     const param = (overrideSlug || locationParam || '').toLowerCase();
-    const loc = getPgLocationBySlug(param);
+    const loc = getPgLocationBySlug(param) ?? getLocalitySeoProfile(param)?.locality;
 
     if (!loc) {
         return (
@@ -62,7 +63,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
         [hubListingsForSeo, name]
     );
 
-    const [hasEmptyListings, setHasEmptyListings] = useState(false);
+    const [] = useState(false);
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
@@ -161,12 +162,12 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
                         </h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                             {locJson
-                                .filter((l) => l.slug !== slug)
+                                .filter((l) => l.slug && l.slug !== slug)
                                 .slice(0, 12)
                                 .map((item) => (
                                     <Link
                                         key={item.slug}
-                                        to={`/rent/${item.slug}`}
+                                        to={item.slug ? `/rent/${item.slug}` : '#'}
                                         className="group flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-slate-200/80 hover:border-brand-red/30 hover:shadow-md transition-all duration-200"
                                     >
                                         <MapPin className="w-3 h-3 text-slate-400 group-hover:text-brand-red shrink-0 transition-colors" />

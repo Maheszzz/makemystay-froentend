@@ -86,14 +86,22 @@ export function getSitemapXml(type: SitemapType, batchIndex = 0): string {
  */
 export function getAppRouterSitemap(): Array<{
     url: string;
+<<<<<<< HEAD
     lastModified: string;
+=======
+    lastModified?: string;
+>>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
     changeFrequency: string;
     priority: number;
 }> {
     const allUrls = generateAllSitemapUrls();
     return allUrls.map(item => ({
         url: item.loc,
+<<<<<<< HEAD
         lastModified: item.lastmod,
+=======
+        ...(item.lastmod ? { lastModified: item.lastmod } : {}),
+>>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
         changeFrequency: item.changefreq,
         priority: Number(item.priority.toFixed(2))
     }));

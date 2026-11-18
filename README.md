@@ -1,50 +1,23 @@
-
 <div align="center">
-  <img src="https://img.shields.io/badge/MakeMyStay-realty-red?style=for-the-badge&logo=homeassistant" alt="MakeMyStay Logo" width="80" height="auto" />
-  <h1>MakeMyStay.ai</h1>
-  <p>The first AI-native revenue engine for co-living and rental operators. Automate growth today.</p>
-
-  <p>
-    <a href="https://react.dev/">
-      <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-    </a>
-    <a href="https://vitejs.dev/">
-      <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" alt="Vite" />
-    </a>
-    <a href="https://tailwindcss.com/">
-      <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-    </a>
-    <a href="https://www.typescriptlang.org/">
-      <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-    </a>
-  </p>
+  <h1>MakeMyStay.ai Frontend</h1>
+  <p>Next.js App Router + React 19 frontend for MakeMyStay.ai (with optional Vite SPA mode).</p>
 </div>
 
 ---
 
-## 🚀 Features
+## Tech Stack & Requirements
 
-- **Modern & Responsive Design**: Built with React 19 and TailwindCSS for a seamless experience across all devices.
-- **Dynamic Property Listings**: Browse and search properties with real-time filtering options.
-- **AI-Powered Insights**: Leveraging AI to optimize revenue and management for property operators.
-- **Service Showcases**: Detailed pages for Property Management, Revenue Optimization, Tenant Acquisition, and Market Intelligence.
-- **Contact Integration**: Integrated contact forms and direct links to sales and support teams.
+- **Node.js**: `20.x` (LTS)
+- **npm**: `10.x+`
+- **Frameworks**: Next.js 15 (App Router, `output: 'standalone'`), React 19, TypeScript 5.7, TailwindCSS v4, Vite 7
 
-## 🛠️ Tech Stack
+---
 
-- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [TailwindCSS v4](https://tailwindcss.com/)
-- **Routing**: [React Router v7](https://reactrouter.com/)
-- **Icons**: [Lucide React](https://lucide.dev/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **HTTP Client**: [Axios](https://axios-http.com/)
-
-## 📦 Installation
+## Local Developer Setup
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone <frontend-repository-url>
    cd make-my-stay
    ```
 
@@ -53,59 +26,76 @@
    npm install
    ```
 
-3. **Start the development server**
+3. **Configure environment variables**
    ```bash
-   npm run dev
+   cp .env.example .env
    ```
-   The application will run at `http://localhost:5173`.
+   Edit `.env` and fill in your local values:
+   ```env
+   NEXT_PUBLIC_API_BASE_URL=/api/v1
+   VITE_API_BASE_URL=/api/v1
+   NEXT_PUBLIC_RAZORPAY_KEY_ID=rzp_test_xxxxxxxx
+   VITE_RAZORPAY_KEY_ID=rzp_test_xxxxxxxx
+   FRONTEND_REVALIDATE_SECRET=your_local_revalidate_secret
+   ```
+   > **Security note:** Never put private API secrets, database passwords, or SSH keys in `NEXT_PUBLIC_*` or `VITE_*` variables—they are inlined into browser bundles at build time.
 
-4. **Verify local API wiring before opening the listings pages**
+4. **Start the backend first**
+   Ensure `makemystay-backend` is running on `http://127.0.0.1:8000` with `ENV=development` (see `../makemystay-backend/README.md`).
+
+5. **Start the frontend development server**
+   - **Next.js (primary, port `3000`)**:
+     ```bash
+     npm run dev
+     ```
+     Requests to `/api/v1/*` are proxied to `http://127.0.0.1:8000/api/v1/*` via `next.config.ts`.
+   - **Vite SPA (optional, port `5173`)**:
+     ```bash
+     npm run dev:vite
+     ```
+     Requests to `/api/*` are proxied to `http://127.0.0.1:8000/api/*` via `vite.config.ts`.
+
+6. **Verify local API & database wiring**
    ```bash
    npm run check:local
    ```
-   This checks the frontend API base URL, backend health, backend `ENV`, database connectivity, and a live PG listings request.
 
-5. **Build for production**
-   ```bash
-   npm run build
-   ```
+---
 
-## 📂 Project Structure
+## Environment Variables Reference
+
+| Variable | Scope | Purpose |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_API_BASE_URL` | Client + SSR (build-time) | API base path (`/api/v1` for local proxy & production same-origin) |
+| `VITE_API_BASE_URL` | Vite client (build-time) | API base path when running Vite (`dev:vite` / `build:vite`) |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Client (build-time) | Publishable Razorpay Key ID (must match backend `RAZORPAY_KEY_ID`) |
+| `VITE_RAZORPAY_KEY_ID` | Vite client (build-time) | Publishable Razorpay Key ID for Vite mode |
+| `NEXT_PUBLIC_WHATSAPP_PHONE` | Client (build-time, optional) | Digits-only WhatsApp number with country code |
+| `FRONTEND_REVALIDATE_SECRET` | Server-only (runtime) | Secret verified by `POST /api/revalidate` |
+| `SERVER_API_BASE_URL` | Server-only (runtime, optional) | Explicit backend URL for Next.js SSR fetches |
+| `BING_SITE_AUTH_USER` | Server-only (runtime, optional) | Bing Webmaster verification code if `public/BingSiteAuth.xml` is absent |
+
+### Deployment Variables (`.deploy.env`, gitignored)
+Manual EC2 helper scripts (`deploy.sh`, `scripts/install-next-remote.sh`, `scripts/nginx-next-remote.sh`) read deployment target settings from `.deploy.env` instead of `.env`:
+```env
+DEPLOY_HOST=your-ec2-ip
+DEPLOY_USER=ubuntu
+DEPLOY_PATH=/var/www/react-app
+PEM_KEY=/path/to/your-key.pem
+```
+
+---
+
+## Build & Verification Commands
 
 ```bash
-make-my-stay/
-├── public/          # Static assets (images, logos, etc.)
-├── src/
-│   ├── components/  # Reusable UI components (Layouts, Modules, Sections, UI)
-│   ├── hooks/       # Custom React hooks (useProperties, useContacts)
-│   ├── lib/         # Utility functions and API clients
-│   ├── pages/       # Application pages and route definitions
-│   ├── types/       # TypeScript type definitions and interfaces
-│   ├── App.tsx      # Main application component with routing
-│   └── main.tsx     # Entry point
-├── dist/            # Production build output
-└── vite.config.ts   # Vite configuration
+# Production Next.js build + standalone dist/ assembly
+npm run build
+
+# Preview standalone server locally
+npm run preview
 ```
 
-## 🔧 Environment Variables
+## License
 
-Create a `.env` file in the root directory to configure your environment:
-
-```env
-# Use either name (both are supported; VITE_API_BASE_URL wins if both are set)
-VITE_API_BASE_URL=http://localhost:8000/api/v1
-```
-
-For local development, make sure the backend is running with `ENV=development`. If the backend is started in production mode, browser requests from `localhost` can be blocked by CORS even when the API itself is healthy.
-
-## SEO / Google Search Console
-
-After deploying changes to titles or meta, use Search Console **URL Inspection** and **Request indexing** for key URLs (home, `/pg`, `/rent`, sample locality and property pages). Expect **7–14+ days** for visible SERP updates. See [docs/seo-gsc.md](docs/seo-gsc.md) for a short checklist.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is proprietary software. All rights reserved. © 2026 MakeMyStay.ai
+Proprietary software. All rights reserved. © 2026 MakeMyStay.ai

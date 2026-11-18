@@ -25,6 +25,10 @@ const STATIC_PATHS = [
     { path: '/compare/whitefield-vs-marathahalli', priority: '0.78', changefreq: 'monthly' },
     { path: '/compare/koramangala-vs-indiranagar', priority: '0.78', changefreq: 'monthly' },
     { path: '/pg-near-me', priority: '0.84', changefreq: 'weekly' },
+    { path: '/pg', priority: '0.9', changefreq: 'daily' },
+    { path: '/pg/bangalore', priority: '0.95', changefreq: 'daily' },
+    { path: '/pg/hyderabad', priority: '0.92', changefreq: 'daily' },
+    { path: '/pg/pune', priority: '0.92', changefreq: 'daily' },
     { path: '/rent', priority: '0.85', changefreq: 'daily' },
     { path: '/rent/bangalore', priority: '0.93', changefreq: 'daily' },
     { path: '/rent/hyderabad', priority: '0.92', changefreq: 'daily' },
@@ -154,13 +158,34 @@ function resolveApiBase() {
     return `${BASE}/${raw}`.replace(/\/+$/, '');
 }
 
-function urlEntry(loc, priority, changefreq) {
+function escapeXml(value) {
+    if (value == null) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+}
+
+function urlEntry(loc, priority, changefreq, images = []) {
     const lastmod = new Date().toISOString();
-    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>\n`;
+    let imageTags = '';
+    if (Array.isArray(images) && images.length > 0) {
+        for (const img of images) {
+            if (!img || !img.url) continue;
+            imageTags += '    <image:image>\n';
+            imageTags += `      <image:loc>${escapeXml(img.url)}</image:loc>\n`;
+            if (img.title) imageTags += `      <image:title>${escapeXml(img.title)}</image:title>\n`;
+            if (img.caption) imageTags += `      <image:caption>${escapeXml(img.caption)}</image:caption>\n`;
+            imageTags += '    </image:image>\n';
+        }
+    }
+    return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n${imageTags}  </url>\n`;
 }
 
 function wrapUrlset(body) {
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}</urlset>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${body}</urlset>\n`;
 }
 
 function wrapIndex(entries) {
@@ -182,7 +207,7 @@ async function fetchAllProperties() {
     let total = Infinity;
 
     while (skip < total) {
-        const url = `${apiBase}/realty/properties?skip=${skip}&limit=${limit}&sort_by=newest`;
+        const url = `${apiBase}/realty/properties?skip=${skip}&limit=${limit}&is_available=true&sort_by=newest`;
         const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) {
             throw new Error(`Failed to fetch property sitemap rows from ${url}: ${response.status}`);
@@ -217,7 +242,7 @@ for (const s of CITY_HUB_PATHS) {
 
 let localitiesBody = '';
 for (const row of locJson) {
-    // localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
+    localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
 }
@@ -232,12 +257,38 @@ for (const slug of BLOG_SLUGS) {
 
 const existingPropertiesSitemap = join(root, 'public', 'sitemap-properties.xml');
 let propertiesBody = '';
+let imagesBody = '';
 let propertyCount = 0;
 let propertiesFromExistingSitemap = false;
 try {
     const properties = await fetchAllProperties();
     for (const property of properties) {
-        propertiesBody += urlEntry(`${BASE}${buildPropertyDetailPath(property)}`, '0.88', 'daily');
+        const images = [];
+        if (property.image) {
+            images.push({
+                url: property.image,
+                title: property.title || property.property_name || 'PG Stay in Bangalore',
+                caption: `${property.title || property.property_name || 'PG Stay'} in ${property.location || 'Bangalore'} (Verified Property)`,
+            });
+        }
+        if (Array.isArray(property.images)) {
+            for (let idx = 0; idx < Math.min(property.images.length, 10); idx++) {
+                const img = property.images[idx];
+                const url = typeof img === 'string' ? img : img?.image_url;
+                if (url && url !== property.image) {
+                    images.push({
+                        url,
+                        title: `${property.title || property.property_name || 'PG Stay'} - Photo ${idx + 1}`,
+                        caption: `${property.title || property.property_name || 'PG Stay'} in ${property.location || 'Bangalore'} - Photo ${idx + 1}`,
+                    });
+                }
+            }
+        }
+        const entryUrl = `${BASE}${buildPropertyDetailPath(property)}`;
+        propertiesBody += urlEntry(entryUrl, '0.88', 'daily', images);
+        if (images.length > 0) {
+            imagesBody += urlEntry(entryUrl, '0.85', 'daily', images);
+        }
     }
     propertyCount = properties.length;
 } catch (error) {
@@ -261,6 +312,9 @@ const files = [
 ];
 if (propertiesBody) {
     files.push({ name: 'sitemap-properties.xml', body: propertiesBody });
+}
+if (imagesBody) {
+    files.push({ name: 'sitemap-images.xml', body: imagesBody });
 }
 
 const publicDir = join(root, 'public');
@@ -286,6 +340,18 @@ if (existsSync(distDir)) {
     writeFileSync(join(distDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
     writeFileSync(join(distDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
     writeFileSync(join(distDir, 'sitemap.xml'), indexXml);
+    writeFileSync(join(distDir, 'sitemap-all.xml'), wrapUrlset(combinedBody));
+
+    const distPublicDir = join(distDir, 'public');
+    if (existsSync(distPublicDir)) {
+        for (const f of files) {
+            writeFileSync(join(distPublicDir, f.name), wrapUrlset(f.body));
+        }
+        writeFileSync(join(distPublicDir, 'sitemap-locations.xml'), wrapUrlset(localitiesBody));
+        writeFileSync(join(distPublicDir, 'sitemap-cities.xml'), wrapUrlset(citiesBody));
+        writeFileSync(join(distPublicDir, 'sitemap.xml'), indexXml);
+        writeFileSync(join(distPublicDir, 'sitemap-all.xml'), wrapUrlset(combinedBody));
+    }
 }
 
 const n =

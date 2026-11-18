@@ -9,7 +9,7 @@ import type {
     Review,
 } from '@/types/api';
 
-const REALTY_PATH = '/realty/properties';
+export const REALTY_PATH = '/realty/properties';
 
 /** HTTPS placeholders only — `data:` URIs are often blocked by CSP `img-src`, so cards looked blank while detail pages used real URLs. */
 const PLACEHOLDER_GENERIC =
@@ -25,7 +25,7 @@ const PLACEHOLDER_VILLA =
  * Unwrap list endpoints that may return a bare array, paginated `{ items, total }`,
  * or alternate keys — always coerce to an array so `.map` never runs on a non-array.
  */
-function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
+export function normalizePropertyListResponse(response: unknown): { rows: unknown[]; total: number } {
     console.log('[normalize] response type:', typeof response);
     console.log('[normalize] keys:', response && typeof response === 'object' ? Object.keys(response as object) : []);
     // 1. Array-first handling: if it's already a bare array, return it directly.
@@ -186,6 +186,9 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
     // Extract images (support object rows + string URLs; copy before sort to avoid mutating response)
     const rawImages = Array.isArray(item.images) ? item.images : [];
     const sortedImages = [...rawImages].sort((a: any, b: any) => {
+        const aPrimary = a && typeof a === 'object' && ('is_primary' in a || 'isPrimary' in a) && (a.is_primary === true || a.isPrimary === true) ? -1 : 0;
+        const bPrimary = b && typeof b === 'object' && ('is_primary' in b || 'isPrimary' in b) && (b.is_primary === true || b.isPrimary === true) ? -1 : 0;
+        if (aPrimary !== bPrimary) return aPrimary - bPrimary;
         const ao = a && typeof a === 'object' && 'sort_order' in a ? a.sort_order ?? 0 : 0;
         const bo = b && typeof b === 'object' && 'sort_order' in b ? b.sort_order ?? 0 : 0;
         return ao - bo;
@@ -288,7 +291,41 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         map_link: item.map_link,
         furnishing: item.furnishing,
         contact_phone: item.phone,
-        is_available: item.is_available ?? true
+        is_available: item.is_available ?? true,
+        documents: (item as any).documents,
+        videos: (() => {
+            const rawVideos: any[] = Array.isArray((item as any).videos) ? [...(item as any).videos] : [];
+            const meta = (item as any).metadata || (item as any).metadata_json || {};
+            const metaObj = typeof meta === 'string' ? (() => { try { return JSON.parse(meta); } catch { return {}; } })() : (meta || {});
+            const pushYt = (title: string, url: string, isShort = false) => {
+                if (url && typeof url === 'string' && !rawVideos.some((v: any) => (v.video_url === url || v.url === url))) {
+                    rawVideos.push({
+                        title: title || 'Property Video Tour',
+                        video_url: url,
+                        is_short: isShort,
+                    });
+                }
+            };
+            if (metaObj.youtube_url) pushYt('YouTube Video Tour', metaObj.youtube_url);
+            if (metaObj.video_url) pushYt('Video Tour', metaObj.video_url);
+            if (metaObj.property_walkthrough) pushYt('Walkthrough Video', metaObj.property_walkthrough);
+            if (Array.isArray(metaObj.youtube_videos)) {
+                for (const v of metaObj.youtube_videos) {
+                    if (v?.url) pushYt(v.title || 'YouTube Video Tour', v.url, !!v.is_short);
+                }
+            }
+            return rawVideos;
+        })(),
+        nearby_places: (item as any).nearby_places,
+        seo: (item as any).seo,
+        share: (item as any).share,
+        metadata: (() => {
+            const m = (item as any).metadata || (item as any).metadata_json;
+            if (typeof m === 'string') {
+                try { return JSON.parse(m); } catch { return {}; }
+            }
+            return m || {};
+        })(),
     };
 }
 

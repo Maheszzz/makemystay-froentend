@@ -10,7 +10,7 @@ import { ArrowRight, Calendar, ChevronDown, MapPin, SlidersHorizontal } from 'lu
 interface FeaturedPropertyFiltersBarProps {
     filters: HeroSearchFilters;
     onFiltersChange: (next: HeroSearchFilters) => void;
-    onExplore: () => void;
+    onExplore: (overrideFilters?: Partial<HeroSearchFilters>) => void;
 }
 
 function FilterSelect({
@@ -57,25 +57,30 @@ export function FeaturedPropertyFiltersBar({
     const patch = (next: Partial<HeroSearchFilters>) => onFiltersChange({ ...filters, ...next });
 
     return (
-        <div className="flex flex-wrap items-center gap-2 mb-6 md:mb-8">
-            {HERO_CITY_TABS.map((tab) => {
-                const active = tab.key === filters.city;
-                return (
-                    <button
-                        key={tab.key}
-                        type="button"
-                        onClick={() => patch({ city: tab.key })}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold transition-all ${
-                            active
-                                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                                : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
-                        }`}
-                    >
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        {tab.label}
-                    </button>
-                );
-            })}
+        <div className="flex flex-wrap items-center gap-2 mb-6 md:mb-8 pt-4 sm:pt-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-2 md:pb-0 md:flex-wrap">
+                {HERO_CITY_TABS.map((tab) => {
+                    const active = tab.key === filters.city;
+                    return (
+                        <button
+                            key={tab.key}
+                            type="button"
+                            onClick={() => {
+                                patch({ city: tab.key });
+                                onExplore({ city: tab.key });
+                            }}
+                            className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold whitespace-nowrap shrink-0 transition-all ${
+                                active
+                                    ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                                    : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400'
+                            }`}
+                        >
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </div>
 
             <div className="hidden md:block h-7 w-px bg-slate-200 mx-1" />
 
@@ -107,6 +112,7 @@ export function FeaturedPropertyFiltersBar({
                 <option value="1RK">1RK</option>
                 <option value="1BHK">1BHK</option>
                 <option value="2BHK">2BHK</option>
+                <option value="1 & 2 BHK">1 & 2 BHK</option>
                 <option value="3BHK">3BHK</option>
             </FilterSelect>
 
@@ -139,7 +145,7 @@ export function FeaturedPropertyFiltersBar({
 
             <button
                 type="button"
-                onClick={onExplore}
+                onClick={() => onExplore()}
                 className="w-full sm:w-auto sm:ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-bold text-white hover:bg-slate-800 transition-colors shadow-sm"
             >
                 Explore Properties
@@ -184,6 +190,7 @@ export function FeaturedPropertyFiltersBar({
                         <option value="1RK">1RK</option>
                         <option value="1BHK">1BHK</option>
                         <option value="2BHK">2BHK</option>
+                        <option value="1 & 2 BHK">1 & 2 BHK</option>
                         <option value="3BHK">3BHK</option>
                     </select>
                     <select

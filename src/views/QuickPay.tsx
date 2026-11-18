@@ -65,7 +65,7 @@ export default function QuickPay() {
             // Check env
             const key = getRazorpayKeyId();
             if (!key) {
-                alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env.local.");
+                alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env.");
                 setIsProcessing(false);
                 return;
             }

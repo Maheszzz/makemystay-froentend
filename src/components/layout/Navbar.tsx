@@ -99,23 +99,50 @@ function CityDropdown({ selectedCity, onSelect }: CityDropdownProps) {
     );
 }
 
-export function Navbar() {
+export function Navbar({ city }: { city?: string }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [selectedCity, setSelectedCity] = useState<NavCitySlug>('bangalore');
     const location = useLocation();
     const navigate = useNavigate();
     useAuth();
 
+    const [selectedCity, setSelectedCity] = useState<NavCitySlug>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('make_my_stay_city');
+            if (city && NAV_CITIES.some(c => c.slug === city.toLowerCase())) {
+                return city.toLowerCase() as NavCitySlug;
+            }
+            if (saved && NAV_CITIES.some(c => c.slug === saved)) {
+                return saved as NavCitySlug;
+            }
+        }
+        return 'bangalore';
+    });
+
     const handleCitySelect = (slug: NavCitySlug) => {
         setSelectedCity(slug);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('make_my_stay_city', slug);
+        }
         navigate(`/pg/${slug}`);
     };
+
+    useEffect(() => {
+        if (city && NAV_CITIES.some(c => c.slug === city.toLowerCase())) {
+            setSelectedCity(city.toLowerCase() as NavCitySlug);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('make_my_stay_city', city.toLowerCase());
+            }
+        }
+    }, [city]);
 
     useEffect(() => {
         const parts = location.pathname.toLowerCase().split('/').filter(Boolean);
         if (parts[0] === 'pg' && parts[1] && NAV_CITIES.some((c) => c.slug === parts[1] as NavCitySlug)) {
             setSelectedCity(parts[1] as NavCitySlug);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('make_my_stay_city', parts[1]);
+            }
         }
     }, [location.pathname]);
 

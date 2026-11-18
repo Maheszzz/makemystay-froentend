@@ -1,7 +1,7 @@
 import { FeaturedProjectCard } from '@/components/modules/listings/FeaturedProjectCard';
+import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { FeaturedPropertyFiltersBar } from '@/components/modules/listings/FeaturedPropertyFiltersBar';
 import { LaunchTrustBar } from '@/components/modules/listings/LaunchTrustBar';
-import { NewLaunchSpotlight } from '@/components/modules/listings/NewLaunchSpotlight';
 import { MobilePropertyCarousel } from '@/components/modules/listings/MobilePropertyCarousel';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
@@ -9,9 +9,10 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { FEATURED_LAUNCH } from '@/data/featuredLaunch';
 import { useProperties, useProperty } from '@/hooks';
 import { buildFeaturedCarouselRows, findFeaturedLaunchProperty } from '@/lib/featuredLaunch';
+
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { buildFeaturedExploreUrl, heroFiltersToApiParams } from '@/lib/heroFilterUtils';
-import type { PaginationParams } from '@/types/api';
+import type { PaginationParams, Property } from '@/types/api';
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, IndianRupee, ShieldCheck } from 'lucide-react';
 import { useMemo, useRef } from 'react';
 import { Link, useNavigate } from '@/lib/navigation';
@@ -22,6 +23,7 @@ interface PropertyGridProps {
     cardVariant?: 'default' | 'project';
     filters?: HeroSearchFilters;
     setFilters?: (next: HeroSearchFilters) => void;
+    initialProperties?: Property[];
 }
 
 export function PropertyGrid({
@@ -30,6 +32,7 @@ export function PropertyGrid({
     cardVariant = 'default',
     filters,
     setFilters,
+    initialProperties,
 }: PropertyGridProps) {
     const navigate = useNavigate();
     const sliderRef = useRef<HTMLDivElement | null>(null);
@@ -43,17 +46,24 @@ export function PropertyGrid({
         return apiBase as PaginationParams;
     }, [category, searchQuery, filters, cardVariant]);
 
-    const { properties, loading, error } = useProperties(params);
+    const { properties, loading, error } = useProperties(params, { initialProperties });
 
     const safeProperties = Array.isArray(properties) ? properties : [];
     
-    // Client-side sort fallback for 'review_count_desc' (matching Properties.tsx logic)
     const sortedProperties = useMemo(() => {
-        return [...safeProperties].sort((a, b) => {
-            const ca = (a.reviews ?? a.review_count ?? 0) || 0;
-            const cb = (b.reviews ?? b.review_count ?? 0) || 0;
-            return cb - ca;
-        });
+        const priorityIds = [239, 272, 286, 218];
+        const priorityProperties = priorityIds
+            .map(id => safeProperties.find(property => Number(property.id) === id))
+            .filter(Boolean) as typeof safeProperties;
+        
+        const remainingProperties = safeProperties.filter(
+            property => !priorityIds.includes(Number(property.id))
+        );
+        
+        return [
+            ...priorityProperties,
+            ...remainingProperties,
+        ];
     }, [safeProperties]);
 
     const amenityGenderFiltered = useMemo(() => {
@@ -91,7 +101,7 @@ export function PropertyGrid({
     const projectDisplayRows = useMemo(() => {
         if (cardVariant !== 'project') return [];
         const base = amenityGenderFiltered.length ? amenityGenderFiltered : [];
-        return buildFeaturedCarouselRows(base, launchProperty, 8);
+        return buildFeaturedCarouselRows(base, launchProperty, 24);
     }, [cardVariant, amenityGenderFiltered, launchProperty]);
 
     // Filter for the home page (limit to 4)
@@ -113,9 +123,9 @@ export function PropertyGrid({
         move_in: '',
     };
 
-    const handleExplore = () => {
+    const handleExplore = (overrideFilters?: Partial<HeroSearchFilters>) => {
         const path = buildFeaturedExploreUrl(
-            activeFilters,
+            { ...activeFilters, ...overrideFilters },
             searchQuery,
             category === 'all' ? 'all' : 'pg'
         );
@@ -152,8 +162,8 @@ export function PropertyGrid({
             id="featured-listings"
             className={
                 cardVariant === 'project'
-                    ? 'py-12 md:py-20 bg-gradient-to-b from-slate-50 via-[#f8f8f7] to-slate-100/60 pb-20 md:pb-20 scroll-mt-24'
-                    : 'py-10 md:py-20 bg-gradient-to-b from-stone-50 via-[#faf9f7] to-stone-100/50 pb-20 md:pb-20 scroll-mt-24'
+                    ? 'py-12 md:py-20 bg-gradient-to-b from-slate-50 via-[#f8f8f7] to-slate-100/60 pb-32 md:pb-24 scroll-mt-28 md:scroll-mt-24'
+                    : 'py-10 md:py-20 bg-gradient-to-b from-stone-50 via-[#faf9f7] to-stone-100/50 pb-32 md:pb-24 scroll-mt-28 md:scroll-mt-24'
             }
         >
             {/* Section Header */}
@@ -166,8 +176,11 @@ export function PropertyGrid({
                     />
                 )}
 
-                {cardVariant === 'project' && launchProperty && (
-                    <NewLaunchSpotlight property={launchProperty} />
+                {cardVariant === 'project' && (
+                    <FeaturedPromoBanner
+                        properties={safeProperties}
+                        launchProperty={launchProperty}
+                    />
                 )}
 
                 {cardVariant === 'project' && <LaunchTrustBar />}

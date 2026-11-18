@@ -1,4 +1,5 @@
 import { JsonLd } from '@/components/seo/JsonLd';
+import { buildFaqPageSchema } from '@/lib/schema';
 
 export interface FaqItem {
   question: string;
@@ -7,17 +8,7 @@ export interface FaqItem {
 
 /** Render JSON‑LD FAQPage */
 export function FAQSchema({ items }: { items: FaqItem[] }) {
-  const data = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: items.map((faq) => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.answer,
-      },
-    })),
-  };
+  const data = buildFaqPageSchema(items);
   return <JsonLd data={data} id="faq-ld" />;
 }
+

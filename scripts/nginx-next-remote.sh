@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
-# Push Next.js nginx config to all hosts in .env.production
+# Push Next.js nginx config to all hosts in .deploy.env
 set -e
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
-export $(grep -v '^#' .env.production | xargs)
-PEM_KEY="${PEM_KEY:?}"
-IFS=',' read -ra HOSTS <<< "${DEPLOY_HOST:?}"
+DEPLOY_ENV_FILE=".deploy.env"
+[[ -f "$DEPLOY_ENV_FILE" ]] || { echo "Missing $DEPLOY_ENV_FILE"; exit 1; }
+set -a
+# shellcheck source=/dev/null
+source "$DEPLOY_ENV_FILE"
+set +a
+PEM_KEY="${PEM_KEY:?Set PEM_KEY in .deploy.env}"
+IFS=',' read -ra HOSTS <<< "${DEPLOY_HOST:?Set DEPLOY_HOST in .deploy.env}"
 CONF="$ROOT/deploy/nginx-makemystay-all.conf"
 
 for HOST in "${HOSTS[@]}"; do

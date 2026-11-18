@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link, useLocation, useSearchParams, useNavigate } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
@@ -8,9 +9,10 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties, useSmartBack, useListingLocalityOptions } from '@/hooks';
+import { useProperties, useListingLocalityOptions } from '@/hooks';
 import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { PremiumTrustStrip } from '@/components/trust/PremiumTrustStrip';
 import { useWishlist } from '@/context/WishlistContext';
 import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
@@ -29,6 +31,7 @@ import {
     computeRentPlotStatsFromListings,
 } from '@/lib/listingInventoryStats';
 import type { Property } from '@/types/api';
+
 import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 
 /** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
@@ -77,14 +80,25 @@ interface PropertiesProps {
     forcedGenderFilter?: 'male' | 'female';
     /** Locality hubs can show a map alongside listings above the fold. */
     showMapPanel?: boolean;
+    /** SSR-seeded properties to render listing cards in static HTML. */
+    initialProperties?: Property[];
+}
+
+function PropertiesUrlSync({ onSync }: { onSync: (qs: string) => void }) {
+    const [searchParams] = useSearchParams();
+    const qs = searchParams.toString();
+    useEffect(() => {
+        onSync(qs);
+    }, [qs, onSync]);
+    return null;
 }
 
 function PropertiesInner({
     initialCategory = 'all',
     initialTypeFilter = 'all',
     initialCity = 'all',
-    pageTitle = 'Find Your Perfect Home',
-    pageSubtitle = 'Browse Professional & Verified Listings',
+    pageTitle = 'Find Your Perfect Stay',
+    pageSubtitle = 'Verified PG, Coliving & Rental Homes in Bangalore',
     hideChrome = false,
     embedRentHubUi = false,
     embedPlotHubUi = false,
@@ -96,23 +110,72 @@ function PropertiesInner({
     onDisplayedListingsForSeo,
     forcedGenderFilter,
     showMapPanel = false,
+    initialProperties,
 }: PropertiesProps) {
+    const router = useRouter();
     const location = useLocation();
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-    const goBack = useSmartBack({ fallback: '/' });
+    const [urlQueryString, setUrlQueryString] = useState('');
+    const searchParams = useMemo(() => new URLSearchParams(urlQueryString), [urlQueryString]);
     const { wishlist } = useWishlist();
 
-    // 1. Initialize state from URL or Props
-    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(
-        (searchParams.get('cat') as any) || initialCategory
+    // 1. Initialize state from Props (URL synced on client via PropertiesUrlSync leaf)
+    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(initialCategory);
+    const [locationFilter, setLocationFilter] = useState(initialCity);
+    const [typeFilter, setTypeFilter] = useState(initialTypeFilter);
+    const [minPrice, setMinPrice] = useState(initialMinPrice);
+    const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
+    const [sortBy, setSortBy] = useState('review_count_desc');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleUrlSync = useCallback(
+        (qs: string) => {
+            setUrlQueryString(qs);
+            const sp = new URLSearchParams(qs);
+            const cat = sp.get('cat') as 'all' | 'pg' | 'rent' | 'buy' | 'plot' | null;
+            if (cat) setCategory(cat);
+            const city = sp.get('city');
+            if (city) setLocationFilter(city);
+            const type = sp.get('type');
+            if (type) setTypeFilter(type);
+            const min = sp.get('min');
+            if (min !== null) setMinPrice(min);
+            const max = sp.get('max');
+            if (max !== null) setMaxPrice(max);
+            const sort = sp.get('sort');
+            if (sort) setSortBy(sort);
+            const q = sp.get('q');
+            if (q !== null) setSearchQuery(q);
+        },
+        [],
     );
-    const [locationFilter, setLocationFilter] = useState(searchParams.get('city') || initialCity);
-    const [typeFilter, setTypeFilter] = useState(searchParams.get('type') || initialTypeFilter);
-    const [minPrice, setMinPrice] = useState(searchParams.get('min') || initialMinPrice);
-    const [maxPrice, setMaxPrice] = useState(searchParams.get('max') || initialMaxPrice);
-    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'review_count_desc');
-    const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+    const setSearchParams = useCallback(
+        (
+            next: URLSearchParams | Record<string, string> | ((prev: URLSearchParams) => URLSearchParams),
+            options?: { replace?: boolean },
+        ) => {
+            const currentQs = typeof window !== 'undefined' ? window.location.search.replace(/^\?/, '') : urlQueryString;
+            let params: URLSearchParams;
+            if (typeof next === 'function') {
+                params = next(new URLSearchParams(currentQs));
+            } else if (next instanceof URLSearchParams) {
+                params = next;
+            } else {
+                params = new URLSearchParams();
+                for (const [k, v] of Object.entries(next)) {
+                    if (v !== undefined && v !== '') params.set(k, v);
+                }
+            }
+            const qs = params.toString();
+            setUrlQueryString(qs);
+            const pathname = location.pathname || '/properties';
+            const href = qs ? `${pathname}?${qs}` : pathname;
+            if (options?.replace) router.replace(href, { scroll: false });
+            else router.push(href, { scroll: false });
+        },
+        [router, location.pathname, urlQueryString],
+    );
     
     const pageQueryParam = searchParams.get('page');
     const listingPageNum = useMemo(() => {
@@ -123,7 +186,7 @@ function PropertiesInner({
     }, [pageQueryParam]);
 
     const [showFilters, setShowFilters] = useState(false);
-
+ 
     // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -189,6 +252,7 @@ function PropertiesInner({
                     { id: '1RK', label: 'Studio (1 RK)' },
                     { id: '1BHK', label: '1 BHK' },
                     { id: '2BHK', label: '2 BHK' },
+                    { id: '1 & 2 BHK', label: '1 & 2 BHK' },
                     { id: '3BHK', label: '3 BHK' },
                     { id: 'Villa', label: 'Villa / Row House' },
                     { id: 'PG', label: 'PG / Hostel' },
@@ -256,7 +320,7 @@ function PropertiesInner({
      */
     const apiCity = useMemo(() => {
         if (locationFilter === 'all') return defaultMetroSlug;
-        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase();
+        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     }, [locationFilter, defaultMetroSlug]);
 
     // 4. API Parameters (Derived from URL/State)
@@ -280,6 +344,17 @@ function PropertiesInner({
         return { ...base, category, property_type: typeFilter === 'all' ? undefined : typeFilter };
     }, [category, searchQuery, typeFilter, minPrice, maxPrice, apiCity, sortBy, priceTier]);
 
+    const isDefaultSeededState =
+        category === initialCategory &&
+        locationFilter === initialCity &&
+        typeFilter === initialTypeFilter &&
+        minPrice === initialMinPrice &&
+        maxPrice === initialMaxPrice &&
+        sortBy === 'review_count_desc' &&
+        !searchQuery.trim() &&
+        listingPageNum === 1 &&
+        !priceTier;
+
     const PAGE_SIZE = 24;
     const {
         properties,
@@ -295,6 +370,7 @@ function PropertiesInner({
         infiniteScroll: true,
         pageSize: PAGE_SIZE,
         initialListingPage: listingPageNum,
+        initialProperties: isDefaultSeededState ? initialProperties : undefined,
     });
 
     const genderFilter = useMemo(() => {
@@ -369,7 +445,27 @@ function PropertiesInner({
             }
 
             if (category !== 'all') {
-                list = list.filter((p) => p.category === category);
+                const byCategory = list.filter((p) => p.category === category);
+                if (byCategory.length > 0 || category !== 'rent') {
+                    list = byCategory;
+                }
+            }
+
+            if (typeFilter && typeFilter !== 'all') {
+                list = list.filter((p) => {
+                    const pt = (p.type || '').toUpperCase().trim();
+                    const target = typeFilter.toUpperCase().trim();
+                    if (target === '1 & 2 BHK') {
+                        return pt === '1BHK' || pt === '2BHK' || pt === '1 & 2 BHK' || pt === '1_2_BHK' || pt === '1RK';
+                    }
+                    if (target === '1BHK') {
+                        return pt === '1BHK' || pt === '1RK' || pt === '1 & 2 BHK' || pt === '1_2_BHK';
+                    }
+                    if (target === '2BHK') {
+                        return pt === '2BHK' || pt === '1 & 2 BHK' || pt === '1_2_BHK';
+                    }
+                    return pt === target;
+                });
             }
 
             return list;
@@ -377,7 +473,7 @@ function PropertiesInner({
             console.error('[Properties] Filtering crash:', e);
             return [];
         }
-    }, [properties, wifiOn, foodOn, acOn, category, genderFilter]);
+    }, [properties, wifiOn, foodOn, acOn, category, genderFilter, typeFilter]);
 
     /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
@@ -386,22 +482,10 @@ function PropertiesInner({
             // If there is a search query, trust the backend's exact-match relevance sorting completely.
             if (searchQuery) return list;
             
-            if (sortBy === 'review_count_desc') {
-                return list.sort((a, b) => {
-                    const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
-                    const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
-                    return cb - ca;
-                });
+            if (sortBy === 'review_count_desc' || sortBy === 'rating_desc') {
+                return list; // The backend already includes priority sorting before these sorts.
             }
-            if (sortBy !== 'rating_desc') return list;
-            return list.sort((a, b) => {
-                const ra = (a?.rating ?? a?.average_rating ?? 0) || 0;
-                const rb = (b?.rating ?? b?.average_rating ?? 0) || 0;
-                if (rb !== ra) return rb - ra;
-                const ca = (a?.reviews ?? a?.review_count ?? 0) || 0;
-                const cb = (b?.reviews ?? b?.review_count ?? 0) || 0;
-                return cb - ca;
-            });
+            return list;
         } catch (e) {
             console.error('[Properties] Sorting crash:', e);
             return propertyListFiltered;
@@ -562,6 +646,9 @@ function PropertiesInner({
 
     return (
         <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
+            <Suspense fallback={null}>
+                <PropertiesUrlSync onSync={handleUrlSync} />
+            </Suspense>
             {listingsHelmet && <SEOHead {...listingsHelmet} />}
             <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
@@ -573,10 +660,10 @@ function PropertiesInner({
                         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                             <div className="animate-fade-in-up">
                                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight leading-tight mb-4">
-                                    Find Your Perfect Stay
+                                    {pageTitle}
                                 </h1>
                                 <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium mb-8">
-                                    Verified PG, Coliving & Rental Homes in Bangalore
+                                    {pageSubtitle}
                                 </p>
                                 
                                 {/* Premium Filter Chips */}
@@ -834,6 +921,11 @@ function PropertiesInner({
                         )}
                     </div>
 
+                    {/* Featured Promotion Banner (Auto Slider + High Demand Ekta Infinity) */}
+                    {!loading && propertyListOrdered.length > 0 && !hideChrome && (
+                        <FeaturedPromoBanner properties={propertyListOrdered} />
+                    )}
+
                     {/* 5. Main Content Grid */}
                     {loading && propertyListOrdered.length === 0 ? (
                         <div className="py-32 text-center">
@@ -861,7 +953,7 @@ function PropertiesInner({
                                             if (!prop || !prop.id) return null;
                                             return (
                                                 <div
-                                                    key={prop.id}
+                                                    key={`${prop.id}-${idx}`}
                                                     className="animate-card-in"
                                                     style={{ animationDelay: `${Math.min(idx * 35, 280)}ms` }}
                                                 >
@@ -1021,9 +1113,5 @@ function PropertiesInner({
 }
 
 export default function Properties(props: PropertiesProps) {
-    return (
-        <Suspense fallback={null}>
-            <PropertiesInner {...props} />
-        </Suspense>
-    );
+    return <PropertiesInner {...props} />;
 }

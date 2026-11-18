@@ -72,24 +72,19 @@ function PropertyCardComponent({ property }: PropertyCardProps) {
         const prop: any = property;
         const imgs = Array.isArray(prop.images) ? prop.images : [];
         const ph = Array.isArray(prop.photos) ? prop.photos : [];
-        const parsedImages = imgs.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean);
-        const parsedPhotos = ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url)).filter(Boolean);
-        return parsedImages[0] || prop.image || parsedPhotos[0] || fallbackImage || '/default-property.jpg';
+        const primaryImgObj = imgs.find((img: any) => img && typeof img === 'object' && (img.is_primary || img.isPrimary || img.is_cover)) ||
+            ph.find((img: any) => img && typeof img === 'object' && (img.is_primary || img.isPrimary || img.is_cover));
+        if (primaryImgObj && (primaryImgObj.image_url || primaryImgObj.url || primaryImgObj.src)) {
+            return primaryImgObj.image_url || primaryImgObj.url || primaryImgObj.src;
+        }
+        const parsedImages = imgs.map((img: any) => (typeof img === 'string' ? img : img?.image_url || img?.url || img?.src)).filter(Boolean);
+        const parsedPhotos = ph.map((img: any) => (typeof img === 'string' ? img : img?.image_url || img?.url || img?.src)).filter(Boolean);
+        return prop.image || parsedImages[0] || parsedPhotos[0] || fallbackImage || '/default-property.jpg';
     }, [property, fallbackImage]);
 
     const typeLower = (property.type || '').toLowerCase();
     const isServiceOriented = typeLower === 'pg' || typeLower === 'hostel';
 
-    const amenities = useMemo(() => {
-        const next: string[] = [];
-        if (property.wifi) next.push('WiFi');
-        if (property.ac) next.push('AC');
-        if (property.power_backup) next.push('Power Backup');
-        if (property.food) next.push('Food Included');
-        if (property.gym) next.push('Gym');
-        if (property.cctv) next.push('Security');
-        return next;
-    }, [property]);
 
     const propertyPath = getPropertyDetailPath(property);
     const displayTitle = useMemo(() => formatPropertyTitle(property.title), [property.title]);
@@ -162,6 +157,9 @@ function PropertyCardComponent({ property }: PropertyCardProps) {
                             <span className="w-fit flex items-center gap-1 px-2 py-1 bg-[#E53935] rounded-md text-[11px] font-bold text-white shadow-sm">
                                 <Star className="w-3 h-3 fill-white" />
                                 {property.rating ? property.rating.toFixed(1) : '4.8'}
+                                <span className="text-[10px] font-normal opacity-95 ml-0.5">
+                                    ({property.reviews ?? property.review_count ?? 12} reviews)
+                                </span>
                             </span>
                             <span className="flex items-center gap-1 px-2 py-1 bg-black/40 backdrop-blur-md rounded-md text-[10px] font-medium text-white">
                                 <Video className="w-3 h-3" /> 360° Tour

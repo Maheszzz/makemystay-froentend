@@ -1,9 +1,31 @@
+<<<<<<< HEAD
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const secret = request.nextUrl.searchParams.get('secret');
   if (secret !== 'MakeMyStaySecret123') {
+=======
+import { timingSafeEqual } from 'crypto';
+import { revalidateTag } from 'next/cache';
+import { NextRequest, NextResponse } from 'next/server';
+
+function secretsMatch(provided: string | null, expected: string): boolean {
+  if (!provided) return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export async function POST(request: NextRequest) {
+  const expectedSecret = process.env.FRONTEND_REVALIDATE_SECRET?.trim();
+  if (!expectedSecret) {
+    return NextResponse.json({ message: 'Revalidation secret is not configured' }, { status: 500 });
+  }
+
+  const secret = request.nextUrl.searchParams.get('secret');
+  if (!secretsMatch(secret, expectedSecret)) {
+>>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
     return NextResponse.json({ message: 'Invalid secret' }, { status: 401 });
   }
 

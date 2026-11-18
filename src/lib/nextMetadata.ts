@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 import { buildPageSEO, type PageSEOInput } from '@/lib/seo';
 import {
-    GEO_PLACENAME,
-    GEO_POSITION,
-    GEO_REGION,
     SITE_AUTHOR,
     SITE_NAME,
     SITE_PUBLISHER,
@@ -42,10 +39,6 @@ export function pageSeoToMetadata(input: PageSEOInput, options?: PageMetadataOpt
             },
         other: {
             'theme-color': THEME_COLOR,
-            'geo.region': GEO_REGION,
-            'geo.placename': GEO_PLACENAME,
-            'geo.position': GEO_POSITION,
-            ICBM: GEO_POSITION.replace(';', ', '),
             language: 'en-IN',
         },
         openGraph: {

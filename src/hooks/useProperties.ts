@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { propertyApi } from '@/lib/api';
 import { inferPropertyTypeFromPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import type { Property, PropertyId, ApiError, PaginationParams } from '@/types/api';
@@ -16,6 +16,8 @@ export interface UsePropertiesOptions {
     pageSize?: number;
     /** 1-based crawlable page (e.g. `?page=2`). Initial fetch uses skip = (page-1)*pageSize when infiniteScroll. */
     initialListingPage?: number;
+    /** Seed properties from SSR/ISR to prevent duplicate initial client fetch */
+    initialProperties?: Property[];
 }
 
 export interface UsePropertiesResult {
@@ -40,13 +42,14 @@ export function useProperties(
     params: PaginationParams = {},
     options: UsePropertiesOptions = {}
 ): UsePropertiesResult {
-    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE, initialListingPage = 1 } = options;
+    const { infiniteScroll = false, pageSize = DEFAULT_PAGE_SIZE, initialListingPage = 1, initialProperties } = options;
     const startPage = Math.max(1, Math.min(500, initialListingPage || 1));
 
-    const [properties, setProperties] = useState<Property[]>([]);
-    const [totalCount, setTotalCount] = useState<number>(0);
+    const hasInitialData = Boolean(initialProperties && initialProperties.length > 0);
+    const [properties, setProperties] = useState<Property[]>(initialProperties || []);
+    const [totalCount, setTotalCount] = useState<number>(initialProperties?.length || 0);
     const [propertyCounts, setPropertyCounts] = useState<Record<string, number> | undefined>(undefined);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(!hasInitialData);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const [error, setError] = useState<ApiError | null>(null);
     const [page, setPage] = useState(1);
@@ -55,9 +58,21 @@ export function useProperties(
     // Stabilize params by stringifying them as the dependency
     const paramsString = JSON.stringify(params);
     const filterKey = useMemo(() => filterKeyFromParams(params), [paramsString]);
+    const seededFilterKeyRef = useRef<string | null>(hasInitialData ? filterKey : null);
 
     // Initial fetch and reset when filters change
     useEffect(() => {
+        if (
+            seededFilterKeyRef.current !== null &&
+            seededFilterKeyRef.current === filterKey &&
+            hasInitialData &&
+            startPage === 1
+        ) {
+            seededFilterKeyRef.current = null;
+            return;
+        }
+        seededFilterKeyRef.current = null;
+
         let isMounted = true;
 
         const fetchInitial = async () => {
@@ -110,7 +125,7 @@ export function useProperties(
 
         void fetchInitial();
         return () => { isMounted = false; };
-    }, [filterKey, pageSize, startPage, infiniteScroll]);
+    }, [filterKey, pageSize, startPage, infiniteScroll, hasInitialData]);
 
     const loadMore = useCallback(async () => {
         if (loading || loadingMore || !hasMore) return;
@@ -338,11 +353,12 @@ export interface UseSimilarPropertiesResult {
  */
 export function useSimilarProperties(
     propertyId: PropertyId | null | undefined,
-    options: { limit?: number } = {}
+    options: { limit?: number; initialProperties?: Property[] } = {}
 ): UseSimilarPropertiesResult {
-    const { limit = 6 } = options;
-    const [properties, setProperties] = useState<Property[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { limit = 6, initialProperties } = options;
+    const hasInitial = Boolean(initialProperties && initialProperties.length > 0);
+    const [properties, setProperties] = useState<Property[]>(initialProperties || []);
+    const [loading, setLoading] = useState(!hasInitial);
     const [error, setError] = useState<ApiError | null>(null);
 
     const refetch = useCallback(async () => {
@@ -374,8 +390,9 @@ export function useSimilarProperties(
     }, [propertyId, limit]);
 
     useEffect(() => {
+        if (hasInitial) return;
         void refetch();
-    }, [refetch]);
+    }, [refetch, hasInitial]);
 
     return { properties, loading, error, refetch };
 }

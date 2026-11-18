@@ -25,6 +25,14 @@ export const LEGACY_PG_SLUG_REDIRECTS: Record<string, string> = {
     'hsr-sector-7': 'hsr-layout',
     'itpl': 'whitefield',
     kundalahalli: 'marathahalli',
+    'aecs-layout': 'brookefield',
+    'aecs': 'brookefield',
+    'magadi-road': 'rajajinagar',
+    'pg-for-boys-in-magadi-road': 'rajajinagar',
+    'silver-storm': 'whitefield',
+    'kengeri': 'banashankari',
+    'vijayanagar': 'rajajinagar',
+    'malleswaram': 'rajajinagar',
 };
 
 /** Resolve legacy slug → canonical slug, or undefined if unknown. */

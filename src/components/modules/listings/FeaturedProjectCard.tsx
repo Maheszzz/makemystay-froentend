@@ -1,4 +1,4 @@
-import { ArrowRight, Heart, MapPin, Sparkles } from 'lucide-react';
+import { ArrowRight, Heart, MapPin, Sparkles, Star } from 'lucide-react';
 import { Link } from '@/lib/navigation';
 
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
@@ -38,6 +38,8 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
     const propertyType = property.type || '';
     const priceLabel = property.price && property.price.trim() ? property.price : 'Price on request';
     const badgeBg = typeof rank === 'number' && rank > 0 ? RANK_COLORS[(rank - 1) % RANK_COLORS.length] : '';
+    const ratingVal = Number(property.rating ?? property.average_rating ?? 4.8) || 4.8;
+    const reviewCount = Number(property.reviews ?? property.review_count ?? 0) || 0;
 
     return (
         <Link
@@ -53,6 +55,9 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
                 <img
                     src={image}
                     alt={title}
+                    width={400}
+                    height={250}
+                    decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                     loading="lazy"
                 />
@@ -104,6 +109,19 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
                         <span className="line-clamp-1">{locationLabel}</span>
                     </div>
                 )}
+
+                {/* Rating & Reviews */}
+                <div className="mt-1.5 flex items-center gap-1.5 text-xs">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200/60">
+                        <Star className="h-3 w-3 fill-emerald-600 text-emerald-600" />
+                        {ratingVal.toFixed(1)}
+                    </span>
+                    {reviewCount > 0 && (
+                        <span className="text-[11px] font-medium text-slate-500">
+                            ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                        </span>
+                    )}
+                </div>
 
                 {/* Price + room type */}
                 <div className="mt-2 flex items-center justify-between gap-2">

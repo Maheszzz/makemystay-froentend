@@ -14,7 +14,10 @@ import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from
 import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthorityProfile } from '@/data/authority';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import AuthorityLocalityPage from '@/views/AuthorityLocalityPage';
+import { getLocalitySeoProfile, generateLocalityHelmetSeo } from '@/lib/locality';
+import { LocalitySeoProfileSections } from '@/components/seo/LocalitySeoProfileSections';
 
 import { ItemListSchema } from '@/components/seo/ItemListSchema';
 import { PlaceSchema } from '@/components/seo/PlaceSchema';
@@ -28,7 +31,7 @@ import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySec
 import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
-import { propertyApi } from '@/lib/api/properties';
+import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import { Link } from '@/lib/navigation';
 import Properties from '@/views/Properties';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -46,17 +49,13 @@ export interface PGLocationPageProps {
     overrideFeature?: string;
 }
 
+
 export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPrice, overrideGender, overrideFeature }: PGLocationPageProps) {
   const actualSlug = overrideSlug || slug || '';
   // Legacy slug redirects (e.g., old URL formats)
   const legacyTarget = resolveLegacyPgSlug(actualSlug);
   if (legacyTarget) {
     redirect(`/pg/${legacyTarget}`);
-  }
-
-  const loc = getPgLocationBySlug(actualSlug);
-  if (!loc) {
-    notFound();
   }
 
   const authorityProfile = getAuthorityProfile(actualSlug);
@@ -67,6 +66,119 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           overrideGender={overrideGender}
           overrideFeature={overrideFeature}
       />;
+  }
+
+  const localitySeoProfile = getLocalitySeoProfile(actualSlug);
+  if (localitySeoProfile) {
+    const { items: initialProperties } = await fetchPropertiesServer({
+      category: 'pg',
+      city: localitySeoProfile.locality.name,
+      is_available: true,
+      limit: 20,
+    });
+
+    const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality);
+    const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
+    const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
+    const isEmptyLocality = initialProperties.length === 0;
+
+    return (
+      <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+        <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
+        <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
+
+        <Navbar />
+        <main id="main-content" className="flex-grow pt-20 pb-16">
+          {/* Hero Banner */}
+          <div className="bg-white border-b border-slate-100">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+              <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
+              <div className="mt-3 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">
+                    Bangalore · PG
+                  </p>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    {localitySeoProfile.hero.heading}
+                  </h1>
+                  <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">
+                    {localitySeoProfile.hero.subHeading}
+                  </p>
+                  <p className="mt-1.5 text-slate-600 text-xs italic">
+                    {localitySeoProfile.hero.seoIntro}
+                  </p>
+                  <div className="mt-4 max-w-2xl space-y-3">
+                    <QuickAnswer locationName={localitySeoProfile.locality.name}>
+                      {localitySeoProfile.quickAnswer}
+                    </QuickAnswer>
+                    <div className="rounded-xl border border-red-100 bg-red-50/60 p-3.5 flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-bold text-brand-red uppercase tracking-wider">Verified Resident Rating</p>
+                        <p className="text-sm text-slate-800 font-semibold mt-0.5">{localitySeoProfile.reviewsSummary.summaryText}</p>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <span className="text-xl font-extrabold text-slate-900">{localitySeoProfile.reviewsSummary.averageRating} ★</span>
+                        <p className="text-[11px] text-slate-500">{localitySeoProfile.reviewsSummary.totalReviews} reviews</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  to="/pg/bangalore"
+                  className="inline-flex items-center gap-1.5 shrink-0 text-xs font-bold text-brand-red hover:underline"
+                >
+                  <MapPin className="w-3.5 h-3.5" />
+                  Full Bangalore PG guide
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Initial Property Cards rendered on the server for SEO */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {initialProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          </div>
+
+          {/* Client-side interactive listing component */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <Properties
+              hideChrome
+              initialCategory="pg"
+              initialCity={localitySeoProfile.locality.name}
+              pageTitle={localitySeoProfile.hero.heading}
+              pageSubtitle={localitySeoProfile.hero.subHeading}
+              showMapPanel
+            />
+          </div>
+
+          {/* Comprehensive Locality SEO Engine sections */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
+            <LocalitySeoProfileSections profile={localitySeoProfile} />
+
+            <FaqSection
+              id="pg-locality-faq-heading"
+              title={`Frequently asked — PG in ${localitySeoProfile.locality.name}`}
+              items={localitySeoProfile.faqs}
+              collapsible
+              titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
+            />
+
+            <RelatedSearchesBlock currentSlug={localitySeoProfile.slug} localityName={localitySeoProfile.locality.name} variant="pg" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const loc = getPgLocationBySlug(actualSlug);
+  if (!loc) {
+    notFound();
   }
 
   const { name, slug: locationSlug } = loc;
@@ -84,33 +196,28 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   ];
   const combinedLd = buildLocalityAeoGraph(profile, faqs, breadcrumbItems, canonicalListingPath);
 
-  // Fetch initial properties for SSR (no limit – fetch all for full SEO as per user decision)
-  // Debug logging for SSR fetch
-  console.log('[SSR] propertyApi.getAll called with', { city: locationSlug, limit: 20, baseUrl: process.env.API_BASE_URL });
-  let initialProperties: any[] = [];
-  try {
-    const result = await propertyApi.getAll({ city: locationSlug, limit: 20 });
-    initialProperties = result.items ?? [];
-    console.log('[SSR] propertyApi.getAll response - count:', initialProperties.length, 'first item:', initialProperties[0]);
-  } catch (error) {
-    console.warn('[SSR] propertyApi.getAll failed for', locationSlug, error);
-    // Continue with empty properties list to avoid 5xx
-  }
+  const { items: initialProperties } = await fetchPropertiesServer({
+    category: 'pg',
+    city: name,
+    is_available: true,
+    limit: 20,
+  });
 
   const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
   const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
+  const isEmptyLocality = initialProperties.length === 0;
 
   const pageTitle = `PG in ${name}`;
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
-      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage} />
+      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
 
       <PlaceSchema name={name} description={profile?.description} />
-      <ItemListSchema items={initialProperties.map(p => ({ url: `/property/${p.slug ?? p.id}`, name: p.title }))} />
+      <ItemListSchema items={initialProperties.map(p => ({ url: getPropertyDetailPath(p), name: p.title }))} />
 
 
       <Navbar />

@@ -1,4 +1,5 @@
 import { JsonLd } from '@/components/seo/JsonLd';
+import { buildPlaceSchema } from '@/lib/schema';
 
 export interface PlaceSchemaProps {
   name: string;
@@ -12,13 +13,7 @@ export interface PlaceSchemaProps {
 
 /** Render JSON‑LD Place schema */
 export function PlaceSchema({ name, description, address, geo }: PlaceSchemaProps) {
-  const data: any = {
-    '@context': 'https://schema.org',
-    '@type': 'Place',
-    name,
-  };
-  if (description) data.description = description;
-  if (address) data.address = address;
-  if (geo) data.geo = { '@type': 'GeoCoordinates', latitude: geo.latitude, longitude: geo.longitude };
+  const data = buildPlaceSchema({ name, description, address, geo });
   return <JsonLd data={data} id="place-ld" />;
 }
+

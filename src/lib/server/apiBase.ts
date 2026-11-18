@@ -3,6 +3,7 @@ import { SITE_URL } from '@/lib/siteConfig';
 /** Absolute API base for server-side fetch (metadata, sitemap). */
 export function resolveServerApiBase(): string {
     const raw = (
+        process.env['SERVER_API_BASE_URL'] ??
         process.env.NEXT_PUBLIC_API_BASE_URL ??
         process.env.NEXT_PUBLIC_API_URL ??
         process.env.VITE_API_BASE_URL ??

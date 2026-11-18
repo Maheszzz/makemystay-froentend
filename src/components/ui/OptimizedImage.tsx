@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import { getOptimizedImageUrl, type ImageSize } from '@/lib/utils/images';
+import { generateImageAltText } from '@/lib/imageSeoEngine';
 
 export type OptimizedImageProps = {
     src: string;
@@ -19,6 +20,7 @@ export type OptimizedImageProps = {
     /** Unsplash resize preset */
     size?: ImageSize;
     ariaHidden?: boolean;
+    fetchPriority?: 'auto' | 'high' | 'low';
     onLoad?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
     onError?: () => void;
     style?: React.CSSProperties;
@@ -56,6 +58,7 @@ export function OptimizedImage({
     className,
     size = 'medium',
     ariaHidden = false,
+    fetchPriority,
     onLoad,
     onError,
     style,
@@ -68,17 +71,19 @@ export function OptimizedImage({
     }
 
     const unoptimized = !isOptimizableSrc(resolved);
+    const effectiveAlt = !alt || alt.trim().length < 5 ? generateImageAltText({ customAlt: alt }) : alt;
 
     return (
         <Image
             src={resolved}
-            alt={ariaHidden ? '' : alt}
-            title={title ?? alt}
+            alt={ariaHidden ? '' : effectiveAlt}
+            title={title ?? effectiveAlt}
             fill={fill}
             width={fill ? undefined : width}
             height={fill ? undefined : height}
             priority={priority}
             loading={priority ? undefined : 'lazy'}
+            fetchPriority={fetchPriority ?? (priority ? 'high' : 'auto')}
             decoding="async"
             quality={quality ?? (priority ? 60 : 75)}
             sizes={sizes ?? (fill ? '(max-width: 768px) 100vw, 33vw' : undefined)}
@@ -94,3 +99,4 @@ export function OptimizedImage({
         />
     );
 }
+

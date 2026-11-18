@@ -1,0 +1,75 @@
+import { api } from '@/lib/api/client';
+import {
+    mapRealtyToProperty,
+    normalizePropertyListResponse,
+    REALTY_PATH,
+} from '@/lib/api/properties';
+import type { Property, RealtyProperty } from '@/types/api';
+
+export interface ServerPropertyQuery {
+    skip?: number;
+    limit?: number;
+    category?: string;
+    property_type?: string;
+    listing_type?: string;
+    is_available?: boolean;
+    search?: string;
+    exclude_property_type?: string;
+    min_price?: number;
+    max_price?: number;
+    city?: string;
+    sort_by?: string;
+}
+
+/**
+ * Server-side property list fetcher using REALTY_PATH, normalizePropertyListResponse, and a timeout.
+ * Throws on network/API failure so Next.js ISR/SSG never caches an empty fallback page.
+ */
+export async function fetchPropertiesServer(
+    params: ServerPropertyQuery = {},
+    timeoutMs = 15000,
+): Promise<{ items: Property[]; total: number }> {
+    const queryParams = new URLSearchParams();
+    if (params.skip !== undefined) queryParams.append('skip', params.skip.toString());
+    if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+    if (params.category) queryParams.append('category', params.category);
+    if (params.property_type) queryParams.append('property_type', params.property_type);
+    if (params.listing_type) queryParams.append('listing_type', params.listing_type);
+    if (params.is_available !== undefined) queryParams.append('is_available', params.is_available.toString());
+    if (params.search) queryParams.append('search', params.search);
+    if (params.exclude_property_type) queryParams.append('exclude_property_type', params.exclude_property_type);
+    if (params.min_price !== undefined) queryParams.append('min_price', params.min_price.toString());
+    if (params.max_price !== undefined) queryParams.append('max_price', params.max_price.toString());
+    if (params.city) queryParams.append('city', params.city);
+    if (params.sort_by) queryParams.append('sort_by', params.sort_by);
+
+    const response = await api.get<unknown>(REALTY_PATH, {
+        params: queryParams,
+        timeout: timeoutMs,
+    });
+
+    const isValidPayload =
+        Array.isArray(response) ||
+        (response !== null &&
+            typeof response === 'object' &&
+            (Array.isArray((response as Record<string, unknown>).items) ||
+                Array.isArray((response as Record<string, unknown>).properties) ||
+                Array.isArray((response as Record<string, unknown>).results)));
+
+    if (!isValidPayload) {
+        throw new Error('[fetchPropertiesServer] Invalid or non-JSON property list response from backend');
+    }
+
+    const { rows, total } = normalizePropertyListResponse(response);
+    const items: Property[] = [];
+    for (const row of rows) {
+        try {
+            items.push(mapRealtyToProperty(row as RealtyProperty));
+        } catch (e) {
+            console.warn('[fetchPropertiesServer] Skipping malformed property row:', e);
+        }
+    }
+
+    return { items, total };
+}
+

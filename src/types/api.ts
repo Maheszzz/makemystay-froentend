@@ -35,9 +35,13 @@ export interface RealtyProperty {
     slug?: string;
     property_name: string;
     location: string;
+    city?: string;
     phone?: string;
     map_link?: string;
-    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '3BHK' | '4BHK' | 'Villa' | 'Plot'; // Extended list
+    last_verified_at?: string;
+    last_booked_at?: string;
+    last_review_at?: string;
+    property_type: 'PG' | '1RK' | '1BHK' | '2BHK' | '1 & 2 BHK' | '3BHK' | '4BHK' | 'Villa' | 'Plot'; // Extended list
     furnishing: 'fully_furnished' | 'semi_furnished' | 'unfurnished';
     private_price?: number;
     single_price?: number;
@@ -62,6 +66,8 @@ export interface RealtyProperty {
     units_remaining?: number | null;
     /** UI tab from API (pg | rent | buy | plot); matches backend PropertyListItem.derive_category. */
     category?: 'pg' | 'rent' | 'buy' | 'plot' | string;
+    metadata?: Record<string, any>;
+    metadata_json?: Record<string, any>;
 }
 
 export type ReviewStatus = 'pending' | 'approved' | 'rejected';
@@ -159,6 +165,50 @@ export interface Property {
     listing_badge?: string;
     /** Optional remaining units when backend provides it. */
     units_remaining?: number | null;
+
+    /** Enterprise Sales Kit PDF Documents (Brochure, Pricing, Photo Album, etc.) */
+    documents?: {
+        id?: number;
+        document_type: string;
+        title: string;
+        document_url: string;
+        file_size?: string;
+        mime_type?: string;
+    }[];
+    /** YouTube Video Tour / Shorts */
+    videos?: {
+        id?: number;
+        title: string;
+        video_url: string;
+        thumbnail_url?: string;
+        is_short?: boolean;
+        sort_order?: number;
+    }[];
+    /** Nearby Places / Landmarks (Metro, Hospital, School, etc.) */
+    nearby_places?: {
+        id?: number;
+        category: string;
+        name: string;
+        distance: string;
+        travel_time?: string;
+        google_rating?: string;
+        map_link?: string;
+    }[];
+    /** SEO Metadata */
+    seo?: {
+        meta_title?: string;
+        meta_description?: string;
+        seo_keywords?: string;
+        focus_keyphrase?: string;
+        canonical_url?: string;
+    };
+    /** Share Settings */
+    share?: {
+        short_url?: string;
+        qr_code_url?: string;
+        share_text?: string;
+    };
+    metadata?: Record<string, any>;
 }
 
 // API Response Types

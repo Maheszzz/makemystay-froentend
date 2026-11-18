@@ -83,6 +83,9 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth tokens if needed in the future
 apiClient.interceptors.request.use(
     (config) => {
+        if (typeof window === 'undefined' && typeof process !== 'undefined' && process.env['SERVER_API_BASE_URL']) {
+            config.baseURL = process.env['SERVER_API_BASE_URL'].replace(/\/+$/, '');
+        }
         const token = getLocalItem('admin_token');
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -187,7 +190,6 @@ export async function apiRequest<T>(
     } catch (error) {
         // Interceptor already logs and transforms most errors into ApiError objects.
         // This catch block handles any catastrophic failures that bypassed the interceptor.
-        console.error(`[apiRequest] Critical failure for ${config.url}:`, error);
         throw error;
     }
 }

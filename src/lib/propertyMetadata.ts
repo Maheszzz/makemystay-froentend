@@ -1,31 +1,27 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { fetchPropertyByIdServer } from '@/lib/server/fetchPropertyById';
-import { getPropertyDetailPath, parsePropertySlugParam } from '@/lib/propertyRouting';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import {
     propertyDetailPageSeo,
+    propertyErrorSeo,
+    propertyUnavailableSeo,
 } from '@/lib/seo';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 
 export async function resolvePropertyPageMetadata(slug: string): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
-    const id = parsePropertySlugParam(param);
     
-    let property = null;
-    
-    if (id) {
-        property = await fetchPropertyByIdServer(id);
-    } else {
-        // Fallback to legacy slug search for backward compatibility
-        const { fetchPropertyBySlugServer } = await import('@/lib/server/fetchPropertyById');
-        property = await fetchPropertyBySlugServer('plot', param);
-    }
+    const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');
+    const property = await fetchPropertyAnySlugServer(param);
 
-    if (!property || property.is_available === false) {
-        notFound();
+    if (!property) {
+        return pageSeoToMetadata(propertyErrorSeo(`/property/${param}`));
     }
 
     const detailPath = getPropertyDetailPath(property);
+    if (property.is_available === false) {
+        return pageSeoToMetadata(propertyUnavailableSeo(detailPath, property.location));
+    }
+
     return pageSeoToMetadata(propertyDetailPageSeo(property, detailPath));
 }
 

@@ -1,9 +1,6 @@
 import { useEffect } from 'react';
 import type { HelmetSEOProps } from '@/lib/seo';
 import {
-    GEO_PLACENAME,
-    GEO_POSITION,
-    GEO_REGION,
     OG_LOCALE,
     SITE_AUTHOR,
     SITE_NAME,
@@ -30,8 +27,9 @@ function upsertMeta(
     key: string,
     attrs: Record<string, string>,
     managed: Element[],
+    existingSelector?: string,
 ): void {
-    const selector = `meta[${MMS_SEO}="${key}"]`;
+    const selector = existingSelector || `meta[${MMS_SEO}="${key}"]`;
     let el = document.head.querySelector(selector);
     if (!el) {
         el = document.createElement('meta');
@@ -48,8 +46,9 @@ function upsertLink(
     key: string,
     attrs: Record<string, string>,
     managed: Element[],
+    existingSelector?: string,
 ): void {
-    const selector = `link[${MMS_SEO}="${key}"]`;
+    const selector = existingSelector || `link[${MMS_SEO}="${key}"]`;
     let el = document.head.querySelector(selector);
     if (!el) {
         el = document.createElement('link');
@@ -86,20 +85,26 @@ export function useClientSeoHead({
         const managed: Element[] = [];
         document.title = title;
 
-        upsertMeta('description', { name: 'description', content: description }, managed);
-        upsertMeta('robots', {
-            name: 'robots',
-            content: noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
-        }, managed);
+        const existingRobots = document.head.querySelector('meta[name="robots"]')?.getAttribute('content') || '';
+        const effectiveNoindex = Boolean(noindex || existingRobots.includes('noindex'));
+
+        upsertMeta('description', { name: 'description', content: description }, managed, 'meta[name="description"]');
+        upsertMeta(
+            'robots',
+            {
+                name: 'robots',
+                content: effectiveNoindex
+                    ? 'noindex, follow'
+                    : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+            },
+            managed,
+            'meta[name="robots"]',
+        );
         upsertMeta('theme-color', { name: 'theme-color', content: THEME_COLOR }, managed);
         upsertMeta('author', { name: 'author', content: SITE_AUTHOR }, managed);
         upsertMeta('publisher', { name: 'publisher', content: SITE_PUBLISHER }, managed);
         upsertMeta('language', { name: 'language', content: 'en-IN' }, managed);
-        upsertMeta('geo.region', { name: 'geo.region', content: GEO_REGION }, managed);
-        upsertMeta('geo.placename', { name: 'geo.placename', content: GEO_PLACENAME }, managed);
-        upsertMeta('geo.position', { name: 'geo.position', content: GEO_POSITION }, managed);
-        upsertMeta('icbm', { name: 'ICBM', content: GEO_POSITION.replace(';', ', ') }, managed);
-        upsertLink('canonical', { rel: 'canonical', href: canonicalHref }, managed);
+        upsertLink('canonical', { rel: 'canonical', href: canonicalHref }, managed, 'link[rel="canonical"]');
 
         upsertMeta('og:title', { property: 'og:title', content: title }, managed);
         upsertMeta('og:description', { property: 'og:description', content: description }, managed);

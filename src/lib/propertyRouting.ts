@@ -62,7 +62,7 @@ export function buildPropertySeoSlug(
     ];
     const deduped = orderedTokens.filter((token, index) => orderedTokens.indexOf(token) === index);
     const semanticSlug = deduped.join('-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-    return semanticSlug || property.slug?.trim() || titleToSlug(property.title || '');
+    return semanticSlug || (property.slug ? titleToSlug(property.slug) : '') || titleToSlug(property.title || '');
 }
 
 /**

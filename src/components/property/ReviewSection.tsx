@@ -38,7 +38,7 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
         () => initialReviews.filter((r) => !r.status || r.status === 'approved'),
         [initialReviews],
     );
-    const [reviews, setReviews] = useState<Review[]>(approved);
+    const [reviews] = useState<Review[]>(approved);
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [userName, setUserName] = useState('');
@@ -333,7 +333,7 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                                                         src={url}
                                                         alt="Tenant photo"
                                                         fill
-                                                        size="thumb"
+                                                        size="thumbnail"
                                                         className="object-cover"
                                                     />
                                                 </div>

@@ -7,7 +7,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle } from 'lucide-react';
+import { Star, Heart, ArrowLeft, Share2, MapPin, CalendarDays, ChevronLeft, ChevronRight, X, Maximize2, MessageCircle, Download, FileText, ExternalLink, Clock, Video } from 'lucide-react';
 import { Link, useParams, useLocation } from '@/lib/navigation';
 import { usePropertyFromRoute, useSmartBack } from '@/hooks';
 import { paymentApi } from '@/lib/api';
@@ -17,7 +17,7 @@ import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { buildPropertyDetailGraph } from '@/lib/schema';
-import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo } from '@/lib/seo';
+import { buildPageSEO, interimPropertyDetailSeo, propertyDetailPageSeo, propertyErrorSeo, propertyUnavailableSeo } from '@/lib/seo';
 import { SITE_URL } from '@/lib/siteConfig';
 
 import type { ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
@@ -43,6 +43,8 @@ import {
 import { findPgLocationForArea } from '@/data/pgLocations';
 import type { Property } from '@/types/api';
 
+import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
+
 const ServiceFeeModal = dynamic(
     () => import('@/components/modals/ServiceFeeModal').then((m) => m.ServiceFeeModal),
     { ssr: false },
@@ -59,10 +61,6 @@ const LeadCaptureModal = dynamic(
     () => import('@/components/modals/LeadCaptureModal').then((m) => m.LeadCaptureModal),
     { ssr: false },
 );
-const SimilarPropertiesSection = dynamic(
-    () => import('@/components/property/SimilarPropertiesSection').then((m) => m.SimilarPropertiesSection),
-    { ssr: false },
-);
 const SafetyPopup = dynamic(
     () => import('@/components/modals/SafetyPopup').then((m) => m.SafetyPopup),
     { ssr: false },
@@ -71,10 +69,12 @@ const SafetyPopup = dynamic(
 type PropertyDetailsProps = {
     /** SSR-hydrated listing from the server page (avoids empty HTML for crawlers). */
     initialProperty?: Property;
+    /** SSR-hydrated similar listings. */
+    initialSimilar?: Property[];
     slug?: string;
 };
 
-export default function PropertyDetails({ initialProperty, slug: slugProp }: PropertyDetailsProps = {}) {
+export default function PropertyDetails({ initialProperty, initialSimilar, slug: slugProp }: PropertyDetailsProps = {}) {
     const { slug: slugFromParams } = useParams<{ slug: string }>();
     const slugParam = slugProp ?? slugFromParams;
     const location = useLocation();
@@ -124,6 +124,9 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
     const detailHelmet = useMemo(() => {
         if (!property) return null;
+        if (property.is_available === false) {
+            return buildPageSEO(propertyUnavailableSeo(canonicalDetailPath, property.location));
+        }
         return buildPageSEO(propertyDetailPageSeo(property, canonicalDetailPath));
     }, [property, canonicalDetailPath]);
     const interimHelmet = useMemo(
@@ -183,6 +186,83 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
 
     const handleBack = goBack;
 
+    const allSalesKitDocuments = useMemo(() => {
+        const list: { id: string; title: string; document_type: string; url: string; file_size?: string }[] = [];
+        const salesKit = (property as any)?.metadata?.sales_kit || {};
+        const metaObj = (property as any)?.metadata || {};
+        const masterDriveLink = salesKit.drive_link || salesKit.brochure || metaObj.drive_link || metaObj.brochure_url;
+
+        if (masterDriveLink && typeof masterDriveLink === 'string' && masterDriveLink.trim()) {
+            list.push({
+                id: 'master_drive_link',
+                title: 'Property Brochure & Sales Kit (Google Drive)',
+                document_type: 'Complete Google Drive Folder & Brochures',
+                url: masterDriveLink.trim(),
+            });
+        }
+
+        const titlesMap: Record<string, { title: string; type: string }> = {
+            brochure: { title: 'Brochure PDF', type: 'Full High-Resolution Property Brochure' },
+            pricing: { title: 'Pricing PDF', type: 'Detailed Rate Card & Fee Breakdown' },
+            album: { title: 'Photo Album PDF', type: 'Printable Photo Gallery Booklet' },
+            wap: { title: 'WAP PDF', type: 'Welcome Pack & Tenant Guidelines' },
+        };
+
+        Object.keys(titlesMap).forEach((key) => {
+            if (salesKit[key] && !list.some((i) => i.url === salesKit[key])) {
+                list.push({
+                    id: key,
+                    title: titlesMap[key].title,
+                    document_type: titlesMap[key].type,
+                    url: salesKit[key],
+                });
+            }
+        });
+
+        if (property?.documents && Array.isArray(property.documents)) {
+            property.documents.forEach((doc, idx) => {
+                if (doc.document_url && !list.some((i) => i.url === doc.document_url)) {
+                    list.push({
+                        id: `doc_${idx}`,
+                        title: doc.title || `Document ${idx + 1}`,
+                        document_type: doc.document_type || 'PDF Document',
+                        url: doc.document_url,
+                        file_size: doc.file_size,
+                    });
+                }
+            });
+        }
+
+        return list;
+    }, [property]);
+
+    const primaryBrochureOrDriveLink = useMemo(() => {
+        const salesKit = (property as any)?.metadata?.sales_kit || {};
+        const metaObj = (property as any)?.metadata || {};
+        return (
+            salesKit.drive_link ||
+            salesKit.brochure ||
+            metaObj.drive_link ||
+            metaObj.brochure_url ||
+            salesKit.pricing ||
+            salesKit.album ||
+            salesKit.wap ||
+            (allSalesKitDocuments.length > 0 ? allSalesKitDocuments[0].url : null)
+        );
+    }, [property, allSalesKitDocuments]);
+
+    const handleDownloadAllBrochures = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const targetUrl = primaryBrochureOrDriveLink;
+        if (targetUrl) {
+            window.open(targetUrl, '_blank', 'noopener,noreferrer');
+        } else if (allSalesKitDocuments.length > 0) {
+            window.open(allSalesKitDocuments[0].url, '_blank', 'noopener,noreferrer');
+        } else {
+            alert('The Google Drive Sales Kit / Brochure link has not been attached for this property yet. Please add your Drive link in Step 6 (Sales Kit) of the Admin Dashboard.');
+        }
+    };
+
     const handleHeroImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
         const img = e.currentTarget;
         setHeroIsPortrait(img.naturalHeight > img.naturalWidth);
@@ -210,7 +290,7 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
             const isLoaded = await loadRazorpay();
             if (!isLoaded) { alert("Razorpay SDK failed to load. Are you online?"); setIsPaymentProcessing(false); return; }
             const key = getRazorpayKeyId();
-            if (!key) { alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env.local."); setIsPaymentProcessing(false); return; }
+            if (!key) { alert("Error: Razorpay key is missing. Set NEXT_PUBLIC_RAZORPAY_KEY_ID in .env."); setIsPaymentProcessing(false); return; }
             const order = await paymentApi.createOrder({ amount: option.amount * 100, currency: "INR", payment_type: "booking", payer_name: "Guest User", payer_email: "guest@example.com", payer_phone: "9999999999" });
             const options = {
                 key,
@@ -253,11 +333,11 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={interimHelmet.title}
                     description={interimHelmet.description}
                     keywords={interimHelmet.keywords}
-                    canonical={interimHelmet.canonicalHref}
-                    image={interimHelmet.ogImage}
+                    canonicalHref={interimHelmet.canonicalHref}
+                    ogImage={interimHelmet.ogImage}
                     noindex={interimHelmet.noindex}
                 />
-                <Navbar />
+                <Navbar city={property?.city} />
                 <main className="flex-grow flex items-center justify-center">
                     <LoadingSpinner message="Loading property details..." />
                 </main>
@@ -273,11 +353,11 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={errorHelmet.title}
                     description={errorHelmet.description}
                     keywords={errorHelmet.keywords}
-                    canonical={errorHelmet.canonicalHref}
-                    image={errorHelmet.ogImage}
+                    canonicalHref={errorHelmet.canonicalHref}
+                    ogImage={errorHelmet.ogImage}
                     noindex={errorHelmet.noindex}
                 />
-                <Navbar />
+                <Navbar city={property?.city} />
                 <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4">
                     <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
                         <ErrorMessage
@@ -298,8 +378,14 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     // Build the images list
     const allImages: string[] = [];
     if (Array.isArray(property.images) && property.images.length > 0) {
-        property.images.forEach((img: any) => {
-            const url = typeof img === 'string' ? img : img?.image_url;
+        const sortedImages = [...property.images].sort((a: any, b: any) => {
+            const aPrimary = (a && typeof a === 'object' && (a.is_primary || a.isPrimary || a.is_cover)) ? 1 : 0;
+            const bPrimary = (b && typeof b === 'object' && (b.is_primary || b.isPrimary || b.is_cover)) ? 1 : 0;
+            return bPrimary - aPrimary;
+        });
+
+        sortedImages.forEach((img: any) => {
+            const url = typeof img === 'string' ? img : img?.image_url || img?.url || img?.src;
             if (url) allImages.push(url);
         });
     } else if (property.image) {
@@ -307,6 +393,65 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     }
 
     const heroImage = allImages[heroIdx] || null;
+
+    // Build the videos list from all possible fields (videos, metadata.youtube_videos, metadata.youtube_url, etc.)
+    const allVideos: { title: string; url: string; is_short?: boolean }[] = [];
+    const pushVideo = (title: string, url: string, is_short?: boolean) => {
+        if (!url || typeof url !== 'string') return;
+        if (!allVideos.some((v) => v.url === url)) {
+            allVideos.push({ title: title || 'Property Walkthrough Video', url, is_short });
+        }
+    };
+    if (Array.isArray(property.videos)) {
+        property.videos.forEach((v: any) => {
+            const url = typeof v === 'string' ? v : v?.video_url || v?.url;
+            if (url) pushVideo(v.title || 'Video Tour', url, v.is_short);
+        });
+    }
+    const meta = (() => {
+        const m = (property as any).metadata || (property as any).metadata_json;
+        if (typeof m === 'string') {
+            try { return JSON.parse(m); } catch { return {}; }
+        }
+        return m || {};
+    })();
+    if (Array.isArray(meta.youtube_videos)) {
+        meta.youtube_videos.forEach((v: any) => {
+            if (v?.url) pushVideo(v.title || 'Video Visit', v.url, v.is_short);
+        });
+    }
+    if (Array.isArray(meta.videos)) {
+        meta.videos.forEach((v: any) => {
+            const url = typeof v === 'string' ? v : v?.url || v?.video_url;
+            if (url) pushVideo(v.title || 'Video Visit', url, v.is_short);
+        });
+    }
+    if (meta.youtube_url) pushVideo('YouTube Walkthrough', meta.youtube_url);
+    if (meta.video_url) pushVideo('Video Walkthrough', meta.video_url);
+    if (meta.virtual_tour_url) pushVideo('Virtual Video Visit', meta.virtual_tour_url);
+    if (meta.property_walkthrough) pushVideo('Property Walkthrough', meta.property_walkthrough);
+    if (meta.drone_video) pushVideo('Drone Video Tour', meta.drone_video);
+    if (meta.instagram_reel) pushVideo('Instagram Reel', meta.instagram_reel);
+    if (meta.virtual_tour) pushVideo('Virtual Tour', meta.virtual_tour);
+    if ((property as any).video_url) pushVideo('Property Video Tour', (property as any).video_url);
+
+    const getYouTubeEmbedUrl = (inputUrl: string): string | null => {
+        if (!inputUrl || typeof inputUrl !== 'string') return null;
+        let url = inputUrl.trim();
+        const iframeSrcMatch = url.match(/src=["'](.*?)["']/);
+        if (iframeSrcMatch) {
+            url = iframeSrcMatch[1];
+        }
+        const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|watch|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+        const match = url.match(regExp);
+        if (match && match[1]) {
+            return `https://www.youtube.com/embed/${match[1]}?rel=0&modestbranding=1`;
+        }
+        if (url.includes('youtube.com/embed/') || url.includes('youtube-nocookie.com/embed/')) {
+            return url;
+        }
+        return null;
+    };
 
     // Build display features (non-array truthy `{}` must not reach .map)
     let displayFeatures = Array.isArray(property.features) ? [...property.features] : [];
@@ -342,12 +487,13 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
     const seoHeading = buildPropertySeoHeading(property);
     const heroLead =
         extractHeroLeadFromNarrative(longSeo, 520) || buildPropertyHeroIntro(property);
+    const propertyCity = property?.city || 'Bangalore';
     const crumbLabel = seoHeading.trim();
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
         ...(isPG
             ? [
-                  { name: 'PG in Bangalore', path: '/pg/bangalore' },
+                  { name: `PG in ${propertyCity}`, path: `/pg/${propertyCity.toLowerCase()}` },
                   ...(pgLoc ? [{ name: `PG in ${pgLoc.name}`, path: `/pg/${pgLoc.slug}` }] : []),
               ]
             : [{ name: 'Listings', path: '/properties' }]),
@@ -367,17 +513,41 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                     title={detailHelmet.title}
                     description={detailHelmet.description}
                     keywords={detailHelmet.keywords}
-                    canonical={detailHelmet.canonicalHref}
-                    image={detailHelmet.ogImage}
+                    canonicalHref={detailHelmet.canonicalHref}
+                    ogImage={detailHelmet.ogImage}
                     noindex={detailHelmet.noindex}
                     ogType="article"
                 />
             )}
             {detailJsonLd && <JsonLd data={detailJsonLd} id="property-detail-schema" />}
             <div className="min-h-screen font-sans flex flex-col bg-gradient-to-b from-white via-[#fbfbfd] to-slate-50">
-            <Navbar />
+            <Navbar city={property?.city} />
 
             <main id="main-content" className="pb-20 md:pb-24 flex-grow">
+                {property.is_available === false && (
+                    <div
+                        role="status"
+                        data-testid="property-unavailable-banner"
+                        className="bg-amber-50 border-b border-amber-200 pt-20 pb-4 px-4 sm:px-6 lg:px-8"
+                    >
+                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div>
+                                <p className="text-sm sm:text-base font-bold text-amber-900">
+                                    This property is no longer available
+                                </p>
+                                <p className="text-xs sm:text-sm text-amber-800">
+                                    This listing in {property.location || 'Bangalore'} is currently rented out or paused. Browse verified similar stays below.
+                                </p>
+                            </div>
+                            <Link
+                                to={pgLoc ? `/pg/${pgLoc.slug}` : '/properties'}
+                                className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-amber-900 text-white text-xs font-bold hover:bg-amber-800 transition-colors shrink-0"
+                            >
+                                {pgLoc ? `Browse available PGs in ${pgLoc.name}` : 'Browse available properties'}
+                            </Link>
+                        </div>
+                    </div>
+                )}
 
                 {/* ─── Cinematic Hero Section ─── */}
                 <section className="relative bg-[#0a0a0b] overflow-hidden group">
@@ -413,6 +583,15 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </button>
 
                                     <div className="flex items-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={handleDownloadAllBrochures}
+                                            className="inline-flex items-center gap-2 bg-brand-red/90 hover:bg-brand-red text-white px-4 py-2.5 rounded-full border border-brand-red/30 hover:border-white/30 transition-all shadow-lg text-xs font-bold tracking-wide group"
+                                            title="Download All 4 Sales Kit PDFs (Brochure, Pricing, Album, WAP)"
+                                        >
+                                            <Download className="w-3.5 h-3.5 text-white group-hover:scale-110 transition-transform" />
+                                            <span>Download Brochure</span>
+                                        </button>
                                         <button
                                             onClick={handleShare}
                                             className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center shadow-lg"
@@ -658,6 +837,75 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                 </section>
                             )}
 
+                            {/* Video Visit / Video Walkthrough */}
+                            {allVideos.length > 0 && (
+                                <section className="bg-slate-50/50 rounded-[3rem] p-8 md:p-12 border border-slate-100">
+                                    <div className="flex items-center justify-between gap-4 mb-8">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-1.5 h-8 bg-brand-red rounded-full" />
+                                            <div>
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-1">Virtual Walkthrough</p>
+                                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Video Visit</h2>
+                                            </div>
+                                        </div>
+                                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{allVideos.length} {allVideos.length === 1 ? 'Video' : 'Videos'}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {allVideos.map((v, idx) => {
+                                            const ytEmbedUrl = getYouTubeEmbedUrl(v.url);
+                                            const isMp4 = !ytEmbedUrl && (v.url.endsWith('.mp4') || v.url.endsWith('.webm') || v.url.includes('cloudinary') || v.url.includes('.mp4?'));
+                                            return (
+                                                <div
+                                                    key={idx}
+                                                    className={`bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm flex flex-col ${
+                                                        allVideos.length === 1 ? 'md:col-span-2 max-w-4xl mx-auto w-full' : ''
+                                                    }`}
+                                                >
+                                                    <div className={`relative w-full bg-black ${v.is_short ? 'aspect-[9/16] max-w-xs mx-auto' : 'aspect-video'}`}>
+                                                        {ytEmbedUrl ? (
+                                                            <iframe
+                                                                src={ytEmbedUrl}
+                                                                title={v.title || `Video Visit ${idx + 1}`}
+                                                                className="w-full h-full border-0"
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                                allowFullScreen
+                                                            />
+                                                        ) : isMp4 ? (
+                                                            <video
+                                                                src={v.url}
+                                                                controls
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-white bg-slate-900">
+                                                                <Video className="w-12 h-12 text-brand-red mb-3" />
+                                                                <p className="font-bold text-sm mb-2">{v.title}</p>
+                                                                <a
+                                                                    href={v.url}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-red text-white font-bold text-xs hover:bg-brand-red/90 transition"
+                                                                >
+                                                                    Watch Video <ExternalLink className="w-3.5 h-3.5" />
+                                                                </a>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {v.title && (
+                                                        <div className="p-4 flex items-center justify-between border-t border-slate-100">
+                                                            <span className="text-sm font-bold text-slate-800">{v.title}</span>
+                                                            <span className="text-[10px] font-black uppercase px-2 py-1 bg-red-50 text-brand-red rounded-md">
+                                                                {v.is_short ? 'Shorts' : 'Tour'}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
+                            )}
+
                             {/* Amenities Overlay */}
                             {displayFeatures.length > 0 && (
                                 <section className="bg-slate-50/50 rounded-[3rem] p-8 md:p-12 border border-slate-100">
@@ -684,8 +932,134 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     </div>
                                 </section>
                             )}
+                            {/* Sales Kit Downloads Section */}
+                            {allSalesKitDocuments.length > 0 && (
+                                <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                        <div>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">Downloads</p>
+                                            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sales Kit & Brochures</h2>
+                                            <p className="text-sm text-slate-500 mt-1">Download official brochures, pricing schedules, photo album, and welcome packs.</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={handleDownloadAllBrochures}
+                                            className="px-5 py-3 bg-brand-red hover:bg-red-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
+                                        >
+                                            <Download className="w-4 h-4" /> Open Brochure / Google Drive
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {allSalesKitDocuments.map((doc, idx) => (
+                                            <div
+                                                key={doc.id || idx}
+                                                className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-brand-red/30 transition-all group"
+                                            >
+                                                <div className="flex items-center gap-4 min-w-0">
+                                                    <div className="w-12 h-12 rounded-xl bg-red-50 text-brand-red flex items-center justify-center shrink-0">
+                                                        <FileText className="w-6 h-6" />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h4 className="text-sm font-bold text-slate-900 truncate group-hover:text-brand-red transition-colors">
+                                                            {doc.title}
+                                                        </h4>
+                                                        <p className="text-xs text-slate-400 uppercase font-semibold truncate">
+                                                            {doc.document_type || 'PDF Document'} {doc.file_size ? `• ${doc.file_size}` : ''}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <a
+                                                    href={doc.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="px-4 py-2 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors shrink-0 shadow-sm"
+                                                >
+                                                    <Download className="w-3.5 h-3.5" /> Open / Download
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
 
-                            <SimilarPropertiesSection current={property} />
+                            {/* Property Location & Interactive Map Section */}
+                            <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                                    <div>
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red mb-2">Location & Map</p>
+                                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">Explore Property Location</h2>
+                                        <p className="text-sm text-slate-500 mt-1">
+                                            Located in <span className="font-semibold text-slate-800">{property.location || property.city || 'Bangalore'}</span> — view interactive neighborhood map below.
+                                        </p>
+                                    </div>
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-5 py-3 bg-slate-900 hover:bg-brand-red text-white text-xs font-bold rounded-2xl flex items-center gap-2 transition-all shadow-md self-start sm:self-auto shrink-0"
+                                    >
+                                        <MapPin className="w-4 h-4 text-brand-red" /> Open in Google Maps
+                                    </a>
+                                </div>
+
+                                {/* Interactive Google Maps Embed */}
+                                <div className="relative w-full h-[400px] rounded-3xl overflow-hidden border border-slate-200 shadow-md bg-slate-100">
+                                    <iframe
+                                        title="Property Location Map"
+                                        src={`https://maps.google.com/maps?q=${encodeURIComponent(`${property.location || ''}, ${property.city || 'Bangalore, India'}`)}&t=&z=14&ie=UTF8&iwloc=&output=embed`}
+                                        className="w-full h-full border-0"
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                </div>
+
+                                {property.nearby_places && property.nearby_places.length > 0 && (
+                                    <div className="mt-8 pt-8 border-t border-slate-100">
+                                        <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
+                                            Key Landmarks Nearby
+                                        </h4>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {property.nearby_places.map((place, idx) => (
+                                                <div
+                                                    key={place.id || idx}
+                                                    className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-4"
+                                                >
+                                                    <div className="flex items-center gap-3.5 min-w-0">
+                                                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shrink-0 font-bold text-xs">
+                                                            {place.category === 'Metro' ? '🚇' : place.category === 'IT Park' ? '🏢' : place.category === 'Hospital' ? '🏥' : '📍'}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <h4 className="text-sm font-bold text-slate-900 truncate">{place.name}</h4>
+                                                            <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+                                                                <span className="font-semibold text-brand-red">{place.distance}</span>
+                                                                {place.travel_time && (
+                                                                    <span className="inline-flex items-center gap-1">
+                                                                        • <Clock className="w-3 h-3 text-slate-400" /> {place.travel_time}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {place.map_link && (
+                                                        <a
+                                                            href={place.map_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-2 bg-white hover:bg-slate-100 text-slate-600 rounded-xl border border-slate-200 transition-colors shrink-0"
+                                                            title="View on Google Maps"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </section>
+
+                            <SimilarPropertiesSection current={property} initialSimilar={initialSimilar} />
 
                             {/* Reviews */}
                             <section className="bg-white rounded-[3rem] p-8 md:p-12 border border-slate-100 shadow-sm">
@@ -808,26 +1182,28 @@ export default function PropertyDetails({ initialProperty, slug: slugProp }: Pro
                                     if (block.startsWith('## ')) {
                                         return <h2 key={bi} className="text-xl md:text-2xl font-bold text-slate-900 mt-6 mb-3">{block.replace('## ', '')}</h2>;
                                     }
+
+                                    const renderTextWithBold = (text: string) => {
+                                        const parts = text.split(/(\*\*.*?\*\*)/g);
+                                        return parts.map((part, i) => {
+                                            if (part.startsWith('**') && part.endsWith('**')) {
+                                                return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
+                                            }
+                                            return part;
+                                        });
+                                    };
+
                                     if (block.startsWith('- ')) {
                                         return (
                                             <ul key={bi} className="list-disc pl-5 mb-4 space-y-1">
-                                                {block.split('\n').map((line, li) => {
-                                                    const cleanLine = line.replace(/^- \**|^\* |^\*+\s*/, '');
-                                                    const parts = cleanLine.split('**');
-                                                    if (parts.length > 2) {
-                                                        return (
-                                                            <li key={li}>
-                                                                <strong className="font-semibold text-slate-900">{parts[1]}</strong>
-                                                                {parts.slice(2).join('')}
-                                                            </li>
-                                                        );
-                                                    }
-                                                    return <li key={li}>{cleanLine}</li>;
-                                                })}
+                                                {block.split('\n').filter(Boolean).map((line, li) => (
+                                                    <li key={li}>{renderTextWithBold(line.replace(/^- /, '').trim())}</li>
+                                                ))}
                                             </ul>
                                         );
                                     }
-                                    return <p key={bi} className="mb-4">{block}</p>;
+
+                                    return <p key={bi} className="mb-4 whitespace-pre-line">{renderTextWithBold(block)}</p>;
                                 })}
                             </div>
                         </section>
