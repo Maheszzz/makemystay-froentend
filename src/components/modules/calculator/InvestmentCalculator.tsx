@@ -127,9 +127,9 @@ export function InvestmentCalculator() {
 
                         <div className="space-y-6 pl-4">
                             {[
-                                { title: "Pre-Approved Rates", desc: "Get the best rates available" },
-                                { title: "Secure Process", desc: "Your data is protected" },
-                                { title: "Quick Approval", desc: "Get approved in 24 hours" }
+                                { title: "Indicative Estimate", desc: "For planning monthly EMI & down payment budgets" },
+                                { title: "Local Calculation", desc: "Runs directly in your browser without submitting data" },
+                                { title: "Compare Scenarios", desc: "Adjust interest rate and tenure to compare totals" }
                             ].map((item, i) => (
                                 <div key={i} className="flex items-start">
                                     <div className="flex-shrink-0 w-6 h-6 rounded-full border border-emerald-500 text-emerald-500 flex items-center justify-center mt-0.5 mr-4">

@@ -21,6 +21,19 @@ import { buildFaqPageSchema, buildHomeOrganizationLocalWebGraph } from '@/lib/sc
 import { HomeBelowFold } from '@/views/HomeBelowFold';
 import type { Property } from '@/types/api';
 
+export interface CityInventoryCounts {
+    bangalore: number;
+    hyderabad: number;
+    pune: number;
+}
+
+export interface MarketplaceStats {
+    totalListings: number;
+    verifiedReviewCount: number;
+    averageRating: number | null;
+    cityCounts: CityInventoryCounts;
+}
+
 const LEGACY_HOME_CATEGORY = new Set<ListingsCategoryKey>(['pg', 'rent', 'buy', 'plot', 'all']);
 
 /**
@@ -69,7 +82,13 @@ function HomeUrlSync({ onChange }: { onChange: (q: string, cat: string | null) =
     return null;
 }
 
-function HomeInner({ initialProperties }: { initialProperties?: Property[] }) {
+function HomeInner({
+    initialProperties,
+    marketplaceStats,
+}: {
+    initialProperties?: Property[];
+    marketplaceStats?: MarketplaceStats;
+}) {
     const router = useRouter();
     useScrollMemory(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -174,6 +193,7 @@ function HomeInner({ initialProperties }: { initialProperties?: Property[] }) {
                         listingsNavigate={handleListingsNavigate}
                         activeHubTab={heroTab}
                         onHubTabChange={handleHubTabChange}
+                        marketplaceStats={marketplaceStats}
                     />
                 </section>
 
@@ -194,6 +214,9 @@ function HomeInner({ initialProperties }: { initialProperties?: Property[] }) {
     );
 }
 
-export default function Home(props: { initialProperties?: Property[] }) {
+export default function Home(props: {
+    initialProperties?: Property[];
+    marketplaceStats?: MarketplaceStats;
+}) {
     return <HomeInner {...props} />;
 }

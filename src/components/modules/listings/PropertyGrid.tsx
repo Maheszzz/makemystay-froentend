@@ -6,8 +6,7 @@ import { MobilePropertyCarousel } from '@/components/modules/listings/MobileProp
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { FEATURED_LAUNCH } from '@/data/featuredLaunch';
-import { useProperties, useProperty } from '@/hooks';
+import { useProperties } from '@/hooks';
 import { buildFeaturedCarouselRows, findFeaturedLaunchProperty } from '@/lib/featuredLaunch';
 
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
@@ -87,16 +86,10 @@ export function PropertyGrid({
         });
     }, [sortedProperties, filters]);
 
-    const launchFromList = useMemo(
-        () => findFeaturedLaunchProperty(amenityGenderFiltered),
-        [amenityGenderFiltered]
+    const launchProperty = useMemo(
+        () => findFeaturedLaunchProperty(amenityGenderFiltered) ?? null,
+        [amenityGenderFiltered],
     );
-
-    const { property: launchById } = useProperty(
-        cardVariant === 'project' && !launchFromList ? FEATURED_LAUNCH.propertyId : null
-    );
-
-    const launchProperty = launchFromList ?? launchById ?? null;
 
     const projectDisplayRows = useMemo(() => {
         if (cardVariant !== 'project') return [];

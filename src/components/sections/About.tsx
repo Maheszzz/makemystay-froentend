@@ -10,11 +10,11 @@ const whatWeDo = [
     { icon: Heart, title: 'Technology powered by real estate expertise', desc: 'Built by people who understand both sides of the transaction.' },
 ];
 
-const trustMetrics = [
-    { value: '1,000+', label: 'Properties Listed' },
-    { value: '500+', label: 'Happy Residents' },
-    { value: '24/7', label: 'Assistance Available' },
-    { value: '100%', label: 'Verified Listings' },
+const trustPillars = [
+    { value: 'Zero', label: 'Brokerage Fee' },
+    { value: 'Real', label: 'Property Photos' },
+    { value: 'Direct', label: 'Scheduled Visits' },
+    { value: 'Clear', label: 'Upfront Pricing' },
 ];
 
 export function About() {
@@ -56,12 +56,12 @@ export function About() {
                     </div>
                 </div>
 
-                {/* ── Trust Metrics ── */}
+                {/* ── Trust Pillars ── */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 md:mb-20">
-                    {trustMetrics.map((m, i) => (
+                    {trustPillars.map((m, i) => (
                         <div key={i} className="text-center py-6 px-4 rounded-2xl" style={{ background: '#F7F8FA', border: '1px solid rgba(0,0,0,0.05)' }}>
                             <p className="text-3xl font-bold mb-1" style={{ color: '#B11226', fontFamily: "'Playfair Display', serif" }}>{m.value}</p>
-                            <p className="text-xs text-slate-500 tracking-wide">{m.label}</p>
+                            <p className="text-xs text-slate-600 tracking-wide font-medium">{m.label}</p>
                         </div>
                     ))}
                 </div>
@@ -200,10 +200,10 @@ export function About() {
                 {/* ── Trust Strip ── */}
                 <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                        { icon: CheckCircle, label: '1,000+ Verified Listings' },
-                        { icon: Phone, label: '24/7 Support' },
+                        { icon: CheckCircle, label: 'Direct Visit Scheduling' },
+                        { icon: Phone, label: 'WhatsApp & Call Support' },
                         { icon: Award, label: 'Transparent Pricing' },
-                        { icon: Heart, label: 'Trusted Across Bangalore' },
+                        { icon: Heart, label: 'Zero Tenant Brokerage' },
                     ].map((t, i) => (
                         <div key={i} className="flex items-center gap-2 p-4 rounded-2xl" style={{ background: '#F7F8FA', border: '1px solid rgba(0,0,0,0.05)' }}>
                             <t.icon className="w-4 h-4 shrink-0" style={{ color: '#C5A021' }} />

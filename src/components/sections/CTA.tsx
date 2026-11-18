@@ -22,11 +22,8 @@ export function CTA() {
                     Stop Losing Profits to Brokers.<br className="hidden md:block" />{' '}
                     <span className="italic">Start Owning Your Growth.</span>
                 </h2>
-                <p className="text-base md:text-xl text-white/90 mb-2 md:mb-3 max-w-2xl mx-auto">
-                    Join 50+ operators who have already automated their growth and reclaimed their profits.
-                </p>
-                <p className="text-sm md:text-base text-white/70 mb-8 md:mb-10 max-w-xl mx-auto">
-                    Operators see results in as little as <span className="font-bold text-white">5–10 days</span>.
+                <p className="text-base md:text-xl text-white/90 mb-8 md:mb-10 max-w-2xl mx-auto">
+                    Connect with tenants directly, showcase verified photos, and automate visit scheduling without broker commissions.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-stretch sm:items-center">

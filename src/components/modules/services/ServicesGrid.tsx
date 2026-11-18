@@ -28,13 +28,6 @@ const services = [
     },
 ];
 
-const stats = [
-    { value: '500+', label: 'Properties Managed' },
-    { value: '95%', label: 'Occupancy Rate' },
-    { value: '2,000+', label: 'Tenants Served' },
-    { value: '4.8★', label: 'Avg. Rating' },
-];
-
 export function ServicesGrid() {
     return (
         <div className="w-full">
@@ -83,23 +76,8 @@ export function ServicesGrid() {
                 ))}
             </div>
 
-            <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {stats.map((stat, i) => (
-                    <div
-                        key={i}
-                        className="text-center py-4 px-3 rounded-2xl"
-                        style={{ background: '#F7F8FA', border: '1px solid rgba(0,0,0,0.05)' }}
-                    >
-                        <p className="text-xl font-bold" style={{ color: '#B11226' }}>
-                            {stat.value}
-                        </p>
-                        <p className="text-xs text-slate-600 mt-0.5">{stat.label}</p>
-                    </div>
-                ))}
-            </div>
-
-            <p className="text-center text-sm text-slate-600 mt-6">
-                Trusted by property owners across Bangalore.
+            <p className="text-center text-sm text-slate-600 mt-8">
+                Built for PG &amp; rental property owners across Bangalore.
             </p>
         </div>
     );

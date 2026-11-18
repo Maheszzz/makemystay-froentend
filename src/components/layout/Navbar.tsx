@@ -207,7 +207,7 @@ export function Navbar({ city }: { city?: string }) {
     const isHomePage = location.pathname === '/';
     const showScrolledStyle = isScrolled || !isHomePage;
     const navLinkDesktop = `font-semibold whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.93rem]' : 'text-sm'}`;
-    const importantNavItems = navigationLinks.filter((item) => ['Home', 'Services', 'About Us'].includes(item));
+    const importantNavItems = navigationLinks.filter((item) => ['Home'].includes(item));
 
     return (
         <>
@@ -228,32 +228,34 @@ export function Navbar({ city }: { city?: string }) {
                             {importantNavItems.map((item) => (
                                 <a
                                     key={item}
-                                    href={item === 'Home' ? '/' : `/#${item.toLowerCase().replace(' ', '-')}`}
+                                    href="/"
                                     onClick={(e) => handleNavClick(item, e)}
                                     className={navLinkDesktop}
                                 >
                                     {item}
                                 </a>
                             ))}
+                            <Link to="/pg" className={navLinkDesktop}>
+                                PGs
+                            </Link>
+                            <Link to="/rent" className={navLinkDesktop}>
+                                Flats
+                            </Link>
+                            <Link to="/about" className={navLinkDesktop}>
+                                About Us
+                            </Link>
                             <Link to="/blog" className={navLinkDesktop}>
                                 Blog
                             </Link>
-                            <Link to="/quick-pay" className={navLinkDesktop}>
-                                Quick Pay
-                            </Link>
-                            <Link
-                                to="/schedule-demo"
-                                className={`flex items-center gap-1.5 ${navLinkDesktop}`}
-                            >
-                                <Video className="w-4 h-4 shrink-0" />
-                                Schedule a Demo
+                            <Link to="/for-owners" className={navLinkDesktop}>
+                                For Owners
                             </Link>
                         </div>
 
                         <div className="flex items-center justify-end justify-self-end shrink-0 gap-2">
                             <Link
-                                to="/pg/bangalore"
-                                aria-label="List your PG in Bangalore"
+                                to="/for-owners"
+                                aria-label="List your PG or property"
                                 className={`md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors bg-brand-red text-white border-brand-red hover:bg-red-600`}
                             >
                                 List PG
@@ -376,7 +378,7 @@ export function Navbar({ city }: { city?: string }) {
                         </div>
 
                         <Link
-                            to="/schedule-demo"
+                            to="/for-owners"
                             onClick={() => setIsMenuOpen(false)}
                             className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
                         >
@@ -384,8 +386,8 @@ export function Navbar({ city }: { city?: string }) {
                                 <Video className="w-4 h-4 text-blue-400" />
                             </div>
                             <div className="flex-1">
-                                <div className="font-semibold text-sm">Schedule a Demo</div>
-                                <div className="text-[11px] text-slate-400">Book a live walkthrough</div>
+                                <div className="font-semibold text-sm">For Property Owners</div>
+                                <div className="text-[11px] text-slate-400">List &amp; manage your property</div>
                             </div>
                             <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                         </Link>
