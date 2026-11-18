@@ -20,9 +20,10 @@ type NavCitySlug = typeof NAV_CITIES[number]['slug'];
 interface CityDropdownProps {
     selectedCity: NavCitySlug;
     onSelect: (slug: NavCitySlug) => void;
+    calm?: boolean;
 }
 
-function CityDropdown({ selectedCity, onSelect }: CityDropdownProps) {
+function CityDropdown({ selectedCity, onSelect, calm = false }: CityDropdownProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement | null>(null);
     const currentLabel = NAV_CITIES.find((c) => c.slug === selectedCity)?.label ?? 'Bangalore';
@@ -52,10 +53,14 @@ function CityDropdown({ selectedCity, onSelect }: CityDropdownProps) {
                 aria-haspopup="listbox"
                 aria-expanded={open}
                 onClick={() => setOpen((v) => !v)}
-                className="hidden md:inline-flex min-w-[132px] items-center justify-between gap-1.5 rounded-full border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:shadow transition-all"
+                className={`hidden md:inline-flex items-center justify-between gap-1.5 rounded-full border transition-all ${
+                    calm
+                        ? 'min-w-[116px] border-pdp-border bg-pdp-surface px-3 py-1 text-xs font-medium text-pdp-ink hover:bg-pdp-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink'
+                        : 'min-w-[132px] border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:border-slate-300 hover:shadow'
+                }`}
             >
                 <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-brand-red shrink-0" />
+                    <MapPin className={`w-3.5 h-3.5 shrink-0 ${calm ? 'text-pdp-muted' : 'text-brand-red'}`} />
                     {currentLabel}
                 </span>
                 <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
@@ -99,7 +104,8 @@ function CityDropdown({ selectedCity, onSelect }: CityDropdownProps) {
     );
 }
 
-export function Navbar({ city }: { city?: string }) {
+export function Navbar({ city, variant = 'default' }: { city?: string; variant?: 'default' | 'calm' }) {
+    const isCalm = variant === 'calm';
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
@@ -206,25 +212,54 @@ export function Navbar({ city }: { city?: string }) {
 
     const isHomePage = location.pathname === '/';
     const showScrolledStyle = isScrolled || !isHomePage;
-    const navLinkDesktop = `font-semibold whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.93rem]' : 'text-sm'}`;
+    const navLinkDesktop = isCalm
+        ? 'font-medium whitespace-nowrap transition-colors cursor-pointer text-sm text-pdp-muted hover:text-pdp-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded'
+        : `font-semibold whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.93rem]' : 'text-sm'}`;
     const importantNavItems = navigationLinks.filter((item) => ['Home'].includes(item));
+
+    const navBarClasses = isCalm
+        ? `fixed w-full z-50 transition-all duration-200 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border ${
+              isScrolled ? 'py-1.5 shadow-[0_1px_8px_rgba(22,24,29,0.04)]' : 'py-2'
+          }`
+        : `fixed w-full z-50 transition-all duration-300 ${
+              showScrolledStyle
+                  ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-3.5 border-b border-slate-200'
+                  : 'bg-white py-3 md:py-4.5 border-b border-slate-100'
+          }`;
 
     return (
         <>
-            <nav className={`fixed w-full z-50 transition-all duration-300 ${showScrolledStyle ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-3.5 border-b border-slate-200' : 'bg-white py-3 md:py-4.5 border-b border-slate-100'
-                }`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+            <nav className={navBarClasses}>
+                <div className={isCalm ? 'max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10'}>
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_auto_1fr_auto] md:items-center md:gap-4 lg:gap-8">
                         <div className="flex items-center gap-2 shrink-0">
-                            <img src={LOGO_SRC} alt="MakeMyStay.ai logo" width={40} height={40} className="w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-contain shadow-sm bg-white" />
-                            <Link to="/" aria-label="MakeMyStay Home" className="text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none">
-                                MakeMyStay<span className="text-brand-red">.ai</span>
+                            <img
+                                src={LOGO_SRC}
+                                alt="MakeMyStay.ai logo"
+                                width={40}
+                                height={40}
+                                className={
+                                    isCalm
+                                        ? 'w-7 h-7 max-w-[28px] max-h-[28px] shrink-0 rounded-md object-contain bg-white border border-pdp-border'
+                                        : 'w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-contain shadow-sm bg-white'
+                                }
+                            />
+                            <Link
+                                to="/"
+                                aria-label="MakeMyStay Home"
+                                className={
+                                    isCalm
+                                        ? 'text-lg font-bold tracking-tight font-heading transition-colors text-pdp-ink leading-none'
+                                        : 'text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none'
+                                }
+                            >
+                                MakeMyStay<span className={isCalm ? 'text-pdp-muted font-semibold' : 'text-brand-red'}>.ai</span>
                             </Link>
                         </div>
 
-                        <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} />
+                        <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} calm={isCalm} />
 
-                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isHomePage && !showScrolledStyle ? 'gap-x-5 lg:gap-x-7' : 'gap-x-6 lg:gap-x-8'}`}>
+                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isCalm ? 'gap-x-5 lg:gap-x-7' : isHomePage && !showScrolledStyle ? 'gap-x-5 lg:gap-x-7' : 'gap-x-6 lg:gap-x-8'}`}>
                             {importantNavItems.map((item) => (
                                 <a
                                     key={item}
@@ -256,19 +291,34 @@ export function Navbar({ city }: { city?: string }) {
                             <Link
                                 to="/for-owners"
                                 aria-label="List your PG or property"
-                                className={`md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors bg-brand-red text-white border-brand-red hover:bg-red-600`}
+                                className={
+                                    isCalm
+                                        ? 'md:hidden inline-flex items-center rounded-full border border-pdp-border bg-pdp-surface px-2.5 py-1 text-[11px] font-medium text-pdp-ink hover:bg-pdp-bg transition-colors'
+                                        : 'md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors bg-brand-red text-white border-brand-red hover:bg-red-600'
+                                }
                             >
                                 List PG
                             </Link>
                             <Link to="/contact-us" className="hidden md:block">
-                                <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-sm hover:shadow-md transition-shadow">Contact Us</Button>
+                                {isCalm ? (
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-[10px] border border-pdp-border bg-transparent px-4 py-1.5 text-sm font-medium text-pdp-ink hover:border-pdp-ink hover:text-pdp-ink hover:bg-pdp-bg shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                                    >
+                                        Contact Us
+                                    </Button>
+                                ) : (
+                                    <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-sm hover:shadow-md transition-shadow">Contact Us</Button>
+                                )}
                             </Link>
                             <button
                                 aria-label={isMenuOpen ? "Close menu" : "Open menu"}
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className={`md:hidden p-2 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-800 hover:bg-slate-100`}
+                                className={`md:hidden p-2 rounded-lg transition-colors flex items-center justify-center text-slate-800 hover:bg-slate-100 ${
+                                    isCalm ? 'min-w-[36px] min-h-[36px]' : 'min-w-[44px] min-h-[44px]'
+                                }`}
                             >
-                                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                                {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                             </button>
                         </div>
                     </div>
@@ -419,9 +469,15 @@ export function Navbar({ city }: { city?: string }) {
                     {/* Menu Footer */}
                     <div className="p-6 border-t border-white/10 space-y-4">
                         <Link to="/contact-us" onClick={() => setIsMenuOpen(false)}>
-                            <Button variant="primary" className="w-full py-3.5 text-base shadow-glow">
-                                Contact Us
-                            </Button>
+                            {isCalm ? (
+                                <Button variant="outline" className="w-full py-3.5 text-base border-white/30 text-white hover:border-white hover:text-white hover:bg-white/10 rounded-[10px]">
+                                    Contact Us
+                                </Button>
+                            ) : (
+                                <Button variant="primary" className="w-full py-3.5 text-base shadow-glow">
+                                    Contact Us
+                                </Button>
+                            )}
                         </Link>
                         <a
                             href="tel:+918150099911"
