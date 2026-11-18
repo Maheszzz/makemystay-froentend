@@ -72,6 +72,9 @@ export interface RealtyProperty {
     notice_period_days?: number | null;
     house_rules?: string[] | string | null;
     food_menu?: string | Record<string, string> | null;
+    token_amount?: number | string | null;
+    token_refund_terms?: string | null;
+    refund_terms?: string | null;
     created_at?: string;
     updated_at?: string;
     metadata?: Record<string, any>;
@@ -108,6 +111,10 @@ export interface PropertyImage {
     file_size?: number | null;
     is_primary: boolean;
     sort_order: number;
+    caption?: string;
+    category?: string;
+    label?: string;
+    room_type?: string;
     created_at: string;
 }
 
@@ -143,6 +150,7 @@ export interface Property {
     pool?: boolean;
     smart_home?: boolean;
     images?: string[];
+    image_items?: { url: string; caption?: string }[];
     tag?: string;
     category: 'pg' | 'rent' | 'buy' | 'plot';
     description: string;
@@ -173,6 +181,8 @@ export interface Property {
     notice_period_days?: number | null;
     house_rules?: string[];
     food_menu?: string | Record<string, string>;
+    token_amount?: number | string | null;
+    token_refund_terms?: string | null;
 
     // Original Realty fields preserved for reference
     map_link?: string;

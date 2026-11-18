@@ -201,9 +201,22 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         return typeof u === 'string' && u.trim() ? u : undefined;
     };
 
+    const imageCaptionFromEntry = (img: string | PropertyImage): string | undefined => {
+        if (!img || typeof img === 'string') return undefined;
+        const raw = img.caption || img.category || img.room_type || img.label;
+        return typeof raw === 'string' && raw.trim() ? raw.trim() : undefined;
+    };
+
     let dbImages: string[] = [];
+    let imageItems: { url: string; caption?: string }[] = [];
     try {
-        dbImages = sortedImages.map(imageUrlFromEntry).filter((x): x is string => Boolean(x));
+        for (const entry of sortedImages) {
+            const url = imageUrlFromEntry(entry);
+            if (!url) continue;
+            dbImages.push(url);
+            const caption = imageCaptionFromEntry(entry);
+            imageItems.push(caption ? { url, caption } : { url });
+        }
     } catch (err) {
         console.warn('[mapRealtyToProperty] Failed to map images array:', err, sortedImages);
     }
@@ -303,6 +316,21 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
             ? rawFoodMenu
             : undefined;
 
+    const rawTokenAmount = item.token_amount ?? metaObj.token_amount ?? metaObj.booking_token_amount;
+    const normalizedTokenAmount =
+        typeof rawTokenAmount === 'number' && Number.isFinite(rawTokenAmount) && rawTokenAmount > 0
+            ? rawTokenAmount
+            : typeof rawTokenAmount === 'string' && rawTokenAmount.trim()
+              ? rawTokenAmount.trim()
+              : null;
+
+    const rawTokenRefundTerms =
+        item.token_refund_terms ?? item.refund_terms ?? metaObj.token_refund_terms ?? metaObj.refund_terms;
+    const normalizedTokenRefundTerms =
+        typeof rawTokenRefundTerms === 'string' && rawTokenRefundTerms.trim()
+            ? rawTokenRefundTerms.trim()
+            : null;
+
     return {
         id: item.id,
         slug: item.slug || '',
@@ -334,6 +362,7 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         balcony: !isPlot && ((featuresList.some(f => f.toLowerCase().includes('balcony'))) || item.property_type === '1BHK' || item.property_type === '2BHK' || item.property_type === '3BHK' || item.property_type === 'Villa'),
         attached_bathroom: !isPlot, // Standard for most listed properties
         images: dbImages,
+        image_items: imageItems,
         tag: item.is_available ? 'Available' : 'Fully booked',
         listing_badge: listingBadge,
         units_remaining: unitsRemaining,
@@ -352,6 +381,8 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         notice_period_days: normalizedNotice,
         house_rules: normalizedHouseRules && normalizedHouseRules.length > 0 ? normalizedHouseRules : undefined,
         food_menu: normalizedFoodMenu,
+        token_amount: normalizedTokenAmount,
+        token_refund_terms: normalizedTokenRefundTerms,
         features: featuresList,
         rating: resolvedAverageRating,
         reviews: resolvedReviewCount,
