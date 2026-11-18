@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Montserrat, Playfair_Display } from 'next/font/google';
+import { Inter, Montserrat, Newsreader, Playfair_Display } from 'next/font/google';
 import Script from 'next/script';
 import { Providers } from './providers';
 import { buildOrganizationSchema } from '@/lib/schema';
@@ -22,6 +22,13 @@ const playfair = Playfair_Display({
     subsets: ['latin'],
     weight: ['700', '900'],
     variable: '--font-playfair',
+    display: 'swap',
+});
+
+const newsreader = Newsreader({
+    subsets: ['latin'],
+    weight: ['400', '500'],
+    variable: '--font-newsreader',
     display: 'swap',
 });
 
@@ -69,7 +76,10 @@ export const revalidate = 3600;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en-IN" className={`${inter.variable} ${montserrat.variable} ${playfair.variable}`}>
+        <html
+            lang="en-IN"
+            className={`${inter.variable} ${montserrat.variable} ${playfair.variable} ${newsreader.variable}`}
+        >
             <body className="antialiased font-sans">
                 <Script
                     src="https://cdn-in.pagesense.io/js/60068323066/7e76ea503238457e82afc5266e8977c1.js"

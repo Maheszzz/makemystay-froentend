@@ -21,10 +21,15 @@ export type OptimizedImageProps = {
     size?: ImageSize;
     ariaHidden?: boolean;
     fetchPriority?: 'auto' | 'high' | 'low';
+    placeholder?: 'blur' | 'empty';
+    blurDataURL?: string;
     onLoad?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
     onError?: () => void;
     style?: React.CSSProperties;
 };
+
+const DEFAULT_BLUR_DATA_URL =
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjEwIiBmaWxsPSIjZThlOGUyIi8+PC9zdmc+';
 
 function isOptimizableSrc(src: string): boolean {
     if (!src || src.startsWith('data:')) return false;
@@ -59,6 +64,8 @@ export function OptimizedImage({
     size = 'medium',
     ariaHidden = false,
     fetchPriority,
+    placeholder,
+    blurDataURL,
     onLoad,
     onError,
     style,
@@ -87,6 +94,8 @@ export function OptimizedImage({
             decoding="async"
             quality={quality ?? (priority ? 60 : 75)}
             sizes={sizes ?? (fill ? '(max-width: 768px) 100vw, 33vw' : undefined)}
+            placeholder={placeholder}
+            blurDataURL={placeholder === 'blur' ? (blurDataURL ?? DEFAULT_BLUR_DATA_URL) : undefined}
             className={className}
             style={style}
             unoptimized={unoptimized}

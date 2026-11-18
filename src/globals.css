@@ -19,7 +19,19 @@
     --font-heading: var(--font-montserrat), 'Montserrat', sans-serif;
     --font-sans: var(--font-inter), 'Inter', sans-serif;
     --font-luxury: var(--font-playfair), 'Playfair Display', serif;
+    --font-serif-display: var(--font-newsreader), Georgia, serif;
     --font-cormorant: 'Cormorant Garamond', serif;
+
+    /* Calm photography-led PDP tokens */
+    --color-pdp-bg: #F8F8F6;
+    --color-pdp-surface: #FFFFFF;
+    --color-pdp-ink: #16181D;
+    --color-pdp-muted: #5C616B;
+    --color-pdp-border: #E4E4DF;
+    --color-pdp-cta: #C0392B;
+    --color-pdp-cta-hover: #A93226;
+    --color-pdp-verified: #1F7A4D;
+    --radius-pdp: 14px;
 
     --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
     --shadow-glow: 0 0 20px rgba(217, 32, 39, 0.2);
@@ -155,18 +167,18 @@
     }
 }
 
-/* Smooth scrolling & touch optimization */
+/* Smooth scrolling & touch optimization (use overflow-x: clip so position: sticky works) */
 html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 body {
     @apply font-sans bg-slate-50 text-slate-900;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
 }
 
