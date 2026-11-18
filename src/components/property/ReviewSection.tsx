@@ -10,6 +10,7 @@ interface ReviewSectionProps {
     propertyId: string | number;
     initialReviews: Review[];
     onReviewAdded?: () => void;
+    calm?: boolean;
 }
 
 function ratingDistribution(reviews: Review[]) {
@@ -34,7 +35,7 @@ function SubRatingRow({ label, value, icon: Icon }: { label: string; value?: num
     );
 }
 
-export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: ReviewSectionProps) {
+export function ReviewSection({ propertyId, initialReviews, onReviewAdded, calm = false }: ReviewSectionProps) {
     const approved = useMemo(
         () => initialReviews.filter((r) => (!r.status || r.status === 'approved') && r.rating > 0),
         [initialReviews],
@@ -128,13 +129,21 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
         <div className="space-y-10">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                 <div>
-                    <h3 className="text-2xl font-bold text-slate-900 border-l-4 border-brand-red pl-4">
+                    <h2
+                        className={
+                            calm
+                                ? 'pdp-type-heading text-pdp-ink'
+                                : 'text-2xl font-bold text-slate-900 border-l-4 border-brand-red pl-4'
+                        }
+                    >
                         Reviews &amp; ratings
-                    </h3>
+                    </h2>
                     {avg && (
-                        <p className="mt-2 pl-5 text-sm text-slate-600">
-                            <span className="font-bold text-slate-900 text-lg">{avg}</span> out of 5 ·{' '}
-                            {reviews.length} verified tenant review{reviews.length === 1 ? '' : 's'}
+                        <p className={`mt-2 ${calm ? 'pdp-type-caption text-pdp-muted' : 'pl-5 text-sm text-slate-600'}`}>
+                            <span className={`font-semibold tabular-nums ${calm ? 'text-pdp-ink text-base' : 'font-bold text-slate-900 text-lg'}`}>
+                                {avg}
+                            </span>{' '}
+                            out of 5 · {reviews.length} verified tenant review{reviews.length === 1 ? '' : 's'}
                         </p>
                     )}
                 </div>
@@ -160,11 +169,11 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                 )}
             </div>
 
-            <div className="bg-slate-50 rounded-3xl p-6 md:p-8 border border-white shadow-sm">
-                <h4 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
-                    <MessageSquare className="w-5 h-5 mr-2 text-brand-red" />
+            <div className={calm ? 'bg-pdp-surface rounded-[var(--radius-pdp)] p-6 md:p-8 border border-pdp-border' : 'bg-slate-50 rounded-3xl p-6 md:p-8 border border-white shadow-sm'}>
+                <h3 className={`text-lg font-semibold mb-6 flex items-center ${calm ? 'text-pdp-ink' : 'font-bold text-slate-900'}`}>
+                    <MessageSquare className={`w-5 h-5 mr-2 ${calm ? 'text-pdp-muted' : 'text-brand-red'}`} aria-hidden />
                     Share your experience
-                </h4>
+                </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
@@ -210,7 +219,11 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                                 value={userName}
                                 onChange={(e) => setUserName(e.target.value)}
                                 placeholder="e.g. Priya Sharma"
-                                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red outline-none font-medium"
+                                className={`w-full pl-12 pr-4 py-3 bg-white border rounded-xl outline-none font-medium ${
+                                    calm
+                                        ? 'border-pdp-border focus:ring-2 focus:ring-pdp-ink focus:border-pdp-ink'
+                                        : 'border-slate-200 focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red'
+                                }`}
                             />
                         </div>
                     </div>
@@ -225,17 +238,26 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="How was move-in, meals, WiFi, and safety?"
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red outline-none font-medium resize-none"
+                            className={`w-full px-4 py-3 bg-white border rounded-2xl outline-none font-medium resize-none ${
+                                calm
+                                    ? 'border-pdp-border focus:ring-2 focus:ring-pdp-ink focus:border-pdp-ink'
+                                    : 'border-slate-200 focus:ring-2 focus:ring-brand-red/20 focus:border-brand-red'
+                            }`}
                         />
                     </div>
 
                     {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
-                    {pendingMsg && <p className="text-emerald-700 text-sm font-medium">{pendingMsg}</p>}
+                    {pendingMsg && <p className={calm ? 'text-pdp-verified text-sm font-medium' : 'text-emerald-700 text-sm font-medium'}>{pendingMsg}</p>}
 
                     <Button
                         type="submit"
+                        variant={calm ? 'dark' : 'primary'}
                         disabled={submitting}
-                        className="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold flex items-center"
+                        className={
+                            calm
+                                ? 'bg-pdp-ink hover:bg-pdp-ink/90 text-white px-6 py-3 rounded-[10px] font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink'
+                                : 'bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold flex items-center'
+                        }
                     >
                         {submitting ? 'Submitting...' : (
                             <>
@@ -273,7 +295,13 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                                                     {review.user_name}
                                                 </h5>
                                                 {review.verified_stay && (
-                                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-800">
+                                                    <span
+                                                        className={
+                                                            calm
+                                                                ? 'inline-flex items-center gap-1 rounded-full bg-pdp-verified-bg border border-pdp-verified/25 px-2.5 py-0.5 text-xs font-medium text-pdp-verified'
+                                                                : 'inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-800'
+                                                        }
+                                                    >
                                                         <BadgeCheck className="w-3 h-3" aria-hidden />
                                                         Verified tenant
                                                     </span>

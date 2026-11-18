@@ -4,12 +4,52 @@ import { MapPin } from 'lucide-react';
 interface PgLocalityHubTeaserProps {
     name: string;
     slug: string;
+    calm?: boolean;
 }
 
 /**
  * Single cross-link to the canonical PG locality hub — avoids duplicating long-form SEO on PDP.
  */
-export function PgLocalityHubTeaser({ name, slug }: PgLocalityHubTeaserProps) {
+export function PgLocalityHubTeaser({ name, slug, calm = false }: PgLocalityHubTeaserProps) {
+    if (calm) {
+        return (
+            <section
+                className="rounded-[var(--radius-pdp)] border border-pdp-border bg-pdp-surface p-6 md:p-8"
+                aria-labelledby={`pg-locality-teaser-${slug}`}
+            >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                    <div className="min-w-0">
+                        <p className="pdp-type-caption text-pdp-muted">Area guide</p>
+                        <h2
+                            id={`pg-locality-teaser-${slug}`}
+                            className="mt-1 pdp-type-heading text-pdp-ink flex items-center gap-2"
+                        >
+                            <MapPin className="h-5 w-5 text-pdp-muted shrink-0" aria-hidden />
+                            PG in {name}
+                        </h2>
+                        <p className="mt-2 pdp-type-body text-pdp-muted max-w-xl">
+                            Compare rent ranges, filters, and verified listings across this neighbourhood.
+                        </p>
+                    </div>
+                    <div className="flex flex-col sm:items-end gap-2 shrink-0">
+                        <Link
+                            to={`/pg/${slug}`}
+                            className="min-h-[44px] inline-flex items-center justify-center rounded-[10px] border border-pdp-ink bg-pdp-ink px-5 py-2.5 pdp-type-caption font-medium text-white hover:bg-pdp-ink/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                        >
+                            Open PG guide →
+                        </Link>
+                        <Link
+                            to="/pg/bangalore"
+                            className="pdp-type-caption font-medium text-pdp-muted hover:text-pdp-ink underline underline-offset-4 text-center sm:text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded"
+                        >
+                            Bangalore city hub
+                        </Link>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
     return (
         <section
             className="rounded-2xl border border-slate-200/90 bg-white p-6 md:p-7 shadow-sm"

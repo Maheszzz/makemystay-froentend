@@ -28,9 +28,16 @@ import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { PgLocalityHubTeaser } from '@/components/seo/PgLocalityHubTeaser';
-import { PropertyGallery } from '@/components/property/PropertyGallery';
-import { PropertyBookingCard, type SharingPriceRow } from '@/components/property/PropertyBookingCard';
+import { PropertyGallery, type GalleryImageInput } from '@/components/property/PropertyGallery';
+import {
+    PropertyBookingCard,
+    type ConfirmedVisitBooking,
+    type SharingPriceRow,
+} from '@/components/property/PropertyBookingCard';
 import { PropertyMobileBar } from '@/components/property/PropertyMobileBar';
+import { PropertyAmenitiesSection } from '@/components/property/PropertyAmenitiesSection';
+import { PropertyDetailsSkeleton } from '@/components/property/PropertyDetailsSkeleton';
+import { PropertySectionNav, type PdpSectionNavItem } from '@/components/property/PropertySectionNav';
 import { SimilarPropertiesSection } from '@/components/property/SimilarPropertiesSection';
 import type { ServiceFeeOption } from '@/components/modals/ServiceFeeModal';
 import { useWishlist } from '@/context/WishlistContext';
@@ -140,6 +147,7 @@ export default function PropertyDetails({
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
     const [visitDate, setVisitDate] = useState('');
     const [visitTime, setVisitTime] = useState('');
+    const [confirmedBooking, setConfirmedBooking] = useState<ConfirmedVisitBooking | null>(null);
     const [shareCopied, setShareCopied] = useState(false);
     const [successData, setSuccessData] = useState<{
         isOpen: boolean;
@@ -357,10 +365,8 @@ export default function PropertyDetails({
         return (
             <div className="bg-pdp-bg min-h-screen font-sans flex flex-col text-pdp-ink">
                 <SEOHead {...interimHelmet} />
-                <Navbar city={property?.city} />
-                <main className="flex-grow flex items-center justify-center pt-24">
-                    <LoadingSpinner message="Loading property details..." />
-                </main>
+                <Navbar city={property?.city} variant="calm" />
+                <PropertyDetailsSkeleton />
                 <Footer />
             </div>
         );
@@ -370,8 +376,8 @@ export default function PropertyDetails({
         return (
             <div className="bg-pdp-bg min-h-screen font-sans flex flex-col text-pdp-ink">
                 <SEOHead {...errorHelmet} />
-                <Navbar city={property?.city} />
-                <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4 pt-28">
+                <Navbar city={property?.city} variant="calm" />
+                <main className="flex-grow flex flex-col items-center justify-center py-12 text-center w-full px-4 pt-24">
                     <div className="max-w-md w-full bg-pdp-surface p-8 rounded-[var(--radius-pdp)] border border-pdp-border">
                         <ErrorMessage
                             message={error?.message || 'Property not found'}
@@ -383,7 +389,9 @@ export default function PropertyDetails({
                         />
                         <div className="mt-6 flex justify-center">
                             <Link to="/properties">
-                                <Button variant="primary">Back to listings</Button>
+                                <Button variant="dark" className="bg-pdp-ink hover:bg-pdp-ink/90 text-white rounded-[10px]">
+                                    Back to listings
+                                </Button>
                             </Link>
                         </div>
                     </div>
@@ -393,20 +401,32 @@ export default function PropertyDetails({
         );
     }
 
-    // Build gallery images
-    const allImages: string[] = [];
-    if (Array.isArray(property.images) && property.images.length > 0) {
+    // Build gallery images (preserve real captions/categories when present)
+    const galleryImages: GalleryImageInput[] = [];
+    if (Array.isArray(property.image_items) && property.image_items.length > 0) {
+        for (const item of property.image_items) {
+            if (item?.url) galleryImages.push(item);
+        }
+    } else if (Array.isArray(property.images) && property.images.length > 0) {
         const sortedImages = [...property.images].sort((a: any, b: any) => {
             const aPrimary = a && typeof a === 'object' && (a.is_primary || a.isPrimary || a.is_cover) ? 1 : 0;
             const bPrimary = b && typeof b === 'object' && (b.is_primary || b.isPrimary || b.is_cover) ? 1 : 0;
             return bPrimary - aPrimary;
         });
+        const seenUrls = new Set<string>();
         sortedImages.forEach((img: any) => {
             const url = typeof img === 'string' ? img : img?.image_url || img?.url || img?.src;
-            if (url && !allImages.includes(url)) allImages.push(url);
+            if (url && !seenUrls.has(url)) {
+                seenUrls.add(url);
+                const cap =
+                    typeof img === 'object' && img
+                        ? (img.caption || img.category || img.room_type || img.label || '').trim()
+                        : '';
+                galleryImages.push(cap ? { url, caption: cap } : url);
+            }
         });
     } else if (property.image) {
-        allImages.push(property.image);
+        galleryImages.push(property.image);
     }
 
     // Videos from real fields only
@@ -552,14 +572,94 @@ export default function PropertyDetails({
     ];
 
     const nearbyPlaces = Array.isArray(property.nearby_places) ? property.nearby_places : [];
+    const hasValidLocation = Boolean(
+        property.location && !/unknown/i.test(property.location.trim()),
+    );
+    const hasCoordinates =
+        typeof property.latitude === 'number' &&
+        Number.isFinite(property.latitude) &&
+        typeof property.longitude === 'number' &&
+        Number.isFinite(property.longitude);
+    const hasLocationData =
+        hasCoordinates ||
+        Boolean(property.map_link) ||
+        hasValidLocation ||
+        nearbyPlaces.length > 0;
+
+    const mapQueryTarget = hasCoordinates
+        ? `${property.latitude},${property.longitude}`
+        : `${property.location || ''}, ${property.city || 'Bangalore, India'}`;
     const mapsHref =
         property.map_link ||
-        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            `${property.location || ''}, ${property.city || 'Bangalore, India'}`,
-        )}`;
+        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQueryTarget)}`;
     const mapsEmbedSrc = `https://maps.google.com/maps?q=${encodeURIComponent(
-        `${property.location || ''}, ${property.city || 'Bangalore, India'}`,
+        mapQueryTarget,
     )}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
+
+    // Highlights row (3-4 items derived from real features; hide if fewer than 2 qualify)
+    const highlights = (() => {
+        if (displayFeatures.length < 2) return [];
+        const priorityPatterns = [
+            /wifi|wi fi|internet|broadband/,
+            /food|meal|cafeteria/,
+            /power|backup/,
+            /housekeeping|cleaning/,
+            /security|cctv|biometric|fingerprint/,
+            /washing|laundry/,
+            /air cond|\bac\b/,
+            /parking/,
+            /lift|elevator/,
+            /ro water|water purifier/,
+            /geyser/,
+            /gym/,
+        ];
+        const picked: string[] = [];
+        const usedKeys = new Set<string>();
+
+        for (const pattern of priorityPatterns) {
+            if (picked.length >= 4) break;
+            const match = displayFeatures.find((feat) => {
+                const k = normalizeFeatureKey(feat);
+                return !usedKeys.has(k) && pattern.test(k);
+            });
+            if (match) {
+                usedKeys.add(normalizeFeatureKey(match));
+                picked.push(match);
+            }
+        }
+        for (const feat of displayFeatures) {
+            if (picked.length >= 4) break;
+            const k = normalizeFeatureKey(feat);
+            if (!usedKeys.has(k)) {
+                usedKeys.add(k);
+                picked.push(feat);
+            }
+        }
+        return picked.length >= 2 ? picked : [];
+    })();
+
+    const inPageSections: PdpSectionNavItem[] = [
+        { id: 'pdp-overview', label: 'Overview' },
+        ...(displayFeatures.length > 0
+            ? [{ id: 'pdp-amenities', label: 'Amenities' }]
+            : []),
+        ...(hasLocationData
+            ? [{ id: 'pdp-location', label: 'Location' }]
+            : []),
+        ...(ratingSummary.showRating
+            ? [{ id: 'pdp-reviews', label: 'Reviews' }]
+            : []),
+    ];
+
+    const handleVisitDateChange = (nextDate: string) => {
+        setVisitDate(nextDate);
+        if (confirmedBooking) setConfirmedBooking(null);
+    };
+
+    const handleVisitTimeChange = (nextTime: string) => {
+        setVisitTime(nextTime);
+        if (confirmedBooking) setConfirmedBooking(null);
+    };
 
     return (
         <Fragment>
@@ -577,22 +677,22 @@ export default function PropertyDetails({
             {detailJsonLd && <JsonLd data={detailJsonLd} id="property-detail-schema" />}
 
             <div className="min-h-screen font-sans flex flex-col bg-pdp-bg text-pdp-ink overflow-x-clip">
-                <Navbar city={property.city} />
+                <Navbar city={property.city} variant="calm" />
 
-                <main id="main-content" className="flex-grow pt-20 sm:pt-24 pb-24 lg:pb-16">
+                <main id="main-content" className="flex-grow pt-14 sm:pt-16 pb-24 lg:pb-16">
                     {property.is_available === false && (
                         <div
                             role="status"
                             data-testid="property-unavailable-banner"
-                            className="bg-amber-50 border-b border-amber-200 py-3.5 px-4 sm:px-6 lg:px-8 mb-4"
+                            className="bg-amber-50 border-b border-amber-200 py-3 px-4 sm:px-6 lg:px-8"
                         >
-                            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                <p className="text-sm text-amber-900">
+                            <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <p className="pdp-type-caption text-amber-900">
                                     This listing in {property.location || 'Bangalore'} is currently booked.
                                 </p>
                                 <Link
                                     to={pgLoc ? `/pg/${pgLoc.slug}` : '/properties'}
-                                    className="min-h-[44px] inline-flex items-center px-4 py-2 rounded-[10px] bg-amber-900 text-white text-sm font-medium hover:bg-amber-800 shrink-0"
+                                    className="min-h-[40px] inline-flex items-center px-4 py-2 rounded-[10px] bg-amber-900 text-white pdp-type-caption font-medium hover:bg-amber-800 shrink-0"
                                 >
                                     {pgLoc ? `Browse stays in ${pgLoc.name}` : 'Browse available listings'}
                                 </Link>
@@ -600,13 +700,16 @@ export default function PropertyDetails({
                         </div>
                     )}
 
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Sticky In-Page Section Nav (only sections with data) */}
+                    <PropertySectionNav sections={inPageSections} />
+
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                         {/* Top Action Row */}
                         <div className="flex flex-wrap items-center justify-between gap-3 py-4">
                             <button
                                 type="button"
                                 onClick={goBack}
-                                className="min-h-[44px] inline-flex items-center gap-2 px-2 -ml-2 text-sm font-medium text-pdp-ink hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-lg cursor-pointer"
+                                className="min-h-[44px] inline-flex items-center gap-2 px-2 -ml-2 pdp-type-caption font-medium text-pdp-ink hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-lg cursor-pointer"
                             >
                                 <ArrowLeft className="w-4 h-4 shrink-0" aria-hidden />
                                 <span>Back to listings</span>
@@ -618,7 +721,7 @@ export default function PropertyDetails({
                                         href={primaryBrochureOrDriveLink}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="min-h-[44px] inline-flex items-center gap-1.5 px-3 text-sm text-pdp-muted hover:text-pdp-ink underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-lg"
+                                        className="min-h-[44px] inline-flex items-center gap-1.5 px-3 pdp-type-caption text-pdp-muted hover:text-pdp-ink underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-lg"
                                     >
                                         <Download className="w-4 h-4 shrink-0" aria-hidden />
                                         <span>Download brochure</span>
@@ -647,7 +750,7 @@ export default function PropertyDetails({
                                     className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-full border border-pdp-border bg-pdp-surface text-pdp-ink hover:bg-pdp-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink cursor-pointer"
                                 >
                                     <Heart
-                                        className={`w-4 h-4 ${wishlisted ? 'fill-pdp-cta text-pdp-cta' : ''}`}
+                                        className={`w-4 h-4 ${wishlisted ? 'fill-pdp-ink text-pdp-ink' : ''}`}
                                         aria-hidden
                                     />
                                 </button>
@@ -658,147 +761,159 @@ export default function PropertyDetails({
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                             {/* Left Column */}
                             <div className="lg:col-span-7 xl:col-span-8 min-w-0">
-                                {/* Gallery */}
-                                <PropertyGallery
-                                    images={allImages}
-                                    title={displayTitle || property.title}
-                                    location={property.location || 'Bangalore'}
-                                />
-
-                                {/* Title, Area & Verification Line */}
-                                <header className="pt-6 pb-6 border-b border-pdp-border">
-                                    <h1
-                                        data-seo="pdp-h1"
+                                {/* Overview Block */}
+                                <div id="pdp-overview" className="scroll-mt-28">
+                                    {/* Gallery */}
+                                    <PropertyGallery
+                                        images={galleryImages}
                                         title={displayTitle || property.title}
-                                        className="font-[var(--font-serif-display)] text-[32px] sm:text-[40px] lg:text-[44px] font-normal leading-[1.15] tracking-tight text-pdp-ink line-clamp-2 break-words"
-                                    >
-                                        {displayTitle || property.title}
-                                    </h1>
+                                        location={property.location || 'Bangalore'}
+                                    />
 
-                                    {property.location && (
-                                        <p className="mt-2 text-base text-pdp-muted break-words">
-                                            {property.location}
-                                        </p>
+                                    {/* Title, Area & Verification Line */}
+                                    <header className="pt-8 pb-8 border-b border-pdp-border">
+                                        <h1
+                                            data-seo="pdp-h1"
+                                            title={displayTitle || property.title}
+                                            className="pdp-type-title font-serif-display font-normal text-[36px] sm:text-[44px] lg:text-[48px] leading-[1.1] tracking-[-0.01em] text-pdp-ink line-clamp-2 break-words"
+                                        >
+                                            {displayTitle || property.title}
+                                        </h1>
+
+                                        {property.location && (
+                                            <p className="mt-2 pdp-type-body text-pdp-muted break-words">
+                                                {property.location}
+                                            </p>
+                                        )}
+
+                                        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 pdp-type-caption">
+                                            {lastVerifiedLabel && (
+                                                <span className="inline-flex items-center gap-1.5 font-medium text-pdp-verified">
+                                                    <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden />
+                                                    Verified by our team on {lastVerifiedLabel}
+                                                </span>
+                                            )}
+                                            <span className="text-pdp-muted">{availabilityText}</span>
+                                        </div>
+                                    </header>
+
+                                    {/* Key Facts Row (real fields only) */}
+                                    {keyFacts.length > 0 && (
+                                        <section
+                                            aria-label="Key property facts"
+                                            className="py-6 border-b border-pdp-border"
+                                        >
+                                            <ul className="flex flex-wrap gap-x-6 gap-y-3">
+                                                {keyFacts.map((fact) => {
+                                                    const Icon = fact.icon;
+                                                    return (
+                                                        <li
+                                                            key={fact.label}
+                                                            className="inline-flex items-center gap-2 pdp-type-body text-pdp-ink"
+                                                        >
+                                                            <Icon className="w-4 h-4 text-pdp-muted shrink-0" aria-hidden />
+                                                            <span>{fact.label}</span>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        </section>
                                     )}
 
-                                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                                        {lastVerifiedLabel && (
-                                            <span className="inline-flex items-center gap-1.5 font-medium text-pdp-verified">
-                                                <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden />
-                                                Verified by our team on {lastVerifiedLabel}
-                                            </span>
-                                        )}
-                                        <span className="text-pdp-muted">{availabilityText}</span>
+                                    {/* Highlights Row (3-4 items derived from real features; hidden if < 2) */}
+                                    {highlights.length >= 2 && (
+                                        <section
+                                            aria-label="Property highlights"
+                                            className="py-8 border-b border-pdp-border"
+                                        >
+                                            <h2 className="pdp-type-caption font-medium text-pdp-muted mb-4">
+                                                Highlights
+                                            </h2>
+                                            <ul className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                                {highlights.map((item) => {
+                                                    const key = normalizeFeatureKey(item);
+                                                    return (
+                                                        <li
+                                                            key={key}
+                                                            className="flex items-center gap-3 rounded-[10px] border border-pdp-border bg-pdp-surface px-4 py-3 pdp-type-caption font-medium text-pdp-ink"
+                                                        >
+                                                            <span className="text-pdp-muted shrink-0" aria-hidden>
+                                                                {getAmenityIcon(key)}
+                                                            </span>
+                                                            <span className="truncate">{item}</span>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        </section>
+                                    )}
+
+                                    {/* Mobile Booking Card (below key facts / highlights) */}
+                                    <div className="lg:hidden py-8 border-b border-pdp-border">
+                                        <PropertyBookingCard
+                                            property={property}
+                                            displayTitle={displayTitle || property.title}
+                                            canonicalPath={canonicalDetailPath}
+                                            isMonthly={isMonthlyListing}
+                                            hasNumericPrice={hasNumericPrice}
+                                            depositDisplay={depositDisplay}
+                                            sharingRows={sharingRows}
+                                            visitDate={visitDate}
+                                            onVisitDateChange={handleVisitDateChange}
+                                            visitTime={visitTime}
+                                            onVisitTimeChange={handleVisitTimeChange}
+                                            onBookVisit={handleBookVisitOpen}
+                                            confirmedBooking={confirmedBooking}
+                                            onResetBooking={() => setConfirmedBooking(null)}
+                                            onPayToken={handlePayNow}
+                                            isPaymentProcessing={isPaymentProcessing}
+                                        />
                                     </div>
-                                </header>
 
-                                {/* Key Facts Row (real fields only) */}
-                                {keyFacts.length > 0 && (
-                                    <section
-                                        aria-label="Key property facts"
-                                        className="py-6 border-b border-pdp-border"
-                                    >
-                                        <ul className="flex flex-wrap gap-x-6 gap-y-3">
-                                            {keyFacts.map((fact) => {
-                                                const Icon = fact.icon;
-                                                return (
-                                                    <li
-                                                        key={fact.label}
-                                                        className="inline-flex items-center gap-2 text-[15px] text-pdp-ink"
-                                                    >
-                                                        <Icon className="w-4 h-4 text-pdp-muted shrink-0" aria-hidden />
-                                                        <span>{fact.label}</span>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    </section>
-                                )}
-
-                                {/* Mobile Booking Card (below key facts) */}
-                                <div className="lg:hidden py-6 border-b border-pdp-border">
-                                    <PropertyBookingCard
-                                        property={property}
-                                        displayTitle={displayTitle || property.title}
-                                        canonicalPath={canonicalDetailPath}
-                                        isMonthly={isMonthlyListing}
-                                        hasNumericPrice={hasNumericPrice}
-                                        depositDisplay={depositDisplay}
-                                        sharingRows={sharingRows}
-                                        visitDate={visitDate}
-                                        onVisitDateChange={setVisitDate}
-                                        visitTime={visitTime}
-                                        onVisitTimeChange={setVisitTime}
-                                        onBookVisit={handleBookVisitOpen}
-                                        onPayToken={handlePayNow}
-                                        isPaymentProcessing={isPaymentProcessing}
-                                    />
+                                    {/* About (property.description only; hidden if empty) */}
+                                    {aboutNarrative.length > 0 && (
+                                        <section className="py-10 lg:py-16 border-b border-pdp-border">
+                                            <h2 className="pdp-type-heading text-pdp-ink mb-4">
+                                                About this property
+                                            </h2>
+                                            <div
+                                                data-seo="pdp-about"
+                                                className={`max-w-[70ch] pdp-type-body text-pdp-ink space-y-4 ${
+                                                    !aboutExpanded && showAboutToggle ? 'max-h-[260px] overflow-hidden' : ''
+                                                }`}
+                                            >
+                                                {aboutNarrative.split(/\n\n+/).map((block, bi) => (
+                                                    <p key={bi} className="whitespace-pre-line">
+                                                        {block}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                            {showAboutToggle && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setAboutExpanded((v) => !v)}
+                                                    className="mt-4 min-h-[44px] inline-flex items-center pdp-type-caption font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded cursor-pointer"
+                                                >
+                                                    {aboutExpanded ? 'Show less' : 'Read full description'}
+                                                </button>
+                                            )}
+                                        </section>
+                                    )}
                                 </div>
 
-                                {/* About (property.description only; hidden if empty) */}
-                                {aboutNarrative.length > 0 && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <h2 className="text-xl font-semibold text-pdp-ink mb-4">
-                                            About this property
-                                        </h2>
-                                        <div
-                                            data-seo="pdp-about"
-                                            className={`max-w-[70ch] text-base leading-[1.7] text-pdp-ink space-y-4 ${
-                                                !aboutExpanded && showAboutToggle ? 'max-h-[260px] overflow-hidden' : ''
-                                            }`}
-                                        >
-                                            {aboutNarrative.split(/\n\n+/).map((block, bi) => (
-                                                <p key={bi} className="whitespace-pre-line">
-                                                    {block}
-                                                </p>
-                                            ))}
-                                        </div>
-                                        {showAboutToggle && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setAboutExpanded((v) => !v)}
-                                                className="mt-4 min-h-[44px] inline-flex items-center text-sm font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded cursor-pointer"
-                                            >
-                                                {aboutExpanded ? 'Show less' : 'Read full description'}
-                                            </button>
-                                        )}
-                                    </section>
-                                )}
-
-                                {/* Amenities (real deduped features only) */}
-                                {displayFeatures.length > 0 && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <h2 className="text-xl font-semibold text-pdp-ink mb-5">Amenities</h2>
-                                        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-3.5">
-                                            {displayFeatures.map((feature) => {
-                                                const lookupKey = normalizeFeatureKey(feature);
-                                                const icon = getAmenityIcon(lookupKey);
-                                                return (
-                                                    <li
-                                                        key={lookupKey}
-                                                        className="flex items-center gap-3 text-[15px] text-pdp-ink"
-                                                    >
-                                                        <span className="text-pdp-muted shrink-0" aria-hidden>
-                                                            {icon}
-                                                        </span>
-                                                        <span>{feature}</span>
-                                                    </li>
-                                                );
-                                            })}
-                                        </ul>
-                                    </section>
-                                )}
+                                {/* Amenities (grouped icon grid, collapsed after 8) */}
+                                <PropertyAmenitiesSection features={displayFeatures} />
 
                                 {/* Price by Sharing Table */}
                                 {sharingRows.length > 0 && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <h2 className="text-xl font-semibold text-pdp-ink mb-5">
+                                    <section className="py-10 lg:py-16 border-b border-pdp-border">
+                                        <h2 className="pdp-type-heading text-pdp-ink mb-6">
                                             Price by sharing
                                         </h2>
                                         <div className="max-w-xl overflow-x-auto">
                                             <table className="w-full text-left border-collapse">
                                                 <thead>
-                                                    <tr className="border-b border-pdp-border text-sm text-pdp-muted">
+                                                    <tr className="border-b border-pdp-border pdp-type-caption text-pdp-muted">
                                                         <th className="py-3 pr-4 font-medium">Room type</th>
                                                         <th className="py-3 pl-4 font-medium text-right">
                                                             Monthly rent
@@ -807,11 +922,11 @@ export default function PropertyDetails({
                                                 </thead>
                                                 <tbody className="divide-y divide-pdp-border">
                                                     {sharingRows.map((row) => (
-                                                        <tr key={row.label} className="text-[15px]">
-                                                            <td className="py-3.5 pr-4 text-pdp-ink">
+                                                        <tr key={row.label} className="pdp-type-body">
+                                                            <td className="py-4 pr-4 text-pdp-ink">
                                                                 {row.label}
                                                             </td>
-                                                            <td className="py-3.5 pl-4 font-medium text-pdp-ink text-right tabular-nums">
+                                                            <td className="py-4 pl-4 font-medium text-pdp-ink text-right tabular-nums">
                                                                 ₹{row.price.toLocaleString('en-IN')}/month
                                                             </td>
                                                         </tr>
@@ -824,8 +939,8 @@ export default function PropertyDetails({
 
                                 {/* Policies, House Rules & Food Menu (hidden until populated) */}
                                 {hasPolicyDetails && (
-                                    <section className="py-8 border-b border-pdp-border space-y-6">
-                                        <h2 className="text-xl font-semibold text-pdp-ink">
+                                    <section className="py-10 lg:py-16 border-b border-pdp-border space-y-6">
+                                        <h2 className="pdp-type-heading text-pdp-ink">
                                             Stay details &amp; house rules
                                         </h2>
 
@@ -835,8 +950,8 @@ export default function PropertyDetails({
                                             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
                                                 {property.gender && (
                                                     <div>
-                                                        <dt className="text-sm text-pdp-muted">Suitable for</dt>
-                                                        <dd className="text-base font-medium text-pdp-ink mt-0.5">
+                                                        <dt className="pdp-type-caption text-pdp-muted">Suitable for</dt>
+                                                        <dd className="pdp-type-body font-medium text-pdp-ink mt-1">
                                                             {property.gender}
                                                         </dd>
                                                     </div>
@@ -844,10 +959,10 @@ export default function PropertyDetails({
                                                 {property.notice_period_days !== null &&
                                                     property.notice_period_days !== undefined && (
                                                         <div>
-                                                            <dt className="text-sm text-pdp-muted">
+                                                            <dt className="pdp-type-caption text-pdp-muted">
                                                                 Notice period
                                                             </dt>
-                                                            <dd className="text-base font-medium text-pdp-ink mt-0.5">
+                                                            <dd className="pdp-type-body font-medium text-pdp-ink mt-1 tabular-nums">
                                                                 {property.notice_period_days} days
                                                             </dd>
                                                         </div>
@@ -857,10 +972,10 @@ export default function PropertyDetails({
 
                                         {property.house_rules && property.house_rules.length > 0 && (
                                             <div>
-                                                <h3 className="text-base font-medium text-pdp-ink mb-2.5">
+                                                <h3 className="pdp-type-body font-medium text-pdp-ink mb-2">
                                                     House rules
                                                 </h3>
-                                                <ul className="list-disc pl-5 space-y-1.5 text-[15px] text-pdp-ink max-w-[70ch]">
+                                                <ul className="list-disc pl-5 space-y-2 pdp-type-body text-pdp-ink max-w-[70ch]">
                                                     {property.house_rules.map((rule) => (
                                                         <li key={rule}>{rule}</li>
                                                     ))}
@@ -870,22 +985,22 @@ export default function PropertyDetails({
 
                                         {property.food_menu && (
                                             <div>
-                                                <h3 className="text-base font-medium text-pdp-ink mb-2.5">
+                                                <h3 className="pdp-type-body font-medium text-pdp-ink mb-2">
                                                     Food menu
                                                 </h3>
                                                 {typeof property.food_menu === 'string' ? (
-                                                    <p className="text-[15px] text-pdp-ink leading-relaxed max-w-[70ch] whitespace-pre-line">
+                                                    <p className="pdp-type-body text-pdp-ink max-w-[70ch] whitespace-pre-line">
                                                         {property.food_menu}
                                                     </p>
                                                 ) : (
-                                                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
+                                                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
                                                         {Object.entries(property.food_menu).map(([day, menu]) => (
                                                             <div
                                                                 key={day}
                                                                 className="py-2 border-b border-pdp-border"
                                                             >
-                                                                <dt className="text-sm text-pdp-muted">{day}</dt>
-                                                                <dd className="text-[15px] text-pdp-ink mt-0.5">
+                                                                <dt className="pdp-type-caption text-pdp-muted">{day}</dt>
+                                                                <dd className="pdp-type-body text-pdp-ink mt-1">
                                                                     {menu}
                                                                 </dd>
                                                             </div>
@@ -899,8 +1014,8 @@ export default function PropertyDetails({
 
                                 {/* Video Walkthrough (hidden if no videos) */}
                                 {allVideos.length > 0 && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <h2 className="text-xl font-semibold text-pdp-ink mb-5">
+                                    <section className="py-10 lg:py-16 border-b border-pdp-border">
+                                        <h2 className="pdp-type-heading text-pdp-ink mb-6">
                                             Video walkthrough
                                         </h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -943,14 +1058,14 @@ export default function PropertyDetails({
                                                             ) : (
                                                                 <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-white bg-pdp-ink">
                                                                     <Video className="w-10 h-10 mb-3" aria-hidden />
-                                                                    <p className="text-sm font-medium mb-3">
+                                                                    <p className="pdp-type-caption font-medium mb-3">
                                                                         {v.title}
                                                                     </p>
                                                                     <a
                                                                         href={v.url}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-pdp-surface text-pdp-ink text-sm font-medium"
+                                                                        className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-pdp-surface text-pdp-ink pdp-type-caption font-medium"
                                                                     >
                                                                         Watch video <ExternalLink className="w-4 h-4" />
                                                                     </a>
@@ -964,89 +1079,13 @@ export default function PropertyDetails({
                                     </section>
                                 )}
 
-                                {/* Location & Nearby Places */}
-                                <section className="py-8 border-b border-pdp-border">
-                                    <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-                                        <div>
-                                            <h2 className="text-xl font-semibold text-pdp-ink">
-                                                Location and nearby places
-                                            </h2>
-                                            {property.location && (
-                                                <p className="text-sm text-pdp-muted mt-1">{property.location}</p>
-                                            )}
-                                        </div>
-                                        <a
-                                            href={mapsHref}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-[10px] border border-pdp-border bg-pdp-surface text-sm font-medium text-pdp-ink hover:bg-pdp-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
-                                        >
-                                            <MapPin className="w-4 h-4 shrink-0" aria-hidden />
-                                            <span>Open in Google Maps</span>
-                                        </a>
-                                    </div>
-
-                                    <div className="relative w-full h-[320px] sm:h-[380px] rounded-[var(--radius-pdp)] overflow-hidden border border-pdp-border bg-[#EAEAE5]">
-                                        <iframe
-                                            title={`Map showing ${displayTitle || property.title} in ${property.location || 'Bangalore'}`}
-                                            src={mapsEmbedSrc}
-                                            className="w-full h-full border-0"
-                                            allowFullScreen
-                                            loading="lazy"
-                                            referrerPolicy="no-referrer-when-downgrade"
-                                        />
-                                    </div>
-
-                                    {nearbyPlaces.length > 0 && (
-                                        <div className="mt-6">
-                                            <h3 className="text-base font-medium text-pdp-ink mb-3">
-                                                Nearby places
-                                            </h3>
-                                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                {nearbyPlaces.map((place, idx) => (
-                                                    <li
-                                                        key={place.id || `${place.name}-${idx}`}
-                                                        className="py-3 px-4 rounded-[10px] border border-pdp-border bg-pdp-surface flex items-center justify-between gap-3"
-                                                    >
-                                                        <div className="min-w-0">
-                                                            <p className="text-[15px] font-medium text-pdp-ink truncate">
-                                                                {place.name}
-                                                            </p>
-                                                            <p className="text-sm text-pdp-muted flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
-                                                                <span>{place.distance}</span>
-                                                                {place.travel_time && (
-                                                                    <span className="inline-flex items-center gap-1">
-                                                                        <Clock className="w-3.5 h-3.5" aria-hidden />
-                                                                        {place.travel_time}
-                                                                    </span>
-                                                                )}
-                                                            </p>
-                                                        </div>
-                                                        {place.map_link && (
-                                                            <a
-                                                                href={place.map_link}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                aria-label={`View ${place.name} on Google Maps`}
-                                                                className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-pdp-muted hover:text-pdp-ink hover:bg-pdp-bg shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
-                                                            >
-                                                                <ExternalLink className="w-4 h-4" aria-hidden />
-                                                            </a>
-                                                        )}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </section>
-
                                 {/* Backend-authored detailed narrative (only if API provides seo_about) */}
                                 {longSeo && longSeo.length > 80 && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <h2 className="text-xl font-semibold text-pdp-ink mb-4">
+                                    <section className="py-10 lg:py-16">
+                                        <h2 className="pdp-type-heading text-pdp-ink mb-4">
                                             Additional details
                                         </h2>
-                                        <div className="max-w-[70ch] text-base leading-[1.7] text-pdp-ink space-y-4">
+                                        <div className="max-w-[70ch] pdp-type-body text-pdp-ink space-y-4">
                                             {longSeo
                                                 .replace(/\\(#{1,6})/g, '$1')
                                                 .split(/\n\n+/)
@@ -1112,29 +1151,10 @@ export default function PropertyDetails({
                                         </div>
                                     </section>
                                 )}
-
-                                {/* Reviews (only shown when qualified: reviewCount >= MIN_REVIEWS_FOR_RATING) */}
-                                {ratingSummary.showRating && (
-                                    <section className="py-8 border-b border-pdp-border">
-                                        <ReviewSection
-                                            propertyId={property.id}
-                                            initialReviews={property.reviews_list || []}
-                                            onReviewAdded={refetch}
-                                        />
-                                    </section>
-                                )}
-
-                                {/* Similar Properties (hides itself if empty) */}
-                                <SimilarPropertiesSection current={property} initialSimilar={initialSimilar} />
-
-                                {/* Breadcrumbs */}
-                                <div className="pt-8">
-                                    <BreadcrumbNav items={breadcrumbItems} />
-                                </div>
                             </div>
 
                             {/* Right Column: Sticky Booking Card */}
-                            <div className="hidden lg:block lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24 self-start">
+                            <div className="hidden lg:block lg:col-span-5 xl:col-span-4 lg:sticky lg:top-[116px] self-start">
                                 <PropertyBookingCard
                                     property={property}
                                     displayTitle={displayTitle || property.title}
@@ -1144,10 +1164,12 @@ export default function PropertyDetails({
                                     depositDisplay={depositDisplay}
                                     sharingRows={sharingRows}
                                     visitDate={visitDate}
-                                    onVisitDateChange={setVisitDate}
+                                    onVisitDateChange={handleVisitDateChange}
                                     visitTime={visitTime}
-                                    onVisitTimeChange={setVisitTime}
+                                    onVisitTimeChange={handleVisitTimeChange}
                                     onBookVisit={handleBookVisitOpen}
+                                    confirmedBooking={confirmedBooking}
+                                    onResetBooking={() => setConfirmedBooking(null)}
                                     onPayToken={handlePayNow}
                                     isPaymentProcessing={isPaymentProcessing}
                                 />
@@ -1155,10 +1177,128 @@ export default function PropertyDetails({
                         </div>
                     </div>
 
+                    {/* Single Contrast Band: Location & Nearby Places (#14161A, hidden if no data) */}
+                    {hasLocationData && (
+                        <section
+                            id="pdp-location"
+                            className="w-full bg-pdp-contrast-bg text-white py-10 lg:py-20 mt-4 scroll-mt-28"
+                            aria-labelledby="pdp-location-heading"
+                        >
+                            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                                    <div>
+                                        <h2
+                                            id="pdp-location-heading"
+                                            className="pdp-type-heading text-white"
+                                        >
+                                            Location and nearby places
+                                        </h2>
+                                        {hasValidLocation && (
+                                            <p className="pdp-type-caption text-pdp-contrast-muted mt-1">
+                                                {property.location}
+                                                {property.city ? `, ${property.city}` : ''}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <a
+                                        href={mapsHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-[10px] border border-pdp-contrast-border bg-pdp-contrast-surface pdp-type-caption font-medium text-white hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white transition-colors"
+                                    >
+                                        <MapPin className="w-4 h-4 shrink-0" aria-hidden />
+                                        <span>Open in Google Maps</span>
+                                    </a>
+                                </div>
+
+                                <div className="relative w-full h-[320px] sm:h-[400px] rounded-[var(--radius-pdp)] overflow-hidden border border-pdp-contrast-border bg-pdp-contrast-surface">
+                                    <iframe
+                                        title={`Map showing ${displayTitle || property.title} in ${property.location || 'Bangalore'}`}
+                                        src={mapsEmbedSrc}
+                                        className="w-full h-full border-0"
+                                        allowFullScreen
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                </div>
+
+                                {nearbyPlaces.length > 0 && (
+                                    <div className="mt-8">
+                                        <h3 className="pdp-type-body font-medium text-white mb-4">
+                                            Nearby places
+                                        </h3>
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            {nearbyPlaces.map((place, idx) => (
+                                                <li
+                                                    key={place.id || `${place.name}-${idx}`}
+                                                    className="py-4 px-4 rounded-[10px] border border-pdp-contrast-border bg-pdp-contrast-surface flex items-center justify-between gap-3"
+                                                >
+                                                    <div className="min-w-0">
+                                                        <p className="pdp-type-body font-medium text-white truncate">
+                                                            {place.name}
+                                                        </p>
+                                                        <p className="pdp-type-caption text-pdp-contrast-muted flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 tabular-nums">
+                                                            <span>{place.distance}</span>
+                                                            {place.travel_time && (
+                                                                <span className="inline-flex items-center gap-1">
+                                                                    <Clock className="w-3.5 h-3.5" aria-hidden />
+                                                                    {place.travel_time}
+                                                                </span>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                    {place.map_link && (
+                                                        <a
+                                                            href={place.map_link}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            aria-label={`View ${place.name} on Google Maps`}
+                                                            className="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-pdp-contrast-muted hover:text-white hover:bg-white/10 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                                        >
+                                                            <ExternalLink className="w-4 h-4" aria-hidden />
+                                                        </a>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Reviews (only shown when qualified: reviewCount >= MIN_REVIEWS_FOR_RATING) */}
+                        {ratingSummary.showRating && (
+                            <section
+                                id="pdp-reviews"
+                                className="py-10 lg:py-16 border-b border-pdp-border scroll-mt-28"
+                            >
+                                <ReviewSection
+                                    propertyId={property.id}
+                                    initialReviews={property.reviews_list || []}
+                                    onReviewAdded={refetch}
+                                    calm
+                                />
+                            </section>
+                        )}
+
+                        {/* Similar Stays (filtered by area & type, hidden if < 2) */}
+                        <SimilarPropertiesSection
+                            current={property}
+                            initialSimilar={initialSimilar}
+                        />
+
+                        {/* Breadcrumbs */}
+                        <div className="pt-8 pb-4">
+                            <BreadcrumbNav items={breadcrumbItems} calm />
+                        </div>
+                    </div>
+
                     {isPG && pgLoc && (
-                        <section className="mt-12 border-t border-pdp-border py-12">
-                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                <PgLocalityHubTeaser name={pgLoc.name} slug={pgLoc.slug} />
+                        <section className="mt-8 border-t border-pdp-border py-10 lg:py-16">
+                            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                                <PgLocalityHubTeaser name={pgLoc.name} slug={pgLoc.slug} calm />
                             </div>
                         </section>
                     )}
@@ -1174,6 +1314,7 @@ export default function PropertyDetails({
                     isMonthly={isMonthlyListing}
                     hasNumericPrice={hasNumericPrice}
                     visitNote={visitNote}
+                    confirmedBooking={confirmedBooking}
                     onBookVisit={handleBookVisitOpen}
                 />
 
@@ -1210,6 +1351,11 @@ export default function PropertyDetails({
                     propertyTitle={displayTitle || property.title}
                     propertyLocation={property.location}
                     initialMessage={leadModal.initialMessage}
+                    onSuccess={() => {
+                        if (visitDate && visitTime) {
+                            setConfirmedBooking({ date: visitDate, time: visitTime });
+                        }
+                    }}
                 />
 
                 <SafetyPopup isOpen={isSafetyPopupOpen} onClose={handleSafetyConfirm} />
