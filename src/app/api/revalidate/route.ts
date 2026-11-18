@@ -1,11 +1,3 @@
-<<<<<<< HEAD
-import { revalidateTag } from 'next/cache';
-import { NextRequest, NextResponse } from 'next/server';
-
-export async function POST(request: NextRequest) {
-  const secret = request.nextUrl.searchParams.get('secret');
-  if (secret !== 'MakeMyStaySecret123') {
-=======
 import { timingSafeEqual } from 'crypto';
 import { revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,7 +17,6 @@ export async function POST(request: NextRequest) {
 
   const secret = request.nextUrl.searchParams.get('secret');
   if (!secretsMatch(secret, expectedSecret)) {
->>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
     return NextResponse.json({ message: 'Invalid secret' }, { status: 401 });
   }
 

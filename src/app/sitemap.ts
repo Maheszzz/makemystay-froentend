@@ -1,22 +1,4 @@
 import type { MetadataRoute } from 'next';
-<<<<<<< HEAD
-import { getAppRouterSitemap } from '@/lib/sitemap';
-
-/**
- * Next.js App Router Dynamic Sitemap
- * Automatically emits canonical XML sitemap entries from the centralized Sitemap Engine.
- * Serves /sitemap.xml natively via Next.js.
- */
-export default function sitemap(): MetadataRoute.Sitemap {
-    const items = getAppRouterSitemap();
-
-    return items.map((item) => ({
-        url: item.url,
-        lastModified: item.lastModified,
-        changeFrequency: item.changeFrequency as MetadataRoute.Sitemap[number]['changeFrequency'],
-        priority: item.priority
-    }));
-=======
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import {
@@ -99,5 +81,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     return entries;
->>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
 }
