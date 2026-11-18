@@ -15,6 +15,7 @@ interface LeadCaptureModalProps {
     propertyLocation?: string;
     whatsappUrl?: string;
     initialMessage?: string;
+    onSuccess?: () => void;
 }
 
 export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
@@ -28,6 +29,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     propertyLocation,
     whatsappUrl,
     initialMessage = '',
+    onSuccess,
 }) => {
     const [formData, setFormData] = useState({
         name: '',
@@ -94,6 +96,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
             }
 
             setStatus('success');
+            onSuccess?.();
             
             if (whatsappUrl) {
                 const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');

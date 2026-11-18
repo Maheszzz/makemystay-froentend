@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { MessageCircle } from 'lucide-react';
+import { CheckCircle2, MessageCircle } from 'lucide-react';
 import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
 import type { Property } from '@/types/api';
+import type { ConfirmedVisitBooking } from '@/components/property/PropertyBookingCard';
 
 interface PropertyMobileBarProps {
     property: Property;
@@ -12,6 +13,7 @@ interface PropertyMobileBarProps {
     isMonthly: boolean;
     hasNumericPrice: boolean;
     visitNote?: string;
+    confirmedBooking?: ConfirmedVisitBooking | null;
     onBookVisit: () => void;
 }
 
@@ -22,6 +24,7 @@ export function PropertyMobileBar({
     isMonthly,
     hasNumericPrice,
     visitNote,
+    confirmedBooking = null,
     onBookVisit,
 }: PropertyMobileBarProps) {
     const whatsappHref = useMemo(
@@ -63,13 +66,20 @@ export function PropertyMobileBar({
                     >
                         <MessageCircle className="w-5 h-5" aria-hidden />
                     </a>
-                    <button
-                        type="button"
-                        onClick={onBookVisit}
-                        className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-cta hover:bg-pdp-cta-hover text-white text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pdp-cta cursor-pointer"
-                    >
-                        Book a visit
-                    </button>
+                    {confirmedBooking ? (
+                        <span className="min-h-[44px] px-4 py-2 rounded-[10px] bg-pdp-verified-bg text-pdp-verified border border-pdp-verified/25 text-sm font-medium inline-flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 shrink-0" aria-hidden />
+                            <span>Visit requested</span>
+                        </span>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={onBookVisit}
+                            className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-cta hover:bg-pdp-cta-hover text-white text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-pdp-cta cursor-pointer"
+                        >
+                            Book a visit
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
