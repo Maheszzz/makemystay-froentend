@@ -1,12 +1,15 @@
 import { useLocation } from '@/lib/navigation';
+import { usePdpStickyActive } from '@/lib/pdpStickyState';
 import { useEffect, useState } from 'react';
 
 const WHATSAPP_NUMBER = '8150099911'; // +91 81500 99911
 
 export function WhatsAppWidget() {
     const { pathname } = useLocation();
-    /** Avoid hover-expand + overlap with PropertyStickyActions (Call / Book visit). */
-    const isPropertyDetailPage = pathname.startsWith('/properties/') || /^\/pg\/\d+/.test(pathname);
+    const pdpStickyActive = usePdpStickyActive();
+    /** Hide floating widget on property detail pages where WhatsApp is integrated into the booking card/bar. */
+    const isPropertyDetailPage =
+        pdpStickyActive || pathname.startsWith('/properties/') || pathname.startsWith('/property/') || /^\/pg\/\d+/.test(pathname);
 
     const [showBounce, setShowBounce] = useState(false);
 
@@ -15,6 +18,10 @@ export function WhatsAppWidget() {
         const t = setTimeout(() => setShowBounce(true), 3000);
         return () => clearTimeout(t);
     }, []);
+
+    if (isPropertyDetailPage) {
+        return null;
+    }
 
     const handleDirectWhatsApp = () => {
         const finalMessage = `Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?`;

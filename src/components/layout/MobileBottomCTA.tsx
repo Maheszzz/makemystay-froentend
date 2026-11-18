@@ -1,5 +1,6 @@
 import { Mail, Phone } from 'lucide-react';
 import { Link } from '@/lib/navigation';
+import { usePdpStickyActive } from '@/lib/pdpStickyState';
 
 /** Official-style WhatsApp mark (matches WhatsAppWidget). */
 function WhatsAppMark({ className }: { className?: string }) {
@@ -17,8 +18,13 @@ function WhatsAppMark({ className }: { className?: string }) {
 }
 
 export function MobileBottomCTA() {
+    const pdpStickyActive = usePdpStickyActive();
     const whatsappMessage = "Hi MakeMyStay! 👋 I visited the MakeMyStay website and am interested in finding a property. Can you help me with suitable listings?";
     const whatsappUrl = `https://wa.me/918150099911?text=${encodeURIComponent(whatsappMessage)}`;
+
+    if (pdpStickyActive) {
+        return null;
+    }
 
     return (
         <>

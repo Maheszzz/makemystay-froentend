@@ -14,6 +14,7 @@ interface LeadCaptureModalProps {
     propertyTitle?: string;
     propertyLocation?: string;
     whatsappUrl?: string;
+    initialMessage?: string;
 }
 
 export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
@@ -25,13 +26,14 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     actionLabel = "Submit Request",
     propertyTitle,
     propertyLocation,
-    whatsappUrl
+    whatsappUrl,
+    initialMessage = '',
 }) => {
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
         email: '',
-        message: ''
+        message: initialMessage
     });
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [errorMsg, setErrorMsg] = useState('');
@@ -39,14 +41,17 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            // Reset status when opening
             setStatus('idle');
             setErrorMsg('');
+            setFormData((prev) => ({
+                ...prev,
+                message: initialMessage || prev.message,
+            }));
         } else {
             document.body.style.overflow = 'unset';
         }
         return () => { document.body.style.overflow = 'unset'; };
-    }, [isOpen]);
+    }, [isOpen, initialMessage]);
 
     if (!isOpen) return null;
 
@@ -126,8 +131,10 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-brand-red via-red-500 to-orange-500" />
                 
                 <button 
+                    type="button"
+                    aria-label="Close dialog"
                     onClick={onClose}
-                    className="absolute top-6 right-6 p-2 rounded-full bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all z-10"
+                    className="absolute top-6 right-6 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-slate-50 text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all z-10"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -138,15 +145,15 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                             <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-100">
                                 <ClipboardCheck className="w-10 h-10 text-emerald-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Received!</h3>
-                            <p className="text-slate-500">Our team will contact you within 4 business hours to finalize the details.</p>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Received</h3>
+                            <p className="text-slate-600">Our team will contact you shortly to confirm the visit details.</p>
                         </div>
                     ) : (
                         <>
                             <div className="mb-8">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-red/5 text-brand-red text-xs font-bold uppercase tracking-wider mb-4 border border-brand-red/10">
-                                    <Sparkles className="w-3 h-3" />
-                                    <span>Instant Confirmation</span>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold mb-4 border border-slate-200">
+                                    <Sparkles className="w-3 h-3 text-brand-red" />
+                                    <span>Direct enquiry</span>
                                 </div>
                                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight mb-2">
                                     {title}

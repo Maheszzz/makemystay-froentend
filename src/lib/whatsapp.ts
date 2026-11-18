@@ -13,14 +13,17 @@ export function buildPropertyWhatsappUrl(
     propertyTitle: string,
     location: string,
     propertyPath?: string,
+    visitNote?: string,
 ): string {
     const phone = getWhatsappDigits();
+    const cleanProductionBase = SITE_URL.replace(/\/$/, '');
     const listingUrl = propertyPath
         ? propertyPath.startsWith('http')
             ? propertyPath
-            : `${SITE_URL}${propertyPath.startsWith('/') ? '' : '/'}${propertyPath}`
+            : `${cleanProductionBase}${propertyPath.startsWith('/') ? '' : '/'}${propertyPath}`
         : '';
-    const linkPart = listingUrl ? ` (${listingUrl})` : '';
-    const text = `Hi! I'm interested in ${propertyTitle} at ${location}${linkPart}. Please share availability and visit slots.`;
+    const linkPart = listingUrl ? ` — ${listingUrl}` : '';
+    const visitPart = visitNote ? ` Preferred visit: ${visitNote}.` : '';
+    const text = `Hi, I'm interested in ${propertyTitle} in ${location}${linkPart}.${visitPart} Please share availability and visit details.`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 }
