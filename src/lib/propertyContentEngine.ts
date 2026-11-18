@@ -1,5 +1,6 @@
 import { findPgLocationForArea } from '@/data/pgLocations';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
 import type { Property, Review } from '@/types/api';
 
 export interface ContentSection {
@@ -129,14 +130,15 @@ function commuteMinutes(locality: string, base: number, tokens: string[]): numbe
 }
 
 function reviewSummary(property: Property): PropertyContentGuide['reviewSummary'] {
-    const reviews = property.reviews_list || [];
+    const summary = getQualifiedRatingSummary(property, { requireReviewsList: true });
+    const reviews = summary.approvedReviews;
     return {
-        overall: property.average_rating ?? property.rating ?? avg(reviews.map((r) => r.rating)),
-        count: property.review_count ?? property.reviews ?? reviews.length,
+        overall: summary.showRating ? summary.rating : undefined,
+        count: summary.reviewCount,
         cleanliness: avg(reviews.map((r) => r.cleanliness_rating)),
         amenities: avg(reviews.flatMap((r) => [r.wifi_rating, r.food_rating])),
         location: avg(reviews.map((r) => r.safety_rating)),
-        value: avg(reviews.map((r) => r.rating)),
+        value: summary.showRating ? summary.rating : undefined,
     };
 }
 

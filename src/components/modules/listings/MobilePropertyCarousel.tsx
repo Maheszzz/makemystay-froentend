@@ -3,6 +3,8 @@ import { useRef, useState } from 'react';
 import { ArrowRight, BadgeCheck, MapPin, MessageCircle, Star } from 'lucide-react';
 import { formatPropertyTitle, reviewsLabel } from '@/lib/formatPropertyTitle';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
+import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
 import type { Property } from '@/types/api';
 import { LeadCaptureModal } from '@/components/modals/LeadCaptureModal';
 
@@ -107,12 +109,10 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                           : [];
                 const images = rawImages.map((img: any) => typeof img === 'string' ? img : img?.image_url).filter(Boolean);
                 const propertyPath = getPropertyDetailPath(property);
-                const contactNumber = '918150099911';
                 const displayTitle = formatPropertyTitle(property.title);
-
-                const rooms = ((Number(property.id) || 0) % 3) + 1;
-
-                const waLink = `https://wa.me/${contactNumber}?text=${encodeURIComponent(`Hi! I'm interested in ${displayTitle} at ${property.location}. Please share more details.`)}`;
+                const isMonthlyRent = property.category === 'pg' || property.category === 'rent';
+                const hasNumericPrice = Boolean(property.price && !/request/i.test(property.price));
+                const waLink = buildPropertyWhatsappUrl(displayTitle || property.title, property.location || '', propertyPath);
 
                 return (
                     <div
@@ -139,20 +139,26 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                         </div>
 
                         <div className="p-4 sm:p-5 bg-gradient-to-b from-white to-stone-50/40">
-                            <div className="flex items-center gap-1.5 mb-2">
-                                {(property.rating ?? 0) > 0 ? (
-                                    <>
-                                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                        <span className="text-xs font-semibold text-stone-700">{(property.rating ?? 0).toFixed(1)}</span>
-                                        <span className="text-xs text-stone-500">({reviewsLabel(property.reviews || 0)})</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Star className="w-3.5 h-3.5 fill-slate-200 text-slate-200" />
-                                        <span className="text-xs font-medium text-stone-400">New Listing</span>
-                                    </>
-                                )}
-                            </div>
+                            {(() => {
+                                const ratingSummary = getQualifiedRatingSummary(property);
+                                return (
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                        {ratingSummary.showRating ? (
+                                            <>
+                                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                                                <span className="text-xs font-semibold text-stone-700">
+                                                    {ratingSummary.rating.toFixed(1)}
+                                                </span>
+                                                <span className="text-xs text-stone-500">
+                                                    ({reviewsLabel(ratingSummary.reviewCount)})
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <span className="text-xs font-medium text-stone-500">New Listing</span>
+                                        )}
+                                    </div>
+                                );
+                            })()}
 
                             <h3 className="text-[15px] font-semibold text-stone-900 leading-snug line-clamp-2 mb-1">{displayTitle}</h3>
 
@@ -169,14 +175,21 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                             <div className="flex flex-col gap-2.5 mb-4">
                                 <div>
                                     <p className="text-xs text-stone-500 leading-tight mb-1">Starting at</p>
-                                    <p className="text-[1.15rem] font-bold leading-tight text-brand-red">{property.price}</p>
-                                    {property.category === 'rent' && (
-                                        <p className="text-xs text-stone-500 mt-1">Per month</p>
-                                    )}
+                                    <p className="text-[1.15rem] font-bold leading-tight text-brand-red">
+                                        {property.price}
+                                        {isMonthlyRent && hasNumericPrice ? ' /mo' : ''}
+                                    </p>
                                 </div>
-                                <span className="inline-flex self-start items-center rounded-lg bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-600 border border-stone-200/80">
-                                    Only {rooms} Rooms Left
-                                </span>
+                                {typeof property.units_remaining === 'number' && property.units_remaining > 0 ? (
+                                    <span className="inline-flex self-start items-center rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-800 border border-amber-200/80">
+                                        Only {property.units_remaining}{' '}
+                                        {property.units_remaining === 1 ? 'Room' : 'Rooms'} Left
+                                    </span>
+                                ) : (
+                                    <span className="inline-flex self-start items-center rounded-lg bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-700 border border-stone-200/80">
+                                        {property.is_available === false ? 'Currently Full' : 'Ready to Move'}
+                                    </span>
+                                )}
                             </div>
 
                             <div className="flex items-center gap-2">

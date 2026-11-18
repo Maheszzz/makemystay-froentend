@@ -2,6 +2,7 @@ import { ArrowRight, Heart, MapPin, Sparkles, Star } from 'lucide-react';
 import { Link } from '@/lib/navigation';
 
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
 import type { Property } from '@/types/api';
 
 interface FeaturedProjectCardProps {
@@ -37,9 +38,14 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
     const locationLabel = property.location || '';
     const propertyType = property.type || '';
     const priceLabel = property.price && property.price.trim() ? property.price : 'Price on request';
+    const isMonthlyRent =
+        property.category === 'pg' ||
+        property.category === 'rent' ||
+        (property.type || '').toLowerCase() === 'pg' ||
+        (property.type || '').toLowerCase() === 'hostel';
+    const hasNumericPrice = Boolean(priceLabel && !/request/i.test(priceLabel));
     const badgeBg = typeof rank === 'number' && rank > 0 ? RANK_COLORS[(rank - 1) % RANK_COLORS.length] : '';
-    const ratingVal = Number(property.rating ?? property.average_rating ?? 4.8) || 4.8;
-    const reviewCount = Number(property.reviews ?? property.review_count ?? 0) || 0;
+    const { showRating: hasRealRating, rating: ratingVal, reviewCount } = getQualifiedRatingSummary(property);
 
     return (
         <Link
@@ -94,7 +100,9 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
             <div className="flex flex-1 flex-col px-3 pt-3 pb-3">
                 {/* Title + optional Featured badge */}
                 <div className="flex items-start gap-2 mb-0.5">
-                    <h3 className="flex-1 text-[15px] leading-snug font-bold text-slate-900 line-clamp-1">{title}</h3>
+                    <h3 title={title} className="flex-1 text-[15px] leading-snug font-bold text-slate-900 line-clamp-2 min-h-[2.4rem]">
+                        {title}
+                    </h3>
                     {featured && (
                         <span className="shrink-0 mt-0.5 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
                             Featured
@@ -104,21 +112,27 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
 
                 {/* Location */}
                 {locationLabel && (
-                    <div className="mt-1 flex items-center gap-1 text-xs text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    <div className="mt-1 flex items-center gap-1 text-xs text-slate-600">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-500" />
                         <span className="line-clamp-1">{locationLabel}</span>
                     </div>
                 )}
 
                 {/* Rating & Reviews */}
                 <div className="mt-1.5 flex items-center gap-1.5 text-xs">
-                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200/60">
-                        <Star className="h-3 w-3 fill-emerald-600 text-emerald-600" />
-                        {ratingVal.toFixed(1)}
-                    </span>
-                    {reviewCount > 0 && (
-                        <span className="text-[11px] font-medium text-slate-500">
-                            ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                    {hasRealRating ? (
+                        <>
+                            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200/60">
+                                <Star className="h-3 w-3 fill-emerald-600 text-emerald-600" />
+                                {ratingVal.toFixed(1)}
+                            </span>
+                            <span className="text-[11px] font-medium text-slate-600">
+                                ({reviewCount} {reviewCount === 1 ? 'review' : 'reviews'})
+                            </span>
+                        </>
+                    ) : (
+                        <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                            Verified Listing
                         </span>
                     )}
                 </div>
@@ -127,7 +141,10 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
                 <div className="mt-2 flex items-center justify-between gap-2">
                     <p className="text-sm font-medium text-slate-600">
                         Starting from{' '}
-                        <span className="text-[15px] font-extrabold text-slate-900">{priceLabel}</span>
+                        <span className="text-[15px] font-extrabold text-slate-900">
+                            {priceLabel}
+                            {isMonthlyRent && hasNumericPrice ? '/mo' : ''}
+                        </span>
                     </p>
                     {propertyType && (
                         <span className="shrink-0 inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 border border-slate-200">

@@ -3,6 +3,7 @@ import { BRAND_CONTACT, BRAND_EXTENDED, BRAND_SAME_AS } from '@/lib/brandEntity'
 import { buildClientSeoAbout } from '@/lib/propertyClientSeoNarrative';
 import { buildPropertyProductName } from '@/lib/propertyDetailCopy';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { getQualifiedRatingSummary } from '@/lib/ratings';
 import { parseInrOfferAmount, stripMarkdownLight } from '@/lib/propertySeoUtils';
 import { DEFAULT_OG_IMAGE, LEGAL_ENTITY_NAME, SITE_NAME, SITE_URL } from '@/lib/siteConfig';
 import type { Property } from '@/types/api';
@@ -377,19 +378,18 @@ export function buildPropertyDetailGraph(
         };
     }
 
-    const reviewCount = property.review_count ?? property.reviews ?? 0;
-    const avgRating = property.average_rating ?? property.rating;
-    if (avgRating != null && avgRating > 0 && reviewCount > 0) {
+    const ratingSummary = getQualifiedRatingSummary(property, { requireReviewsList: true });
+    if (ratingSummary.showRating) {
         product.aggregateRating = {
             '@type': 'AggregateRating',
-            ratingValue: Math.min(5, Math.max(1, Number(avgRating))),
-            reviewCount,
+            ratingValue: Math.min(5, Math.max(1, ratingSummary.rating)),
+            reviewCount: ratingSummary.reviewCount,
             bestRating: 5,
             worstRating: 1,
         };
     }
 
-    const reviewsList = property.reviews_list?.filter((r) => r && (r.rating > 0 || r.comment?.trim()));
+    const reviewsList = ratingSummary.approvedReviews.filter((r) => r && (r.rating > 0 || r.comment?.trim()));
     if (reviewsList && reviewsList.length > 0) {
         product.review = reviewsList.slice(0, 8).map((r) => {
             const node: Record<string, unknown> = {

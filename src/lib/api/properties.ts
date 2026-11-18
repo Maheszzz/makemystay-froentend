@@ -246,6 +246,29 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
     const positivePrice = (val: unknown): number | undefined =>
         typeof val === 'number' && Number.isFinite(val) && val > 0 ? val : undefined;
 
+    const mappedReviewsList = Array.isArray(item.reviews)
+        ? item.reviews.map((r: Review) => ({
+              ...r,
+              comment: r.comment ?? r.review_text,
+          }))
+        : [];
+    const approvedReviewsList = mappedReviewsList.filter(
+        (r) => !r.status || r.status === 'approved',
+    );
+    const hasEmbeddedReviews = Array.isArray(item.reviews);
+    const resolvedReviewCount = hasEmbeddedReviews
+        ? approvedReviewsList.length
+        : item.review_count || 0;
+    const resolvedAverageRating = hasEmbeddedReviews
+        ? approvedReviewsList.length > 0
+            ? Number(
+                  (
+                      approvedReviewsList.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) /
+                      approvedReviewsList.length
+                  ).toFixed(1),
+              )
+            : 0
+        : item.average_rating || 0;
     const rawGender = item.gender ?? metaObj.gender;
     const normalizedGender =
         typeof rawGender === 'string' && rawGender.trim() ? rawGender.trim() : undefined;
@@ -330,16 +353,11 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         house_rules: normalizedHouseRules && normalizedHouseRules.length > 0 ? normalizedHouseRules : undefined,
         food_menu: normalizedFoodMenu,
         features: featuresList,
-        rating: item.average_rating || 0,
-        reviews: item.review_count || 0,
-        average_rating: item.average_rating,
-        review_count: item.review_count,
-        reviews_list: Array.isArray(item.reviews)
-            ? item.reviews.map((r: Review) => ({
-                  ...r,
-                  comment: r.comment ?? r.review_text,
-              }))
-            : [],
+        rating: resolvedAverageRating,
+        reviews: resolvedReviewCount,
+        average_rating: resolvedAverageRating,
+        review_count: resolvedReviewCount,
+        reviews_list: mappedReviewsList,
         last_verified_at: item.last_verified_at,
         last_booked_at: item.last_booked_at,
         last_review_at: item.last_review_at,

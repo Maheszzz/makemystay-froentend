@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { OptimizedImage } from '@/components/ui/OptimizedImage';
 import type { Review } from '@/types/api';
 import { api } from '@/lib/api/client';
+import { MIN_REVIEWS_FOR_RATING } from '@/lib/ratings';
 
 interface ReviewSectionProps {
     propertyId: string | number;
@@ -35,10 +36,10 @@ function SubRatingRow({ label, value, icon: Icon }: { label: string; value?: num
 
 export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: ReviewSectionProps) {
     const approved = useMemo(
-        () => initialReviews.filter((r) => !r.status || r.status === 'approved'),
+        () => initialReviews.filter((r) => (!r.status || r.status === 'approved') && r.rating > 0),
         [initialReviews],
     );
-    const [reviews] = useState<Review[]>(approved);
+    const reviews = approved;
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [userName, setUserName] = useState('');
@@ -51,10 +52,10 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
     const [error, setError] = useState<string | null>(null);
     const [pendingMsg, setPendingMsg] = useState<string | null>(null);
 
-    const avg =
-        reviews.length > 0
-            ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
-            : null;
+    const showAggregateRating = reviews.length >= MIN_REVIEWS_FOR_RATING;
+    const avg = showAggregateRating
+        ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+        : null;
     const dist = useMemo(() => ratingDistribution(reviews), [reviews]);
     const maxDist = Math.max(...dist, 1);
 
@@ -137,7 +138,7 @@ export function ReviewSection({ propertyId, initialReviews, onReviewAdded }: Rev
                         </p>
                     )}
                 </div>
-                {reviews.length > 0 && (
+                {showAggregateRating && (
                     <div className="lg:w-64 space-y-2 shrink-0">
                         {[5, 4, 3, 2, 1].map((star) => {
                             const count = dist[star - 1];
