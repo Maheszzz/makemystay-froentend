@@ -3,7 +3,6 @@ import { useSimilarProperties } from '@/hooks';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import type { Property } from '@/types/api';
 import { findPgLocationForArea } from '@/data/pgLocations';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 interface SimilarPropertiesSectionProps {
     current: Property;
@@ -20,48 +19,42 @@ export function SimilarPropertiesSection({ current, initialSimilar }: SimilarPro
         initialProperties: initialSimilar,
     });
 
-    if (!loading && (error || similar.length === 0)) {
+    if (loading || error || similar.length === 0) {
         return null;
     }
 
     const heading = isPg
         ? pgLoc
-            ? `Similar PG in ${pgLoc.name}`
-            : `More PG stays${city ? ` near ${city}` : ' in Bangalore'}`
+            ? `Similar PGs in ${pgLoc.name}`
+            : `More PG stays${city ? ` near ${city}` : ''}`
         : pgLoc
           ? `Similar ${current.type} in ${pgLoc.name}`
           : `More ${current.type} listings${city ? ` near ${city}` : ''}`;
 
     return (
-        <section className="bg-white rounded-3xl border border-slate-200/70 shadow-[0_18px_55px_-35px_rgba(15,23,42,0.25)] p-5 sm:p-6 md:p-8" aria-labelledby="similar-pg-heading">
-            <div className="mb-4 md:mb-5 flex flex-wrap items-end justify-between gap-3">
+        <section className="py-8 border-t border-pdp-border" aria-labelledby="similar-pg-heading">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 id="similar-pg-heading" className="text-xl md:text-2xl font-extrabold text-slate-900">
+                    <h2 id="similar-pg-heading" className="text-xl font-semibold text-pdp-ink">
                         {heading}
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">Verified listings — tap to compare and save</p>
+                    <p className="text-sm text-pdp-muted mt-1">Compare nearby listings</p>
                 </div>
                 {pgLoc && (
                     <Link
                         to={`/pg/${pgLoc.slug}`}
-                        className="text-sm font-semibold text-brand-red hover:underline flex items-center gap-1"
+                        className="min-h-[44px] inline-flex items-center text-sm font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded"
                     >
-                        View all in {pgLoc.name} <span className="text-lg">→</span>
+                        View all in {pgLoc.name}
                     </Link>
                 )}
             </div>
 
-            {loading && similar.length === 0 ? (
-                <div className="py-12 flex justify-center">
-                    <LoadingSpinner size={40} message="Loading similar listings…" />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
-                    {similar.map((p) => (
-                        <PropertyCard key={p.id} property={p} />
-                    ))}
-                </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {similar.map((p) => (
+                    <PropertyCard key={p.id} property={p} />
+                ))}
+            </div>
         </section>
     );
 }
