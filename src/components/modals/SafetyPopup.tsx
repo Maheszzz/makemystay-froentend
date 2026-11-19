@@ -28,16 +28,16 @@ export const SafetyPopup: React.FC<SafetyPopupProps> = ({ isOpen, onClose }) => 
             aria-modal="false"
             aria-labelledby="safety-popup-title"
         >
-            <div className="pointer-events-auto overflow-hidden rounded-2xl bg-white ring-1 ring-slate-900/10 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.45)]">
+            <div className="pointer-events-auto overflow-hidden rounded-[var(--radius-pdp)] bg-white border border-line shadow-lg">
 
-                {/* Gradient top bar */}
-                <div className="h-[3px] bg-gradient-to-r from-amber-400 via-red-500 to-rose-600" />
+                {/* Brand accent top bar */}
+                <div className="h-[3px] bg-red" />
 
                 {/* Header */}
-                <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2.5 border-b border-slate-100">
+                <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2.5 border-b border-line">
                     <div className="flex items-center gap-2.5">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-50 to-red-100 border border-red-200/60">
-                            <ShieldAlert className="h-4 w-4 text-red-600" aria-hidden />
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blush-100 border border-line">
+                            <ShieldAlert className="h-4 w-4 text-red" aria-hidden />
                         </div>
                         <div>
                             <h2

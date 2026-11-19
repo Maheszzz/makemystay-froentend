@@ -101,21 +101,21 @@ export function ServiceFeeModal({ isOpen, onClose, propertyType }: ServiceFeeMod
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative">
 
                 {/* Header */}
-                <div className="relative p-6 border-b border-slate-100" style={{ background: 'linear-gradient(135deg,#f8f9fb,#fff)' }}>
+                <div className="relative p-6 border-b border-line bg-page">
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="absolute top-4 right-4 p-2 rounded-full hover:bg-blush-100 text-slate hover:text-ink transition-colors"
                     >
                         <X size={18} />
                     </button>
                     <div className="flex items-center gap-3 mb-2">
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(177,18,38,0.08)' }}>
-                            <Lock className="w-4 h-4" style={{ color: '#B11226' }} />
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blush-100">
+                            <Lock className="w-4 h-4 text-red" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900">Select Booking Token</h3>
+                        <h3 className="text-xl font-bold text-ink">Select Booking Token</h3>
                     </div>
-                    <p className="text-sm text-slate-500 leading-relaxed">
-                        This token <span className="font-semibold text-slate-700">secures your room</span> and blocks it from other bookings instantly.
+                    <p className="text-sm text-slate leading-relaxed">
+                        This token <span className="font-semibold text-ink">secures your room</span> and blocks it from other bookings instantly.
                     </p>
                 </div>
 
@@ -127,15 +127,15 @@ export function ServiceFeeModal({ isOpen, onClose, propertyType }: ServiceFeeMod
                             <div
                                 key={option.id}
                                 onClick={() => setSelectedOptionId(option.id)}
-                                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-150 ${isSelected
-                                    ? 'border-[#B11226] bg-red-50/40 ring-1 ring-[#B11226]/20'
-                                    : 'border-slate-100 hover:border-slate-200 hover:bg-slate-50'
+                                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-colors ${isSelected
+                                    ? 'border-red bg-blush-100/60 ring-1 ring-red/20'
+                                    : 'border-line hover:border-ink/30 hover:bg-page'
                                     }`}
                             >
                                 {/* Badge */}
                                 {option.badge && (
                                     <div className="absolute -top-2.5 left-4">
-                                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white" style={{ background: '#B11226' }}>
+                                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full text-white bg-red">
                                             {option.badge}
                                         </span>
                                     </div>
@@ -143,27 +143,27 @@ export function ServiceFeeModal({ isOpen, onClose, propertyType }: ServiceFeeMod
 
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-start gap-3">
-                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors ${isSelected ? 'text-white' : 'text-slate-400 bg-slate-100'
-                                            }`} style={isSelected ? { background: '#B11226' } : {}}>
+                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors ${isSelected ? 'bg-red text-white' : 'text-slate bg-page'
+                                            }`}>
                                             {option.icon}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                                            <div className="font-bold text-ink flex items-center gap-2 text-sm">
                                                 {option.label}
-                                                {isSelected && <Check size={14} className="text-[#B11226]" strokeWidth={3} />}
+                                                {isSelected && <Check size={14} className="text-red" strokeWidth={3} />}
                                             </div>
-                                            <div className="text-xs text-slate-400 mt-0.5">{option.description}</div>
+                                            <div className="text-xs text-slate mt-0.5">{option.description}</div>
                                             {option.refundNote && (
                                                 <div className="flex items-center gap-1 mt-1.5">
-                                                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                                                    <span className="text-[11px] text-emerald-600 font-semibold">{option.refundNote}</span>
+                                                    <Star className="w-3 h-3 text-champagne fill-champagne" />
+                                                    <span className="text-[11px] text-verified font-semibold">{option.refundNote}</span>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
                                     <div className="text-right shrink-0 ml-3">
-                                        <div className="text-lg font-extrabold text-slate-900">₹{option.amount.toLocaleString('en-IN')}</div>
-                                        <div className="text-[10px] text-slate-400">one-time</div>
+                                        <div className="text-lg font-extrabold text-ink tabular-nums">₹{option.amount.toLocaleString('en-IN')}</div>
+                                        <div className="text-[10px] text-slate">one-time</div>
                                     </div>
                                 </div>
 

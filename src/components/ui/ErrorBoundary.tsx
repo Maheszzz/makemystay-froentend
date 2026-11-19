@@ -41,7 +41,7 @@ export class ErrorBoundary extends Component<Props, State> {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: '#f8fafc',
+                        background: 'var(--color-page)',
                         fontFamily: 'Inter, sans-serif',
                         padding: '2rem',
                         textAlign: 'center',
@@ -53,16 +53,15 @@ export class ErrorBoundary extends Component<Props, State> {
                             width: 64,
                             height: 64,
                             borderRadius: '50%',
-                            background: 'linear-gradient(135deg,#e92e35,#b01018)',
+                            background: 'var(--color-red)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             marginBottom: '1.5rem',
-                            boxShadow: '0 8px 24px -4px rgba(217,32,39,0.35)',
                         }}
                     >
                         {/* exclamation mark */}
-                        <span style={{ color: '#fff', fontSize: 28, fontWeight: 900, lineHeight: 1 }}>
+                        <span style={{ color: '#FFFFFF', fontSize: 28, fontWeight: 900, lineHeight: 1 }}>
                             !
                         </span>
                     </div>
@@ -71,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
                         style={{
                             fontSize: '1.6rem',
                             fontWeight: 800,
-                            color: '#0f172a',
+                            color: 'var(--color-ink)',
                             marginBottom: '0.5rem',
                         }}
                     >
@@ -79,7 +78,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     </h1>
                     <p
                         style={{
-                            color: '#64748b',
+                            color: 'var(--color-slate)',
                             maxWidth: 420,
                             lineHeight: 1.65,
                             marginBottom: '2rem',
@@ -97,9 +96,9 @@ export class ErrorBoundary extends Component<Props, State> {
                                 marginBottom: '1.5rem',
                                 maxWidth: 520,
                                 textAlign: 'left',
-                                background: '#fff',
+                                background: '#FFFFFF',
                                 borderRadius: 12,
-                                border: '1px solid #e2e8f0',
+                                border: '1px solid var(--color-line)',
                                 padding: '0.75rem 1rem',
                             }}
                         >
@@ -108,7 +107,7 @@ export class ErrorBoundary extends Component<Props, State> {
                                     cursor: 'pointer',
                                     fontSize: '0.78rem',
                                     fontWeight: 700,
-                                    color: '#94a3b8',
+                                    color: 'var(--color-slate)',
                                     letterSpacing: '0.08em',
                                     textTransform: 'uppercase',
                                 }}
@@ -119,7 +118,7 @@ export class ErrorBoundary extends Component<Props, State> {
                                 style={{
                                     marginTop: '0.5rem',
                                     fontSize: '0.75rem',
-                                    color: '#b91c1c',
+                                    color: 'var(--color-red)',
                                     whiteSpace: 'pre-wrap',
                                     wordBreak: 'break-all',
                                 }}
@@ -135,14 +134,13 @@ export class ErrorBoundary extends Component<Props, State> {
                         onClick={() => window.location.reload()}
                         style={{
                             padding: '0.7rem 2rem',
-                            borderRadius: 12,
-                            background: 'linear-gradient(135deg,#e92e35,#b01018)',
-                            color: '#fff',
+                            borderRadius: 10,
+                            background: 'var(--color-red)',
+                            color: '#FFFFFF',
                             fontWeight: 700,
                             fontSize: '0.9rem',
                             border: 'none',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 14px -2px rgba(217,32,39,0.4)',
                             marginRight: '0.75rem',
                         }}
                     >
@@ -152,12 +150,12 @@ export class ErrorBoundary extends Component<Props, State> {
                         href="/"
                         style={{
                             padding: '0.7rem 2rem',
-                            borderRadius: 12,
-                            background: '#fff',
-                            color: '#0f172a',
+                            borderRadius: 10,
+                            background: '#FFFFFF',
+                            color: 'var(--color-ink)',
                             fontWeight: 700,
                             fontSize: '0.9rem',
-                            border: '1px solid #e2e8f0',
+                            border: '1px solid var(--color-ink)',
                             cursor: 'pointer',
                             textDecoration: 'none',
                             display: 'inline-block',

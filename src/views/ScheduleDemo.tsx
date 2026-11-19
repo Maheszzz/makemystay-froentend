@@ -146,24 +146,22 @@ export default function ScheduleDemo() {
                     {/* ─── B2B Hero ─── */}
                     {step === 1 && (
                         <div className="text-center mb-10">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4 border"
-                                style={{ color: '#B11226', background: 'rgba(177,18,38,0.06)', borderColor: 'rgba(177,18,38,0.15)' }}>
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#B11226] animate-pulse inline-block" />
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest mb-4 border border-line bg-blush-100 text-red">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red inline-block" />
                                 Free Strategy Session · 30 mins
                             </div>
-                            <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight"
-                                style={{ fontFamily: "'Playfair Display', serif" }}>
-                                Book Your <span style={{ color: '#B11226' }}>Growth Demo</span>
+                            <h1 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mb-4 leading-tight">
+                                Book Your <span className="text-red">Growth Demo</span>
                             </h1>
-                            <p className="text-slate-500 max-w-xl mx-auto text-base md:text-lg mb-8">
+                            <p className="text-slate max-w-xl mx-auto text-base md:text-lg mb-8">
                                 See exactly how operators increase occupancy and cut broker dependency — live, in 30 minutes.
                             </p>
                             {/* Stats row */}
                             <div className="flex flex-wrap justify-center gap-6 mb-4">
                                 {STATS.map(({ icon: Icon, label, value }) => (
-                                    <div key={label} className="flex items-center gap-2 text-sm text-slate-600">
-                                        <Icon className="w-4 h-4 shrink-0" style={{ color: '#B11226' }} />
-                                        <span className="font-bold text-slate-900">{value}</span>
+                                    <div key={label} className="flex items-center gap-2 text-sm text-slate">
+                                        <Icon className="w-4 h-4 shrink-0 text-red" />
+                                        <span className="font-bold text-ink">{value}</span>
                                         <span>{label}</span>
                                     </div>
                                 ))}
@@ -173,11 +171,10 @@ export default function ScheduleDemo() {
 
                     {step === 2 && (
                         <div className="text-center mb-8">
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-900"
-                                style={{ fontFamily: "'Playfair Display', serif" }}>
+                            <h1 className="font-serif-display text-2xl md:text-3xl font-normal text-ink">
                                 Almost there — tell us about you
                             </h1>
-                            <p className="text-slate-500 mt-2 text-sm">We'll tailor the demo to your portfolio size.</p>
+                            <p className="text-slate mt-2 text-sm">We'll tailor the demo to your portfolio size.</p>
                         </div>
                     )}
 
@@ -187,40 +184,40 @@ export default function ScheduleDemo() {
                         {step === 1 && (
                             <motion.div key="step1"
                                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-                                className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100"
+                                className="bg-white rounded-[var(--radius-pdp)] shadow-sm overflow-hidden border border-line"
                             >
                                 <div className="grid grid-cols-1 md:grid-cols-2">
                                     {/* Calendar */}
-                                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-slate-100">
+                                    <div className="p-6 md:p-8 border-b md:border-b-0 md:border-r border-line">
                                         <div className="flex items-center justify-between mb-5">
-                                            <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                                <CalendarIcon className="w-5 h-5" style={{ color: '#B11226' }} />
+                                            <h3 className="font-bold text-ink flex items-center gap-2">
+                                                <CalendarIcon className="w-5 h-5 text-red" />
                                                 Select Date
                                             </h3>
                                             <div className="flex gap-1">
                                                 <button
                                                     disabled={prevMonthDisabled}
                                                     onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                                                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    className="p-2 hover:bg-blush-100 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                 >
                                                     <ChevronLeft className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                                                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                                                    className="p-2 hover:bg-blush-100 rounded-lg transition-colors"
                                                 >
                                                     <ChevronRight className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="text-center mb-4 font-semibold text-slate-700 text-sm">
+                                        <div className="text-center mb-4 font-semibold text-ink text-sm">
                                             {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
                                         </div>
 
                                         <div className="grid grid-cols-7 gap-1 text-center mb-1">
                                             {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d, i) => (
-                                                <div key={d} className={`text-[10px] font-bold uppercase py-2 ${i === 0 ? 'text-red-300' : 'text-slate-400'}`}>{d}</div>
+                                                <div key={d} className={`text-[10px] font-bold uppercase py-2 ${i === 0 ? 'text-red/60' : 'text-slate'}`}>{d}</div>
                                             ))}
                                             {getDaysInMonth(currentMonth).map((d, i) => {
                                                 if (d.day === null) return <div key={`e-${i}`} />;
@@ -235,34 +232,33 @@ export default function ScheduleDemo() {
                                                         disabled={disabled}
                                                         onClick={() => { setSelectedDate(date); setSelectedTime(null); }}
                                                         className={`
-                                                            aspect-square flex items-center justify-center rounded-xl text-xs font-semibold transition-all
-                                                            ${disabled ? 'text-slate-200 cursor-not-allowed' : 'hover:bg-red-50 text-slate-700 cursor-pointer'}
-                                                            ${isSel ? 'text-white shadow-md' : ''}
-                                                            ${isTdy && !isSel ? 'border text-[#B11226]' : ''}
-                                                            ${isSun && !disabled ? 'text-red-300' : ''}
+                                                            aspect-square flex items-center justify-center rounded-xl text-xs font-semibold transition-colors
+                                                            ${disabled ? 'text-slate/30 cursor-not-allowed' : 'hover:bg-blush-100 text-ink cursor-pointer'}
+                                                            ${isSel ? 'bg-red text-white border border-red' : ''}
+                                                            ${isTdy && !isSel ? 'border border-red text-red bg-blush-100/50' : ''}
+                                                            ${isSun && !disabled ? 'text-red/70' : ''}
                                                         `}
-                                                        style={isSel ? { background: '#B11226', borderColor: '#B11226' } : (isTdy && !isSel ? { borderColor: 'rgba(177,18,38,0.3)' } : {})}
                                                     >
                                                         {d.day}
                                                     </button>
                                                 );
                                             })}
                                         </div>
-                                        <p className="text-[10px] text-slate-400 text-center mt-2">Sundays unavailable · Mon–Sat only</p>
+                                        <p className="text-[10px] text-slate text-center mt-2">Sundays unavailable · Mon–Sat only</p>
                                     </div>
 
                                     {/* Time Slots */}
-                                    <div className="p-6 md:p-8 bg-slate-50/50 flex flex-col">
-                                        <h3 className="font-bold text-slate-900 flex items-center gap-2 mb-5">
-                                            <Clock className="w-5 h-5" style={{ color: '#B11226' }} />
+                                    <div className="p-6 md:p-8 bg-page flex flex-col">
+                                        <h3 className="font-bold text-ink flex items-center gap-2 mb-5">
+                                            <Clock className="w-5 h-5 text-red" />
                                             {selectedDate
                                                 ? `Slots for ${selectedDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}`
                                                 : 'Available Slots'}
                                         </h3>
 
                                         {!selectedDate ? (
-                                            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center px-6 py-12">
-                                                <CalendarIcon className="w-10 h-10 mb-3 opacity-20" />
+                                            <div className="flex-1 flex flex-col items-center justify-center text-slate text-center px-6 py-12">
+                                                <CalendarIcon className="w-10 h-10 mb-3 opacity-25" />
                                                 <p className="text-sm">Pick a date to see available time slots</p>
                                             </div>
                                         ) : (
@@ -271,11 +267,10 @@ export default function ScheduleDemo() {
                                                     <button
                                                         key={time}
                                                         onClick={() => setSelectedTime(time)}
-                                                        className={`py-3 px-3 rounded-xl text-sm font-semibold transition-all border ${selectedTime === time
-                                                            ? 'text-white border-transparent shadow-md'
-                                                            : 'bg-white border-slate-200 text-slate-600 hover:border-[#B11226]/40 hover:text-[#B11226]'
+                                                        className={`py-3 px-3 rounded-[10px] text-sm font-semibold transition-colors border ${selectedTime === time
+                                                            ? 'bg-blush-100 border-red text-red'
+                                                            : 'bg-white border-line text-ink hover:border-red/50 hover:text-red'
                                                             }`}
-                                                        style={selectedTime === time ? { background: '#B11226', boxShadow: '0 4px 12px rgba(177,18,38,0.2)' } : {}}
                                                     >
                                                         {time}
                                                     </button>
@@ -287,14 +282,10 @@ export default function ScheduleDemo() {
                                             <button
                                                 disabled={!selectedDate || !selectedTime}
                                                 onClick={() => setStep(2)}
-                                                className={`w-full py-4 rounded-xl font-bold text-base transition-all ${selectedDate && selectedTime
-                                                    ? 'text-white hover:-translate-y-0.5 hover:shadow-lg'
-                                                    : 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                                                className={`w-full py-4 rounded-[10px] font-semibold text-base transition-colors ${selectedDate && selectedTime
+                                                    ? 'bg-red hover:bg-red-hover text-white'
+                                                    : 'bg-line/50 text-slate cursor-not-allowed'
                                                     }`}
-                                                style={(selectedDate && selectedTime) ? {
-                                                    background: 'linear-gradient(135deg,#B11226,#8B0D1C)',
-                                                    boxShadow: '0 4px 16px rgba(177,18,38,0.25)'
-                                                } : {}}
                                             >
                                                 Confirm Slot →
                                             </button>
@@ -308,24 +299,23 @@ export default function ScheduleDemo() {
                         {step === 2 && (
                             <motion.div key="step2"
                                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-                                className="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 md:p-12 max-w-2xl mx-auto"
+                                className="bg-white rounded-[var(--radius-pdp)] shadow-sm border border-line p-6 md:p-10 max-w-2xl mx-auto"
                             >
                                 <button
                                     onClick={() => setStep(1)}
-                                    className="flex items-center gap-2 text-slate-400 hover:text-slate-700 transition-colors mb-8 text-sm font-medium"
+                                    className="flex items-center gap-2 text-slate hover:text-ink transition-colors mb-8 text-sm font-medium"
                                 >
                                     <ArrowLeft className="w-4 h-4" /> Back to Calendar
                                 </button>
 
                                 {/* Selected slot summary */}
-                                <div className="mb-8 p-4 rounded-2xl flex items-center gap-4 border" style={{ background: 'rgba(177,18,38,0.04)', borderColor: 'rgba(177,18,38,0.12)' }}>
-                                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                                        style={{ background: 'rgba(177,18,38,0.08)' }}>
-                                        <CalendarIcon className="w-5 h-5" style={{ color: '#B11226' }} />
+                                <div className="mb-8 p-4 rounded-xl flex items-center gap-4 border border-line bg-blush-100">
+                                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 bg-white border border-line">
+                                        <CalendarIcon className="w-5 h-5 text-red" />
                                     </div>
                                     <div>
-                                        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Your Selected Slot</div>
-                                        <div className="font-bold text-slate-900">
+                                        <div className="text-[10px] font-bold uppercase tracking-widest text-slate mb-0.5">Your Selected Slot</div>
+                                        <div className="font-bold text-ink">
                                             {selectedDate?.toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })} · {selectedTime}
                                         </div>
                                     </div>
@@ -334,49 +324,49 @@ export default function ScheduleDemo() {
                                 <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Full Name *</label>
+                                            <label className="text-xs font-bold text-slate uppercase tracking-wider">Full Name *</label>
                                             <input required type="text" placeholder="Enter your name"
                                                 value={formData.name}
                                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#B11226]/20 focus:border-[#B11226] outline-none transition-all bg-slate-50/50 text-slate-900 placeholder:text-slate-400"
+                                                className="w-full px-4 py-3.5 rounded-xl border border-line focus:ring-2 focus:ring-red/20 focus:border-red outline-none transition-colors bg-page text-ink placeholder:text-slate/60"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Phone *</label>
+                                            <label className="text-xs font-bold text-slate uppercase tracking-wider">Phone *</label>
                                             <input required type="tel" inputMode="numeric" placeholder="Enter your phone number"
                                                 value={formData.phone}
                                                 onChange={e => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '') })}
-                                                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#B11226]/20 focus:border-[#B11226] outline-none transition-all bg-slate-50/50 text-slate-900 placeholder:text-slate-400"
+                                                className="w-full px-4 py-3.5 rounded-xl border border-line focus:ring-2 focus:ring-red/20 focus:border-red outline-none transition-colors bg-page text-ink placeholder:text-slate/60"
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Work Email *</label>
+                                        <label className="text-xs font-bold text-slate uppercase tracking-wider">Work Email *</label>
                                         <input required type="email" placeholder="Enter your email"
                                             value={formData.email}
                                             onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                            className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#B11226]/20 focus:border-[#B11226] outline-none transition-all bg-slate-50/50 text-slate-900 placeholder:text-slate-400"
+                                            className="w-full px-4 py-3.5 rounded-xl border border-line focus:ring-2 focus:ring-red/20 focus:border-red outline-none transition-colors bg-page text-ink placeholder:text-slate/60"
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                                            <label className="text-xs font-bold text-slate uppercase tracking-wider flex items-center gap-1.5">
                                                 <Building2 className="w-3.5 h-3.5" /> Company / PG Name
                                             </label>
                                             <input type="text" placeholder="Enter your company name"
                                                 value={formData.company}
                                                 onChange={e => setFormData({ ...formData, company: e.target.value })}
-                                                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#B11226]/20 focus:border-[#B11226] outline-none transition-all bg-slate-50/50 text-slate-900 placeholder:text-slate-400"
+                                                className="w-full px-4 py-3.5 rounded-xl border border-line focus:ring-2 focus:ring-red/20 focus:border-red outline-none transition-colors bg-page text-ink placeholder:text-slate/60"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                                            <label className="text-xs font-bold text-slate uppercase tracking-wider flex items-center gap-1.5">
                                                 <Users className="w-3.5 h-3.5" /> No. of Beds / Units
                                             </label>
                                             <select
                                                 value={formData.units}
                                                 onChange={e => setFormData({ ...formData, units: e.target.value })}
-                                                className="w-full px-4 py-3.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#B11226]/20 focus:border-[#B11226] outline-none transition-all bg-slate-50/50 text-slate-700"
+                                                className="w-full px-4 py-3.5 rounded-xl border border-line focus:ring-2 focus:ring-red/20 focus:border-red outline-none transition-colors bg-page text-ink"
                                             >
                                                 <option value="">Select range</option>
                                                 <option value="1-10">1 – 10 beds</option>
@@ -390,16 +380,12 @@ export default function ScheduleDemo() {
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className={`w-full py-4 rounded-xl font-bold text-base transition-all mt-2 flex items-center justify-center gap-2 ${loading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'text-white hover:-translate-y-0.5 hover:shadow-lg'
+                                        className={`w-full py-4 rounded-[10px] font-semibold text-base transition-colors mt-2 flex items-center justify-center gap-2 ${loading ? 'bg-line text-slate cursor-not-allowed' : 'bg-red hover:bg-red-hover text-white'
                                             }`}
-                                        style={!loading ? {
-                                            background: 'linear-gradient(135deg,#B11226,#8B0D1C)',
-                                            boxShadow: '0 4px 16px rgba(177,18,38,0.25)'
-                                        } : {}}
                                     >
-                                        {loading ? 'Scheduling...' : '🔒 Confirm & Schedule Demo'}
+                                        {loading ? 'Scheduling...' : 'Confirm & Schedule Demo'}
                                     </button>
-                                    <p className="text-center text-xs text-slate-400">
+                                    <p className="text-center text-xs text-slate">
                                         No spam · You'll receive a confirmation on WhatsApp & email
                                     </p>
                                 </form>
@@ -477,8 +463,8 @@ export default function ScheduleDemo() {
                                     <p className="text-center text-sm font-semibold text-slate-600 mb-4">📞 Need to reach us sooner?</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <a href="tel:+918150099911"
-                                            className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50 transition-all">
-                                            <Phone className="w-4 h-4" style={{ color: '#B11226' }} />
+                                            className="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold border border-line text-ink hover:bg-blush-100 transition-colors">
+                                            <Phone className="w-4 h-4 text-red" />
                                             Call Now
                                         </a>
                                         <a href="https://wa.me/918150099911?text=Hi, I just scheduled a demo on MakeMyStay.ai"

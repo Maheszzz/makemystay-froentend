@@ -127,18 +127,14 @@ export default function ServiceDetail() {
     const ServiceIcon = service.icon;
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-page text-ink">
             <Navbar />
 
             {/* ── Hero Section ── */}
-            <section className="relative min-h-[75vh] overflow-hidden flex items-center">
+            <section className="relative min-h-[70vh] overflow-hidden flex items-center bg-red-900">
                 {/* Background */}
                 <div className="absolute inset-0 z-0">
-                    <img src={service.image} alt={service.title} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.70)' }} />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black" />
-                    {/* Subtle radial glow */}
-                    <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(197,160,33,0.06) 0%, transparent 60%)' }} />
+                    <img src={service.image} alt={service.title} className="w-full h-full object-cover opacity-30" />
                 </div>
 
                 <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
@@ -146,7 +142,7 @@ export default function ServiceDetail() {
                     <button
                         type="button"
                         onClick={goBack}
-                        className="inline-flex items-center gap-2 text-white/60 hover:text-white mb-10 lg:mb-14 transition-colors group -ml-2 p-2"
+                        className="inline-flex items-center gap-2 text-red-subtitle hover:text-white mb-10 lg:mb-14 transition-colors group -ml-2 p-2"
                     >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         <span className="text-xs tracking-widest uppercase">Back</span>
@@ -155,37 +151,24 @@ export default function ServiceDetail() {
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                         {/* Left Content */}
                         <div>
-                            {/* Gold Badge */}
-                            <div
-                                className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full mb-8"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(184,150,46,0.10))',
-                                    border: '1px solid rgba(197,160,33,0.35)',
-                                    boxShadow: '0 0 20px rgba(197,160,33,0.12)',
-                                }}
-                            >
-                                <ServiceIcon className="w-4 h-4" style={{ color: '#D4AF37' }} />
-                                <span
-                                    className="text-xs font-semibold tracking-[0.25em] uppercase"
-                                    style={{ color: '#D4AF37', fontFamily: "'Playfair Display', serif" }}
-                                >
+                            {/* Tagline Badge */}
+                            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full mb-8 bg-red-800 border border-champagne/35">
+                                <ServiceIcon className="w-4 h-4 text-champagne" />
+                                <span className="text-xs font-semibold tracking-[0.2em] uppercase text-red-subtitle">
                                     {service.tagline}
                                 </span>
                             </div>
 
                             {/* Headline */}
-                            <h1
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium text-white mb-6 leading-[1.08] tracking-tight"
-                                style={{ fontFamily: "'Playfair Display', serif" }}
-                            >
+                            <h1 className="font-serif-display text-4xl sm:text-5xl md:text-6xl font-normal text-white mb-6 leading-[1.08] tracking-tight">
                                 {service.title}
                             </h1>
 
                             {/* Description */}
-                            <p className="text-lg lg:text-xl text-white/80 leading-relaxed mb-5 max-w-xl">
+                            <p className="text-lg lg:text-xl text-white leading-relaxed mb-5 max-w-xl">
                                 {service.description}
                             </p>
-                            <p className="text-base text-white/60 leading-relaxed mb-10 max-w-xl">
+                            <p className="text-base text-red-subtitle leading-relaxed mb-10 max-w-xl">
                                 {service.fullDescription}
                             </p>
 
@@ -193,8 +176,7 @@ export default function ServiceDetail() {
                             <div className="flex flex-wrap gap-4">
                                 <Link
                                     to="/contact-us"
-                                    className="group px-8 py-4 text-white font-semibold rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                                    style={{ background: 'linear-gradient(135deg,#B11226,#8B0D1C)', boxShadow: '0 4px 20px rgba(177,18,38,0.3)' }}
+                                    className="group px-8 py-4 text-white font-semibold rounded-[10px] bg-red hover:bg-red-hover flex items-center justify-center gap-2 w-full sm:w-auto transition-colors"
                                 >
                                     Schedule a Consultation
                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -203,12 +185,7 @@ export default function ServiceDetail() {
                                     href="https://wa.me/918150099911?text=Hi%2C%20I%20want%20to%20know%20more%20about%20your%20services."
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="group px-8 py-4 font-semibold rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto transition-all duration-300 hover:-translate-y-0.5"
-                                    style={{
-                                        background: 'transparent',
-                                        border: '1.5px solid rgba(197,160,33,0.5)',
-                                        color: '#D4AF37',
-                                    }}
+                                    className="group px-8 py-4 font-semibold rounded-[10px] border border-white text-white hover:bg-white/10 flex items-center justify-center gap-2 w-full sm:w-auto transition-colors"
                                 >
                                     <Phone className="w-4 h-4" />
                                     Talk to an Expert
@@ -218,11 +195,8 @@ export default function ServiceDetail() {
 
                         {/* Right — Icon Display */}
                         <div className="flex items-center justify-center mt-8 lg:mt-0">
-                            <div className="relative">
-                                <div className="w-64 h-64 lg:w-80 lg:h-80 rounded-full blur-3xl absolute inset-0" style={{ background: 'radial-gradient(circle, rgba(177,18,38,0.25) 0%, rgba(197,160,33,0.15) 100%)' }} />
-                                <div className="relative w-48 h-48 lg:w-64 lg:h-64 rounded-3xl backdrop-blur-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
-                                    <ServiceIcon className="w-24 h-24 lg:w-32 lg:h-32" style={{ color: '#B11226' }} />
-                                </div>
+                            <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-[var(--radius-pdp)] bg-red-800 border border-champagne/30 flex items-center justify-center">
+                                <ServiceIcon className="w-24 h-24 lg:w-32 lg:h-32 text-champagne" />
                             </div>
                         </div>
                     </div>
@@ -230,13 +204,13 @@ export default function ServiceDetail() {
             </section>
 
             {/* ── Stats Row ── */}
-            <section className="py-10 bg-black border-y border-white/5">
+            <section className="py-10 bg-white border-y border-line">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
                         {service.stats.map((stat: { value: string; label: string }, i: number) => (
                             <div key={i}>
-                                <p className="text-3xl font-bold mb-1" style={{ color: '#D4AF37', fontFamily: "'Playfair Display', serif" }}>{stat.value}</p>
-                                <p className="text-sm text-white/50 tracking-wide">{stat.label}</p>
+                                <p className="font-serif-display text-3xl font-normal mb-1 text-red tabular-nums">{stat.value}</p>
+                                <p className="text-sm text-slate tracking-wide">{stat.label}</p>
                             </div>
                         ))}
                     </div>
@@ -244,50 +218,27 @@ export default function ServiceDetail() {
             </section>
 
             {/* ── Features Section ── */}
-            <section className="relative py-24 bg-gradient-to-b from-black to-[#0D0D0D]">
+            <section className="relative py-16 md:py-24 bg-page">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2
-                            className="text-4xl md:text-5xl font-medium text-white mb-4"
-                            style={{ fontFamily: "'Playfair Display', serif" }}
-                        >
-                            What You Gain With Us
+                    <div className="text-center mb-14">
+                        <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mb-4">
+                            What you gain with us
                         </h2>
-                        <div className="w-16 h-0.5 mx-auto" style={{ background: 'linear-gradient(90deg,#D4AF37,#B8962E)' }} />
+                        <div className="w-12 h-[1px] bg-champagne mx-auto" />
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {service.features.map((feature: string, idx: number) => (
                             <div
                                 key={idx}
-                                className="group relative p-7 rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-                                style={{
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.07)',
-                                }}
+                                className="group p-7 rounded-[var(--radius-pdp)] bg-white border border-line hover:border-ink/35 transition-colors"
                             >
-                                {/* Hover glow border */}
-                                <div
-                                    className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    style={{ boxShadow: '0 0 0 1px rgba(197,160,33,0.3) inset' }}
-                                />
-
-                                <div className="flex items-start gap-4 relative z-10">
-                                    {/* Gold circle icon */}
-                                    <div
-                                        className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                                        style={{ background: 'linear-gradient(135deg,rgba(212,175,55,0.2),rgba(184,150,46,0.1))', border: '1px solid rgba(197,160,33,0.3)' }}
-                                    >
-                                        <CheckCircle className="w-4 h-4" style={{ color: '#D4AF37' }} />
+                                <div className="flex items-start gap-4">
+                                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-blush-100 border border-line">
+                                        <CheckCircle className="w-4 h-4 text-red" />
                                     </div>
-                                    <p className="text-white/85 font-medium leading-relaxed pt-1">{feature}</p>
+                                    <p className="text-ink font-medium leading-relaxed pt-1">{feature}</p>
                                 </div>
-
-                                {/* Bottom gold bar */}
-                                <div
-                                    className="absolute bottom-0 left-0 h-[2px] w-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left rounded-b-2xl"
-                                    style={{ background: 'linear-gradient(90deg,#D4AF37,#B8962E)' }}
-                                />
                             </div>
                         ))}
                     </div>
@@ -295,34 +246,27 @@ export default function ServiceDetail() {
             </section>
 
             {/* ── Final CTA Section ── */}
-            <section className="relative py-24 overflow-hidden" style={{ background: 'linear-gradient(135deg, #0D0D0D 0%, #1A0A0E 100%)' }}>
-                {/* Gold radial glow */}
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at center, rgba(197,160,33,0.07) 0%, transparent 65%)' }} />
-
-                <div className="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2
-                        className="text-4xl md:text-5xl font-medium text-white mb-5 leading-tight"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                        Maximize Your Property's{' '}
-                        <em style={{ fontStyle: 'italic', color: '#D4AF37' }}>Potential Today</em>
+            <section className="py-16 md:py-24 bg-red-800 border-t border-champagne/25">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-white mb-5 leading-tight">
+                        Maximize your property&apos;s{' '}
+                        <em className="italic">potential today</em>
                     </h2>
-                    <p className="text-lg text-white/60 mb-12 max-w-2xl mx-auto leading-relaxed">
+                    <div className="w-12 h-[1px] bg-champagne mx-auto mb-5" />
+                    <p className="text-lg text-red-subtitle mb-10 max-w-2xl mx-auto leading-relaxed">
                         Partner with a dedicated management team focused on performance, protection, and profitability.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             to="/contact-us"
-                            className="inline-flex items-center justify-center gap-3 px-10 py-5 text-white font-bold rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                            style={{ background: 'linear-gradient(135deg,#B11226,#8B0D1C)', boxShadow: '0 4px 24px rgba(177,18,38,0.35)' }}
+                            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-red hover:bg-red-hover text-white font-semibold rounded-[10px] transition-colors"
                         >
                             Book a Strategy Call
                             <ArrowRight className="w-5 h-5" />
                         </Link>
                         <a
                             href="tel:+918150099911"
-                            className="inline-flex items-center justify-center gap-2 px-10 py-5 font-semibold rounded-xl transition-all duration-300 hover:-translate-y-1"
-                            style={{ border: '1.5px solid rgba(197,160,33,0.4)', color: '#D4AF37', background: 'transparent' }}
+                            className="inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-[10px] border border-white text-white hover:bg-white/10 transition-colors"
                         >
                             <Phone className="w-4 h-4" />
                             Call Now

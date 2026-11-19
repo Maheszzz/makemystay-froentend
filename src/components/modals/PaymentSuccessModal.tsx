@@ -48,7 +48,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
 
         .pms-modal {
           background: #ffffff;
-          border-radius: 20px;
+          border-radius: 14px;
           width: 100%; max-width: 460px;
           padding: 0;
           overflow: hidden;
@@ -63,12 +63,12 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
         .pms-close {
           position: absolute; top: 14px; right: 16px;
           background: none; border: none; cursor: pointer;
-          color: #9ca3af; padding: 4px;
+          color: var(--color-slate); padding: 4px;
           display: flex; align-items: center; justify-content: center;
           border-radius: 50%; transition: background 0.15s, color 0.15s;
           z-index: 10;
         }
-        .pms-close:hover { background: #f3f4f6; color: #374151; }
+        .pms-close:hover { background: var(--color-blush-100); color: var(--color-ink); }
 
         /* Top section */
         .pms-top {
@@ -83,37 +83,37 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
         .pms-check-wrap {
           display: inline-flex; align-items: center; justify-content: center;
           width: 72px; height: 72px;
-          background: #f0fdf4;
-          border: 6px solid #dcfce7;
+          background: color-mix(in srgb, var(--color-verified) 10%, white);
+          border: 6px solid color-mix(in srgb, var(--color-verified) 20%, white);
           border-radius: 50%;
           margin-bottom: 18px;
         }
 
         .pms-title {
           font-size: 1.625rem; font-weight: 800;
-          color: #111827; letter-spacing: -0.02em;
+          color: var(--color-ink); letter-spacing: -0.02em;
           margin-bottom: 8px; line-height: 1.2;
         }
 
         .pms-subtitle {
-          font-size: 0.875rem; color: #6b7280;
+          font-size: 0.875rem; color: var(--color-slate);
           line-height: 1.5; margin-bottom: 14px;
         }
 
         /* Verified badge */
         .pms-badge {
           display: inline-flex; align-items: center; gap: 5px;
-          border: 1.5px solid #22c55e;
-          color: #16a34a; font-size: 0.6875rem;
+          border: 1.5px solid var(--color-verified);
+          color: var(--color-verified); font-size: 0.6875rem;
           font-weight: 700; letter-spacing: 0.08em;
           padding: 5px 14px; border-radius: 999px;
-          background: #f0fdf4;
+          background: color-mix(in srgb, var(--color-verified) 8%, white);
         }
 
         /* Details card */
         .pms-card {
           margin: 0 20px 16px;
-          border: 1.5px solid #e5e7eb;
+          border: 1px solid var(--color-line);
           border-radius: 14px;
           overflow: hidden;
           opacity: 0; transform: translateY(10px);
@@ -129,55 +129,55 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
         .pms-logo-row { display: flex; align-items: center; gap: 12px; }
         .pms-logo-circle {
           width: 44px; height: 44px; border-radius: 50%;
-          background: #B91C1C;
+          background: var(--color-red);
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
           overflow: hidden;
         }
         .pms-logo-initials { font-size: 10px; font-weight: 800; color: white; text-align: center; line-height: 1.1; }
-        .pms-merchant-name { font-size: 0.9375rem; font-weight: 700; color: #111827; }
-        .pms-merchant-tag { font-size: 0.75rem; color: #9ca3af; margin-top: 1px; }
+        .pms-merchant-name { font-size: 0.9375rem; font-weight: 700; color: var(--color-ink); }
+        .pms-merchant-tag { font-size: 0.75rem; color: var(--color-slate); margin-top: 1px; }
         .pms-amount-wrap { display: flex; align-items: center; gap: 6px; }
-        .pms-amount { font-size: 1.25rem; font-weight: 800; color: #111827; }
+        .pms-amount { font-size: 1.25rem; font-weight: 800; color: var(--color-ink); }
 
-        .pms-divider { height: 1px; background: #e5e7eb; margin: 0; }
+        .pms-divider { height: 1px; background: var(--color-line); margin: 0; }
 
         /* Detail rows */
         .pms-rows { padding: 2px 0; }
         .pms-row {
           display: flex; justify-content: space-between; align-items: center;
           padding: 11px 18px;
-          border-bottom: 1px solid #f9fafb;
+          border-bottom: 1px solid var(--color-page);
         }
         .pms-row:last-child { border-bottom: none; }
         .pms-row-key {
-          font-size: 0.8125rem; color: #6b7280; font-weight: 400;
+          font-size: 0.8125rem; color: var(--color-slate); font-weight: 400;
           flex-shrink: 0;
         }
         .pms-row-val {
-          font-size: 0.8125rem; color: #111827; font-weight: 500;
+          font-size: 0.8125rem; color: var(--color-ink); font-weight: 500;
           display: flex; align-items: center; gap: 6px;
           text-align: right;
         }
-        .pms-row-val.green { color: #16a34a; font-weight: 700; }
+        .pms-row-val.green { color: var(--color-verified); font-weight: 700; }
         .pms-txn-id {
           font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
           font-size: 0.75rem;
         }
         .pms-copy-btn {
           background: none; border: none; cursor: pointer;
-          color: #9ca3af; padding: 2px;
+          color: var(--color-slate); padding: 2px;
           display: flex; align-items: center;
           transition: color 0.15s;
           flex-shrink: 0;
         }
-        .pms-copy-btn:hover { color: #374151; }
+        .pms-copy-btn:hover { color: var(--color-ink); }
 
         /* Security note */
         .pms-security {
           margin: 0 20px 16px;
-          background: #f0fdf4;
-          border: 1.5px solid #bbf7d0;
+          background: color-mix(in srgb, var(--color-verified) 8%, white);
+          border: 1px solid color-mix(in srgb, var(--color-verified) 30%, white);
           border-radius: 12px;
           padding: 11px 16px;
           display: flex; align-items: center; gap: 10px;
@@ -185,7 +185,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
           transition: all 0.4s ease 0.2s;
         }
         .pms-security.show { opacity: 1; transform: translateY(0); }
-        .pms-security-text { font-size: 0.8125rem; color: #15803d; font-weight: 500; }
+        .pms-security-text { font-size: 0.8125rem; color: var(--color-verified); font-weight: 500; }
 
         /* Buttons */
         .pms-buttons {
@@ -198,29 +198,29 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
 
         .pms-btn-share {
           flex: 1; padding: 13px;
-          background: #ffffff; color: #374151;
-          border: 1.5px solid #d1d5db; border-radius: 12px;
+          background: #ffffff; color: var(--color-ink);
+          border: 1px solid var(--color-ink); border-radius: 10px;
           font-family: inherit; font-size: 0.875rem; font-weight: 600;
           display: flex; align-items: center; justify-content: center; gap: 7px;
           cursor: pointer; transition: all 0.2s ease;
         }
-        .pms-btn-share:hover { background: #f9fafb; border-color: #9ca3af; }
+        .pms-btn-share:hover { background: var(--color-blush-100); }
 
         .pms-btn-download {
           flex: 1; padding: 13px;
-          background: #2563eb; color: #ffffff;
-          border: none; border-radius: 12px;
+          background: var(--color-red); color: #ffffff;
+          border: none; border-radius: 10px;
           font-family: inherit; font-size: 0.875rem; font-weight: 600;
           display: flex; align-items: center; justify-content: center; gap: 7px;
           cursor: pointer; transition: all 0.2s ease;
           text-decoration: none;
         }
-        .pms-btn-download:hover { background: #1d4ed8; }
-        .pms-btn-download:active { background: #1e40af; }
+        .pms-btn-download:hover { background: var(--color-red-hover); }
+        .pms-btn-download:active { background: var(--color-red-hover); }
 
         .status-dot-green {
           width: 8px; height: 8px; border-radius: 50%;
-          background: #22c55e; display: inline-block; flex-shrink: 0;
+          background: var(--color-verified); display: inline-block; flex-shrink: 0;
         }
       `}</style>
 
@@ -237,7 +237,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
                     {/* Top: check + title + badge */}
                     <div className={`pms-top ${contentVisible ? "show" : ""}`}>
                         <div className="pms-check-wrap">
-                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--color-verified)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12" />
                             </svg>
                         </div>
@@ -246,7 +246,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
                             Your payment of ₹{amount.toLocaleString("en-IN")} has been processed successfully.
                         </p>
                         <div className="pms-badge">
-                            <svg width="11" height="11" viewBox="0 0 24 24" fill="#22c55e" stroke="none">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="var(--color-verified)" stroke="none">
                                 <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
                             </svg>
                             VERIFIED
@@ -268,7 +268,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
                             </div>
                             <div className="pms-amount-wrap">
                                 <span className="pms-amount">₹{amount.toLocaleString("en-IN")}</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-slate)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="18 15 12 9 6 15" />
                                 </svg>
                             </div>
@@ -284,7 +284,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
                                     <span className="pms-txn-id">{paymentId}</span>
                                     <button className="pms-copy-btn" onClick={handleCopy} title="Copy">
                                         {copied
-                                            ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                                            ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-verified)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                                             : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                                         }
                                     </button>
@@ -306,7 +306,7 @@ export function PaymentSuccessModal({ isOpen, onClose, paymentId, amount, receip
 
                     {/* Security note */}
                     <div className={`pms-security ${contentVisible ? "show" : ""}`}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#22c55e" stroke="none" style={{ flexShrink: 0 }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--color-verified)" stroke="none" style={{ flexShrink: 0 }}>
                             <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" />
                         </svg>
                         <span className="pms-security-text">This payment is secured and encrypted.</span>

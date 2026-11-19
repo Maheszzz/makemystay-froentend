@@ -41,7 +41,7 @@ export default function Wishlist() {
 
                         <div className="flex items-center gap-3">
                             {wishlist.length > 1 && (
-                                <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border" style={{ color: '#B11226', background: 'rgba(177,18,38,0.05)', borderColor: 'rgba(177,18,38,0.15)' }}>
+                                <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl border border-line bg-blush-100 text-red tabular-nums">
                                     <TrendingUp className="w-3.5 h-3.5" />
                                     {wishlist.length} properties saved
                                 </div>

@@ -11,12 +11,12 @@ export function QuickAnswersBlock({ locationName, variant = 'light' }: QuickAnsw
     const isDark = variant === 'dark';
 
     const shell = isDark
-        ? 'rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-sm ring-1 ring-white/5 backdrop-blur-sm'
-        : 'rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm';
+        ? 'rounded-[var(--radius-pdp)] border border-champagne/30 bg-red-900 p-6'
+        : 'rounded-[var(--radius-pdp)] border border-line bg-white p-6';
 
-    const titleCls = isDark ? 'text-lg font-bold text-white' : 'text-lg font-bold text-slate-900';
-    const labelCls = isDark ? 'min-w-[5.5rem] font-semibold text-slate-200' : 'min-w-[5.5rem] font-semibold text-slate-900';
-    const valueCls = isDark ? 'text-sm text-slate-300' : 'text-sm text-slate-700';
+    const titleCls = isDark ? 'text-lg font-bold text-white' : 'text-lg font-bold text-ink';
+    const labelCls = isDark ? 'min-w-[5.5rem] font-semibold text-white' : 'min-w-[5.5rem] font-semibold text-ink';
+    const valueCls = isDark ? 'text-sm text-red-subtitle' : 'text-sm text-slate';
 
     return (
         <section className={shell} aria-labelledby="quick-answers-heading">

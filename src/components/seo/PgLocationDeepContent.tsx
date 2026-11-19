@@ -44,49 +44,49 @@ export function PgLocationDeepContent({ name, profile }: PgLocationDeepContentPr
             {/* Header & Intro */}
             <div className="flex flex-col sm:flex-row sm:items-start gap-5 md:gap-6 border-b border-slate-100 pb-6">
                 <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-red/[0.08] to-amber-400/[0.12] border border-brand-red/15 shadow-sm"
+                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blush-100 border border-line"
                     aria-hidden
                 >
-                    <MapPin className="h-7 w-7 text-brand-red" strokeWidth={2} />
+                    <MapPin className="h-7 w-7 text-red" strokeWidth={2} />
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">Locality &amp; Commute Authority Guide</p>
-                    <h2 className="mt-1.5 text-2xl md:text-[1.65rem] font-bold text-slate-900 tracking-tight leading-tight">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne-text">Locality &amp; Commute Authority Guide</p>
+                    <h2 className="mt-1.5 font-serif-display text-2xl md:text-[1.65rem] font-normal text-ink tracking-tight leading-tight">
                         Living in ${name} Bangalore: The Ultimate 2026 Locality Guide
                     </h2>
                     <p className="mt-3">
-                        Choosing where to live in Bangalore can be a daunting decision, but a <strong className="text-slate-800 font-semibold">PG in ${name}</strong> offers one of the most strategic residential bases in the entire city. Known for its proximity to key tech corridors, rapid infrastructural development, and rich social fabric, ${name} has transitioned from a quiet suburb into a massive urban center. It is now home to thousands of software developers, product managers, early-stage startup founders, and students who value a short daily commute and a highly active lifestyle. In this guide, we dive deep into connectivity, local tech corridors, metro extensions, educational institutions, dining choices, and rent trends to help you shortlist the perfect stay on makemystay.ai.
+                        Choosing where to live in Bangalore can be a daunting decision, but a <strong className="text-ink font-semibold">PG in ${name}</strong> offers one of the most strategic residential bases in the entire city. Known for its proximity to key tech corridors, rapid infrastructural development, and rich social fabric, ${name} has transitioned from a quiet suburb into a massive urban center. It is now home to thousands of software developers, product managers, early-stage startup founders, and students who value a short daily commute and a highly active lifestyle. In this guide, we dive deep into connectivity, local tech corridors, metro extensions, educational institutions, dining choices, and rent trends to help you shortlist the perfect stay on makemystay.ai.
                     </p>
                 </div>
             </div>
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-                <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50/80 to-white p-4 md:p-5 shadow-sm">
-                    <div className="flex items-center gap-2 text-slate-500 mb-2">
-                        <Banknote className="h-4 w-4 shrink-0 text-brand-red/90" aria-hidden />
+                <div className="rounded-[var(--radius-pdp)] border border-line bg-white p-4 md:p-5">
+                    <div className="flex items-center gap-2 text-slate mb-2">
+                        <Banknote className="h-4 w-4 shrink-0 text-red" aria-hidden />
                         <span className="text-[11px] font-bold uppercase tracking-wider">Average Rent</span>
                     </div>
-                    <p className="text-lg font-bold text-slate-900">{sharedRent}</p>
-                    <p className="text-xs text-slate-500 mt-1">Shared room options. Single private spaces typically start at {singleRent}/month.</p>
+                    <p className="text-lg font-bold text-ink">{sharedRent}</p>
+                    <p className="text-xs text-slate mt-1">Shared room options. Single private spaces typically start at {singleRent}/month.</p>
                 </div>
-                <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50/80 to-white p-4 md:p-5 shadow-sm">
-                    <div className="flex items-center gap-2 text-slate-500 mb-2">
-                        <Wifi className="h-4 w-4 shrink-0 text-brand-red/90" aria-hidden />
+                <div className="rounded-[var(--radius-pdp)] border border-line bg-white p-4 md:p-5">
+                    <div className="flex items-center gap-2 text-slate mb-2">
+                        <Wifi className="h-4 w-4 shrink-0 text-red" aria-hidden />
                         <span className="text-[11px] font-bold uppercase tracking-wider">Top Amenities</span>
                     </div>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">
+                    <p className="text-sm font-semibold text-ink leading-snug">
                         High-Speed WiFi, Food Plans, CCTV &amp; Housekeeping
                     </p>
-                    <p className="text-xs text-slate-500 mt-1.5">Standard across managed co-living</p>
+                    <p className="text-xs text-slate mt-1.5">Standard across managed co-living</p>
                 </div>
-                <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50/80 to-white p-4 md:p-5 shadow-sm">
-                    <div className="flex items-center gap-2 text-slate-500 mb-2">
-                        <Utensils className="h-4 w-4 shrink-0 text-brand-red/90" aria-hidden />
+                <div className="rounded-[var(--radius-pdp)] border border-line bg-white p-4 md:p-5">
+                    <div className="flex items-center gap-2 text-slate mb-2">
+                        <Utensils className="h-4 w-4 shrink-0 text-red" aria-hidden />
                         <span className="text-[11px] font-bold uppercase tracking-wider">Food Inclusions</span>
                     </div>
-                    <p className="text-sm font-semibold text-slate-800 leading-snug">Veg &amp; Non-Veg Meals Offered</p>
-                    <p className="text-xs text-slate-500 mt-1.5">Usually covers breakfast &amp; dinner</p>
+                    <p className="text-sm font-semibold text-ink leading-snug">Veg &amp; Non-Veg Meals Offered</p>
+                    <p className="text-xs text-slate mt-1.5">Usually covers breakfast &amp; dinner</p>
                 </div>
             </div>
 

@@ -6,22 +6,22 @@
     padding: 0;
     border-radius: 1rem;
     overflow: hidden;
-    background-color: var(--color-surface, #0f172a);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-red-900);
+    box-shadow: 0 10px 25px -5px rgba(94, 15, 18, 0.15);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-line);
 }
 
 .figureHover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.25), 0 12px 15px -8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 20px 30px -10px rgba(94, 15, 18, 0.22);
 }
 
 .imageContainer {
     position: relative;
     width: 100%;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+    background-color: var(--color-blush-100);
 }
 
 .image {
@@ -54,18 +54,16 @@
     padding: 0.75rem 1.15rem;
     font-size: 0.8125rem;
     line-height: 1.4;
-    color: var(--color-text-secondary, #94a3b8);
-    background: rgba(15, 23, 42, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--color-slate);
+    background: var(--color-page);
+    border-top: 1px solid var(--color-line);
 }
 
 .captionIcon {
     flex-shrink: 0;
     width: 14px;
     height: 14px;
-    color: var(--color-primary, #38bdf8);
+    color: var(--color-red);
 }
 
 .captionText {
@@ -86,12 +84,9 @@
     border-radius: 9999px;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #ffffff;
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: var(--color-background);
+    background: var(--color-red-900);
+    border: 1px solid color-mix(in srgb, var(--color-champagne) 35%, transparent);
     z-index: 10;
     pointer-events: none;
 }
@@ -99,7 +94,7 @@
 .badgeIcon {
     width: 12px;
     height: 12px;
-    color: #38bdf8;
+    color: var(--color-champagne);
 }
 
 .galleryGrid {

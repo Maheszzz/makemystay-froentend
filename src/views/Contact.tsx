@@ -72,39 +72,29 @@ export default function Contact() {
     };
 
     return (
-        <div className="bg-[#fbfbfd] min-h-screen font-sans selection:bg-brand-red/10 selection:text-brand-red">
+        <div className="bg-page min-h-screen font-sans selection:bg-blush-100 selection:text-ink">
             <Navbar />
 
             <main className="pb-24">
-                {/* ─── Premium Hero Section ─── */}
-                <section className="relative pt-32 md:pt-48 pb-24 md:pb-32 overflow-hidden">
-                    <div className="absolute inset-0 z-0">
-                        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px] -translate-y-1/2" />
-                        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[140px] translate-y-1/2" />
-                    </div>
-
+                {/* ─── Hero Section ─── */}
+                <section className="relative pt-32 md:pt-40 pb-16 md:pb-24">
                     <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            className="text-center"
-                        >
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-slate-100 mb-8">
-                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Growth Team Active</span>
+                        <div className="text-center">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-line mb-8">
+                                <span className="flex h-2 w-2 rounded-full bg-verified" />
+                                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate">Growth Team Active</span>
                             </div>
                             
-                            <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-[1.1] mb-8">
-                                Let's Scale Your <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-brand-red/70">Rental Empire</span>
+                            <h1 className="font-serif-display text-5xl md:text-7xl font-normal text-ink tracking-tight leading-[1.08] mb-8">
+                                Let&apos;s Scale Your <br />
+                                <span className="text-red">Rental Empire</span>
                             </h1>
                             
-                            <p className="text-lg md:text-xl text-slate-500 max-w-3xl mx-auto leading-relaxed font-medium">
+                            <p className="text-lg md:text-xl text-slate max-w-3xl mx-auto leading-relaxed font-medium">
                                 Experience 2x occupancy growth with our proprietary property management framework. <br className="hidden md:block" />
                                 Join 500+ successful property owners who trust MakeMyStay.
                             </p>
-                        </motion.div>
+                        </div>
                     </div>
                 </section>
 
@@ -296,14 +286,13 @@ export default function Contact() {
                                             <button
                                                 type="submit"
                                                 disabled={loading}
-                                                className="group relative w-full h-20 bg-slate-900 rounded-2xl overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70"
+                                                className="group w-full h-16 bg-red hover:bg-red-hover text-white rounded-[10px] transition-colors disabled:opacity-70"
                                             >
-                                                <div className="absolute inset-0 bg-gradient-to-r from-brand-red to-brand-red/80 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <div className="relative z-10 flex items-center justify-center gap-3">
-                                                    <span className="text-white text-sm font-black uppercase tracking-[0.2em]">
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <span className="text-white text-sm font-semibold uppercase tracking-[0.16em]">
                                                         {loading ? 'Processing...' : 'Generate Growth Plan'}
                                                     </span>
-                                                    <Send className="w-5 h-5 text-white transition-transform group-hover:translate-x-2" />
+                                                    <Send className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
                                                 </div>
                                             </button>
                                         </div>

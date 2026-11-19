@@ -36,10 +36,10 @@ export const AeoSnippet: React.FC<AeoSnippetProps> = ({ property }) => {
     return (
         <div
             id="aeo-summary"
-            className="mb-8 p-5 bg-gradient-to-br from-slate-50 to-white border border-slate-100 rounded-2xl shadow-sm"
+            className="mb-8 p-5 bg-white border border-line rounded-[var(--radius-pdp)]"
             aria-label="Property Summary"
         >
-            <p className="text-[15px] text-slate-600 leading-relaxed font-medium">
+            <p className="text-[15px] text-slate leading-relaxed font-medium">
                 {summaryText}
             </p>
         </div>

@@ -2,8 +2,10 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-const BRAND_RED = '#D92027';
-const BRAND_DARK = '#0f172a';
+const BRAND_RED = '#C41F25';
+const BRAND_DARK = '#5E0F12';
+const BRAND_DEEP = '#7F1519';
+const BRAND_SUBTITLE = '#F6DCDD';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -22,8 +24,8 @@ export async function GET(request: Request) {
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     padding: '56px 64px',
-                    background: `linear-gradient(135deg, ${BRAND_DARK} 0%, #1e293b 55%, ${BRAND_RED} 140%)`,
-                    color: '#fff',
+                    background: `linear-gradient(135deg, ${BRAND_DARK} 0%, ${BRAND_DEEP} 55%, ${BRAND_RED} 120%)`,
+                    color: '#FFFFFF',
                     fontFamily: 'system-ui, sans-serif',
                 }}
             >
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
                             fontWeight: 600,
                             textTransform: 'uppercase',
                             letterSpacing: '0.08em',
-                            color: '#fca5a5',
+                            color: BRAND_SUBTITLE,
                         }}
                     >
                         {type}

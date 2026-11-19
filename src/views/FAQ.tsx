@@ -440,14 +440,14 @@ export default function FAQ() {
                         ))}
 
                     {/* Bottom CTA */}
-                    <div className="mt-10 rounded-2xl bg-gradient-to-r from-brand-red to-rose-500 p-8 text-center text-white shadow-lg">
-                        <h3 className="text-xl md:text-2xl font-bold mb-2">Still have questions?</h3>
-                        <p className="text-rose-100 mb-5 text-sm md:text-base">
+                    <div className="mt-10 rounded-[var(--radius-pdp)] bg-red-800 border border-champagne/30 p-8 text-center text-white">
+                        <h3 className="font-serif-display text-xl md:text-2xl font-normal mb-2 text-white">Still have questions?</h3>
+                        <p className="text-red-subtitle mb-5 text-sm md:text-base">
                             Our team is here to help you find the perfect property.
                         </p>
                         <a
                             href="/contact-us"
-                            className="inline-block bg-white text-brand-red font-semibold px-6 py-3 rounded-xl hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm md:text-base"
+                            className="inline-block bg-red hover:bg-red-hover text-white font-semibold px-6 py-3 rounded-[10px] transition-colors text-sm md:text-base"
                         >
                             Get in Touch →
                         </a>

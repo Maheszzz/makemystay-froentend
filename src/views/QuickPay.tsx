@@ -133,7 +133,7 @@ export default function QuickPay() {
                     contact: phone
                 },
                 theme: {
-                    color: "#C5A021"
+                    color: '#C41F25'
                 },
                 modal: {
                     ondismiss: function () {
@@ -170,60 +170,30 @@ export default function QuickPay() {
                 >
 
                     {/* Left Panel - Visual Side */}
-                    <div className="hidden md:flex md:col-span-2 bg-slate-950 relative p-8 md:p-12 flex-col justify-between overflow-hidden">
-                        {/* Premium Gradient Background */}
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(197,160,33,0.15),transparent_70%)]"></div>
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(197,160,33,0.05),transparent_70%)]"></div>
-                        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")' }}></div>
-
+                    <div className="hidden md:flex md:col-span-2 bg-red-900 relative p-8 md:p-12 flex-col justify-between overflow-hidden border-r border-champagne/25">
                         <div className="relative z-10">
-                            <motion.div
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.2 }}
-                            >
-                                <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                            <div>
+                                <h2 className="font-serif-display text-3xl md:text-4xl font-normal mb-2">
                                     <span className="text-white">MakeMyStay</span>
-                                    <span className="text-brand-gold">.ai</span>
+                                    <span className="text-red-subtitle">.ai</span>
                                 </h2>
-                                <div className="h-1 w-12 bg-brand-gold rounded-full mb-4"></div>
-                                <p className="text-white/80 text-lg font-light mb-1">Premium Property Payments</p>
-                                <p className="text-white/40 text-sm leading-relaxed max-w-xs">Fast, secure payments for bookings, deposits &amp; professional services.</p>
-                            </motion.div>
+                                <div className="h-[1px] w-12 bg-champagne mb-4"></div>
+                                <p className="text-white text-lg font-medium mb-1">Premium Property Payments</p>
+                                <p className="text-red-subtitle text-sm leading-relaxed max-w-xs">Fast, secure payments for bookings, deposits &amp; professional services.</p>
+                            </div>
                         </div>
 
-                        {/* 3D Layered Cards Visual */}
-                        <div className="relative z-10 my-12 transform perspective-1000">
-                            <motion.div
-                                animate={{ 
-                                    y: [0, -10, 0],
-                                    rotateX: [0, 2, 0],
-                                    rotateY: [0, 5, 0]
-                                }}
-                                transition={{ 
-                                    duration: 6, 
-                                    repeat: Infinity, 
-                                    ease: "easeInOut" 
-                                }}
-                                className="relative"
-                            >
-                                {/* Card 3 - Background */}
-                                <div className="absolute top-0 left-4 right-4 h-48 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-md rounded-2xl border border-white/10 transform -rotate-6 translate-y-8 shadow-2xl"></div>
-
-                                {/* Card 2 - Middle */}
-                                <div className="absolute top-0 left-2 right-2 h-48 bg-gradient-to-br from-brand-gold/10 to-transparent backdrop-blur-md rounded-2xl border border-brand-gold/20 transform -rotate-3 translate-y-4 shadow-2xl"></div>
-
-                                {/* Main Card */}
-                                <div className="relative bg-gradient-to-br from-white/10 via-white/5 to-transparent backdrop-blur-2xl rounded-2xl border border-white/20 p-8 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/10 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                                    
+                        {/* Layered Cards Visual */}
+                        <div className="relative z-10 my-12">
+                            <div className="relative">
+                                <div className="relative bg-red-800 rounded-[var(--radius-pdp)] border border-champagne/35 p-8 overflow-hidden">
                                     <div className="flex justify-between items-start mb-12">
-                                        <div className="w-14 h-10 bg-white/10 rounded-lg flex items-center justify-center border border-white/10">
-                                            <CreditCard className="w-7 h-7 text-white/40" />
+                                        <div className="w-14 h-10 bg-red-900 rounded-lg flex items-center justify-center border border-champagne/30">
+                                            <CreditCard className="w-7 h-7 text-red-subtitle" />
                                         </div>
                                         <div className="flex flex-col items-end">
-                                            <Shield className="w-7 h-7 text-brand-gold mb-1" />
-                                            <span className="text-[10px] text-brand-gold uppercase tracking-tighter font-bold">Secure</span>
+                                            <Shield className="w-7 h-7 text-champagne mb-1" />
+                                            <span className="text-[10px] text-red-subtitle uppercase tracking-wider font-semibold">Secure</span>
                                         </div>
                                     </div>
                                     
@@ -234,17 +204,15 @@ export default function QuickPay() {
                                     
                                     <div className="flex justify-between items-end">
                                         <div>
-                                            <div className="text-xs text-white/30 uppercase tracking-widest mb-1 font-medium">Card Number</div>
-                                            <div className="text-lg font-mono tracking-[0.2em] text-white/90">•••• •••• •••• 4242</div>
+                                            <div className="text-xs text-red-subtitle uppercase tracking-widest mb-1 font-medium">Card Number</div>
+                                            <div className="text-lg font-mono tracking-[0.2em] text-white">•••• •••• •••• 4242</div>
                                         </div>
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-gold via-amber-500 to-brand-gold p-[1px]">
-                                            <div className="w-full h-full rounded-full bg-slate-900 flex items-center justify-center">
-                                                <Zap className="w-6 h-6 text-brand-gold fill-brand-gold/20" />
-                                            </div>
+                                        <div className="w-12 h-12 rounded-full border border-champagne/40 bg-red-900 flex items-center justify-center">
+                                            <Zap className="w-6 h-6 text-champagne" />
                                         </div>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         </div>
 
                         <div className="relative z-10 space-y-4">
@@ -403,11 +371,10 @@ export default function QuickPay() {
                                 >
                                     <Button
                                         type="submit"
-                                        variant="gold"
-                                        className="w-full py-5 text-lg font-bold shadow-[0_15px_30px_-10px_rgba(197,160,33,0.4)] rounded-2xl transition-all flex items-center justify-center gap-3 group overflow-hidden relative"
+                                        variant="primary"
+                                        className="w-full py-5 text-lg font-bold rounded-[10px] transition-colors flex items-center justify-center gap-3 group"
                                         disabled={isProcessing}
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-shimmer"></div>
                                         {isProcessing ? (
                                             <>
                                                 <LoadingSpinner size={20} className="text-white" />
@@ -415,7 +382,7 @@ export default function QuickPay() {
                                             </>
                                         ) : (
                                             <>
-                                                <Lock className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                                <Lock className="w-5 h-5" />
                                                 <span>
                                                     {amount && parseFloat(amount) > 0
                                                         ? `Pay ₹${Number(amount).toLocaleString('en-IN')} Now`
