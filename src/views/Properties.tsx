@@ -2,20 +2,20 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { Link, useLocation, useSearchParams, useNavigate } from '@/lib/navigation';
+import { Link, useLocation, useSearchParams } from '@/lib/navigation';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useListingLocalityOptions, useScrollMemory } from '@/hooks';
-import { ArrowRight, ChevronDown, Heart, LayoutGrid, List, MessageCircle, RefreshCw, Search } from 'lucide-react';
-import { PropertyCard, type PropertyCardVariant } from '@/components/modules/listings/PropertyCard';
+import { ArrowRight, ChevronDown, Heart, MessageCircle, RefreshCw, Search } from 'lucide-react';
+import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { ListingFilterBar, type ActiveFilterPill } from '@/components/modules/listings/ListingFilterBar';
 import { ListingHero, type HeroClaimKey, type HeroBreadcrumb } from '@/components/modules/listings/ListingHero';
-import { PopularAreasStrip, type PopularAreaItem } from '@/components/modules/listings/PopularAreasStrip';
 import { useWishlist } from '@/context/WishlistContext';
-import { PROPERTY_CITY_OPTIONS, findPgLocationForArea } from '@/data/pgLocations';
+import { findPgLocationForArea } from '@/data/pgLocations';
 import {
     normalizePgGenderParam,
     propertyMatchesPgFeatureFilters,
@@ -33,7 +33,7 @@ import {
     buildEmptyFilterWhatsappMessage,
     deriveAvailableFilterOptions,
     formatFurnishingLabel,
-    formatResultHeadingParts,
+    formatResultHeading,
     getBudgetPresetsForCategory,
     getListingHeaderCopy,
     parsePropertyPriceInr,
@@ -123,7 +123,6 @@ function PropertiesInner({
 }: PropertiesProps) {
     const router = useRouter();
     const location = useLocation();
-    const navigate = useNavigate();
     const [urlQueryString, setUrlQueryString] = useState('');
     const [hasUrlSynced, setHasUrlSynced] = useState(false);
     const searchParams = useMemo(() => new URLSearchParams(urlQueryString), [urlQueryString]);
@@ -140,17 +139,6 @@ function PropertiesInner({
     const [furnishingFilter, setFurnishingFilter] = useState('');
     const [plotSizeFilter, setPlotSizeFilter] = useState('');
     const [mapOpen, setMapOpen] = useState(initialMapProp);
-    const [viewParam, setViewParam] = useState<'list' | 'grid' | null>(null);
-    const [isLgViewport, setIsLgViewport] = useState(true);
-
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        const mq = window.matchMedia('(min-width: 1024px)');
-        const sync = () => setIsLgViewport(mq.matches);
-        sync();
-        mq.addEventListener('change', sync);
-        return () => mq.removeEventListener('change', sync);
-    }, []);
 
     const handleUrlSync = useCallback(
         (qs: string) => {
@@ -167,8 +155,6 @@ function PropertiesInner({
             setSharingFilter(sp.get('sharing') ?? '');
             setFurnishingFilter(sp.get('furnishing') ?? '');
             setPlotSizeFilter(sp.get('plot_size') ?? '');
-            const rawView = sp.get('view');
-            setViewParam(rawView === 'list' || rawView === 'grid' ? rawView : null);
             if (sp.has('map')) setMapOpen(sp.get('map') === '1');
             setHasUrlSynced(true);
         },
@@ -238,7 +224,7 @@ function PropertiesInner({
                 params.page = pageRaw.trim();
             }
 
-            for (const key of ['wifi', 'food', 'ac', 'price', 'gender', 'map', 'view'] as const) {
+            for (const key of ['wifi', 'food', 'ac', 'price', 'gender', 'map'] as const) {
                 const v = searchParams.get(key);
                 if (v) params[key] = v;
             }
@@ -654,7 +640,20 @@ function PropertiesInner({
         activeTabKey,
         metroSlug,
     );
-    const cities = localitiesFromApi.length > 0 ? localitiesFromApi : PROPERTY_CITY_OPTIONS;
+    const areaOptions = useMemo(() => {
+        if (localitiesFromApi.length > 0) return localitiesFromApi;
+        const set = new Set<string>();
+        const rows = Array.isArray(properties) ? properties : [];
+        for (const p of rows) {
+            if (!p || p.is_available === false) continue;
+            const loc = typeof p.location === 'string' ? p.location.trim() : '';
+            if (!loc) continue;
+            const head = loc.split(',')[0].trim();
+            if (head.length <= 1) continue;
+            set.add(findPgLocationForArea(head)?.name ?? head);
+        }
+        return Array.from(set).sort((a, b) => a.localeCompare(b, 'en-IN'));
+    }, [localitiesFromApi, properties]);
 
     const updateParamKey = useCallback(
         (key: string, value: string | null) => {
@@ -681,13 +680,21 @@ function PropertiesInner({
         setSearchParams({}, { replace: true });
     }, [initialCity, setSearchParams]);
 
-    const handleCategoryTab = useCallback(
-        (cat: ListingCategoryKey) => {
-            const url = listingsHubTabNavigateUrl(cat, apiCity, searchQuery);
-            navigate(url);
-        },
-        [apiCity, searchQuery, navigate],
+    const categoryHref = useCallback(
+        (cat: ListingCategoryKey) => listingsHubTabNavigateUrl(cat, apiCity, searchQuery),
+        [apiCity, searchQuery],
     );
+
+    const metroLabel = useMemo(
+        () => metroSlug.charAt(0).toUpperCase() + metroSlug.slice(1),
+        [metroSlug],
+    );
+
+    const areaSelectValue = useMemo(() => {
+        const cur = locationFilter.trim().toLowerCase();
+        if (!cur || cur === 'all' || cur === metroSlug.toLowerCase()) return '';
+        return locationFilter;
+    }, [locationFilter, metroSlug]);
 
     const hasClientFilters = Boolean(
         wifiOn || foodOn || acOn || genderFilter || sharingFilter || furnishingFilter || plotSizeFilter || (typeFilter && typeFilter !== 'all'),
@@ -906,82 +913,6 @@ function PropertiesInner({
 
     const budgetPresets = useMemo(() => getBudgetPresetsForCategory(activeTabKey), [activeTabKey]);
 
-    const metroLabel = useMemo(
-        () => metroSlug.charAt(0).toUpperCase() + metroSlug.slice(1),
-        [metroSlug],
-    );
-
-    const areaSelectValue = useMemo(() => {
-        const cur = locationFilter.trim().toLowerCase();
-        if (!cur || cur === 'all' || cur === metroSlug.toLowerCase()) return '';
-        return locationFilter;
-    }, [locationFilter, metroSlug]);
-
-    const categoryHref = useCallback(
-        (cat: ListingCategoryKey) => listingsHubTabNavigateUrl(cat, apiCity, searchQuery),
-        [apiCity, searchQuery],
-    );
-
-    const viewAllAreasHref = useMemo(() => {
-        if (activeTabKey === 'rent') return `/rent/${metroSlug}#top-areas-heading`;
-        if (activeTabKey === 'buy') return `/buy/in/${metroSlug}`;
-        if (activeTabKey === 'plot') return `/plots/in/${metroSlug}`;
-        return `/pg/${metroSlug}#top-areas-heading`;
-    }, [activeTabKey, metroSlug]);
-
-    const popularAreas = useMemo<PopularAreaItem[]>(() => {
-        return areaChipsWithHref.map((chip) => ({
-            name: chip.name,
-            count: chip.count,
-            href: chip.href,
-            coverImage: chip.coverImage,
-            active:
-                searchQuery.trim().toLowerCase() === chip.name.toLowerCase() ||
-                locationFilter.trim().toLowerCase() === chip.name.toLowerCase() ||
-                location.pathname === chip.href,
-        }));
-    }, [areaChipsWithHref, searchQuery, locationFilter, location.pathname]);
-
-    const handleViewChange = useCallback(
-        (nextView: 'list' | 'grid') => {
-            setViewParam(nextView);
-            updateParamKey('view', nextView);
-        },
-        [updateParamKey],
-    );
-
-    const cardVariant: PropertyCardVariant = viewParam ?? 'auto';
-    const showHero = !hideChrome || Boolean(hero);
-    const MainOrDiv = hideChrome ? 'div' : 'main';
-    const resultHeadingParts = useMemo(
-        () => formatResultHeadingParts(displayResultCount, activeTabKey, cityLabelDisplay),
-        [displayResultCount, activeTabKey, cityLabelDisplay],
-    );
-
-    const focusRing =
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2';
-
-    const gridBtnClass =
-        viewParam === 'grid'
-            ? 'bg-red border-red text-white'
-            : viewParam === 'list'
-              ? 'bg-white border-line text-ink hover:bg-blush-100'
-              : 'max-lg:bg-red max-lg:border-red max-lg:text-white lg:bg-white lg:border-line lg:text-ink lg:hover:bg-blush-100';
-
-    const listBtnClass =
-        viewParam === 'list'
-            ? 'bg-red border-red text-white'
-            : viewParam === 'grid'
-              ? 'bg-white border-line text-ink hover:bg-blush-100'
-              : 'lg:bg-red lg:border-red lg:text-white max-lg:bg-white max-lg:border-line max-lg:text-ink max-lg:hover:bg-blush-100';
-
-    const resultsContainerClass =
-        viewParam === 'list'
-            ? 'flex flex-col gap-5'
-            : viewParam === 'grid'
-              ? `grid grid-cols-1 ${showMap ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`
-              : `grid grid-cols-1 md:grid-cols-2 ${showMap ? '' : 'lg:flex lg:flex-col'} gap-5`;
-
     return (
         <div className="bg-page min-h-screen text-ink font-sans flex flex-col overflow-x-clip">
             <Suspense fallback={null}>
@@ -991,9 +922,9 @@ function PropertiesInner({
             <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
 
-            <MainOrDiv id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
+            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
                 {/* 1. Hero (photo + deep-red gradient) */}
-                {showHero && (
+                {(!hideChrome || hero) && (
                     <ListingHero
                         breadcrumbs={heroBreadcrumbs}
                         title={hero?.title ?? resolvedTitle}
@@ -1012,7 +943,7 @@ function PropertiesInner({
                     searchQuery={searchQuery}
                     onSearchSubmit={setSearchQuery}
                     metroLabel={metroLabel}
-                    areaOptions={cities}
+                    areaOptions={areaOptions}
                     areaValue={areaSelectValue}
                     onAreaChange={(val) => setLocationFilter(val || metroLabel)}
                     minPrice={minPrice}
@@ -1023,6 +954,8 @@ function PropertiesInner({
                         if (priceTier) updateParamKey('price', null);
                     }}
                     budgetPresets={budgetPresets}
+                    sortBy={sortBy}
+                    onSortChange={(val) => setSortBy(normalizeSortParam(val))}
                     typeFilter={typeFilter}
                     onTypeFilterChange={setTypeFilter}
                     genderFilter={genderFilter}
@@ -1034,110 +967,93 @@ function PropertiesInner({
                     plotSizeFilter={plotSizeFilter}
                     onPlotSizeChange={setPlotSizeFilter}
                     availableOptions={availableFilterOptions}
+                    hasGeoCoordinates={hasGeoCoordinates}
+                    showMapPanel={showMap}
+                    onMapToggle={() => setMapOpen((v) => !v)}
                     activeFilterPills={activeFilterPills}
                     onClearAll={resetFilters}
                     resultCount={displayResultCount}
                     loading={loading}
-                    overlapHero={showHero}
+                    overlapHero={!hideChrome || Boolean(hero)}
                 />
 
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-1">
-                    {/* 3. Popular Areas Horizontal Card Row */}
-                    <PopularAreasStrip
-                        cityLabel={metroLabel}
-                        category={activeTabKey}
-                        areas={popularAreas}
-                        viewAllHref={viewAllAreasHref}
-                    />
-
-                    {/* 4. Results Heading + Sort + Grid/List View Toggle */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                        <div className="flex items-center gap-3 min-w-0">
-                            <h2 className="font-heading text-xl sm:text-2xl font-bold text-ink tracking-tight tabular-nums">
-                                {loading && propertyListOrdered.length === 0 ? (
-                                    `Searching ${LISTING_TAB_LABEL[activeTabKey].toLowerCase()} in ${cityLabelDisplay}...`
-                                ) : (
-                                    <>
-                                        <span className="text-red">{resultHeadingParts.countText}</span>{' '}
-                                        <span>{resultHeadingParts.restText}</span>
-                                    </>
-                                )}
-                            </h2>
-                            {loadingMore && (
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate">
-                                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-red" aria-hidden="true" />
-                                    Loading more...
-                                </span>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-2.5 shrink-0">
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="results-sort-select" className="text-sm text-slate whitespace-nowrap hidden sm:inline">
-                                    Sort by:
-                                </label>
-                                <div className="relative">
-                                    <select
-                                        id="results-sort-select"
-                                        value={sortBy}
-                                        onChange={(e) => setSortBy(normalizeSortParam(e.target.value))}
-                                        aria-label="Sort listings"
-                                        className={`min-h-[44px] appearance-none pl-3.5 pr-9 rounded-[10px] border border-line bg-white text-sm font-semibold text-ink cursor-pointer hover:border-ink/40 ${focusRing}`}
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+                    {/* 3. Horizontally Scrollable Area Text Tabs with Counts & Red Underline */}
+                    {areaChipsWithHref.length > 0 && (
+                        <nav
+                            aria-label="Popular areas"
+                            className="mb-7 flex items-center gap-6 border-b border-line overflow-x-auto no-scrollbar"
+                        >
+                            {areaChipsWithHref.map((chip) => {
+                                const isCurrentArea =
+                                    searchQuery.trim().toLowerCase() === chip.name.toLowerCase() ||
+                                    locationFilter.trim().toLowerCase() === chip.name.toLowerCase() ||
+                                    location.pathname === chip.href;
+                                return (
+                                    <Link
+                                        key={`${chip.name}-${chip.href}`}
+                                        to={chip.href}
+                                        aria-current={isCurrentArea ? 'page' : undefined}
+                                        className={`min-h-[42px] pb-2.5 text-sm whitespace-nowrap inline-flex items-center gap-1.5 border-b-2 -mb-px transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
+                                            isCurrentArea
+                                                ? 'border-red text-ink font-semibold'
+                                                : 'border-transparent text-slate font-medium hover:text-ink hover:border-line'
+                                        }`}
                                     >
-                                        <option value="newest">Newest</option>
-                                        <option value="price_asc">Price: low to high</option>
-                                        <option value="price_desc">Price: high to low</option>
-                                    </select>
-                                    <ChevronDown
-                                        aria-hidden="true"
-                                        className="w-4 h-4 text-slate absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                                    />
-                                </div>
-                            </div>
+                                        <span>{chip.name}</span>
+                                        <span className="tabular-nums text-xs text-slate">
+                                            {chip.count}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </nav>
+                    )}
 
-                            <div className="flex items-center gap-1.5" role="group" aria-label="View layout">
-                                <button
-                                    type="button"
-                                    aria-label="Grid view"
-                                    aria-pressed={(viewParam ?? (isLgViewport ? 'list' : 'grid')) === 'grid'}
-                                    onClick={() => handleViewChange('grid')}
-                                    className={`w-11 h-11 rounded-[10px] border flex items-center justify-center transition-colors cursor-pointer ${focusRing} ${gridBtnClass}`}
-                                >
-                                    <LayoutGrid className="w-4 h-4" aria-hidden="true" />
-                                </button>
-                                <button
-                                    type="button"
-                                    aria-label="List view"
-                                    aria-pressed={(viewParam ?? (isLgViewport ? 'list' : 'grid')) === 'list'}
-                                    onClick={() => handleViewChange('list')}
-                                    className={`w-11 h-11 rounded-[10px] border flex items-center justify-center transition-colors cursor-pointer ${focusRing} ${listBtnClass}`}
-                                >
-                                    <List className="w-4 h-4" aria-hidden="true" />
-                                </button>
-                            </div>
-                        </div>
+                    {/* 4. Featured Highlight Card */}
+                    {!loading && propertyListOrdered.length > 0 && !hideChrome && activeFilterPills.length === 0 && (
+                        <FeaturedPromoBanner properties={propertyListOrdered} />
+                    )}
+
+                    {/* 5. Results Heading */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-ink tracking-tight tabular-nums">
+                            {loading && propertyListOrdered.length === 0
+                                ? `Searching ${LISTING_TAB_LABEL[activeTabKey].toLowerCase()} in ${cityLabelDisplay}...`
+                                : formatResultHeading(displayResultCount, activeTabKey, cityLabelDisplay)}
+                        </h2>
+                        {loadingMore && (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate">
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin text-red" />
+                                Loading more...
+                            </span>
+                        )}
                     </div>
 
-                    {/* 5. Results List/Grid & States */}
+                    {/* 6. Results Grid & States */}
                     {loading && propertyListOrdered.length === 0 ? (
                         <div
-                            className={resultsContainerClass}
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                             aria-busy="true"
                             aria-label="Loading listings"
                         >
-                            {Array.from({ length: 4 }).map((_, idx) => (
+                            {Array.from({ length: 6 }).map((_, idx) => (
                                 <div
                                     key={idx}
-                                    className="bg-white rounded-[14px] border border-line overflow-hidden p-4 flex flex-col lg:flex-row gap-4 animate-pulse"
+                                    className="bg-white rounded-[var(--radius-pdp)] border border-line overflow-hidden flex flex-col animate-pulse"
                                 >
-                                    <div className="w-full lg:w-[40%] aspect-[4/3] rounded-[10px] bg-blush-100 shrink-0" />
-                                    <div className="flex-1 flex flex-col gap-3 py-2">
+                                    <div className="w-full aspect-[4/3] bg-blush-100" />
+                                    <div className="p-5 flex flex-col gap-3">
+                                        <div className="h-3 w-16 bg-blush-100 rounded" />
                                         <div className="h-5 w-3/4 bg-blush-100 rounded" />
                                         <div className="h-4 w-1/2 bg-blush-100 rounded" />
-                                        <div className="flex gap-2 mt-2">
-                                            <div className="h-12 w-20 bg-blush-100 rounded-[10px]" />
-                                            <div className="h-12 w-20 bg-blush-100 rounded-[10px]" />
-                                            <div className="h-12 w-20 bg-blush-100 rounded-[10px]" />
+                                        <div className="flex gap-2 mt-1">
+                                            <div className="h-6 w-20 bg-blush-100 rounded-lg" />
+                                            <div className="h-6 w-20 bg-blush-100 rounded-lg" />
+                                        </div>
+                                        <div className="pt-3 mt-2 border-t border-champagne/40 flex items-center justify-between">
+                                            <div className="h-6 w-24 bg-blush-100 rounded" />
+                                            <div className="h-10 w-28 bg-blush-100 rounded-[10px]" />
                                         </div>
                                     </div>
                                 </div>
@@ -1156,17 +1072,17 @@ function PropertiesInner({
                                         : ''
                                 }
                             >
-                                <div className={resultsContainerClass}>
+                                <div
+                                    className={`grid grid-cols-1 ${
+                                        showMap ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'
+                                    } gap-6`}
+                                >
                                     {propertyListOrdered.length > 0 ? (
                                         propertyListOrdered.map((prop, idx) => {
                                             if (!prop || !prop.id) return null;
                                             return (
                                                 <div key={`${prop.id}-${idx}`} className="h-full">
-                                                    <PropertyCard
-                                                        property={prop}
-                                                        priority={idx === 0}
-                                                        variant={cardVariant}
-                                                    />
+                                                    <PropertyCard property={prop} priority={idx === 0} />
                                                 </div>
                                             );
                                         })
@@ -1263,7 +1179,7 @@ function PropertiesInner({
                         </div>
                     )}
                 </div>
-            </MainOrDiv>
+            </main>
 
             {!hideChrome && <Footer />}
 

@@ -49,10 +49,6 @@ export default function PlotBangaloreHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
-    const subtitleWithRange = sqftRange
-        ? `${PAGE_SUBTITLE} (${formatSqftRange(sqftRange.min, sqftRange.max)})`
-        : PAGE_SUBTITLE;
-
     return (
         <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
@@ -66,7 +62,7 @@ export default function PlotBangaloreHub() {
                     initialCategory="plot"
                     initialCity="bangalore"
                     pageTitle={PAGE_TITLE}
-                    pageSubtitle={subtitleWithRange}
+                    pageSubtitle={PAGE_SUBTITLE}
                     hero={{
                         breadcrumbs: [
                             { name: 'Home', path: '/' },
@@ -74,7 +70,9 @@ export default function PlotBangaloreHub() {
                             { name: PAGE_TITLE },
                         ],
                         title: PAGE_TITLE,
-                        subtitle: subtitleWithRange,
+                        subtitle: sqftRange
+                            ? `${PAGE_SUBTITLE} (${formatSqftRange(sqftRange.min, sqftRange.max)})`
+                            : PAGE_SUBTITLE,
                     }}
                     onPlotHubInventoryRange={onPlotHubInventoryRange}
                 />

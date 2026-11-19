@@ -1,8 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, type ReactNode } from 'react';
-import { Fragment } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 import { CalendarCheck, ChevronRight, Home, ShieldCheck, Tag } from 'lucide-react';
 import { Link } from '@/lib/navigation';
 
@@ -34,15 +33,18 @@ export interface ListingHeroProps {
 /**
  * Licensed hero photo (Wikimedia Commons, CC BY-SA 4.0, by SlowPhoton) hosted locally.
  * Source, licence and the crop applied are documented in public/images/hero/CREDITS.md.
- * If the file is missing or fails to load, the section falls back cleanly to --gradient-brand.
+ * If the file is missing or fails to load, the header falls back to --color-hero-deep -> --color-red.
  */
 export const LISTING_HERO_PHOTO = '/images/hero/bangalore-skyline.webp';
+
+const HERO_FOCUS_RING =
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-hero-deep';
 
 export function ListingHero({ breadcrumbs, title, subtitle, count, claims, extra }: ListingHeroProps) {
     const [photoFailed, setPhotoFailed] = useState(false);
 
     return (
-        <header className="relative isolate overflow-hidden bg-brand-band min-h-[280px] md:min-h-[360px]">
+        <header className="relative isolate overflow-hidden bg-listing-hero-fallback min-h-[280px] md:min-h-[360px]">
             {!photoFailed && (
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-[280px] md:h-full -z-20 overflow-hidden">
                     <Image
@@ -64,77 +66,81 @@ export function ListingHero({ breadcrumbs, title, subtitle, count, claims, extra
                     href="https://commons.wikimedia.org/wiki/File:Skyline_of_Varthur,_Bangalore.jpg"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute right-3 top-3 z-10 hidden md:inline-flex items-center rounded bg-red-900/90 px-2 py-0.5 text-[11px] font-medium text-white hover:bg-red-900 focus-visible:outline-2 focus-visible:outline-white"
+                    className={`absolute right-3 top-3 z-10 hidden md:inline-flex items-center rounded bg-red-900/90 px-2 py-0.5 text-[11px] font-medium text-white hover:bg-red-900 ${HERO_FOCUS_RING}`}
                 >
                     Photo: SlowPhoton, CC BY-SA 4.0
                 </a>
             )}
 
-            <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 md:pt-8 pb-[78px] md:pb-[96px]">
-                <nav aria-label="Breadcrumb">
-                    <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px] text-white">
-                        {breadcrumbs.map((crumb, i) => {
-                            const isLast = i === breadcrumbs.length - 1;
-                            return (
-                                <Fragment key={`${crumb.name}-${i}`}>
-                                    {i > 0 && (
-                                        <li aria-hidden="true" className="flex items-center">
-                                            <ChevronRight className="w-3.5 h-3.5 opacity-85" />
-                                        </li>
-                                    )}
-                                    <li className="flex items-center gap-1.5">
-                                        {i === 0 && <Home className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
-                                        {!isLast && crumb.path ? (
-                                            <Link
-                                                to={crumb.path}
-                                                className="inline-flex items-center min-h-[24px] hover:underline underline-offset-2 rounded focus-visible:outline-2 focus-visible:outline-white"
-                                            >
-                                                {crumb.name}
-                                            </Link>
-                                        ) : (
-                                            <span aria-current={isLast ? 'page' : undefined} className={isLast ? 'font-medium' : undefined}>
-                                                {crumb.name}
-                                            </span>
+            <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-8 pb-[84px] md:pb-[92px]">
+                <div className="max-w-[640px]">
+                    <nav aria-label="Breadcrumb">
+                        <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-white">
+                            {breadcrumbs.map((crumb, i) => {
+                                const isLast = i === breadcrumbs.length - 1;
+                                return (
+                                    <Fragment key={`${crumb.name}-${i}`}>
+                                        {i > 0 && (
+                                            <li aria-hidden="true" className="flex items-center">
+                                                <ChevronRight className="w-3.5 h-3.5 opacity-85" />
+                                            </li>
                                         )}
-                                    </li>
-                                </Fragment>
-                            );
-                        })}
-                    </ol>
-                </nav>
+                                        <li className="flex items-center gap-1.5">
+                                            {i === 0 && <Home className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
+                                            {!isLast && crumb.path ? (
+                                                <Link
+                                                    to={crumb.path}
+                                                    className={`inline-flex items-center min-h-[24px] hover:underline underline-offset-2 rounded ${HERO_FOCUS_RING}`}
+                                                >
+                                                    {crumb.name}
+                                                </Link>
+                                            ) : (
+                                                <span aria-current={isLast ? 'page' : undefined} className={isLast ? 'font-medium' : undefined}>
+                                                    {crumb.name}
+                                                </span>
+                                            )}
+                                        </li>
+                                    </Fragment>
+                                );
+                            })}
+                        </ol>
+                    </nav>
 
-                <div className="mt-3 md:mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
-                    <h1 className="type-h1 text-white">{title}</h1>
-                    {typeof count === 'number' && (
-                        <span className="inline-flex items-center rounded-full bg-white px-3.5 py-1 text-sm font-semibold text-red tabular-nums">
-                            {count.toLocaleString('en-IN')} {count === 1 ? 'listing' : 'listings'}
-                        </span>
+                    <div className="mt-4 md:mt-5">
+                        <h1 className="type-h1 text-white">
+                            <span>{title}</span>
+                            {typeof count === 'number' && (
+                                <span className="ml-3 inline-flex -translate-y-1 align-middle items-center rounded-full bg-white px-3.5 py-1 font-sans text-sm font-semibold tracking-normal text-red tabular-nums">
+                                    {count.toLocaleString('en-IN')} {count === 1 ? 'listing' : 'listings'}
+                                </span>
+                            )}
+                        </h1>
+                    </div>
+
+                    <div aria-hidden="true" className="mt-3 h-[3px] w-14 rounded-full bg-red-subtitle" />
+
+                    {subtitle && (
+                        <p className="mt-3 text-[15px] md:text-base leading-relaxed text-white/90 line-clamp-2">
+                            {subtitle}
+                        </p>
                     )}
+
+                    {claims.length > 0 && (
+                        <ul className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13px] md:text-sm font-medium text-white">
+                            {claims.map((key) => {
+                                const { text, Icon } = HERO_CLAIMS[key];
+                                return (
+                                    <li key={key} className="inline-flex items-center gap-2">
+                                        <Icon className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+                                        <span>{text}</span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+
+                    {extra && <div className="mt-4">{extra}</div>}
                 </div>
-
-                <div aria-hidden="true" className="mt-3 h-[3px] w-14 rounded-full bg-blush-100" />
-
-                {subtitle && (
-                    <p className="mt-2.5 md:mt-3 max-w-[34rem] text-[14px] md:text-base leading-relaxed text-white line-clamp-2 md:line-clamp-none">
-                        {subtitle}
-                    </p>
-                )}
-
-                {claims.length > 0 && (
-                    <ul className="mt-3.5 md:mt-4 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-[13px] md:text-sm font-medium text-white">
-                        {claims.map((key) => {
-                            const { text, Icon } = HERO_CLAIMS[key];
-                            return (
-                                <li key={key} className="inline-flex items-center gap-2">
-                                    <Icon className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
-                                    <span>{text}</span>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                )}
-
-                {extra && <div className="mt-3">{extra}</div>}
             </div>
         </header>
     );

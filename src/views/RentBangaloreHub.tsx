@@ -1,16 +1,14 @@
 'use client';
 
-import { Link } from '@/lib/navigation';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { FaqSection } from '@/components/seo/FaqSection';
-import { PG_LOCATIONS } from '@/data/pgLocations';
 import { buildPageSEO, rentBangaloreHubSeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/views/Properties';
-import { ChevronRight, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { formatInrRange } from '@/lib/listingInventoryStats';
 
@@ -56,11 +54,6 @@ export default function RentBangaloreHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
-    const topSlugs = PG_LOCATIONS.slice(0, 16);
-    const subtitleWithRange = rentRange
-        ? `${PAGE_SUBTITLE} (${formatInrRange(rentRange.min, rentRange.max)}/mo in current listings)`
-        : PAGE_SUBTITLE;
-
     return (
         <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
@@ -74,47 +67,22 @@ export default function RentBangaloreHub() {
                     initialCategory="rent"
                     initialCity="bangalore"
                     pageTitle={PAGE_TITLE}
-                    pageSubtitle={subtitleWithRange}
+                    pageSubtitle={PAGE_SUBTITLE}
                     hero={{
                         breadcrumbs: [
                             { name: 'Home', path: '/' },
-                            { name: 'Flats for rent in Bangalore' },
+                            { name: 'Flats', path: '/rent' },
+                            { name: PAGE_TITLE },
                         ],
                         title: PAGE_TITLE,
-                        subtitle: subtitleWithRange,
+                        subtitle: rentRange
+                            ? `${PAGE_SUBTITLE} (${formatInrRange(rentRange.min, rentRange.max)}/mo in current listings)`
+                            : PAGE_SUBTITLE,
                     }}
                     onRentHubInventoryRange={onRentHubInventoryRange}
                 />
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-20 space-y-14">
-                    <section aria-labelledby="top-areas-heading">
-                        <div className="mb-6">
-                            <h2 id="top-areas-heading" className="font-heading text-2xl font-bold text-ink tracking-tight">
-                                Browse flats by area in Bangalore
-                            </h2>
-                            <p className="text-slate mt-1 text-sm md:text-base">
-                                Select a locality to view rental options and local FAQs.
-                            </p>
-                        </div>
-                        <nav className="grid grid-cols-2 sm:grid-cols-4 gap-3.5" aria-label="Rent areas">
-                            {topSlugs.map((loc) => (
-                                <Link
-                                    key={loc.slug}
-                                    to={`/rent/${loc.slug}`}
-                                    className="group flex items-center justify-between p-4 rounded-[12px] bg-white border border-line hover:border-red/40 transition-colors"
-                                >
-                                    <span className="inline-flex items-center gap-2 min-w-0">
-                                        <MapPin className="w-4 h-4 text-red shrink-0" aria-hidden="true" />
-                                        <span className="text-sm font-semibold text-ink group-hover:text-red truncate">
-                                            Flats in {loc.name}
-                                        </span>
-                                    </span>
-                                    <ChevronRight className="w-4 h-4 text-slate shrink-0" aria-hidden="true" />
-                                </Link>
-                            ))}
-                        </nav>
-                    </section>
-
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-20">
                     <FaqSection
                         title="Frequently asked — rent in Bangalore"
                         items={HUB_FAQS}

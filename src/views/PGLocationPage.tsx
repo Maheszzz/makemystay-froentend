@@ -86,7 +86,6 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
         <Navbar />
         <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-          {/* Interactive listing hero, filter card, popular areas & results (seeded with SSR properties) */}
           <Properties
             hideChrome
             initialCategory="pg"

@@ -45,26 +45,14 @@ export function getListingHeaderCopy(category: ListingCategoryKey, cityLabel: st
     }
 }
 
-export function formatResultHeadingParts(
-    count: number,
-    category: ListingCategoryKey,
-    areaOrCity: string,
-): { countText: string; restText: string } {
+export function formatResultHeading(count: number, category: ListingCategoryKey, areaOrCity: string): string {
     const plural = count !== 1;
     let noun = plural ? 'properties' : 'property';
     if (category === 'pg') noun = plural ? 'PGs' : 'PG';
     else if (category === 'rent') noun = plural ? 'flats for rent' : 'flat for rent';
     else if (category === 'buy') noun = plural ? 'homes to buy' : 'home to buy';
     else if (category === 'plot') noun = plural ? 'plots' : 'plot';
-    return {
-        countText: count.toLocaleString('en-IN'),
-        restText: `${noun} in ${areaOrCity}`,
-    };
-}
-
-export function formatResultHeading(count: number, category: ListingCategoryKey, areaOrCity: string): string {
-    const { countText, restText } = formatResultHeadingParts(count, category, areaOrCity);
-    return `${countText} ${restText}`;
+    return `${count.toLocaleString('en-IN')} ${noun} in ${areaOrCity}`;
 }
 
 export function parsePropertyPriceInr(priceStr?: string): number | null {

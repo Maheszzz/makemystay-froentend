@@ -67,23 +67,41 @@
         background-image: var(--gradient-brand);
     }
 
-    /* Listing hero: deep red opaque on the left, fading to the photo by ~65% (no wash-out overlays) */
+    /* Listing hero fallback when the skyline photo is missing: flat --color-hero-deep to --color-red */
+    .bg-listing-hero-fallback {
+        background-color: var(--color-hero-deep);
+        background-image: linear-gradient(90deg, var(--color-hero-deep) 0%, var(--color-red) 100%);
+    }
+
+    /* Listing hero: deep red opaque across the left text column, transparent by ~66% on xl so skyline stays crisp */
     .listing-hero-overlay {
         background: linear-gradient(
             90deg,
             var(--color-hero-deep) 0%,
-            var(--color-hero-deep) 28%,
-            color-mix(in srgb, var(--color-hero-deep) 55%, transparent) 46%,
-            transparent 65%
+            var(--color-hero-deep) 52%,
+            color-mix(in srgb, var(--color-hero-deep) 84%, transparent) 65%,
+            transparent 78%
         );
     }
 
-    /* Mobile: text spans the full width, so a gentler but still AA-safe veil over a shorter crop */
+    @media (min-width: 1280px) {
+        .listing-hero-overlay {
+            background: linear-gradient(
+                90deg,
+                var(--color-hero-deep) 0%,
+                var(--color-hero-deep) 44%,
+                color-mix(in srgb, var(--color-hero-deep) 86%, transparent) 55%,
+                transparent 66%
+            );
+        }
+    }
+
+    /* Mobile: gentler AA-safe veil over the shorter 280px skyline crop */
     @media (max-width: 767px) {
         .listing-hero-overlay {
             background: linear-gradient(
                 90deg,
-                color-mix(in srgb, var(--color-hero-deep) 94%, transparent) 0%,
+                color-mix(in srgb, var(--color-hero-deep) 92%, transparent) 0%,
                 color-mix(in srgb, var(--color-hero-deep) 78%, transparent) 100%
             );
         }

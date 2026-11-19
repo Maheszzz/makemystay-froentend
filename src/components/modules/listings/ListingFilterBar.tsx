@@ -7,15 +7,15 @@ import {
     Building2,
     Check,
     ChevronDown,
+    Home,
     IndianRupee,
-    LayoutGrid,
     Layers,
+    LayoutGrid,
     MapPin,
     Search,
     SlidersHorizontal,
     Users,
     Utensils,
-    Home,
     X,
 } from 'lucide-react';
 import { Link } from '@/lib/navigation';
@@ -53,6 +53,9 @@ interface ListingFilterBarProps {
     onBudgetApply: (min: string, max: string) => void;
     budgetPresets: BudgetPreset[];
 
+    sortBy: string;
+    onSortChange: (val: string) => void;
+
     typeFilter: string;
     onTypeFilterChange: (val: string) => void;
     genderFilter?: 'male' | 'female';
@@ -64,6 +67,10 @@ interface ListingFilterBarProps {
     plotSizeFilter: string;
     onPlotSizeChange: (bucketId: string) => void;
     availableOptions: AvailableTypeFilters;
+
+    hasGeoCoordinates: boolean;
+    showMapPanel: boolean;
+    onMapToggle: () => void;
 
     activeFilterPills: ActiveFilterPill[];
     onClearAll: () => void;
@@ -77,11 +84,11 @@ const FOCUS_RING =
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2';
 
 const TAB_ICON: Record<ListingCategoryKey, React.ReactNode> = {
-    all: <LayoutGrid className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
-    pg: <BedDouble className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
-    rent: <Building2 className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
-    buy: <Home className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
-    plot: <Layers className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+    all: <LayoutGrid className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" aria-hidden="true" />,
+    pg: <BedDouble className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" aria-hidden="true" />,
+    rent: <Building2 className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" aria-hidden="true" />,
+    buy: <Home className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" aria-hidden="true" />,
+    plot: <Layers className="w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0" aria-hidden="true" />,
 };
 
 const PRIMARY_TABS: ListingCategoryKey[] = ['all', 'pg', 'rent'];
@@ -108,7 +115,7 @@ function SelectControl({
         <div className={`relative ${className}`}>
             <span
                 aria-hidden="true"
-                className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
+                className={`pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
             >
                 {icon}
             </span>
@@ -116,7 +123,7 @@ function SelectControl({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 aria-label={label}
-                className={`h-12 w-full min-w-[9.5rem] appearance-none cursor-pointer rounded-[10px] border pl-10 pr-9 text-sm font-medium transition-colors ${FOCUS_RING} ${
+                className={`h-12 w-full appearance-none cursor-pointer rounded-[10px] border pl-8 pr-7 text-sm font-medium transition-colors ${FOCUS_RING} ${
                     active
                         ? 'border-red bg-blush-100 text-red'
                         : 'border-line bg-white text-ink hover:border-ink/40'
@@ -126,7 +133,7 @@ function SelectControl({
             </select>
             <ChevronDown
                 aria-hidden="true"
-                className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
+                className={`pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
             />
         </div>
     );
@@ -146,6 +153,8 @@ export function ListingFilterBar({
     maxPrice,
     onBudgetApply,
     budgetPresets,
+    sortBy,
+    onSortChange,
     typeFilter,
     onTypeFilterChange,
     genderFilter,
@@ -157,6 +166,9 @@ export function ListingFilterBar({
     plotSizeFilter,
     onPlotSizeChange,
     availableOptions,
+    hasGeoCoordinates,
+    showMapPanel,
+    onMapToggle,
     activeFilterPills,
     onClearAll,
     resultCount,
@@ -245,6 +257,7 @@ export function ListingFilterBar({
     }, [drawerOpen, closeDrawer]);
 
     const isMoreActive = MORE_TABS.includes(activeTabKey);
+    const activeMoreCount = isMoreActive ? propertyCounts?.[activeTabKey] : undefined;
 
     const isBudgetActive = Boolean(minPrice || maxPrice);
     const budgetLabel = useMemo(() => {
@@ -265,18 +278,31 @@ export function ListingFilterBar({
         onSearchSubmit(draftQuery.trim());
     };
 
+    const handleClearSearch = () => {
+        setDraftQuery('');
+        if (searchQuery) {
+            onSearchSubmit('');
+        }
+    };
+
     const showPg = activeTabKey === 'pg';
     const showRentBuy = activeTabKey === 'rent' || activeTabKey === 'buy' || activeTabKey === 'all';
     const showPlot = activeTabKey === 'plot';
 
+    const resolvedAreaOptions = useMemo(() => {
+        if (!areaValue) return areaOptions;
+        if (areaOptions.some((a) => a.toLowerCase() === areaValue.toLowerCase())) return areaOptions;
+        return [areaValue, ...areaOptions];
+    }, [areaOptions, areaValue]);
+
     const renderBudget = (fullWidth = false) => (
-        <div ref={fullWidth ? undefined : budgetRef} className={`relative ${fullWidth ? '' : 'shrink-0'}`}>
+        <div ref={fullWidth ? undefined : budgetRef} className={`relative ${fullWidth ? 'w-full' : 'shrink-0'}`}>
             <button
                 type="button"
                 aria-expanded={budgetOpen}
                 aria-controls={budgetPanelId}
                 onClick={() => setBudgetOpen((v) => !v)}
-                className={`h-12 w-full min-w-[9.5rem] inline-flex items-center gap-2 rounded-[10px] border pl-3.5 pr-3 text-sm font-medium transition-colors cursor-pointer ${FOCUS_RING} ${
+                className={`h-12 w-full inline-flex items-center gap-1.5 rounded-[10px] border pl-2.5 pr-2 text-sm font-medium transition-colors cursor-pointer ${FOCUS_RING} ${
                     isBudgetActive
                         ? 'border-red bg-blush-100 text-red'
                         : 'border-line bg-white text-ink hover:border-ink/40'
@@ -309,7 +335,7 @@ export function ListingFilterBar({
                                         onBudgetApply(active ? '' : preset.min, active ? '' : preset.max);
                                         if (!fullWidth) setBudgetOpen(false);
                                     }}
-                                    className={`min-h-[44px] px-3 rounded-lg text-sm border transition-colors cursor-pointer ${FOCUS_RING} ${
+                                    className={`min-h-[44px] sm:min-h-[36px] px-3 rounded-lg text-sm border transition-colors cursor-pointer ${FOCUS_RING} ${
                                         active
                                             ? 'bg-blush-100 text-red border-red font-semibold'
                                             : 'bg-page text-ink border-line font-medium hover:bg-blush-100'
@@ -347,13 +373,13 @@ export function ListingFilterBar({
         </div>
     );
 
-    /** Area + type-specific dropdowns, shared by the desktop row 2 and the mobile drawer. */
+    /** Area + category-specific dropdowns, shared by desktop row 2 and mobile drawer. */
     const renderDropdowns = (fullWidth = false) => {
         const w = fullWidth ? 'w-full' : 'shrink-0';
         return (
             <>
                 <SelectControl
-                    className={w}
+                    className={fullWidth ? 'w-full' : 'shrink-0 max-w-[12.5rem]'}
                     icon={<MapPin className="w-4 h-4" />}
                     label="Filter by area"
                     value={areaValue}
@@ -361,7 +387,7 @@ export function ListingFilterBar({
                     onChange={onAreaChange}
                 >
                     <option value="">All of {metroLabel}</option>
-                    {areaOptions.map((a) => (
+                    {resolvedAreaOptions.map((a) => (
                         <option key={a} value={a}>
                             {a}
                         </option>
@@ -379,7 +405,7 @@ export function ListingFilterBar({
                         active={Boolean(genderFilter)}
                         onChange={(v) => onGenderChange(v === 'male' || v === 'female' ? v : undefined)}
                     >
-                        <option value="">Gender</option>
+                        <option value="">{genderFilter ? 'Any' : 'Gender'}</option>
                         {availableOptions.pgGenders.map((g) => (
                             <option key={g} value={g}>
                                 {g === 'male' ? 'Boys' : 'Girls'}
@@ -397,7 +423,7 @@ export function ListingFilterBar({
                         active={foodOn}
                         onChange={(v) => onFoodChange(v === 'included')}
                     >
-                        <option value="">Meals</option>
+                        <option value="">{foodOn ? 'Any' : 'Meals'}</option>
                         <option value="included">Meals included</option>
                     </SelectControl>
                 )}
@@ -459,56 +485,50 @@ export function ListingFilterBar({
         );
     };
 
-    const searchInput = (id: string) => (
+    const searchInput = (inputId: string, compactMobile = false) => (
         <div className="relative flex-1 min-w-0">
             <Search
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate"
                 aria-hidden="true"
-                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate"
             />
             <input
-                id={id}
+                id={inputId}
                 type="search"
+                enterKeyHint="search"
                 value={draftQuery}
                 onChange={(e) => setDraftQuery(e.target.value)}
                 placeholder="Search area, property or landmark..."
                 aria-label="Search area, property or landmark"
-                enterKeyHint="search"
-                className={`h-12 w-full rounded-[10px] border border-line bg-page pl-10 pr-10 text-sm text-ink placeholder:text-slate transition-colors focus:bg-white focus:border-red ${FOCUS_RING}`}
+                className={`w-full rounded-[10px] border border-line bg-white pl-9 ${
+                    draftQuery ? 'pr-9' : 'pr-3'
+                } text-sm text-ink placeholder:text-slate transition-colors focus:border-red ${FOCUS_RING} ${
+                    compactMobile ? 'h-11' : 'h-12'
+                }`}
             />
             {draftQuery && (
                 <button
                     type="button"
-                    aria-label="Clear search text"
-                    onClick={() => {
-                        setDraftQuery('');
-                        if (searchQuery) onSearchSubmit('');
-                    }}
-                    className={`absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate hover:text-ink ${FOCUS_RING}`}
+                    onClick={handleClearSearch}
+                    aria-label="Clear search"
+                    className={`absolute right-1 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-lg text-slate hover:text-ink cursor-pointer ${FOCUS_RING}`}
                 >
-                    <X className="h-4 w-4" aria-hidden="true" />
+                    <X className="w-4 h-4" aria-hidden="true" />
                 </button>
             )}
         </div>
     );
 
-    const tabClass = (active: boolean) =>
-        `min-h-[44px] px-4 rounded-[10px] border text-sm whitespace-nowrap inline-flex items-center gap-2 transition-colors cursor-pointer ${FOCUS_RING} ${
-            active
-                ? 'bg-red border-red text-white font-semibold'
-                : 'bg-white border-line text-ink font-medium hover:bg-blush-100'
-        }`;
-
     return (
         <>
             <div
-                className={`relative z-20 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 ${
-                    overlapHero ? '-mt-[60px]' : 'pt-4'
-                } mb-8`}
+                className={`sticky top-[56px] md:top-[60px] z-30 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 w-full ${
+                    overlapHero ? '-mt-[60px] mb-6' : 'pt-4 mb-6'
+                }`}
             >
-                <div className="rounded-[14px] border border-line bg-white p-4 md:p-5 shadow-[0_10px_32px_rgba(94,15,18,0.10)]">
-                    {/* Row 1: type tabs */}
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 py-1">
-                        <nav aria-label="Property categories" className="flex items-center gap-2">
+                <div className="bg-white rounded-[14px] border border-line/80 shadow-[0_10px_30px_-8px_rgba(26,20,22,0.10),0_2px_8px_rgba(26,20,22,0.04)] p-3.5 sm:p-5">
+                    {/* Row 1: Category tabs with icon + live count, More dropdown (Buy, Plots), plus desktop Sort/Map */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <nav aria-label="Property categories" className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                             {PRIMARY_TABS.map((cat) => {
                                 const active = activeTabKey === cat;
                                 const count = propertyCounts?.[cat];
@@ -517,107 +537,175 @@ export function ListingFilterBar({
                                         key={cat}
                                         to={categoryHref(cat)}
                                         aria-current={active ? 'page' : undefined}
-                                        className={tabClass(active)}
+                                        className={`min-h-[44px] sm:min-h-[40px] px-2.5 sm:px-4 rounded-[10px] border text-xs sm:text-sm whitespace-nowrap inline-flex items-center gap-1.5 sm:gap-2 transition-colors ${FOCUS_RING} ${
+                                            active
+                                                ? 'bg-red text-white border-red font-semibold'
+                                                : 'bg-[#F4F2F3] text-ink border-transparent font-medium hover:bg-[#EAE7E8]'
+                                        }`}
                                     >
                                         {TAB_ICON[cat]}
                                         <span>{LISTING_TAB_LABEL[cat]}</span>
                                         {typeof count === 'number' && (
-                                            <span className={`tabular-nums ${active ? 'text-white' : 'text-slate'}`}>
+                                            <span className={`tabular-nums ${active ? 'text-white/90' : 'text-slate'}`}>
                                                 ({count.toLocaleString('en-IN')})
                                             </span>
                                         )}
                                     </Link>
                                 );
                             })}
-                        </nav>
 
-                        <div ref={moreRef} className="relative shrink-0">
-                            <button
-                                type="button"
-                                aria-expanded={moreOpen}
-                                aria-controls={morePanelId}
-                                onClick={() => setMoreOpen((v) => !v)}
-                                className={tabClass(isMoreActive)}
-                            >
-                                <Layers className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
-                                <span>{isMoreActive ? LISTING_TAB_LABEL[activeTabKey] : 'More'}</span>
-                                <ChevronDown className="w-4 h-4 shrink-0" aria-hidden="true" />
-                            </button>
-                            {moreOpen && (
-                                <ul
-                                    id={morePanelId}
-                                    className="absolute left-0 top-full z-40 mt-2 w-52 rounded-[14px] border border-line bg-white p-1.5 shadow-lg"
+                            <div ref={moreRef} className="relative">
+                                <button
+                                    type="button"
+                                    aria-expanded={moreOpen}
+                                    aria-haspopup="menu"
+                                    aria-controls={morePanelId}
+                                    onClick={() => setMoreOpen((v) => !v)}
+                                    className={`min-h-[44px] sm:min-h-[40px] px-2.5 sm:px-4 rounded-[10px] border text-xs sm:text-sm whitespace-nowrap inline-flex items-center gap-1.5 sm:gap-2 transition-colors cursor-pointer ${FOCUS_RING} ${
+                                        isMoreActive
+                                            ? 'bg-red text-white border-red font-semibold'
+                                            : 'bg-[#F4F2F3] text-ink border-transparent font-medium hover:bg-[#EAE7E8]'
+                                    }`}
                                 >
-                                    {MORE_TABS.map((cat) => {
-                                        const active = activeTabKey === cat;
-                                        const count = propertyCounts?.[cat];
-                                        return (
-                                            <li key={cat}>
+                                    {isMoreActive ? TAB_ICON[activeTabKey] : TAB_ICON.plot}
+                                    <span>{isMoreActive ? LISTING_TAB_LABEL[activeTabKey] : 'More'}</span>
+                                    {typeof activeMoreCount === 'number' && (
+                                        <span className="tabular-nums text-white/90">
+                                            ({activeMoreCount.toLocaleString('en-IN')})
+                                        </span>
+                                    )}
+                                    <ChevronDown className="w-3.5 h-3.5 opacity-80 shrink-0" aria-hidden="true" />
+                                </button>
+
+                                {moreOpen && (
+                                    <div
+                                        id={morePanelId}
+                                        role="menu"
+                                        aria-label="More property categories"
+                                        className="absolute left-0 top-full mt-2 w-52 rounded-[12px] border border-line bg-white p-1.5 shadow-lg z-40"
+                                    >
+                                        {MORE_TABS.map((cat) => {
+                                            const active = activeTabKey === cat;
+                                            const count = propertyCounts?.[cat];
+                                            return (
                                                 <Link
+                                                    key={cat}
+                                                    role="menuitem"
                                                     to={categoryHref(cat)}
-                                                    aria-current={active ? 'page' : undefined}
                                                     onClick={() => setMoreOpen(false)}
-                                                    className={`flex min-h-[44px] items-center justify-between gap-2 rounded-lg px-3 text-sm ${FOCUS_RING} ${
+                                                    className={`min-h-[44px] w-full flex items-center justify-between gap-2 px-3 rounded-lg text-sm transition-colors ${FOCUS_RING} ${
                                                         active
-                                                            ? 'bg-blush-100 font-semibold text-red'
-                                                            : 'font-medium text-ink hover:bg-blush-100'
+                                                            ? 'bg-blush-100 text-red font-semibold'
+                                                            : 'text-ink font-medium hover:bg-blush-100'
                                                     }`}
                                                 >
                                                     <span className="inline-flex items-center gap-2">
-                                                        {TAB_ICON[cat]}
-                                                        {LISTING_TAB_LABEL[cat]}
+                                                        {active ? (
+                                                            <Check className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                                        ) : (
+                                                            TAB_ICON[cat]
+                                                        )}
+                                                        <span>{LISTING_TAB_LABEL[cat]}</span>
                                                     </span>
                                                     {typeof count === 'number' && (
-                                                        <span className="tabular-nums text-slate">({count})</span>
+                                                        <span className="text-xs text-slate tabular-nums">
+                                                            {count.toLocaleString('en-IN')}
+                                                        </span>
                                                     )}
                                                 </Link>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </nav>
+
+                        {/* Desktop Sort & Map controls (preserve existing features without changing results header) */}
+                        <div className="hidden lg:flex items-center gap-2 ml-auto shrink-0">
+                            {hasGeoCoordinates && (
+                                <button
+                                    type="button"
+                                    aria-pressed={showMapPanel}
+                                    onClick={onMapToggle}
+                                    className={`h-10 px-3 rounded-[10px] border text-sm inline-flex items-center gap-1.5 transition-colors cursor-pointer ${FOCUS_RING} ${
+                                        showMapPanel
+                                            ? 'bg-blush-100 text-red border-red font-semibold'
+                                            : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
+                                    }`}
+                                >
+                                    <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
+                                    <span>Map</span>
+                                </button>
                             )}
+
+                            <div className="relative">
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => onSortChange(e.target.value)}
+                                    aria-label="Sort results"
+                                    className={`h-10 appearance-none pl-3 pr-8 rounded-[10px] border border-line bg-white text-sm font-medium text-ink cursor-pointer hover:border-ink/40 ${FOCUS_RING}`}
+                                >
+                                    <option value="newest">Sort: Newest</option>
+                                    <option value="price_asc">Price: low to high</option>
+                                    <option value="price_desc">Price: high to low</option>
+                                </select>
+                                <ChevronDown
+                                    className="w-4 h-4 text-slate absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+                                    aria-hidden="true"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    {/* Row 2 (desktop): search + dropdowns + Search button */}
+                    {/* Row 2 (Desktop — single line): Search + Area + Budget + Category Dropdowns + Search CTA */}
                     <form
-                        role="search"
                         onSubmit={submitSearch}
-                        className="hidden lg:flex items-center gap-3 mt-3 pt-4 border-t border-line"
+                        className="hidden lg:flex items-center gap-2.5 mt-3.5 pt-3.5 border-t border-line/70"
                     >
-                        {searchInput('listing-search')}
+                        <div className="flex-1 min-w-[260px] flex">{searchInput('listing-search-desktop')}</div>
                         {renderDropdowns(false)}
                         <button
                             type="submit"
-                            className={`h-12 shrink-0 inline-flex items-center justify-center gap-2 rounded-[10px] bg-red px-7 text-sm font-semibold text-white transition-colors hover:bg-red-hover cursor-pointer ${FOCUS_RING}`}
+                            className={`h-12 px-5 shrink-0 inline-flex items-center justify-center gap-2 rounded-[10px] bg-red text-sm font-semibold text-white hover:bg-red-hover transition-colors cursor-pointer ${FOCUS_RING}`}
                         >
-                            <Search className="h-4 w-4" aria-hidden="true" />
-                            Search
+                            <Search className="w-4 h-4 shrink-0" aria-hidden="true" />
+                            <span>Search</span>
                         </button>
                     </form>
 
-                    {/* Row 2 (mobile): collapses into a Filters button */}
-                    <div className="lg:hidden mt-3 pt-4 border-t border-line">
+                    {/* Row 2 (Mobile): Search input stays visible + Search submit icon + Filters drawer button */}
+                    <form
+                        onSubmit={submitSearch}
+                        className="lg:hidden mt-3 pt-3 border-t border-line/70 flex items-center gap-2"
+                    >
+                        {searchInput('listing-search-mobile', true)}
+                        <button
+                            type="submit"
+                            aria-label="Search"
+                            className={`h-11 w-11 shrink-0 inline-flex items-center justify-center rounded-[10px] bg-red text-white hover:bg-red-hover transition-colors cursor-pointer ${FOCUS_RING}`}
+                        >
+                            <Search className="w-4 h-4" aria-hidden="true" />
+                        </button>
                         <button
                             ref={filtersBtnRef}
                             type="button"
-                            aria-haspopup="dialog"
-                            aria-expanded={drawerOpen}
                             onClick={() => setDrawerOpen(true)}
-                            className={`h-12 w-full inline-flex items-center justify-center gap-2 rounded-[10px] border border-red bg-white text-sm font-semibold text-red hover:bg-blush-100 cursor-pointer ${FOCUS_RING}`}
+                            aria-expanded={drawerOpen}
+                            className={`h-11 px-3.5 shrink-0 inline-flex items-center justify-center gap-1.5 rounded-[10px] border border-line bg-white text-sm font-medium text-ink hover:bg-blush-100 cursor-pointer ${FOCUS_RING}`}
                         >
-                            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                            <SlidersHorizontal className="w-4 h-4 text-red shrink-0" aria-hidden="true" />
                             <span>Filters</span>
                             {activeFilterPills.length > 0 && (
-                                <span className="rounded-full bg-red px-2 py-0.5 text-[11px] font-semibold leading-none text-white tabular-nums">
+                                <span className="px-1.5 py-0.5 rounded-full bg-red text-white text-[11px] font-semibold tabular-nums leading-none">
                                     {activeFilterPills.length}
                                 </span>
                             )}
                         </button>
-                    </div>
+                    </form>
 
+                    {/* Active Removable Filter Chips (unchanged) */}
                     {activeFilterPills.length > 0 && (
-                        <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 mt-3.5 pt-3 border-t border-line/70">
                             <span className="text-xs text-slate">Active:</span>
                             {activeFilterPills.map((pill) => (
                                 <button
@@ -625,7 +713,7 @@ export function ListingFilterBar({
                                     type="button"
                                     onClick={pill.onRemove}
                                     aria-label={`Remove filter ${pill.label}`}
-                                    className={`min-h-[44px] px-3 rounded-full bg-blush-100 border border-red text-xs font-semibold text-red hover:bg-white inline-flex items-center gap-1.5 cursor-pointer ${FOCUS_RING}`}
+                                    className={`min-h-[44px] sm:min-h-[34px] px-3 rounded-full bg-blush-100 border border-red text-xs font-semibold text-red hover:bg-white inline-flex items-center gap-1.5 cursor-pointer ${FOCUS_RING}`}
                                 >
                                     <Check className="w-3 h-3 shrink-0" aria-hidden="true" />
                                     <span>{pill.label}</span>
@@ -635,7 +723,7 @@ export function ListingFilterBar({
                             <button
                                 type="button"
                                 onClick={onClearAll}
-                                className={`min-h-[44px] px-3 text-sm font-medium text-ink hover:text-red underline underline-offset-4 cursor-pointer ${FOCUS_RING}`}
+                                className={`min-h-[44px] sm:min-h-[34px] px-3 text-xs font-medium text-ink hover:text-red underline underline-offset-4 cursor-pointer ${FOCUS_RING}`}
                             >
                                 Clear all
                             </button>
@@ -664,7 +752,7 @@ export function ListingFilterBar({
                                 type="button"
                                 aria-label="Close filters"
                                 onClick={closeDrawer}
-                                className={`flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-blush-100 ${FOCUS_RING}`}
+                                className={`flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-blush-100 cursor-pointer ${FOCUS_RING}`}
                             >
                                 <X className="h-5 w-5" aria-hidden="true" />
                             </button>
@@ -682,8 +770,47 @@ export function ListingFilterBar({
                                     Search
                                 </label>
                                 {searchInput('drawer-search')}
+
                                 <p className="pt-2 text-sm font-semibold text-ink">Filters</p>
                                 <div className="flex flex-col gap-3">{renderDropdowns(true)}</div>
+
+                                <div className="pt-2 space-y-2">
+                                    <label htmlFor="drawer-sort" className="block text-sm font-semibold text-ink">
+                                        Sort by
+                                    </label>
+                                    <div className="relative">
+                                        <select
+                                            id="drawer-sort"
+                                            value={sortBy}
+                                            onChange={(e) => onSortChange(e.target.value)}
+                                            className={`h-12 w-full appearance-none rounded-[10px] border border-line bg-white pl-3.5 pr-9 text-sm font-medium text-ink ${FOCUS_RING}`}
+                                        >
+                                            <option value="newest">Sort: Newest</option>
+                                            <option value="price_asc">Price: low to high</option>
+                                            <option value="price_desc">Price: high to low</option>
+                                        </select>
+                                        <ChevronDown
+                                            className="w-4 h-4 text-slate absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                                            aria-hidden="true"
+                                        />
+                                    </div>
+
+                                    {hasGeoCoordinates && (
+                                        <button
+                                            type="button"
+                                            aria-pressed={showMapPanel}
+                                            onClick={onMapToggle}
+                                            className={`h-12 w-full rounded-[10px] border px-4 text-sm font-medium inline-flex items-center justify-center gap-2 cursor-pointer ${FOCUS_RING} ${
+                                                showMapPanel
+                                                    ? 'bg-blush-100 text-red border-red font-semibold'
+                                                    : 'bg-white text-ink border-line hover:bg-blush-100'
+                                            }`}
+                                        >
+                                            <MapPin className="w-4 h-4" aria-hidden="true" />
+                                            <span>{showMapPanel ? 'Hide map view' : 'Show map view'}</span>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-3 border-t border-line bg-white p-4">
@@ -701,8 +828,8 @@ export function ListingFilterBar({
                                     type="submit"
                                     className={`h-12 flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] bg-red px-5 text-sm font-semibold text-white hover:bg-red-hover cursor-pointer ${FOCUS_RING}`}
                                 >
-                                    <Search className="h-4 w-4" aria-hidden="true" />
-                                    {loading ? 'Search' : `Show ${resultCount.toLocaleString('en-IN')} results`}
+                                    <Search className="w-4 h-4" aria-hidden="true" />
+                                    <span>{loading ? 'Search' : `Show ${resultCount.toLocaleString('en-IN')} results`}</span>
                                 </button>
                             </div>
                         </form>
