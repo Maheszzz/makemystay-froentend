@@ -35,21 +35,27 @@ export default function HowWeVerify() {
     const faqLd = buildFaqPageSchema(VERIFY_FAQS);
 
     return (
-        <div className="min-h-screen bg-pdp-bg text-pdp-ink flex flex-col">
+        <div className="min-h-screen bg-page text-ink flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd id="how-verify-breadcrumb" data={breadcrumbLd} />
             <JsonLd id="how-verify-faq" data={faqLd} />
             <JsonLd id="how-verify-trust-signals" data={buildTrustSignalsSchema()} />
             <Navbar />
-            <main id="main-content" className="flex-grow pt-24 pb-16 lg:pb-20">
-                <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="bg-pdp-surface border border-pdp-border rounded-[var(--radius-pdp)] p-6 sm:p-10 md:p-12 prose-mms">
-                        <h1>How we verify listings</h1>
-                        <p className="prose-mms-lead">
-                            Every live listing should meet a <strong>minimum quality bar</strong> before we send traffic to
-                            it: accurate category (PG vs rent vs buy vs plot), honest photos, and pricing that is not
-                            misleading compared with similar inventory in the same neighbourhood.
+            <main id="main-content" className="flex-grow pt-16 sm:pt-20">
+                <section className="w-full bg-red-800 text-white py-12 md:py-20 border-b border-champagne/25">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <h1 className="font-serif-display text-[36px] md:text-[48px] leading-[1.1] font-normal tracking-[-0.015em] text-white">
+                            How we verify listings
+                        </h1>
+                        <div className="w-12 h-[1px] bg-champagne mt-3 mb-4" aria-hidden="true" />
+                        <p className="text-[17px] leading-[1.6] text-red-subtitle max-w-[60ch]">
+                            Every live listing should meet a minimum quality bar before we send traffic to
+                            it: accurate category, honest photos, and pricing that aligns with neighbourhood reality.
                         </p>
+                    </div>
+                </section>
+                <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
+                    <div className="bg-white border border-line rounded-[var(--radius-pdp)] p-6 sm:p-10 md:p-12 prose-mms">
                         <h2>What our process covers</h2>
                         <ol>
                             <li>

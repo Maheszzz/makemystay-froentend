@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
     Calendar,
+    Check,
     CheckCircle2,
     ChevronLeft,
     ChevronRight,
@@ -310,19 +311,19 @@ export function PropertyBookingCard({
             aria-label="Booking and enquiry"
             className="bg-white border border-line rounded-[var(--radius-pdp)] overflow-hidden"
         >
-            {/* Oxblood-900 Header Strip with White Newsreader Price */}
-            <div className="bg-oxblood-900 px-6 py-5 border-b border-champagne/30">
-                <p className="pdp-type-caption text-blush-muted mb-1">{priceContextLabel}</p>
+            {/* Brand Gradient + Pattern Header Strip with White Newsreader Price */}
+            <div className="bg-brand-band px-6 py-5 border-b border-champagne/30">
+                <p className="pdp-type-caption text-red-subtitle mb-1">{priceContextLabel}</p>
                 <div className="flex items-baseline gap-1.5 flex-wrap">
                     <span className="font-serif-display text-3xl font-normal text-white tracking-tight tabular-nums leading-none">
                         {property.price || 'Price on request'}
                     </span>
                     {isMonthly && hasNumericPrice && (
-                        <span className="pdp-type-body text-blush-muted">/month</span>
+                        <span className="pdp-type-body text-red-subtitle">/month</span>
                     )}
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 pdp-type-caption">
-                    <span className="text-blush-muted">Security deposit</span>
+                    <span className="text-red-subtitle">Security deposit</span>
                     {depositDisplay ? (
                         <span className="font-medium text-white text-right tabular-nums">
                             {depositDisplay}
@@ -332,7 +333,7 @@ export function PropertyBookingCard({
                             href={depositWhatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-white underline decoration-champagne underline-offset-4 hover:text-blush-100 text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                            className="font-medium text-white underline decoration-champagne underline-offset-4 hover:text-blush-100 text-right transition-colors rounded"
                         >
                             Ask for deposit details
                         </a>
@@ -438,13 +439,14 @@ export function PropertyBookingCard({
                                                     onVisitDateChange(selected ? '' : chip.key);
                                                     setCalendarOpen(false);
                                                 }}
-                                                className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 cursor-pointer ${
+                                                className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                                                     selected
                                                         ? 'bg-blush-100 text-red border-red font-semibold'
                                                         : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
                                                 }`}
                                             >
-                                                {chip.label}
+                                                {selected && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                                <span>{chip.label}</span>
                                             </button>
                                         );
                                     })
@@ -587,7 +589,7 @@ export function PropertyBookingCard({
                                             onClick={() =>
                                                 onVisitTimeChange(selected ? '' : slot.label)
                                             }
-                                            className={`min-h-[44px] px-3 py-2 rounded-[10px] border pdp-type-caption transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
+                                            className={`min-h-[44px] px-3 py-2 rounded-[10px] border pdp-type-caption inline-flex items-center justify-center gap-1.5 transition-colors ${
                                                 isPastSlotToday
                                                     ? 'bg-page text-slate/50 border-line line-through cursor-not-allowed font-normal'
                                                     : selected
@@ -595,7 +597,8 @@ export function PropertyBookingCard({
                                                       : 'bg-white text-ink border-line font-medium hover:bg-blush-100 cursor-pointer'
                                             }`}
                                         >
-                                            {slot.label}
+                                            {selected && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                            <span>{slot.label}</span>
                                         </button>
                                     );
                                 })}

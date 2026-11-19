@@ -346,7 +346,7 @@ export default function PropertyDetails({
                 theme: {
                     color:
                         typeof window !== 'undefined'
-                            ? getComputedStyle(document.documentElement).getPropertyValue('--color-oxblood-900').trim()
+                            ? getComputedStyle(document.documentElement).getPropertyValue('--color-red').trim()
                             : undefined,
                 },
                 modal: { ondismiss: () => setIsPaymentProcessing(false) },
@@ -1226,11 +1226,11 @@ export default function PropertyDetails({
                         </div>
                     </div>
 
-                    {/* Single Contrast Band: Location & Nearby Places (oxblood-900 + champagne hairline) */}
+                    {/* Dark Contrast Band: Location & Nearby Places (red-800 + champagne hairline) */}
                     {hasLocationData && (
                         <section
                             id="pdp-location"
-                            className="w-full bg-oxblood-900 text-white py-10 lg:py-20 mt-4 scroll-mt-28 border-t border-champagne/30"
+                            className="w-full bg-red-800 text-white py-10 lg:py-20 mt-4 scroll-mt-28 border-t border-champagne/30"
                             aria-labelledby="pdp-location-heading"
                         >
                             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -1244,7 +1244,7 @@ export default function PropertyDetails({
                                         </h2>
                                         <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-2.5" />
                                         {hasValidLocation && (
-                                            <p className="pdp-type-caption text-blush-muted mt-1">
+                                            <p className="pdp-type-caption text-red-subtitle mt-1">
                                                 {property.location}
                                                 {property.city ? `, ${property.city}` : ''}
                                             </p>

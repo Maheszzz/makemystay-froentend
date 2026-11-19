@@ -56,10 +56,10 @@ export function PropertyDetailsSkeleton() {
                     {/* Sticky Booking Card Skeleton */}
                     <div className="hidden lg:block lg:col-span-5 xl:col-span-4">
                         <div className="h-[490px] rounded-[var(--radius-pdp)] border border-line bg-white overflow-hidden">
-                            <div className="p-6 bg-oxblood-900 space-y-3">
-                                <div className="h-4 w-24 rounded bg-oxblood-700 animate-pulse" />
-                                <div className="h-9 w-36 rounded bg-oxblood-700 animate-pulse" />
-                                <div className="h-4 w-full rounded bg-oxblood-700 animate-pulse mt-3" />
+                            <div className="p-6 bg-red-800 space-y-3">
+                                <div className="h-4 w-24 rounded bg-red-900/70 animate-pulse" />
+                                <div className="h-9 w-36 rounded bg-red-900/70 animate-pulse" />
+                                <div className="h-4 w-full rounded bg-red-900/70 animate-pulse mt-3" />
                             </div>
                             <div className="p-6 space-y-6">
                                 <div className="space-y-3">
