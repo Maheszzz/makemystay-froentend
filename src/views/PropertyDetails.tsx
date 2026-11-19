@@ -500,9 +500,21 @@ export default function PropertyDetails({
             icon: Bath,
         });
     }
-    if (typeof property.area === 'number' && property.area > 0) {
+    const areaSqft = (() => {
+        if (typeof property.area === 'number' && Number.isFinite(property.area) && property.area > 0) {
+            return property.area;
+        }
+        const parsedArea = Number(property.area);
+        if (Number.isFinite(parsedArea) && parsedArea > 0) return parsedArea;
+        if (typeof property.sqft === 'string' && /^\d+/.test(property.sqft.trim())) {
+            const fromSqft = parseFloat(property.sqft.trim());
+            if (Number.isFinite(fromSqft) && fromSqft > 0) return fromSqft;
+        }
+        return null;
+    })();
+    if (areaSqft !== null) {
         keyFacts.push({
-            label: `${property.area.toLocaleString('en-IN')} sq ft`,
+            label: `${areaSqft.toLocaleString('en-IN')} sq ft`,
             icon: Maximize2,
         });
     }
@@ -536,7 +548,7 @@ export default function PropertyDetails({
               ? `${property.units_remaining} ${property.units_remaining === 1 ? 'unit' : 'units'} available`
               : 'Available';
 
-    const depositDisplay = (() => {
+    const depositDisplay: string | null = (() => {
         if (
             property.deposit_amount !== null &&
             property.deposit_amount !== undefined &&
@@ -546,7 +558,7 @@ export default function PropertyDetails({
                 ? `₹${property.deposit_amount.toLocaleString('en-IN')}`
                 : String(property.deposit_amount);
         }
-        return 'Ask for deposit details';
+        return null;
     })();
 
     const hasPolicyDetails =
@@ -596,8 +608,8 @@ export default function PropertyDetails({
         mapQueryTarget,
     )}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
 
-    // Highlights row (3-4 items derived from real features; hide if fewer than 2 qualify)
-    const highlights = (() => {
+    // Highlights row (3-4 items derived from real features with optional real detail; hide if fewer than 2 qualify)
+    const highlights: { label: string; key: string; detail?: string }[] = (() => {
         if (displayFeatures.length < 2) return [];
         const priorityPatterns = [
             /wifi|wi fi|internet|broadband/,
@@ -613,7 +625,19 @@ export default function PropertyDetails({
             /geyser/,
             /gym/,
         ];
-        const picked: string[] = [];
+
+        const deriveRealDetail = (key: string): string | undefined => {
+            if (/food|meal|cafeteria/.test(key) && typeof property.food_menu === 'string') {
+                const snippet = property.food_menu.trim();
+                if (snippet && snippet.length <= 64) return snippet;
+            }
+            if (/furniture|furnished/.test(key) && furnishingLabel) {
+                return furnishingLabel;
+            }
+            return undefined;
+        };
+
+        const picked: { label: string; key: string; detail?: string }[] = [];
         const usedKeys = new Set<string>();
 
         for (const pattern of priorityPatterns) {
@@ -623,16 +647,17 @@ export default function PropertyDetails({
                 return !usedKeys.has(k) && pattern.test(k);
             });
             if (match) {
-                usedKeys.add(normalizeFeatureKey(match));
-                picked.push(match);
+                const key = normalizeFeatureKey(match);
+                usedKeys.add(key);
+                picked.push({ label: match, key, detail: deriveRealDetail(key) });
             }
         }
         for (const feat of displayFeatures) {
             if (picked.length >= 4) break;
-            const k = normalizeFeatureKey(feat);
-            if (!usedKeys.has(k)) {
-                usedKeys.add(k);
-                picked.push(feat);
+            const key = normalizeFeatureKey(feat);
+            if (!usedKeys.has(key)) {
+                usedKeys.add(key);
+                picked.push({ label: feat, key, detail: deriveRealDetail(key) });
             }
         }
         return picked.length >= 2 ? picked : [];
@@ -764,18 +789,20 @@ export default function PropertyDetails({
                                 {/* Overview Block */}
                                 <div id="pdp-overview" className="scroll-mt-28">
                                     {/* Gallery */}
-                                    <PropertyGallery
-                                        images={galleryImages}
-                                        title={displayTitle || property.title}
-                                        location={property.location || 'Bangalore'}
-                                    />
+                                    <div id="pdp-gallery">
+                                        <PropertyGallery
+                                            images={galleryImages}
+                                            title={displayTitle || property.title}
+                                            location={property.location || 'Bangalore'}
+                                        />
+                                    </div>
 
                                     {/* Title, Area & Verification Line */}
                                     <header className="pt-8 pb-8 border-b border-pdp-border">
                                         <h1
                                             data-seo="pdp-h1"
                                             title={displayTitle || property.title}
-                                            className="pdp-type-title font-serif-display font-normal text-[36px] sm:text-[44px] lg:text-[48px] leading-[1.1] tracking-[-0.01em] text-pdp-ink line-clamp-2 break-words"
+                                            className="pdp-type-title font-serif-display font-normal text-pdp-ink line-clamp-2 break-words"
                                         >
                                             {displayTitle || property.title}
                                         </h1>
@@ -793,7 +820,17 @@ export default function PropertyDetails({
                                                     Verified by our team on {lastVerifiedLabel}
                                                 </span>
                                             )}
-                                            <span className="text-pdp-muted">{availabilityText}</span>
+                                            {property.is_available !== false ? (
+                                                <span className="inline-flex items-center gap-2 font-medium text-pdp-ink">
+                                                    <span
+                                                        aria-hidden="true"
+                                                        className="w-2 h-2 rounded-full bg-pdp-verified shrink-0"
+                                                    />
+                                                    <span>{availabilityText}</span>
+                                                </span>
+                                            ) : (
+                                                <span className="text-pdp-muted">{availabilityText}</span>
+                                            )}
                                         </div>
                                     </header>
 
@@ -803,15 +840,15 @@ export default function PropertyDetails({
                                             aria-label="Key property facts"
                                             className="py-6 border-b border-pdp-border"
                                         >
-                                            <ul className="flex flex-wrap gap-x-6 gap-y-3">
+                                            <ul className="flex flex-wrap gap-x-8 gap-y-4">
                                                 {keyFacts.map((fact) => {
                                                     const Icon = fact.icon;
                                                     return (
                                                         <li
                                                             key={fact.label}
-                                                            className="inline-flex items-center gap-2 pdp-type-body text-pdp-ink"
+                                                            className="inline-flex items-center gap-2.5 text-base font-medium text-pdp-ink"
                                                         >
-                                                            <Icon className="w-4 h-4 text-pdp-muted shrink-0" aria-hidden />
+                                                            <Icon className="w-5 h-5 text-pdp-muted shrink-0" aria-hidden />
                                                             <span>{fact.label}</span>
                                                         </li>
                                                     );
@@ -820,30 +857,39 @@ export default function PropertyDetails({
                                         </section>
                                     )}
 
-                                    {/* Highlights Row (3-4 items derived from real features; hidden if < 2) */}
+                                    {/* Highlights Row (2x2 desktop / 1-col mobile, soft circle icon, wrapping text, hidden if < 2) */}
                                     {highlights.length >= 2 && (
                                         <section
                                             aria-label="Property highlights"
-                                            className="py-8 border-b border-pdp-border"
+                                            className="py-10 lg:py-12 border-b border-pdp-border"
                                         >
-                                            <h2 className="pdp-type-caption font-medium text-pdp-muted mb-4">
+                                            <h2 className="pdp-type-heading text-pdp-ink mb-6">
                                                 Highlights
                                             </h2>
-                                            <ul className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                                {highlights.map((item) => {
-                                                    const key = normalizeFeatureKey(item);
-                                                    return (
-                                                        <li
-                                                            key={key}
-                                                            className="flex items-center gap-3 rounded-[10px] border border-pdp-border bg-pdp-surface px-4 py-3 pdp-type-caption font-medium text-pdp-ink"
+                                            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                                {highlights.map((item) => (
+                                                    <li
+                                                        key={item.key}
+                                                        className="flex items-start gap-4"
+                                                    >
+                                                        <span
+                                                            className="w-10 h-10 rounded-full bg-pdp-surface border border-pdp-border flex items-center justify-center shrink-0 text-pdp-ink mt-0.5"
+                                                            aria-hidden
                                                         >
-                                                            <span className="text-pdp-muted shrink-0" aria-hidden>
-                                                                {getAmenityIcon(key)}
-                                                            </span>
-                                                            <span className="truncate">{item}</span>
-                                                        </li>
-                                                    );
-                                                })}
+                                                            {getAmenityIcon(item.key)}
+                                                        </span>
+                                                        <div className="min-w-0">
+                                                            <p className="text-base font-semibold text-pdp-ink leading-snug">
+                                                                {item.label}
+                                                            </p>
+                                                            {item.detail && (
+                                                                <p className="mt-1 pdp-type-caption text-pdp-muted">
+                                                                    {item.detail}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </li>
+                                                ))}
                                             </ul>
                                         </section>
                                     )}
@@ -873,12 +919,12 @@ export default function PropertyDetails({
                                     {/* About (property.description only; hidden if empty) */}
                                     {aboutNarrative.length > 0 && (
                                         <section className="py-10 lg:py-16 border-b border-pdp-border">
-                                            <h2 className="pdp-type-heading text-pdp-ink mb-4">
+                                            <h2 className="pdp-type-heading text-pdp-ink mb-6">
                                                 About this property
                                             </h2>
                                             <div
                                                 data-seo="pdp-about"
-                                                className={`max-w-[70ch] pdp-type-body text-pdp-ink space-y-4 ${
+                                                className={`prose-mms ${
                                                     !aboutExpanded && showAboutToggle ? 'max-h-[260px] overflow-hidden' : ''
                                                 }`}
                                             >
@@ -892,7 +938,7 @@ export default function PropertyDetails({
                                                 <button
                                                     type="button"
                                                     onClick={() => setAboutExpanded((v) => !v)}
-                                                    className="mt-4 min-h-[44px] inline-flex items-center pdp-type-caption font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded cursor-pointer"
+                                                    className="mt-4 min-h-[44px] inline-flex items-center pdp-type-caption font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-cta focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded cursor-pointer"
                                                 >
                                                     {aboutExpanded ? 'Show less' : 'Read full description'}
                                                 </button>
@@ -1082,10 +1128,10 @@ export default function PropertyDetails({
                                 {/* Backend-authored detailed narrative (only if API provides seo_about) */}
                                 {longSeo && longSeo.length > 80 && (
                                     <section className="py-10 lg:py-16">
-                                        <h2 className="pdp-type-heading text-pdp-ink mb-4">
+                                        <h2 className="pdp-type-heading text-pdp-ink mb-6">
                                             Additional details
                                         </h2>
-                                        <div className="max-w-[70ch] pdp-type-body text-pdp-ink space-y-4">
+                                        <div className="prose-mms">
                                             {longSeo
                                                 .replace(/\\(#{1,6})/g, '$1')
                                                 .split(/\n\n+/)
@@ -1095,7 +1141,7 @@ export default function PropertyDetails({
                                                         const firstNewline = trimmed.indexOf('\n');
                                                         if (firstNewline === -1) {
                                                             return (
-                                                                <h3 key={bi} className="text-lg font-semibold text-pdp-ink pt-2">
+                                                                <h3 key={bi}>
                                                                     {trimmed.replace(/^#{1,6}\s+/, '')}
                                                                 </h3>
                                                             );
@@ -1105,21 +1151,19 @@ export default function PropertyDetails({
                                                             .replace(/^#{1,6}\s+/, '');
                                                         const restText = trimmed.slice(firstNewline + 1).trim();
                                                         return (
-                                                            <div key={bi} className="space-y-2">
-                                                                <h3 className="text-lg font-semibold text-pdp-ink pt-2">
-                                                                    {headingText}
-                                                                </h3>
+                                                            <Fragment key={bi}>
+                                                                <h3>{headingText}</h3>
                                                                 {restText && (
                                                                     <p className="whitespace-pre-line">{restText}</p>
                                                                 )}
-                                                            </div>
+                                                            </Fragment>
                                                         );
                                                     }
 
                                                     const renderBold = (text: string) =>
                                                         text.split(/(\*\*.*?\*\*)/g).map((part, i) =>
                                                             part.startsWith('**') && part.endsWith('**') ? (
-                                                                <strong key={i} className="font-semibold">
+                                                                <strong key={i}>
                                                                     {part.slice(2, -2)}
                                                                 </strong>
                                                             ) : (
@@ -1129,7 +1173,7 @@ export default function PropertyDetails({
 
                                                     if (trimmed.startsWith('- ')) {
                                                         return (
-                                                            <ul key={bi} className="list-disc pl-5 space-y-1.5">
+                                                            <ul key={bi}>
                                                                 {trimmed
                                                                     .split('\n')
                                                                     .filter(Boolean)

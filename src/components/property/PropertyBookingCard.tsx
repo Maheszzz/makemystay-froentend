@@ -9,7 +9,7 @@ import {
     Info,
     MessageCircle,
 } from 'lucide-react';
-import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
+import { buildDepositWhatsappUrl, buildPropertyWhatsappUrl } from '@/lib/whatsapp';
 import type { Property } from '@/types/api';
 
 const VISIT_TIME_SLOTS = [
@@ -72,7 +72,7 @@ interface PropertyBookingCardProps {
     canonicalPath: string;
     isMonthly: boolean;
     hasNumericPrice: boolean;
-    depositDisplay: string;
+    depositDisplay: string | null;
     sharingRows: SharingPriceRow[];
     visitDate: string;
     onVisitDateChange: (value: string) => void;
@@ -265,6 +265,16 @@ export function PropertyBookingCard({
         [displayTitle, property.title, property.location, canonicalPath, visitSummary],
     );
 
+    const depositWhatsappHref = useMemo(
+        () =>
+            buildDepositWhatsappUrl(
+                displayTitle || property.title,
+                property.location || 'Bangalore',
+                canonicalPath,
+            ),
+        [displayTitle, property.title, property.location, canonicalPath],
+    );
+
     const priceContextLabel =
         property.category === 'buy'
             ? 'Sale price'
@@ -313,9 +323,20 @@ export function PropertyBookingCard({
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 pdp-type-caption">
                     <span className="text-pdp-muted">Security deposit</span>
-                    <span className="font-medium text-pdp-ink text-right tabular-nums">
-                        {depositDisplay}
-                    </span>
+                    {depositDisplay ? (
+                        <span className="font-medium text-pdp-ink text-right tabular-nums">
+                            {depositDisplay}
+                        </span>
+                    ) : (
+                        <a
+                            href={depositWhatsappHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-cta text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded"
+                        >
+                            Ask for deposit details
+                        </a>
+                    )}
                 </div>
             </div>
 

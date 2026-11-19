@@ -27,3 +27,20 @@ export function buildPropertyWhatsappUrl(
     const text = `Hi, I'm interested in ${propertyTitle} in ${location}${linkPart}.${visitPart} Please share availability and visit details.`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 }
+
+export function buildDepositWhatsappUrl(
+    propertyTitle: string,
+    location: string,
+    propertyPath?: string,
+): string {
+    const phone = getWhatsappDigits();
+    const cleanProductionBase = SITE_URL.replace(/\/$/, '');
+    const listingUrl = propertyPath
+        ? propertyPath.startsWith('http')
+            ? propertyPath
+            : `${cleanProductionBase}${propertyPath.startsWith('/') ? '' : '/'}${propertyPath}`
+        : '';
+    const linkPart = listingUrl ? ` (${listingUrl})` : '';
+    const text = `Hi, could you share the security deposit details for ${propertyTitle} in ${location}${linkPart}?`;
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+}

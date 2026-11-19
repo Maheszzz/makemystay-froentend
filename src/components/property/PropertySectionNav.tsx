@@ -9,10 +9,16 @@ export interface PdpSectionNavItem {
 
 interface PropertySectionNavProps {
     sections: PdpSectionNavItem[];
+    /** Show sticky section bar only after this gallery element leaves the viewport. */
+    galleryId?: string;
 }
 
-export function PropertySectionNav({ sections }: PropertySectionNavProps) {
+export function PropertySectionNav({
+    sections,
+    galleryId = 'pdp-gallery',
+}: PropertySectionNavProps) {
     const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? '');
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         if (sections.length === 0) return;
@@ -20,6 +26,28 @@ export function PropertySectionNav({ sections }: PropertySectionNavProps) {
             sections.some((s) => s.id === prev) ? prev : sections[0].id,
         );
     }, [sections]);
+
+    // Reveal section nav only after the gallery leaves the top of the viewport
+    useEffect(() => {
+        if (typeof IntersectionObserver === 'undefined') return;
+        const galleryEl = document.getElementById(galleryId);
+        if (!galleryEl) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                const pastGallery =
+                    !entry.isIntersecting && entry.boundingClientRect.top < 64;
+                setIsVisible(pastGallery);
+            },
+            {
+                rootMargin: '-48px 0px 0px 0px',
+                threshold: 0,
+            },
+        );
+
+        observer.observe(galleryEl);
+        return () => observer.disconnect();
+    }, [galleryId]);
 
     useEffect(() => {
         if (sections.length === 0 || typeof IntersectionObserver === 'undefined') {
@@ -57,7 +85,7 @@ export function PropertySectionNav({ sections }: PropertySectionNavProps) {
         return () => observer.disconnect();
     }, [sections]);
 
-    if (sections.length <= 1) {
+    if (sections.length <= 1 || !isVisible) {
         return null;
     }
 
@@ -77,7 +105,7 @@ export function PropertySectionNav({ sections }: PropertySectionNavProps) {
     return (
         <nav
             aria-label="Property sections"
-            className="sticky top-[44px] sm:top-[48px] z-30 bg-pdp-bg/95 backdrop-blur-md border-b border-pdp-border"
+            className="fixed top-[45px] sm:top-[49px] inset-x-0 z-40 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border shadow-[0_2px_8px_rgba(22,24,29,0.04)]"
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <ul className="flex items-center gap-6 overflow-x-auto no-scrollbar">
@@ -91,7 +119,7 @@ export function PropertySectionNav({ sections }: PropertySectionNavProps) {
                                     onClick={() => handleSelect(section.id)}
                                     className={`relative min-h-[44px] py-3 pdp-type-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-sm cursor-pointer ${
                                         isActive
-                                            ? 'text-pdp-ink'
+                                            ? 'text-pdp-ink font-semibold'
                                             : 'text-pdp-muted hover:text-pdp-ink'
                                     }`}
                                 >
