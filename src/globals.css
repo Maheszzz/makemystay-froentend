@@ -67,6 +67,28 @@
         background-image: var(--gradient-brand);
     }
 
+    /* Listing hero: deep red opaque on the left, fading to the photo by ~65% (no wash-out overlays) */
+    .listing-hero-overlay {
+        background: linear-gradient(
+            90deg,
+            var(--color-hero-deep) 0%,
+            var(--color-hero-deep) 28%,
+            color-mix(in srgb, var(--color-hero-deep) 55%, transparent) 46%,
+            transparent 65%
+        );
+    }
+
+    /* Mobile: text spans the full width, so a gentler but still AA-safe veil over a shorter crop */
+    @media (max-width: 767px) {
+        .listing-hero-overlay {
+            background: linear-gradient(
+                90deg,
+                color-mix(in srgb, var(--color-hero-deep) 94%, transparent) 0%,
+                color-mix(in srgb, var(--color-hero-deep) 78%, transparent) 100%
+            );
+        }
+    }
+
     .glass-panel {
         @apply bg-white border border-line shadow-card;
     }
