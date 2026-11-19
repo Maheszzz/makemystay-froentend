@@ -1,6 +1,5 @@
 'use server';
 
-import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -25,7 +24,6 @@ import { PlaceSchema } from '@/components/seo/PlaceSchema';
 import RelatedLocalities from '@/components/RelatedLocalities';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
-import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { LocalityAuthoritySections } from '@/components/seo/LocalityAuthoritySections';
 import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHub';
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
@@ -88,61 +86,36 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
         <Navbar />
         <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-          {/* Hero Banner */}
-          <header className="bg-brand-band">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
-              <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div className="max-w-2xl">
-                  <h1 className="type-h1 text-white">
-                    {localitySeoProfile.hero.heading}
-                  </h1>
-                  <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                  <p className="text-red-subtitle text-base leading-relaxed">
-                    {localitySeoProfile.hero.subHeading}
-                  </p>
-                </div>
+          {/* Interactive listing hero, filter card, popular areas & results (seeded with SSR properties) */}
+          <Properties
+            hideChrome
+            initialCategory="pg"
+            initialCity={localitySeoProfile.locality.name}
+            pageTitle={localitySeoProfile.hero.heading}
+            pageSubtitle={localitySeoProfile.hero.subHeading}
+            initialProperties={initialProperties}
+            hero={{
+              breadcrumbs: localitySeoProfile.breadcrumb,
+              title: localitySeoProfile.hero.heading,
+              subtitle: localitySeoProfile.hero.subHeading,
+              extra: (
                 <Link
                   to="/pg/bangalore"
-                  className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-white hover:underline underline-offset-4"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:underline underline-offset-4"
                 >
-                  <MapPin className="w-4 h-4 text-champagne" />
+                  <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
                   All Bangalore PGs
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 shrink-0" aria-hidden="true" />
                 </Link>
-              </div>
-              <div className="mt-5 max-w-2xl">
-                <QuickAnswer locationName={localitySeoProfile.locality.name}>
-                  {localitySeoProfile.quickAnswer}
-                </QuickAnswer>
-              </div>
-            </div>
-          </header>
-
-          {/* Initial Property Cards rendered on the server for SEO */}
-          {initialProperties.length > 0 && (
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {initialProperties.map((property, idx) => (
-                  <PropertyCard key={property.id} property={property} priority={idx === 0} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Client-side interactive listing component */}
-          <div className="mt-4">
-            <Properties
-              hideChrome
-              initialCategory="pg"
-              initialCity={localitySeoProfile.locality.name}
-              pageTitle={localitySeoProfile.hero.heading}
-              pageSubtitle={localitySeoProfile.hero.subHeading}
-            />
-          </div>
+              ),
+            }}
+          />
 
           {/* Comprehensive Locality SEO Engine sections */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
+            <QuickAnswer locationName={localitySeoProfile.locality.name}>
+              {localitySeoProfile.quickAnswer}
+            </QuickAnswer>
             <LocalitySeoProfileSections profile={localitySeoProfile} />
 
             <FaqSection
@@ -192,8 +165,8 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
   const isEmptyLocality = initialProperties.length === 0;
 
-  const pageTitle = `PG in ${name}`;
-  const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
+  const pageTitle = `PGs in ${name}`;
+  const pageSubtitle = `PGs and coliving stays in ${name} — filter by budget, meals, and gender.`;
 
   return (
     <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
@@ -207,59 +180,37 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
       <Navbar />
       <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-        {/* Hero Banner */}
-        <header className="bg-brand-band">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
-            <BreadcrumbNav items={breadcrumbItems} />
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <div className="max-w-2xl">
-                <h1 className="type-h1 text-white">
-                  PGs in {name}
-                </h1>
-                <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                <p className="text-red-subtitle text-base leading-relaxed">
-                  PGs and coliving stays in {name}, with price and last-verified date on every card.
-                </p>
-                <div className="mt-5 max-w-2xl">
-                  <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
-                </div>
-              </div>
+        <Properties
+          hideChrome
+          initialCategory="pg"
+          initialCity={name}
+          pageTitle={pageTitle}
+          pageSubtitle={pageSubtitle}
+          initialProperties={initialProperties}
+          hero={{
+            breadcrumbs: [
+              { name: 'Home', path: '/' },
+              { name: 'PG', path: '/pg' },
+              { name: `PGs in ${name}` },
+            ],
+            title: pageTitle,
+            subtitle: pageSubtitle,
+            extra: (
               <Link
                 to="/pg/bangalore"
-                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-white hover:underline underline-offset-4"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:underline underline-offset-4"
               >
-                <MapPin className="w-4 h-4 text-champagne" />
+                <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
                 All Bangalore PGs
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 shrink-0" aria-hidden="true" />
               </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* Initial Property Cards rendered on the server for SEO */}
-        {initialProperties.length > 0 && (
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {initialProperties.map((property, idx) => (
-                <PropertyCard key={property.id} property={property} priority={idx === 0} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Client‑side interactive listing component */}
-        <div className="mt-4">
-          <Properties
-            hideChrome
-            initialCategory="pg"
-            initialCity={name}
-            pageTitle={pageTitle}
-            pageSubtitle={pageSubtitle}
-          />
-        </div>
+            ),
+          }}
+        />
 
         {/* Additional locality sections */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
+          <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
           <section className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
             <PgLocationDeepContent name={name} profile={profile} />
           </section>

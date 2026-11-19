@@ -4,7 +4,6 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { buildPageSEO, buyBangaloreHubSeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
@@ -49,36 +48,22 @@ export default function BuyBangaloreHub() {
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-brand-band">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
-                        <BreadcrumbNav
-                            items={[
-                                { name: 'Home', path: '/' },
-                                { name: 'Buy', path: '/buy' },
-                                { name: 'Homes to buy in Bangalore' },
-                            ]}
-                        />
-                        <div className="mt-4 max-w-3xl">
-                            <h1 className="type-h1 text-white">
-                                {PAGE_TITLE}
-                            </h1>
-                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                            <p className="text-red-subtitle text-base md:text-lg leading-relaxed max-w-2xl">
-                                Residential flats and homes for sale in Bangalore, with price and last-verified date on every card.
-                            </p>
-                        </div>
-                    </div>
-                </header>
-
-                <div>
-                    <Properties
-                        hideChrome
-                        initialCategory="buy"
-                        initialCity="bangalore"
-                        pageTitle={PAGE_TITLE}
-                        pageSubtitle={PAGE_SUBTITLE}
-                    />
-                </div>
+                <Properties
+                    hideChrome
+                    initialCategory="buy"
+                    initialCity="bangalore"
+                    pageTitle={PAGE_TITLE}
+                    pageSubtitle={PAGE_SUBTITLE}
+                    hero={{
+                        breadcrumbs: [
+                            { name: 'Home', path: '/' },
+                            { name: 'Buy', path: '/buy' },
+                            { name: PAGE_TITLE },
+                        ],
+                        title: PAGE_TITLE,
+                        subtitle: PAGE_SUBTITLE,
+                    }}
+                />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-20">
                     <FaqSection

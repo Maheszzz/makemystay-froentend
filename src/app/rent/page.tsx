@@ -41,7 +41,7 @@ export default async function Page() {
             initialCategory="rent"
             initialCity="Bangalore"
             pageTitle="Flats for rent in Bangalore"
-            pageSubtitle="Flats and independent homes for rent in Bangalore, with price and last-verified date on every card."
+            pageSubtitle="Flats and independent homes for rent across Bangalore — filter by area, BHK, and budget."
             initialProperties={fallbackRes.items}
             initialTotalCount={fallbackRes.total}
             initialPropertyCounts={fallbackRes.propertyCounts}

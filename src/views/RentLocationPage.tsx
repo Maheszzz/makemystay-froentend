@@ -7,7 +7,6 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import locJson from '@/data/pg-locations.json';
@@ -73,47 +72,33 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-brand-band">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
-                        <BreadcrumbNav
-                            items={[
-                                { name: 'Home', path: '/' },
-                                { name: 'Flats', path: '/rent/bangalore' },
-                                { name: `Flats for rent in ${name}` },
-                            ]}
-                        />
-                        <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                            <div className="max-w-2xl">
-                                <h1 className="type-h1 text-white">
-                                    Flats for rent in {name}
-                                </h1>
-                                <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                                <p className="text-red-subtitle text-base leading-relaxed">
-                                    Flats and independent homes for rent in {name}, with price and last-verified date on every card.
-                                </p>
-                            </div>
+                <Properties
+                    hideChrome
+                    initialCategory="rent"
+                    initialCity={name}
+                    pageTitle={`Flats for rent in ${name}`}
+                    pageSubtitle={`Flats and independent homes for rent in ${name} — filter by BHK and budget.`}
+                    hero={{
+                        breadcrumbs: [
+                            { name: 'Home', path: '/' },
+                            { name: 'Flats', path: '/rent/bangalore' },
+                            { name: `Flats for rent in ${name}` },
+                        ],
+                        title: `Flats for rent in ${name}`,
+                        subtitle: `Flats and independent homes for rent in ${name} — filter by BHK and budget.`,
+                        extra: (
                             <Link
                                 to={`/pg/${slug}`}
-                                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-white hover:underline underline-offset-4"
+                                className="inline-flex items-center gap-1.5 text-sm font-medium text-white hover:underline underline-offset-4"
                             >
-                                <Home className="w-4 h-4 text-champagne" aria-hidden />
+                                <Home className="w-4 h-4 shrink-0" aria-hidden="true" />
                                 PGs in {name}
-                                <ChevronRight className="w-4 h-4" aria-hidden />
+                                <ChevronRight className="w-4 h-4 shrink-0" aria-hidden="true" />
                             </Link>
-                        </div>
-                    </div>
-                </header>
-
-                <div>
-                    <Properties
-                        hideChrome
-                        initialCategory="rent"
-                        initialCity={name}
-                        pageTitle={`Flats for rent in ${name}`}
-                        pageSubtitle={`Flats & houses in ${name} — filter by BHK and budget.`}
-                        onDisplayedListingsForSeo={onDisplayedListingsForSeo}
-                    />
-                </div>
+                        ),
+                    }}
+                    onDisplayedListingsForSeo={onDisplayedListingsForSeo}
+                />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
                     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

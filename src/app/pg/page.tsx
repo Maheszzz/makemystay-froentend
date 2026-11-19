@@ -29,7 +29,7 @@ export default async function Page() {
             initialCategory="pg"
             initialCity="Bangalore"
             pageTitle="PGs in Bangalore"
-            pageSubtitle="PGs and coliving homes across Bangalore, with price and last-verified date on every card."
+            pageSubtitle="PGs and coliving homes across Bangalore — filter by area, budget, and amenities."
             initialProperties={initialProperties}
             initialTotalCount={total}
             initialPropertyCounts={propertyCounts}

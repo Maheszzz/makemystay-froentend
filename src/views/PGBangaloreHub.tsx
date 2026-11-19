@@ -7,7 +7,6 @@ import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { QuickAnswersBlock } from '@/components/seo/QuickAnswersBlock';
-import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { PG_LOCATIONS } from '@/data/pgLocations';
 import { buildPageSEO, pgBangaloreHubSeo } from '@/lib/seo';
@@ -93,39 +92,22 @@ export default function PGBangaloreHub() {
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                {/* ── Hero Header ── */}
-                <header className="bg-brand-band">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
-                        <BreadcrumbNav
-                            items={[
-                                { name: 'Home', path: '/' },
-                                { name: 'PG', path: '/pg' },
-                                { name: 'PGs in Bangalore' },
-                            ]}
-                        />
-                        <div className="mt-4 max-w-3xl">
-                            <h1 className="type-h1 text-white">
-                                PGs in Bangalore
-                            </h1>
-                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                            <p className="text-red-subtitle text-base md:text-lg leading-relaxed max-w-2xl">
-                                PGs and coliving homes across Bangalore, with price and last-verified date on every card.
-                            </p>
-                        </div>
-                    </div>
-                </header>
-
-                {/* ── PROPERTIES GRID (HIGH PRIORITY) ── */}
-                <div>
-                    <Properties
-                        hideChrome
-                        initialCategory="pg"
-                        initialCity="Bangalore"
-                        pageTitle="PGs in Bangalore"
-                        pageSubtitle="Paying guest stays and coliving spaces across Bangalore."
-                        onDisplayedListingsForSeo={onDisplayedListingsForSeo}
-                    />
-                </div>
+                <Properties
+                    hideChrome
+                    initialCategory="pg"
+                    initialCity="Bangalore"
+                    pageTitle="PGs in Bangalore"
+                    pageSubtitle="PGs and coliving homes across Bangalore — filter by area, budget, and amenities."
+                    hero={{
+                        breadcrumbs: [
+                            { name: 'Home', path: '/' },
+                            { name: 'PGs in Bangalore' },
+                        ],
+                        title: 'PGs in Bangalore',
+                        subtitle: 'PGs and coliving homes across Bangalore — filter by area, budget, and amenities.',
+                    }}
+                    onDisplayedListingsForSeo={onDisplayedListingsForSeo}
+                />
 
                 {/* ── SEO CONTENT & AREA GUIDES (BELOW THE FOLD) ── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 space-y-16">

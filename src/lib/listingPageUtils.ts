@@ -19,40 +19,52 @@ export function getListingHeaderCopy(category: ListingCategoryKey, cityLabel: st
         case 'pg':
             return {
                 title: `PGs in ${cityLabel}`,
-                subtitle: `PGs and coliving homes across ${cityLabel}, with price and last-verified date on every card.`,
+                subtitle: `PGs and coliving homes across ${cityLabel} — filter by area, budget, and amenities.`,
             };
         case 'rent':
             return {
                 title: `Flats for rent in ${cityLabel}`,
-                subtitle: `Flats and independent homes for rent in ${cityLabel}, with price and last-verified date on every card.`,
+                subtitle: `Flats and independent homes for rent across ${cityLabel} — filter by area, BHK, and budget.`,
             };
         case 'buy':
             return {
                 title: `Homes to buy in ${cityLabel}`,
-                subtitle: `Residential flats and homes for sale in ${cityLabel}, with price and last-verified date on every card.`,
+                subtitle: `Residential flats and homes for sale in ${cityLabel}, with transparent pricing.`,
             };
         case 'plot':
             return {
                 title: `Plots in ${cityLabel}`,
-                subtitle: `Residential land and plot listings across ${cityLabel}, with price and last-verified date on every card.`,
+                subtitle: `Residential land and plot listings across ${cityLabel}, with area and budget filters.`,
             };
         case 'all':
         default:
             return {
                 title: `Properties in ${cityLabel}`,
-                subtitle: `PGs, flats for rent, homes to buy, and plots across ${cityLabel}, with price and last-verified date on every card.`,
+                subtitle: `PGs, flats for rent, homes to buy, and plots across ${cityLabel}.`,
             };
     }
 }
 
-export function formatResultHeading(count: number, category: ListingCategoryKey, areaOrCity: string): string {
+export function formatResultHeadingParts(
+    count: number,
+    category: ListingCategoryKey,
+    areaOrCity: string,
+): { countText: string; restText: string } {
     const plural = count !== 1;
     let noun = plural ? 'properties' : 'property';
     if (category === 'pg') noun = plural ? 'PGs' : 'PG';
     else if (category === 'rent') noun = plural ? 'flats for rent' : 'flat for rent';
     else if (category === 'buy') noun = plural ? 'homes to buy' : 'home to buy';
     else if (category === 'plot') noun = plural ? 'plots' : 'plot';
-    return `${count.toLocaleString('en-IN')} ${noun} in ${areaOrCity}`;
+    return {
+        countText: count.toLocaleString('en-IN'),
+        restText: `${noun} in ${areaOrCity}`,
+    };
+}
+
+export function formatResultHeading(count: number, category: ListingCategoryKey, areaOrCity: string): string {
+    const { countText, restText } = formatResultHeadingParts(count, category, areaOrCity);
+    return `${countText} ${restText}`;
 }
 
 export function parsePropertyPriceInr(priceStr?: string): number | null {

@@ -8,5 +8,5 @@ export const metadata: Metadata = pageSeoToMetadata(plotBangaloreHubSeo());
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
-  return <Properties key="plots" initialCategory="plot" initialCity="Bangalore" pageTitle="Plots in Bangalore" pageSubtitle="Residential land and plot listings across Bangalore, with price and last-verified date on every card." />;
+  return <Properties key="plots" initialCategory="plot" initialCity="Bangalore" pageTitle="Plots in Bangalore" pageSubtitle="Residential land and plot listings across Bangalore, with area and budget filters." />;
 }

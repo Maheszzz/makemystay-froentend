@@ -5,7 +5,6 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { buildPageSEO, plotBangaloreHubSeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
@@ -50,6 +49,10 @@ export default function PlotBangaloreHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
+    const subtitleWithRange = sqftRange
+        ? `${PAGE_SUBTITLE} (${formatSqftRange(sqftRange.min, sqftRange.max)})`
+        : PAGE_SUBTITLE;
+
     return (
         <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
@@ -57,43 +60,24 @@ export default function PlotBangaloreHub() {
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-brand-band">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
-                        <BreadcrumbNav
-                            items={[
-                                { name: 'Home', path: '/' },
-                                { name: 'Plots', path: '/plots' },
-                                { name: 'Plots in Bangalore' },
-                            ]}
-                        />
-                        <div className="mt-4 max-w-3xl">
-                            <h1 className="type-h1 text-white">
-                                {PAGE_TITLE}
-                            </h1>
-                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                            <p className="text-red-subtitle text-base md:text-lg leading-relaxed max-w-2xl">
-                                Residential land and plot listings across Bangalore, with price and last-verified date on every card.
-                                {sqftRange ? (
-                                    <span className="ml-2 text-white font-medium tabular-nums">
-                                        ({formatSqftRange(sqftRange.min, sqftRange.max)})
-                                    </span>
-                                ) : null}
-                            </p>
-                        </div>
-                    </div>
-                </header>
-
-                <div>
-                    <Properties
-                        hideChrome
-                        embedPlotHubUi
-                        initialCategory="plot"
-                        initialCity="bangalore"
-                        pageTitle={PAGE_TITLE}
-                        pageSubtitle={PAGE_SUBTITLE}
-                        onPlotHubInventoryRange={onPlotHubInventoryRange}
-                    />
-                </div>
+                <Properties
+                    hideChrome
+                    embedPlotHubUi
+                    initialCategory="plot"
+                    initialCity="bangalore"
+                    pageTitle={PAGE_TITLE}
+                    pageSubtitle={subtitleWithRange}
+                    hero={{
+                        breadcrumbs: [
+                            { name: 'Home', path: '/' },
+                            { name: 'Plots', path: '/plots' },
+                            { name: PAGE_TITLE },
+                        ],
+                        title: PAGE_TITLE,
+                        subtitle: subtitleWithRange,
+                    }}
+                    onPlotHubInventoryRange={onPlotHubInventoryRange}
+                />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-20">
                     <FaqSection
