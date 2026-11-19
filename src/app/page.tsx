@@ -83,7 +83,7 @@ export default async function HomePage() {
                 ? Number((ratingWeightedSum / verifiedReviewCount).toFixed(1))
                 : null,
         cityCounts: {
-            bangalore: bangalorePgTotal > 0 ? bangalorePgTotal : initialProperties.length,
+            bangalore: bangaloreAllTotal > 0 ? bangaloreAllTotal : initialProperties.length,
             hyderabad: hyderabadCount,
             pune: puneCount,
         },

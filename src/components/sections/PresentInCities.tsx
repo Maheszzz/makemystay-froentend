@@ -18,7 +18,7 @@ const CITY_CONFIG: CityData[] = [
         name: 'Bengaluru',
         image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=600&q=85&auto=format&fit=crop',
         areas: ['Whitefield', 'Koramangala', 'HSR Layout'],
-        href: '/pg/bangalore',
+        href: '/properties/in/bangalore',
         accentColor: '#C5A021',
     },
     {
@@ -26,7 +26,7 @@ const CITY_CONFIG: CityData[] = [
         name: 'Hyderabad',
         image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=85&auto=format&fit=crop',
         areas: ['HITEC City', 'Gachibowli', 'Kondapur'],
-        href: '/pg/hyderabad',
+        href: '/properties/in/hyderabad',
         accentColor: '#60a5fa',
     },
     {
@@ -34,7 +34,7 @@ const CITY_CONFIG: CityData[] = [
         name: 'Pune',
         image: 'https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=600&q=85&auto=format&fit=crop',
         areas: ['Hinjewadi', 'Kharadi', 'Baner'],
-        href: '/pg/pune',
+        href: '/properties/in/pune',
         accentColor: '#4ade80',
     },
 ];
@@ -93,7 +93,7 @@ export function PresentInCities({ hideSectionLabel = false, cityCounts }: Presen
                                 <Link
                                     to={city.href}
                                     className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 rounded-2xl"
-                                    aria-label={`Explore PG listings in ${city.name}`}
+                                    aria-label={`Explore all listings in ${city.name}`}
                                 />
                             ) : (
                                 <div className="absolute inset-0 z-0" aria-label={`${city.name} — coming soon`} />
