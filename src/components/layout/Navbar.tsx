@@ -104,8 +104,7 @@ function CityDropdown({ selectedCity, onSelect, calm = false }: CityDropdownProp
     );
 }
 
-export function Navbar({ city, variant = 'default' }: { city?: string; variant?: 'default' | 'calm' }) {
-    const isCalm = variant === 'calm';
+export function Navbar({ city, variant: _variant }: { city?: string; variant?: 'default' | 'calm' }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
@@ -210,116 +209,154 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
         setIsMenuOpen(false);
     };
 
-    const isHomePage = location.pathname === '/';
-    const showScrolledStyle = isScrolled || !isHomePage;
-    const navLinkDesktop = isCalm
-        ? 'font-medium whitespace-nowrap transition-colors cursor-pointer text-sm text-pdp-muted hover:text-pdp-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded'
-        : `font-semibold whitespace-nowrap transition-colors cursor-pointer text-slate-700 hover:text-brand-red ${isHomePage && !showScrolledStyle ? 'text-[0.93rem]' : 'text-sm'}`;
+    const pathname = location.pathname.toLowerCase();
+    const isContactPage = pathname === '/contact-us';
     const importantNavItems = navigationLinks.filter((item) => ['Home'].includes(item));
 
-    const navBarClasses = isCalm
-        ? `fixed w-full z-50 transition-all duration-200 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border ${
-              isScrolled ? 'py-1.5 shadow-[0_1px_8px_rgba(22,24,29,0.04)]' : 'py-2'
-          }`
-        : `fixed w-full z-50 transition-all duration-300 ${
-              showScrolledStyle
-                  ? 'bg-white/95 backdrop-blur-md shadow-sm py-2.5 md:py-3.5 border-b border-slate-200'
-                  : 'bg-white py-3 md:py-4.5 border-b border-slate-100'
-          }`;
+    const desktopNavItems: { label: string; to: string; active: boolean; isHome?: boolean }[] = [
+        ...importantNavItems.map((item) => ({
+            label: item,
+            to: '/',
+            active: pathname === '/',
+            isHome: true,
+        })),
+        {
+            label: 'PGs',
+            to: '/pg',
+            active:
+                pathname === '/pg' ||
+                pathname.startsWith('/pg/') ||
+                pathname.startsWith('/pg-'),
+        },
+        {
+            label: 'Flats',
+            to: '/rent',
+            active:
+                pathname === '/rent' ||
+                pathname.startsWith('/rent/') ||
+                pathname.includes('bhk') ||
+                pathname === '/flats-in-bangalore',
+        },
+        {
+            label: 'About Us',
+            to: '/about',
+            active: pathname === '/about',
+        },
+        {
+            label: 'Blog',
+            to: '/blog',
+            active: pathname === '/blog' || pathname.startsWith('/blog/'),
+        },
+        {
+            label: 'Quick Pay',
+            to: '/quick-pay',
+            active: pathname === '/quick-pay',
+        },
+        {
+            label: 'For Owners',
+            to: '/for-owners',
+            active: pathname === '/for-owners',
+        },
+    ];
+
+    const navBarClasses = `fixed w-full z-50 transition-all duration-200 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border ${
+        isScrolled ? 'py-1.5 shadow-[0_1px_8px_rgba(22,24,29,0.04)]' : 'py-2'
+    }`;
 
     return (
         <>
-            <nav className={navBarClasses}>
-                <div className={isCalm ? 'max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10'}>
+            <nav className={navBarClasses} aria-label="Main navigation">
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between md:grid md:grid-cols-[auto_auto_1fr_auto] md:items-center md:gap-4 lg:gap-8">
                         <div className="flex items-center gap-2 shrink-0">
                             <img
                                 src={LOGO_SRC}
                                 alt="MakeMyStay.ai logo"
-                                width={40}
-                                height={40}
-                                className={
-                                    isCalm
-                                        ? 'w-7 h-7 max-w-[28px] max-h-[28px] shrink-0 rounded-md object-contain bg-white border border-pdp-border'
-                                        : 'w-8 h-8 md:w-10 md:h-10 max-w-[32px] max-h-[32px] md:max-w-[40px] md:max-h-[40px] shrink-0 rounded-lg object-contain shadow-sm bg-white'
-                                }
+                                width={28}
+                                height={28}
+                                className="w-7 h-7 max-w-[28px] max-h-[28px] shrink-0 rounded-md object-contain bg-white border border-pdp-border"
                             />
                             <Link
                                 to="/"
                                 aria-label="MakeMyStay Home"
-                                className={
-                                    isCalm
-                                        ? 'text-lg font-bold tracking-tight font-heading transition-colors text-pdp-ink leading-none'
-                                        : 'text-xl md:text-[1.95rem] font-bold tracking-tight font-heading transition-colors text-slate-900 leading-none'
-                                }
+                                className="text-lg font-bold tracking-tight font-heading transition-colors text-pdp-ink leading-none"
                             >
-                                MakeMyStay<span className={isCalm ? 'text-pdp-muted font-semibold' : 'text-brand-red'}>.ai</span>
+                                MakeMyStay<span className="text-pdp-muted font-semibold">.ai</span>
                             </Link>
                         </div>
 
-                        <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} calm={isCalm} />
+                        <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} calm />
 
-                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isCalm ? 'gap-x-4 lg:gap-x-6' : isHomePage && !showScrolledStyle ? 'gap-x-4 lg:gap-x-6 xl:gap-x-7' : 'gap-x-4 lg:gap-x-6 xl:gap-x-7'}`}>
-                            {importantNavItems.map((item) => (
-                                <a
-                                    key={item}
-                                    href="/"
-                                    onClick={(e) => handleNavClick(item, e)}
-                                    className={navLinkDesktop}
-                                >
-                                    {item}
-                                </a>
-                            ))}
-                            <Link to="/pg" className={navLinkDesktop}>
-                                PGs
-                            </Link>
-                            <Link to="/rent" className={navLinkDesktop}>
-                                Flats
-                            </Link>
-                            <Link to="/about" className={navLinkDesktop}>
-                                About Us
-                            </Link>
-                            <Link to="/blog" className={navLinkDesktop}>
-                                Blog
-                            </Link>
-                            <Link to="/quick-pay" className={navLinkDesktop}>
-                                Quick Pay
-                            </Link>
-                            <Link to="/for-owners" className={navLinkDesktop}>
-                                For Owners
-                            </Link>
+                        <div className="hidden md:flex items-center justify-self-center min-w-0 gap-x-4 lg:gap-x-6">
+                            {desktopNavItems.map((navItem) => {
+                                const linkCls = `relative py-1 whitespace-nowrap text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded ${
+                                    navItem.active
+                                        ? 'font-semibold text-pdp-ink'
+                                        : 'font-medium text-pdp-muted hover:text-pdp-ink'
+                                }`;
+                                return navItem.isHome ? (
+                                    <a
+                                        key={navItem.label}
+                                        href="/"
+                                        aria-current={navItem.active ? 'page' : undefined}
+                                        onClick={(e) => handleNavClick(navItem.label, e)}
+                                        className={linkCls}
+                                    >
+                                        {navItem.label}
+                                        {navItem.active && (
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pdp-ink rounded-full"
+                                            />
+                                        )}
+                                    </a>
+                                ) : (
+                                    <Link
+                                        key={navItem.label}
+                                        to={navItem.to}
+                                        aria-current={navItem.active ? 'page' : undefined}
+                                        className={linkCls}
+                                    >
+                                        {navItem.label}
+                                        {navItem.active && (
+                                            <span
+                                                aria-hidden="true"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pdp-ink rounded-full"
+                                            />
+                                        )}
+                                    </Link>
+                                );
+                            })}
                         </div>
 
                         <div className="flex items-center justify-end justify-self-end shrink-0 gap-2">
                             <Link
                                 to="/for-owners"
                                 aria-label="List your PG or property"
-                                className={
-                                    isCalm
-                                        ? 'md:hidden inline-flex items-center rounded-full border border-pdp-border bg-pdp-surface px-2.5 py-1 text-[11px] font-medium text-pdp-ink hover:bg-pdp-bg transition-colors'
-                                        : 'md:hidden inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-wide transition-colors bg-brand-red text-white border-brand-red hover:bg-red-600'
-                                }
+                                className="md:hidden inline-flex items-center rounded-full border border-pdp-border bg-pdp-surface px-2.5 py-1 text-[11px] font-medium text-pdp-ink hover:bg-pdp-bg transition-colors"
                             >
                                 List PG
                             </Link>
-                            <Link to="/contact-us" className="hidden md:block">
-                                {isCalm ? (
-                                    <Button
-                                        variant="outline"
-                                        className="rounded-[10px] border border-pdp-border bg-transparent px-4 py-1.5 text-sm font-medium text-pdp-ink hover:border-pdp-ink hover:text-pdp-ink hover:bg-pdp-bg shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
-                                    >
-                                        Contact Us
-                                    </Button>
-                                ) : (
-                                    <Button variant="primary" className="px-5 lg:px-6 py-2.5 text-sm shadow-sm hover:shadow-md transition-shadow">Contact Us</Button>
-                                )}
+                            <Link
+                                to="/contact-us"
+                                aria-current={isContactPage ? 'page' : undefined}
+                                className="hidden md:block"
+                            >
+                                <Button
+                                    variant="outline"
+                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink transition-colors ${
+                                        isContactPage
+                                            ? 'border-pdp-ink bg-pdp-ink text-white hover:bg-pdp-ink/90 hover:text-white hover:border-pdp-ink'
+                                            : 'border-pdp-border bg-transparent text-pdp-ink hover:border-pdp-ink hover:text-pdp-ink hover:bg-pdp-bg'
+                                    }`}
+                                >
+                                    Contact Us
+                                </Button>
                             </Link>
                             <button
-                                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className={`md:hidden p-2 rounded-lg transition-colors flex items-center justify-center text-slate-800 hover:bg-slate-100 ${
-                                    isCalm ? 'min-w-[36px] min-h-[36px]' : 'min-w-[44px] min-h-[44px]'
-                                }`}
+                                className="md:hidden p-2 rounded-lg transition-colors flex items-center justify-center text-pdp-ink hover:bg-pdp-bg min-w-[40px] min-h-[40px]"
                             >
                                 {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                             </button>
@@ -367,7 +404,7 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
                     <div className="flex-1 overflow-y-auto py-4 px-5">
 
                         {/* ── Primary Booking Actions ── */}
-                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 px-1 mb-3">Quick Actions</p>
+                        <p className="text-xs font-medium text-slate-400 px-1 mb-3">Quick actions</p>
                         <div className="space-y-1.5 mb-5">
                             <Link
                                 to="/properties"
@@ -448,7 +485,7 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
                         {/* ── Divider ── */}
                         <div className="flex items-center gap-3 mb-3">
                             <div className="flex-1 h-px bg-white/8" />
-                            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">More</p>
+                            <p className="text-xs font-medium text-slate-400">More</p>
                             <div className="flex-1 h-px bg-white/8" />
                         </div>
 
@@ -472,15 +509,12 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
                     {/* Menu Footer */}
                     <div className="p-6 border-t border-white/10 space-y-4">
                         <Link to="/contact-us" onClick={() => setIsMenuOpen(false)}>
-                            {isCalm ? (
-                                <Button variant="outline" className="w-full py-3.5 text-base border-white/30 text-white hover:border-white hover:text-white hover:bg-white/10 rounded-[10px]">
-                                    Contact Us
-                                </Button>
-                            ) : (
-                                <Button variant="primary" className="w-full py-3.5 text-base shadow-glow">
-                                    Contact Us
-                                </Button>
-                            )}
+                            <Button
+                                variant="outline"
+                                className="w-full py-3.5 text-base border-white/30 text-white hover:border-white hover:text-white hover:bg-white/10 rounded-[10px]"
+                            >
+                                Contact Us
+                            </Button>
                         </Link>
                         <a
                             href="tel:+918150099911"

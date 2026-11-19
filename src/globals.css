@@ -191,45 +191,27 @@
         animation: pdp-backdrop-in 0.18s ease-out both;
     }
 
-    /* Single PDP type scale (title, section heading, body, caption) */
+    /* Single site reading & PDP type scale (title, h2 heading, body, caption) */
     .pdp-type-title {
         font-family: var(--font-serif-display);
-        font-size: 2.25rem;
+        font-size: clamp(2.75rem, 4.5vw, 3.5rem); /* 44px - 56px */
         line-height: 1.1;
         letter-spacing: -0.01em;
         font-weight: 400;
     }
 
-    @media (min-width: 640px) {
-        .pdp-type-title {
-            font-size: 2.75rem; /* 44px */
-        }
-    }
-
-    @media (min-width: 1024px) {
-        .pdp-type-title {
-            font-size: 3rem; /* 48px */
-        }
-    }
-
     .pdp-type-heading {
-        font-family: var(--font-sans);
-        font-size: 1.375rem; /* 22px */
-        line-height: 1.25;
+        font-family: var(--font-serif-display);
+        font-size: clamp(1.75rem, 2.5vw, 2rem); /* 28px - 32px */
+        line-height: 1.2;
         letter-spacing: -0.01em;
-        font-weight: 600;
-    }
-
-    @media (min-width: 640px) {
-        .pdp-type-heading {
-            font-size: 1.5rem; /* 24px */
-        }
+        font-weight: 500;
     }
 
     .pdp-type-body {
         font-family: var(--font-sans);
-        font-size: 1rem; /* 16px */
-        line-height: 1.65;
+        font-size: 1.0625rem; /* 17px */
+        line-height: 1.7;
         font-weight: 400;
     }
 
@@ -249,6 +231,137 @@
         .animate-pdp-backdrop {
             animation: none;
         }
+    }
+}
+
+@layer components {
+    /* Shared editorial rich-text container (replaces unconfigured @tailwindcss/typography) */
+    .prose-mms {
+        font-family: var(--font-sans);
+        font-size: 1.0625rem; /* 17px */
+        line-height: 1.7;
+        max-width: 66ch;
+        color: var(--color-pdp-ink);
+    }
+
+    .prose-mms > :first-child {
+        margin-top: 0;
+    }
+
+    .prose-mms > :last-child {
+        margin-bottom: 0;
+    }
+
+    .prose-mms h1 {
+        font-family: var(--font-serif-display);
+        font-size: clamp(2.75rem, 4.5vw, 3.5rem); /* 44px - 56px */
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        font-weight: 400;
+        color: var(--color-pdp-ink);
+        margin-top: 0;
+        margin-bottom: 0.5em;
+    }
+
+    .prose-mms h2 {
+        font-family: var(--font-serif-display);
+        font-size: clamp(1.75rem, 2.5vw, 2rem); /* 28px - 32px */
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+        font-weight: 500;
+        color: var(--color-pdp-ink);
+        margin-top: 2.5em;
+        margin-bottom: 0.75em;
+    }
+
+    .prose-mms h3 {
+        font-family: var(--font-sans);
+        font-size: clamp(1.125rem, 1.5vw, 1.25rem); /* 18px - 20px */
+        line-height: 1.35;
+        font-weight: 600;
+        color: var(--color-pdp-ink);
+        margin-top: 1.75em;
+        margin-bottom: 0.5em;
+    }
+
+    .prose-mms p {
+        margin-top: 0;
+        margin-bottom: 1.1em;
+    }
+
+    .prose-mms .lead,
+    .prose-mms-lead {
+        color: var(--color-pdp-muted);
+        font-size: 1.125rem;
+        line-height: 1.65;
+    }
+
+    .prose-mms ul,
+    .prose-mms ol {
+        margin-top: 0;
+        margin-bottom: 1.25em;
+        padding-left: 1.35em;
+    }
+
+    .prose-mms ul {
+        list-style-type: disc;
+    }
+
+    .prose-mms ol {
+        list-style-type: decimal;
+    }
+
+    .prose-mms ul li::marker {
+        color: var(--color-pdp-muted);
+        font-size: 0.78em;
+    }
+
+    .prose-mms ol li::marker {
+        color: var(--color-pdp-muted);
+        font-weight: 500;
+    }
+
+    .prose-mms li + li {
+        margin-top: 0.5em;
+    }
+
+    .prose-mms a {
+        color: var(--color-pdp-ink);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        text-decoration-thickness: 1px;
+        transition: color 0.15s ease;
+    }
+
+    .prose-mms a:hover {
+        color: var(--color-pdp-cta);
+    }
+
+    .prose-mms strong {
+        font-weight: 600;
+        color: var(--color-pdp-ink);
+    }
+
+    .prose-mms blockquote,
+    .prose-mms .prose-callout {
+        border-left: 2px solid var(--color-pdp-ink);
+        background-color: var(--color-pdp-bg);
+        padding: 1rem 1.25rem;
+        margin: 1.5em 0;
+        border-radius: 0 10px 10px 0;
+        color: var(--color-pdp-ink);
+    }
+
+    .prose-mms blockquote p:last-child,
+    .prose-mms .prose-callout p:last-child,
+    .prose-mms .prose-callout ul:last-child {
+        margin-bottom: 0;
+    }
+
+    .prose-mms hr {
+        border: 0;
+        border-top: 1px solid var(--color-pdp-border);
+        margin: 2.25em 0;
     }
 }
 

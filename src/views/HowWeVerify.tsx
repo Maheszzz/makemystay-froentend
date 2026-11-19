@@ -35,46 +35,50 @@ export default function HowWeVerify() {
     const faqLd = buildFaqPageSchema(VERIFY_FAQS);
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-pdp-bg text-pdp-ink flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd id="how-verify-breadcrumb" data={breadcrumbLd} />
             <JsonLd id="how-verify-faq" data={faqLd} />
             <JsonLd id="how-verify-trust-signals" data={buildTrustSignalsSchema()} />
             <Navbar />
-            <main id="main-content" className="flex-grow pt-28 pb-16">
-                <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight not-prose mb-6">
-                        How we verify listings
-                    </h1>
-                    <p className="lead text-slate-600">
-                        Every live listing should meet a <strong>minimum quality bar</strong> before we send traffic to
-                        it: accurate category (PG vs rent vs buy vs plot), honest photos, and pricing that is not
-                        obviously misleading versus comparable inventory in the same micro-market.
-                    </p>
-                    <h2>What our process covers</h2>
-                    <ol>
-                        <li>
-                            <strong>Photo &amp; amenity audit</strong> — we look for stock-image patterns, duplicate
-                            galleries across unrelated listings, and claims (WiFi, food, AC) that the PDP should
-                            support.
-                        </li>
-                        <li>
-                            <strong>Operator identity</strong> — owner or authorised manager contact on file; repeat
-                            fraud patterns are blocked.
-                        </li>
-                        <li>
-                            <strong>Rent / price sanity</strong> — extreme outliers vs the same locality and bed count
-                            are flagged for human review.
-                        </li>
-                        <li>
-                            <strong>Change control</strong> — material edits to price or availability can trigger
-                            re-verification on sensitive categories.
-                        </li>
-                    </ol>
-                    <p className="text-slate-600 text-base not-prose">
-                        This page describes our product intent. For legal terms see{' '}
-                        <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy</Link>.
-                    </p>
+            <main id="main-content" className="flex-grow pt-24 pb-16 lg:pb-20">
+                <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="bg-pdp-surface border border-pdp-border rounded-[var(--radius-pdp)] p-6 sm:p-10 md:p-12 prose-mms">
+                        <h1>How we verify listings</h1>
+                        <p className="prose-mms-lead">
+                            Every live listing should meet a <strong>minimum quality bar</strong> before we send traffic to
+                            it: accurate category (PG vs rent vs buy vs plot), honest photos, and pricing that is not
+                            misleading compared with similar inventory in the same neighbourhood.
+                        </p>
+                        <h2>What our process covers</h2>
+                        <ol>
+                            <li>
+                                <strong>Photo &amp; amenity audit</strong> — we check for stock-image patterns, duplicate
+                                galleries across unrelated listings, and claims (WiFi, food, AC) that the listing details
+                                should support.
+                            </li>
+                            <li>
+                                <strong>Operator identity</strong> — owner or authorised manager contact on file; repeat
+                                fraud patterns are blocked.
+                            </li>
+                            <li>
+                                <strong>Rent and price sanity</strong> — extreme outliers versus the same locality and
+                                room count are flagged for human review.
+                            </li>
+                            <li>
+                                <strong>Change control</strong> — material edits to price or availability can trigger
+                                re-verification on sensitive categories.
+                            </li>
+                        </ol>
+                        <blockquote>
+                            Always visit the property, read the agreement, confirm deposit and notice terms, and check
+                            building or society rules before you pay any token or deposit.
+                        </blockquote>
+                        <p>
+                            This page describes our verification process. For legal terms see{' '}
+                            <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy</Link>.
+                        </p>
+                    </div>
                 </article>
             </main>
             <Footer />

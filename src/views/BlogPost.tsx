@@ -54,82 +54,82 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
     } = profile;
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+        <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
             <JsonLd data={schema} id="blog-post-jsonld" />
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-20 pb-20">
                 {/* ── Article Header ── */}
-                <header className="bg-white border-b border-slate-100 pb-10">
+                <header className="bg-pdp-surface border-b border-pdp-border py-10">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6">
-                        <BreadcrumbNav items={breadcrumb} />
+                        <BreadcrumbNav items={breadcrumb} calm />
 
                         <div className="mt-5">
-                            <div className="flex items-center gap-3 text-xs font-bold uppercase tracking-wider text-brand-red mb-3">
+                            <div className="flex items-center gap-3 text-xs font-medium text-pdp-muted mb-3">
                                 <span>{hero.category}</span>
-                                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                                <span>Bangalore PG Guides</span>
+                                <span className="w-1 h-1 rounded-full bg-pdp-border" />
+                                <span>Bangalore PG guides</span>
                             </div>
 
                             <h1
                                 data-seo="blog-h1"
-                                className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight"
+                                className="pdp-type-title font-serif-display text-pdp-ink max-w-[24ch]"
                             >
                                 {hero.heading}
                             </h1>
 
-                            <p className="mt-3 text-slate-600 text-base md:text-lg leading-relaxed">
+                            <p className="mt-4 pdp-type-body text-pdp-muted max-w-[66ch]">
                                 {hero.subHeading}
                             </p>
 
-                            <div className="mt-6 flex flex-wrap items-center gap-4 text-xs md:text-sm text-slate-500 border-t border-slate-100 pt-4">
+                            <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-pdp-muted border-t border-pdp-border pt-4">
                                 <div className="flex items-center gap-1.5">
-                                    <Calendar className="w-4 h-4 text-slate-400" />
+                                    <Calendar className="w-4 h-4 text-pdp-muted" />
                                     <span>Updated: {updatedDate}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                    <Clock className="w-4 h-4 text-slate-400" />
+                                    <Clock className="w-4 h-4 text-pdp-muted" />
                                     <span>{estimatedReadingTime} min read</span>
                                 </div>
-                                <div className="flex items-center gap-1.5 font-semibold text-slate-700">
+                                <div className="flex items-center gap-1.5 font-medium text-pdp-ink">
                                     <span>By {author.name}</span>
                                 </div>
                             </div>
 
                             {/* Quick Summary — Google AI Overview / Speakable Target */}
-                            <div
+                            <blockquote
                                 data-seo="blog-quick-summary"
-                                className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/70 p-6"
+                                className="mt-8 border-l-2 border-pdp-ink bg-pdp-bg rounded-r-[10px] p-5 md:p-6 max-w-[66ch]"
                             >
-                                <p className="text-sm md:text-base text-blue-950 leading-relaxed font-normal">
-                                    <strong className="font-bold text-blue-900">Quick Summary (AEO Answer): </strong>
+                                <p className="pdp-type-body text-pdp-ink">
+                                    <strong className="font-semibold">Quick summary: </strong>
                                     {quickSummary}
                                 </p>
-                            </div>
+                            </blockquote>
                         </div>
                     </div>
                 </header>
 
-                {/* ── Article Layout (Main + Sidebar TOC) ── */}
+                {/* ── Article Layout ── */}
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 mt-10">
                     <div className="space-y-12">
                         {/* ── Table of Contents ── */}
                         <nav
                             aria-label="Table of contents"
-                            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                            className="rounded-[var(--radius-pdp)] border border-pdp-border bg-pdp-surface p-6"
                         >
-                            <h2 className="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
-                                <ListChecks className="w-5 h-5 text-brand-red" />
-                                Table of Contents
+                            <h2 className="text-lg font-semibold text-pdp-ink mb-3 flex items-center gap-2">
+                                <ListChecks className="w-5 h-5 text-pdp-muted" aria-hidden />
+                                Table of contents
                             </h2>
-                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-sm">
                                 {tableOfContents.map((toc, idx) => (
                                     <li key={toc.id}>
                                         <a
                                             href={`#${toc.id}`}
-                                            className="text-slate-600 hover:text-brand-red hover:underline flex items-center gap-1.5 transition-colors"
+                                            className="text-pdp-ink underline underline-offset-4 hover:text-pdp-cta flex items-center gap-1.5 transition-colors"
                                         >
-                                            <span className="text-xs font-bold text-slate-400">{idx + 1}.</span>
+                                            <span className="text-xs font-medium text-pdp-muted tabular-nums">{idx + 1}.</span>
                                             {toc.title.replace(/^\d+\.\s*/, '')}
                                         </a>
                                     </li>
@@ -137,62 +137,49 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
                             </ul>
                         </nav>
 
-                        {/* ── Introduction ── */}
-                        <section className="space-y-4 text-slate-700 text-base md:text-lg leading-relaxed">
+                        {/* ── Introduction & Long-Form Sections rendered with .prose-mms ── */}
+                        <article className="prose-mms max-w-[66ch]">
                             {introduction.map((para, i) => (
                                 <p key={i}>{para}</p>
                             ))}
-                        </section>
 
-                        {/* ── Long-Form Sections ── */}
-                        <div className="space-y-12">
                             {mainContent.map((sec) => (
-                                <section
-                                    key={sec.id}
-                                    id={sec.id}
-                                    className="scroll-mt-24 space-y-4 rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm"
-                                >
-                                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-                                        {sec.title}
-                                    </h2>
+                                <section key={sec.id} id={sec.id} className="scroll-mt-24">
+                                    <h2>{sec.title}</h2>
+                                    {sec.content.map((p, i) => (
+                                        <p key={i} className="whitespace-pre-line">{p}</p>
+                                    ))}
 
-                                    <div className="space-y-4 text-slate-700 text-base leading-relaxed">
-                                        {sec.content.map((p, i) => (
-                                            <p key={i} className="whitespace-pre-line">{p}</p>
-                                        ))}
-                                    </div>
-
-                                    {/* Optional Structured Table */}
                                     {sec.table && (
-                                        <div className="mt-6 overflow-x-auto pt-2">
+                                        <div className="my-6 overflow-x-auto">
                                             {sec.table.caption && (
-                                                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                                                <p className="text-sm font-medium text-pdp-muted mb-2">
                                                     {sec.table.caption}
                                                 </p>
                                             )}
-                                            <table className="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
-                                                <thead className="bg-slate-100/80">
+                                            <table className="w-full text-sm border border-pdp-border rounded-lg overflow-hidden bg-pdp-surface">
+                                                <thead className="bg-pdp-bg">
                                                     <tr>
                                                         {sec.table.headers.map((h, i) => (
                                                             <th
                                                                 key={i}
-                                                                className="text-left py-3 px-4 font-bold text-slate-800 border-b border-slate-200"
+                                                                className="text-left py-3 px-4 font-semibold text-pdp-ink border-b border-pdp-border"
                                                             >
                                                                 {h}
                                                             </th>
                                                         ))}
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-slate-100">
+                                                <tbody className="divide-y divide-pdp-border">
                                                     {sec.table.rows.map((row, ri) => (
-                                                        <tr key={ri} className="hover:bg-slate-50/70 transition-colors">
+                                                        <tr key={ri}>
                                                             {row.map((cell, ci) => (
                                                                 <td
                                                                     key={ci}
-                                                                    className={`py-3.5 px-4 ${
+                                                                    className={`py-3 px-4 ${
                                                                         ci === 0
-                                                                            ? 'font-semibold text-slate-900'
-                                                                            : 'text-slate-600'
+                                                                            ? 'font-medium text-pdp-ink'
+                                                                            : 'text-pdp-muted'
                                                                     }`}
                                                                 >
                                                                     {cell}
@@ -206,7 +193,7 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
                                     )}
                                 </section>
                             ))}
-                        </div>
+                        </article>
 
                         {/* ── Rental Insights Table ── */}
                         <section
@@ -334,15 +321,15 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {/* Localities */}
                                 <div>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                                        PG Localities
+                                    <h3 className="text-sm font-semibold text-pdp-muted mb-3">
+                                        PG localities
                                     </h3>
                                     <ul className="space-y-2">
                                         {internalLinks.localities.map((item) => (
                                             <li key={item.path}>
                                                 <Link
                                                     to={item.path}
-                                                    className="flex items-center gap-1.5 text-sm text-brand-red hover:underline font-medium"
+                                                    className="flex items-center gap-1.5 text-sm text-pdp-ink underline underline-offset-4 hover:text-pdp-cta font-medium"
                                                 >
                                                     <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
                                                     {item.name}
@@ -354,15 +341,15 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
 
                                 {/* Tech Parks */}
                                 <div>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                                        Tech Park Coliving
+                                    <h3 className="text-sm font-semibold text-pdp-muted mb-3">
+                                        Tech park coliving
                                     </h3>
                                     <ul className="space-y-2">
                                         {internalLinks.techParks.map((item) => (
                                             <li key={item.path}>
                                                 <Link
                                                     to={item.path}
-                                                    className="flex items-center gap-1.5 text-sm text-brand-red hover:underline font-medium"
+                                                    className="flex items-center gap-1.5 text-sm text-pdp-ink underline underline-offset-4 hover:text-pdp-cta font-medium"
                                                 >
                                                     <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
                                                     {item.name}
@@ -374,15 +361,15 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
 
                                 {/* Related Blogs */}
                                 <div>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                                        Related Guides
+                                    <h3 className="text-sm font-semibold text-pdp-muted mb-3">
+                                        Related guides
                                     </h3>
                                     <ul className="space-y-2">
                                         {internalLinks.blogs.map((item) => (
                                             <li key={item.path}>
                                                 <Link
                                                     to={item.path}
-                                                    className="flex items-center gap-1.5 text-sm text-brand-red hover:underline font-medium line-clamp-1"
+                                                    className="flex items-center gap-1.5 text-sm text-pdp-ink underline underline-offset-4 hover:text-pdp-cta font-medium line-clamp-1"
                                                 >
                                                     <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
                                                     {item.title}
@@ -394,15 +381,15 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
 
                                 {/* Property Pages */}
                                 <div>
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
-                                        Browse Listings
+                                    <h3 className="text-sm font-semibold text-pdp-muted mb-3">
+                                        Browse listings
                                     </h3>
                                     <ul className="space-y-2">
                                         {internalLinks.propertyPages.map((item) => (
                                             <li key={item.path}>
                                                 <Link
                                                     to={item.path}
-                                                    className="flex items-center gap-1.5 text-sm text-brand-red hover:underline font-medium"
+                                                    className="flex items-center gap-1.5 text-sm text-pdp-ink underline underline-offset-4 hover:text-pdp-cta font-medium"
                                                 >
                                                     <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
                                                     {item.name}
