@@ -197,6 +197,7 @@ export function Footer() {
                         <Link to="/privacy" className="hover:text-brand-red transition-colors">Privacy Policy</Link>
                         <Link to="/terms" className="hover:text-brand-red transition-colors">Terms &amp; Conditions</Link>
                         <Link to="/refund-policy" className="hover:text-brand-red transition-colors">Refund Policy</Link>
+                        <Link to="/quick-pay" className="hover:text-brand-red transition-colors">Quick Pay</Link>
                         <Link to="/faq" className="hover:text-brand-red transition-colors">FAQ</Link>
                         <Link to="/about" className="hover:text-brand-red transition-colors">About</Link>
                         <Link to="/how-we-verify" className="hover:text-brand-red transition-colors">How we verify</Link>

@@ -259,7 +259,7 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
 
                         <CityDropdown selectedCity={selectedCity} onSelect={handleCitySelect} calm={isCalm} />
 
-                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isCalm ? 'gap-x-5 lg:gap-x-7' : isHomePage && !showScrolledStyle ? 'gap-x-5 lg:gap-x-7' : 'gap-x-6 lg:gap-x-8'}`}>
+                        <div className={`hidden md:flex items-center justify-self-center min-w-0 ${isCalm ? 'gap-x-4 lg:gap-x-6' : isHomePage && !showScrolledStyle ? 'gap-x-4 lg:gap-x-6 xl:gap-x-7' : 'gap-x-4 lg:gap-x-6 xl:gap-x-7'}`}>
                             {importantNavItems.map((item) => (
                                 <a
                                     key={item}
@@ -281,6 +281,9 @@ export function Navbar({ city, variant = 'default' }: { city?: string; variant?:
                             </Link>
                             <Link to="/blog" className={navLinkDesktop}>
                                 Blog
+                            </Link>
+                            <Link to="/quick-pay" className={navLinkDesktop}>
+                                Quick Pay
                             </Link>
                             <Link to="/for-owners" className={navLinkDesktop}>
                                 For Owners
