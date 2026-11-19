@@ -107,19 +107,19 @@ export function InvestmentCalculator() {
 
                     {/* Right: Results */}
                     <div>
-                        <div className="bg-[#1e3a8a] text-white rounded-3xl p-8 mb-8 relative overflow-hidden">
+                        <div className="bg-red-800 text-white rounded-[var(--radius-pdp)] border border-champagne/30 p-8 mb-8 relative overflow-hidden">
                             <div className="relative z-10">
-                                <div className="text-blue-100 text-sm mb-1">Estimated Monthly Payment</div>
-                                <div className="text-5xl font-bold mb-8">₹{monthlyPayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                                <div className="text-red-subtitle text-sm mb-1">Estimated Monthly Payment</div>
+                                <div className="text-5xl font-bold mb-8 tabular-nums">₹{monthlyPayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
 
                                 <div className="grid grid-cols-2 gap-8">
                                     <div>
-                                        <div className="text-blue-200 text-sm mb-1">Total Payment</div>
-                                        <div className="text-xl font-bold">₹{totalPayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                                        <div className="text-red-subtitle text-sm mb-1">Total Payment</div>
+                                        <div className="text-xl font-bold tabular-nums">₹{totalPayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                                     </div>
                                     <div>
-                                        <div className="text-blue-200 text-sm mb-1">Total Interest</div>
-                                        <div className="text-xl font-bold">₹{totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                                        <div className="text-red-subtitle text-sm mb-1">Total Interest</div>
+                                        <div className="text-xl font-bold tabular-nums">₹{totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                                     </div>
                                 </div>
                             </div>

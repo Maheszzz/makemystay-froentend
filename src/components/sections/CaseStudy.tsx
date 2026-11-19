@@ -26,47 +26,42 @@ export function CaseStudy({ caseStudy = null }: CaseStudyProps) {
     }
 
     return (
-        <section id="case-study" className="py-14 md:py-24 bg-brand-charcoal relative overflow-hidden isolate">
-            <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none z-0" />
-
+        <section id="case-study" className="py-12 md:py-20 lg:py-24 bg-red-800 relative overflow-hidden isolate border-t border-champagne/25">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="flex flex-col md:flex-row gap-10 md:gap-16 items-start">
                     <div className={caseStudy.stats?.length ? 'md:w-1/2' : 'w-full max-w-3xl'}>
-                        <div className="inline-block px-4 py-1.5 rounded-full bg-brand-red/10 text-brand-red border border-brand-red/20 text-xs font-bold uppercase tracking-wider mb-6">
+                        <div className="inline-block px-4 py-1.5 rounded-full bg-red-900 text-red-subtitle border border-champagne/30 text-xs font-semibold uppercase tracking-wider mb-6">
                             Client Case Study
                         </div>
-                        <h2 className="text-2xl md:text-4xl font-bold text-white mb-6">
+                        <h2 className="font-serif-display text-2xl md:text-4xl font-normal text-white mb-6">
                             {caseStudy.companyName}
                         </h2>
-                        <div className="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 backdrop-blur-sm">
-                            <div className="flex flex-wrap gap-4 text-sm text-slate-300">
+                        <div className="bg-red-900/70 p-6 rounded-[var(--radius-pdp)] border border-champagne/25 mb-8">
+                            <div className="flex flex-wrap gap-4 text-sm text-red-subtitle">
                                 <span className="flex items-center">
-                                    <MapPin className="w-4 h-4 mr-1 text-brand-red" /> {caseStudy.city}
+                                    <MapPin className="w-4 h-4 mr-1 text-champagne" /> {caseStudy.city}
                                 </span>
                                 {caseStudy.propertiesLabel && (
                                     <span className="flex items-center">
-                                        <Building2 className="w-4 h-4 mr-1 text-brand-red" /> {caseStudy.propertiesLabel}
+                                        <Building2 className="w-4 h-4 mr-1 text-champagne" /> {caseStudy.propertiesLabel}
                                     </span>
                                 )}
                                 {caseStudy.bedsLabel && (
                                     <span className="flex items-center">
-                                        <UserCheck className="w-4 h-4 mr-1 text-brand-red" /> {caseStudy.bedsLabel}
+                                        <UserCheck className="w-4 h-4 mr-1 text-champagne" /> {caseStudy.bedsLabel}
                                     </span>
                                 )}
                             </div>
                         </div>
-                        <p className="text-xl font-semibold text-slate-300 mb-6 leading-relaxed">
+                        <p className="text-xl font-semibold text-white mb-6 leading-relaxed">
                             {caseStudy.headline}
                         </p>
-                        <blockquote
-                            className="text-lg text-slate-300 mb-8 leading-[1.8] italic border-l-4 pl-5"
-                            style={{ borderColor: '#C5A021' }}
-                        >
+                        <blockquote className="text-lg text-red-subtitle mb-8 leading-[1.8] italic border-l-4 border-champagne pl-5">
                             &ldquo;{caseStudy.quote}&rdquo;
                         </blockquote>
                         <div className="flex items-center space-x-4">
                             {caseStudy.avatarUrl && (
-                                <div className="w-12 h-12 bg-slate-700 rounded-full overflow-hidden border border-white/10">
+                                <div className="w-12 h-12 bg-red-900 rounded-full overflow-hidden border border-champagne/30">
                                     <img
                                         src={caseStudy.avatarUrl}
                                         alt={caseStudy.clientName}
@@ -76,7 +71,7 @@ export function CaseStudy({ caseStudy = null }: CaseStudyProps) {
                             )}
                             <div>
                                 <div className="font-bold text-white">{caseStudy.clientName}</div>
-                                <div className="text-sm text-slate-400">
+                                <div className="text-sm text-red-subtitle">
                                     {caseStudy.role}, {caseStudy.companyName}
                                 </div>
                             </div>
@@ -85,16 +80,16 @@ export function CaseStudy({ caseStudy = null }: CaseStudyProps) {
 
                     {caseStudy.stats && caseStudy.stats.length > 0 && (
                         <div className="md:w-1/2 w-full">
-                            <div className="bg-gradient-to-br from-brand-red to-[#B91C1C] rounded-2xl md:rounded-3xl p-6 md:p-8 text-white shadow-glow relative overflow-hidden border border-white/10">
-                                <h3 className="text-2xl font-bold mb-8 relative z-10">Reported Metrics</h3>
-                                <div className="grid grid-cols-2 gap-6 relative z-10">
+                            <div className="bg-red-900 rounded-[var(--radius-pdp)] p-6 md:p-8 text-white border border-champagne/30">
+                                <h3 className="font-serif-display text-2xl font-normal mb-8">Reported Metrics</h3>
+                                <div className="grid grid-cols-2 gap-6">
                                     {caseStudy.stats.map((stat, i) => (
                                         <div
                                             key={i}
-                                            className="bg-black/20 backdrop-blur-md p-4 rounded-xl border border-white/10"
+                                            className="bg-red-800/80 p-4 rounded-xl border border-champagne/25"
                                         >
-                                            <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                                            <div className="text-white/80 text-sm">{stat.label}</div>
+                                            <div className="text-3xl font-bold mb-1 tabular-nums">{stat.value}</div>
+                                            <div className="text-red-subtitle text-sm">{stat.label}</div>
                                         </div>
                                     ))}
                                 </div>

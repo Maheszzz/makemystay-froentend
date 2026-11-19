@@ -15,11 +15,13 @@ export function Solution() {
     }, []);
 
     return (
-        <section id="solution" className="py-14 md:py-24 bg-white relative overflow-hidden">
+        <section id="solution" className="py-12 md:py-20 lg:py-24 bg-white border-b border-line">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <span className="text-brand-red font-semibold tracking-wide uppercase text-sm">Our Solution</span>
-                    <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mt-2">Full-Stack AI Growth Engine</h2>
+                <div className="text-center mb-14">
+                    <span className="text-champagne-text font-semibold tracking-wider uppercase text-xs">Our solution</span>
+                    <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mt-2">
+                        Full-stack AI growth engine
+                    </h2>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8 md:gap-12">
@@ -29,38 +31,34 @@ export function Solution() {
                             <button
                                 key={idx}
                                 onClick={() => setActiveFeature(idx)}
-                                className={`text-left p-4 lg:p-6 rounded-2xl transition-all duration-300 border flex-shrink-0 w-[240px] lg:w-auto snap-start ${activeFeature === idx
-                                    ? 'bg-slate-50 border-brand-red/20 shadow-md lg:scale-105'
-                                    : 'bg-white border-slate-100 lg:border-transparent hover:bg-slate-50'
+                                className={`text-left p-4 lg:p-6 rounded-[var(--radius-pdp)] transition-colors border flex-shrink-0 w-[240px] lg:w-auto snap-start ${activeFeature === idx
+                                    ? 'bg-blush-100 border-red'
+                                    : 'bg-white border-line hover:bg-page'
                                     }`}
                             >
-                                <h3 className={`text-lg font-bold mb-1 ${activeFeature === idx ? 'text-brand-red' : 'text-slate-500'}`}>
+                                <h3 className={`text-lg font-bold mb-1 ${activeFeature === idx ? 'text-red' : 'text-ink'}`}>
                                     {feature.title}
                                 </h3>
-                                <p className="text-sm text-slate-500">{feature.desc}</p>
+                                <p className="text-sm text-slate">{feature.desc}</p>
                             </button>
                         ))}
                     </div>
 
-                    {/* Feature Display */}
+                    {/* Feature Display (Dark Red-800 Contrast Panel) */}
                     <div className="lg:w-2/3">
-                        <div className="relative h-full min-h-[320px] md:min-h-[400px] bg-brand-charcoal rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
-                            {/* Decorative Pattern */}
-                            <div className="absolute inset-0 bg-diagonal-grid opacity-10 pointer-events-none"></div>
-                            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-red/20 rounded-full blur-3xl opacity-50"></div>
-
+                        <div className="relative h-full min-h-[320px] md:min-h-[400px] bg-red-800 rounded-[var(--radius-pdp)] border border-champagne/30 overflow-hidden">
                             <div className="relative p-6 md:p-12 h-full flex flex-col justify-center">
                                 <div className="transition-all duration-500">
                                     {solutionFeatures.map((item, idx) => (
                                         activeFeature === idx && (
-                                            <div key={idx} className="animate-in fade-in slide-in-from-right-8 duration-500">
-                                                <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center mb-8 backdrop-blur-sm border border-white/10 shadow-glow">
-                                                    <item.icon className="w-8 h-8 text-brand-red" />
+                                            <div key={idx}>
+                                                <div className="w-16 h-16 rounded-2xl bg-red-900 flex items-center justify-center mb-8 border border-champagne/30">
+                                                    <item.icon className="w-8 h-8 text-champagne" />
                                                 </div>
-                                                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">{item.title}</h3>
-                                                <p className="text-base md:text-lg text-slate-300 mb-6 md:mb-8 leading-relaxed max-w-xl">{item.text}</p>
-                                                <div className="inline-flex items-center px-4 py-2 rounded-full bg-brand-red/10 text-brand-red border border-brand-red/20 text-sm font-bold">
-                                                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                                                <h3 className="font-serif-display text-2xl md:text-3xl font-normal text-white mb-4 md:mb-6">{item.title}</h3>
+                                                <p className="text-base md:text-lg text-red-subtitle mb-6 md:mb-8 leading-relaxed max-w-xl">{item.text}</p>
+                                                <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-900 text-white border border-champagne/35 text-sm font-semibold">
+                                                    <CheckCircle2 className="w-4 h-4 mr-2 text-champagne" />
                                                     {item.stats}
                                                 </div>
                                             </div>

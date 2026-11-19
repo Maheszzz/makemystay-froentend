@@ -35,39 +35,27 @@ export function ServicesGrid() {
                 {services.map((service, index) => (
                     <div
                         key={index}
-                        className="relative group rounded-[20px] p-6 overflow-hidden"
-                        style={{
-                            background: '#F7F8FA',
-                            border: '1px solid rgba(0,0,0,0.06)',
-                            boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-                        }}
+                        className="relative group rounded-[var(--radius-pdp)] p-6 bg-white border border-line hover:border-ink/35 transition-colors"
                     >
                         <div className="relative z-10 flex flex-col h-full">
-                            <div
-                                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-                                style={{ background: 'rgba(197,160,33,0.10)' }}
-                            >
-                                <service.icon className="w-6 h-6" style={{ color: '#B11226' }} />
+                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-blush-100 border border-line">
+                                <service.icon className="w-6 h-6 text-red" />
                             </div>
 
-                            <h3 className="text-base font-bold text-slate-900 mb-2 group-hover:text-[#B11226]">
+                            <h3 className="text-base font-bold text-ink mb-2 group-hover:text-red transition-colors">
                                 {service.title}
                             </h3>
 
-                            <p className="text-slate-600 text-sm leading-relaxed flex-1">{service.desc}</p>
+                            <p className="text-slate text-sm leading-relaxed flex-1">{service.desc}</p>
 
                             <div className="mt-5 flex items-center justify-between">
                                 <Link
                                     to={`/services/${service.id}`}
-                                    className="flex items-center gap-1.5 text-sm font-semibold"
-                                    style={{ color: '#B11226' }}
+                                    className="flex items-center gap-1.5 text-sm font-semibold text-red hover:text-red-hover hover:underline underline-offset-4 transition-colors"
                                 >
                                     Explore Service
-                                    <span
-                                        className="inline-flex items-center justify-center w-6 h-6 rounded-full"
-                                        style={{ background: 'rgba(177,18,38,0.08)' }}
-                                    >
-                                        <ArrowRight className="w-3.5 h-3.5" style={{ color: '#B11226' }} />
+                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blush-100">
+                                        <ArrowRight className="w-3.5 h-3.5 text-red" />
                                     </span>
                                 </Link>
                             </div>
@@ -76,7 +64,7 @@ export function ServicesGrid() {
                 ))}
             </div>
 
-            <p className="text-center text-sm text-slate-600 mt-8">
+            <p className="text-center text-sm text-slate mt-8">
                 Built for PG &amp; rental property owners across Bangalore.
             </p>
         </div>
