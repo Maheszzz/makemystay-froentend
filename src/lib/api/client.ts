@@ -72,6 +72,7 @@ function localhostApiHint(): string {
 // Create axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL || undefined,
+    ...(typeof window === 'undefined' ? { proxy: false as const } : {}),
     headers: {
         'Content-Type': 'application/json',
     },
