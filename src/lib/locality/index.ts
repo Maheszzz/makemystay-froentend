@@ -12,13 +12,3 @@ export * from './schemaGenerator';
 export * from './breadcrumbGenerator';
 export * from './internalLinks';
 export * from './localityEngine';
-<<<<<<< HEAD
-=======
-
-
-
-
-
-
-
->>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14

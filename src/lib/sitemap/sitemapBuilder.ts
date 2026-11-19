@@ -29,13 +29,9 @@ export function buildXmlSitemap(entries: SitemapUrlEntry[]): string {
     for (const entry of entries) {
         lines.push('  <url>');
         lines.push(`    <loc>${escapeXml(entry.loc)}</loc>`);
-<<<<<<< HEAD
-        lines.push(`    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`);
-=======
         if (entry.lastmod) {
             lines.push(`    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`);
         }
->>>>>>> 30c0a7d5dcc26f2969e7389fc64a888ad3bd2f14
         lines.push(`    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`);
         lines.push(`    <priority>${entry.priority.toFixed(2)}</priority>`);
         lines.push('  </url>');

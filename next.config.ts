@@ -8,6 +8,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig: NextConfig = {
     output: 'standalone',
     reactStrictMode: true,
+    serverExternalPackages: ['axios', 'follow-redirects', 'proxy-from-env'],
     eslint: { ignoreDuringBuilds: true },
     typescript: { ignoreBuildErrors: false },
     images: {
