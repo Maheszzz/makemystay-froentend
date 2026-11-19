@@ -153,11 +153,7 @@ export function PropertyGrid({
     return (
         <section
             id="featured-listings"
-            className={
-                cardVariant === 'project'
-                    ? 'py-12 md:py-20 bg-gradient-to-b from-slate-50 via-[#f8f8f7] to-slate-100/60 pb-32 md:pb-24 scroll-mt-28 md:scroll-mt-24'
-                    : 'py-10 md:py-20 bg-gradient-to-b from-stone-50 via-[#faf9f7] to-stone-100/50 pb-32 md:pb-24 scroll-mt-28 md:scroll-mt-24'
-            }
+            className="py-12 md:py-20 bg-page border-t border-line pb-32 md:pb-24 scroll-mt-28 md:scroll-mt-24"
         >
             {/* Section Header */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

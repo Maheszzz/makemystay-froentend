@@ -182,7 +182,7 @@ function HomeInner({
             <JsonLd data={buildHomeOrganizationLocalWebGraph()} id="home-org-local-website-schema" />
 
             <Navbar />
-            <main id="main-content" className="min-h-screen bg-white pb-24 md:pb-0">
+            <main id="main-content" className="min-h-screen bg-page pb-24 md:pb-0">
                 <section id="home">
                     <Hero
                         category={listingsCategory}

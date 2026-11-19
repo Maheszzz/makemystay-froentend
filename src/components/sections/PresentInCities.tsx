@@ -12,14 +12,13 @@ interface CityData {
     accentColor: string;
 }
 
-const CITY_CONFIG: CityData[] = [
+const CITY_CONFIG: Omit<CityData, 'accentColor'>[] = [
     {
         key: 'bangalore',
         name: 'Bengaluru',
         image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=600&q=85&auto=format&fit=crop',
         areas: ['Whitefield', 'Koramangala', 'HSR Layout'],
         href: '/properties/in/bangalore',
-        accentColor: '#C5A021',
     },
     {
         key: 'hyderabad',
@@ -27,7 +26,6 @@ const CITY_CONFIG: CityData[] = [
         image: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&q=85&auto=format&fit=crop',
         areas: ['HITEC City', 'Gachibowli', 'Kondapur'],
         href: '/properties/in/hyderabad',
-        accentColor: '#60a5fa',
     },
     {
         key: 'pune',
@@ -35,7 +33,6 @@ const CITY_CONFIG: CityData[] = [
         image: 'https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=600&q=85&auto=format&fit=crop',
         areas: ['Hinjewadi', 'Kharadi', 'Baner'],
         href: '/properties/in/pune',
-        accentColor: '#4ade80',
     },
 ];
 
@@ -87,35 +84,32 @@ export function PresentInCities({ hideSectionLabel = false, cityCounts }: Presen
                     return (
                         <div
                             key={city.name}
-                            className="flex flex-col bg-white hover:bg-slate-50 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden h-full relative group"
+                            className="flex flex-col bg-white hover:bg-blush-100/40 rounded-2xl border border-line hover:border-ink/30 transition-colors overflow-hidden h-full relative group"
                         >
                             {isActive ? (
                                 <Link
                                     to={city.href}
-                                    className="absolute inset-0 z-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold/60 rounded-2xl"
+                                    className="absolute inset-0 z-0 rounded-2xl"
                                     aria-label={`Explore all listings in ${city.name}`}
                                 />
                             ) : (
                                 <div className="absolute inset-0 z-0" aria-label={`${city.name} — coming soon`} />
                             )}
 
-                            <div className="w-full aspect-[16/10] bg-slate-100 overflow-hidden relative pointer-events-none z-0">
+                            <div className="w-full aspect-[16/10] bg-blush-100 overflow-hidden relative pointer-events-none z-0">
                                 <OptimizedImage
                                     src={city.image}
                                     alt={`${city.name} properties`}
                                     fill
                                     size="medium"
                                     sizes="(max-width: 768px) 100vw, 33vw"
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                                     style={{ filter: isActive ? 'none' : 'saturate(0.4) brightness(0.9)' }}
                                 />
                             </div>
 
                             <div className="flex flex-col flex-1 p-4 relative z-10 pointer-events-none">
-                                <h3
-                                    className="text-lg font-bold text-slate-900 mb-2.5"
-                                    style={{ fontFamily: "'Montserrat', sans-serif" }}
-                                >
+                                <h3 className="text-lg font-bold text-ink mb-2.5 font-heading">
                                     {city.name}
                                 </h3>
 
@@ -127,7 +121,7 @@ export function PresentInCities({ hideSectionLabel = false, cityCounts }: Presen
                                                 <Link
                                                     key={area}
                                                     to={`${city.href}?q=${encodeURIComponent(area)}`}
-                                                    className="px-2.5 py-1 text-[10px] font-semibold bg-slate-100 text-slate-600 rounded-md hover:bg-brand-red hover:text-white transition-colors z-20 relative shadow-sm"
+                                                    className="px-2.5 py-1 text-[10px] font-semibold bg-blush-100 text-ink border border-line rounded-md hover:bg-red hover:border-red hover:text-white transition-colors z-20 relative"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     {area}
@@ -137,7 +131,7 @@ export function PresentInCities({ hideSectionLabel = false, cityCounts }: Presen
                                         return (
                                             <span
                                                 key={area}
-                                                className="px-2.5 py-1 text-[10px] font-semibold bg-slate-50 text-slate-400 rounded-md shadow-sm"
+                                                className="px-2.5 py-1 text-[10px] font-semibold bg-page text-slate border border-line rounded-md"
                                             >
                                                 {area}
                                             </span>
@@ -145,21 +139,23 @@ export function PresentInCities({ hideSectionLabel = false, cityCounts }: Presen
                                     })}
                                 </div>
 
-                                <div className="mt-auto pt-3 border-t border-slate-100 flex items-end justify-between gap-2">
+                                <div className="mt-auto pt-3 border-t border-line flex items-end justify-between gap-2">
                                     <div className="flex flex-col">
                                         <span
-                                            className="font-bold text-sm sm:text-base leading-none mb-1"
-                                            style={{ color: isActive ? '#10b981' : '#d97706' }}
+                                            className={`font-bold text-sm sm:text-base leading-none mb-1 tabular-nums ${
+                                                isActive ? 'text-verified' : 'text-champagne-text'
+                                            }`}
                                         >
                                             {countText}
                                         </span>
-                                        <span className="text-[10px] sm:text-xs text-slate-500 whitespace-nowrap">
+                                        <span className="text-[10px] sm:text-xs text-slate whitespace-nowrap">
                                             {countLabel}
                                         </span>
                                     </div>
                                     <div
-                                        className="flex items-center gap-1 text-[10px] sm:text-[11px] font-bold tracking-wide uppercase shrink-0 pb-[1px]"
-                                        style={{ color: isActive ? '#0f172a' : '#d97706' }}
+                                        className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-bold tracking-wide uppercase shrink-0 pb-[1px] ${
+                                            isActive ? 'text-ink' : 'text-champagne-text'
+                                        }`}
                                     >
                                         <span>{isActive ? 'Explore' : 'Soon'}</span>
                                         {isActive && <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}

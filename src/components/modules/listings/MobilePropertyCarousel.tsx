@@ -117,9 +117,9 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                 return (
                     <div
                         key={property.id}
-                        className="group bg-gradient-to-b from-stone-50 via-white to-white rounded-[1.1rem] overflow-hidden border border-stone-200/90 shadow-[0_14px_30px_-16px_rgba(15,23,42,0.32)]"
+                        className="group bg-white rounded-[var(--radius-pdp)] overflow-hidden border border-line"
                     >
-                        <div className="relative w-full bg-slate-900" style={{ aspectRatio: '16/9' }}>
+                        <div className="relative w-full bg-blush-100" style={{ aspectRatio: '16/9' }}>
                             <div className="absolute inset-0">
                                 <SwipeableImageGallery
                                     images={images}
@@ -128,44 +128,44 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                                 />
                             </div>
                             <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10 pointer-events-none">
-                                <span className="text-[10px] sm:text-xs font-semibold tracking-[0.12em] uppercase leading-tight px-2.5 py-1 rounded-md bg-white/95 text-stone-800 shadow-sm backdrop-blur-md border border-stone-200/90 transition-transform duration-300 group-hover:-translate-y-0.5">
+                                <span className="text-xs font-medium leading-tight px-2.5 py-1 rounded-full bg-white/95 text-ink border border-line">
                                     {property.category === 'buy' ? 'For Sale' : 'For Rent'}
                                 </span>
-                                <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-semibold tracking-wide uppercase leading-tight px-2.5 py-1 rounded-md text-white bg-slate-900/84 backdrop-blur-sm shadow-sm border border-white/10 transition-transform duration-300 group-hover:-translate-y-0.5">
-                                    <BadgeCheck className="w-3 h-3 shrink-0 text-emerald-300" aria-hidden />
+                                <span className="inline-flex items-center gap-1 text-xs font-medium leading-tight px-2.5 py-1 rounded-full text-white bg-red-900/90">
+                                    <BadgeCheck className="w-3 h-3 shrink-0 text-champagne" aria-hidden />
                                     Verified
                                 </span>
                             </div>
                         </div>
 
-                        <div className="p-4 sm:p-5 bg-gradient-to-b from-white to-stone-50/40">
+                        <div className="p-4 sm:p-5 bg-white">
                             {(() => {
                                 const ratingSummary = getQualifiedRatingSummary(property);
                                 return (
                                     <div className="flex items-center gap-1.5 mb-2">
                                         {ratingSummary.showRating ? (
                                             <>
-                                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                                <span className="text-xs font-semibold text-stone-700">
+                                                <Star className="w-3.5 h-3.5 fill-champagne text-champagne" />
+                                                <span className="text-xs font-semibold text-ink tabular-nums">
                                                     {ratingSummary.rating.toFixed(1)}
                                                 </span>
-                                                <span className="text-xs text-stone-500">
+                                                <span className="text-xs text-slate tabular-nums">
                                                     ({reviewsLabel(ratingSummary.reviewCount)})
                                                 </span>
                                             </>
                                         ) : (
-                                            <span className="text-xs font-medium text-stone-500">New Listing</span>
+                                            <span className="text-xs font-medium text-slate">New Listing</span>
                                         )}
                                     </div>
                                 );
                             })()}
 
-                            <h3 className="text-[15px] font-semibold text-stone-900 leading-snug line-clamp-2 mb-1">{displayTitle}</h3>
+                            <h3 className="font-serif-display text-[18px] font-normal text-ink leading-snug line-clamp-2 mb-1">{displayTitle}</h3>
 
-                            <div className="flex items-center text-stone-500 text-xs gap-1 mb-4">
-                                <MapPin className="w-3.5 h-3.5 shrink-0 text-brand-red/60" />
+                            <div className="flex items-center text-slate text-xs gap-1 mb-4">
+                                <MapPin className="w-3.5 h-3.5 shrink-0 text-red" />
                                 <span className="truncate">
-                                    <span className="font-medium text-stone-700">{property.location?.split(',')[0]}</span>
+                                    <span className="font-medium text-ink">{property.location?.split(',')[0]}</span>
                                     {property.location?.includes(',')
                                         ? `, ${property.location.split(',').slice(1).join(',').trim()}`
                                         : ''}
@@ -174,19 +174,19 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
 
                             <div className="flex flex-col gap-2.5 mb-4">
                                 <div>
-                                    <p className="text-xs text-stone-500 leading-tight mb-1">Starting at</p>
-                                    <p className="text-[1.15rem] font-bold leading-tight text-brand-red">
+                                    <p className="text-xs text-slate leading-tight mb-1">Starting at</p>
+                                    <p className="font-serif-display text-[1.25rem] font-normal leading-tight text-ink tabular-nums">
                                         {property.price}
                                         {isMonthlyRent && hasNumericPrice ? ' /mo' : ''}
                                     </p>
                                 </div>
                                 {typeof property.units_remaining === 'number' && property.units_remaining > 0 ? (
-                                    <span className="inline-flex self-start items-center rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-800 border border-amber-200/80">
+                                    <span className="inline-flex self-start items-center rounded-lg bg-blush-100 px-2.5 py-1.5 text-xs font-medium text-champagne-text border border-champagne/40 tabular-nums">
                                         Only {property.units_remaining}{' '}
                                         {property.units_remaining === 1 ? 'Room' : 'Rooms'} Left
                                     </span>
                                 ) : (
-                                    <span className="inline-flex self-start items-center rounded-lg bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-700 border border-stone-200/80">
+                                    <span className="inline-flex self-start items-center rounded-lg bg-page px-2.5 py-1.5 text-xs font-medium text-slate border border-line">
                                         {property.is_available === false ? 'Currently Full' : 'Ready to Move'}
                                     </span>
                                 )}
@@ -196,13 +196,10 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                                 <Link
                                     to={propertyPath}
                                     state={{ from }}
-                                    className="relative overflow-hidden flex-1 text-center py-2.5 rounded-xl text-white text-xs font-semibold tracking-wide bg-gradient-to-br from-brand-red to-red-900 shadow-md shadow-brand-red/20 active:scale-[0.98] transition-transform"
+                                    className="flex-1 text-center py-2.5 rounded-[10px] text-white text-xs font-semibold bg-red hover:bg-red-hover transition-colors inline-flex items-center justify-center gap-1"
                                 >
-                                    <span className="absolute inset-y-0 -left-1/2 w-1/2 bg-white/20 blur-xl -skew-x-12 transition-all duration-700 group-hover:left-[110%]" />
-                                    <span className="relative inline-flex items-center gap-1">
-                                        Book a Visit
-                                        <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
-                                    </span>
+                                    <span>Book a Visit</span>
+                                    <ArrowRight className="w-3.5 h-3.5" />
                                 </Link>
                                 <button
                                     onClick={(e) => {
@@ -211,10 +208,10 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                                         setSelectedProperty(property);
                                         setSelectedWaLink(waLink);
                                     }}
-                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs font-semibold transition-all border active:scale-[0.98] text-stone-700 border-stone-300/80 bg-white/95 hover:bg-emerald-50/40 hover:border-emerald-300/50 hover:text-emerald-900 shadow-[0_8px_20px_-14px_rgba(16,185,129,0.55)] cursor-pointer"
+                                    className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-[10px] text-xs font-semibold transition-colors border text-ink border-ink bg-white hover:bg-blush-100 cursor-pointer"
                                     aria-label="WhatsApp chat"
                                 >
-                                    <MessageCircle className="w-3.5 h-3.5 shrink-0 text-emerald-600 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6" aria-hidden />
+                                    <MessageCircle className="w-3.5 h-3.5 shrink-0 text-verified" aria-hidden />
                                     Chat
                                 </button>
                             </div>

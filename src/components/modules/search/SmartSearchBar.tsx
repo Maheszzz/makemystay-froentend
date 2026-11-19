@@ -192,15 +192,9 @@ export function SmartSearchBar({
     };
 
     return (
-        <div
-            className={
-                hubTabsUi
-                    ? 'bg-white rounded-2xl md:rounded-[2rem] shadow-sm p-3 md:p-7 w-full relative border border-slate-200'
-                    : 'bg-white rounded-2xl md:rounded-[2rem] shadow-md p-3 md:p-7 w-full relative border border-slate-200'
-            }
-        >
+        <div className="bg-white rounded-2xl md:rounded-[var(--radius-pdp)] shadow-sm p-3 md:p-7 w-full relative border border-line">
             {hubTabsUi ? (
-                <div className="mb-4 md:mb-5 overflow-x-auto hide-scrollbar flex gap-1.5 sm:gap-3 border-b border-slate-100 pb-px -mx-0.5 px-0.5">
+                <div className="mb-4 md:mb-5 overflow-x-auto hide-scrollbar flex gap-1.5 sm:gap-3 border-b border-line pb-px -mx-0.5 px-0.5">
                     {HUB_TAB_CONFIG.map((tab) => (
                         <button
                             key={tab.id}
@@ -208,17 +202,16 @@ export function SmartSearchBar({
                             onClick={() => setHubTab(tab.id)}
                             className={`shrink-0 pb-2.5 px-1.5 sm:px-2 text-[11px] sm:text-xs font-semibold tracking-wide transition-colors border-b-[3px] -mb-[2px] ${
                                 effectiveHubTab === tab.id
-                                    ? 'text-slate-900 border-brand-red'
-                                    : 'text-slate-500 border-transparent hover:text-slate-800'
+                                    ? 'text-ink border-red'
+                                    : 'text-slate border-transparent hover:text-ink'
                             }`}
-                            style={{ fontFamily: "'Montserrat', sans-serif" }}
                         >
                             {tab.label}
                         </button>
                     ))}
                 </div>
             ) : (
-                <div className="flex w-full overflow-x-auto sm:overflow-visible max-w-[380px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-5 bg-slate-100 rounded-full p-1 border border-slate-200 hide-scrollbar flex-nowrap justify-start sm:justify-center items-stretch">
+                <div className="flex w-full overflow-x-auto sm:overflow-visible max-w-[380px] sm:max-w-none sm:w-fit mx-auto gap-1 mb-2.5 md:mb-5 bg-page rounded-full p-1 border border-line hide-scrollbar flex-nowrap justify-start sm:justify-center items-stretch">
                     {LEGACY_TAB_CONFIG.map((tab) => (
                         <button
                             key={tab.id}
@@ -228,10 +221,10 @@ export function SmartSearchBar({
                                 setActiveLegacyTab(id);
                                 setCategory?.(id);
                             }}
-                            className={`shrink-0 min-w-[60px] sm:min-w-0 sm:flex-none py-1.5 px-2 sm:px-4 md:px-6 rounded-full text-[9px] sm:text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 min-h-[36px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${
+                            className={`shrink-0 min-w-[60px] sm:min-w-0 sm:flex-none py-1.5 px-2 sm:px-4 md:px-6 rounded-full text-[9px] sm:text-xs md:text-sm font-semibold tracking-wider transition-colors min-h-[36px] md:min-h-[42px] whitespace-nowrap flex items-center justify-center ${
                                 effectiveLegacyTab === tab.id
-                                    ? 'bg-brand-red text-white shadow-sm'
-                                    : 'bg-transparent text-slate-500 hover:text-slate-800'
+                                    ? 'bg-red text-white'
+                                    : 'bg-transparent text-slate hover:text-ink'
                             }`}
                         >
                             {tab.label}
@@ -242,33 +235,32 @@ export function SmartSearchBar({
 
             {hubTabsUi && (
                 <div className="flex items-center gap-2 mb-4 md:mb-5">
-                    <div className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-slate-50 border border-slate-200 px-3.5 py-2.5 min-h-[44px] md:min-h-[48px]">
-                        <MapPin className="w-4 h-4 shrink-0 text-slate-400" aria-hidden />
+                    <div className="flex flex-1 min-w-0 items-center gap-2.5 rounded-xl bg-page border border-line px-3.5 py-2.5 min-h-[44px] md:min-h-[48px]">
+                        <MapPin className="w-4 h-4 shrink-0 text-slate" aria-hidden />
                         <select
                             aria-label="City (Bangalore)"
                             title="City"
                             value={activeFilters.city}
                             onChange={(e) => updateFilters({ city: e.target.value as HeroSearchFilters['city'] })}
-                            className="flex-1 min-w-0 bg-transparent text-slate-900 text-sm font-medium outline-none appearance-none"
-                            style={{ fontFamily: "'Montserrat', sans-serif" }}
+                            className="flex-1 min-w-0 bg-transparent text-ink text-sm font-medium outline-none appearance-none"
                         >
                             <option value="bangalore">Bangalore</option>
                             <option value="pune">Pune</option>
                             <option value="hyderabad">Hyderabad</option>
                         </select>
-                        <ChevronDown className="w-4 h-4 shrink-0 text-slate-400 pointer-events-none" aria-hidden />
+                        <ChevronDown className="w-4 h-4 shrink-0 text-slate pointer-events-none" aria-hidden />
                     </div>
                 </div>
             )}
 
             {/* Search row + CTA */}
             <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 items-stretch relative">
-                <div className="relative flex flex-1 min-w-0 items-stretch bg-slate-50 border border-slate-200 rounded-2xl md:rounded-xl group focus-within:ring-2 focus-within:ring-brand-red/20 focus-within:border-brand-red/40 transition-all min-h-[46px] md:min-h-[52px] pl-10 md:pl-12 pr-3">
-                    <MapPin className="absolute left-3 md:left-4 top-1/2 z-[1] -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate-400 group-focus-within:text-brand-red transition-colors duration-300 pointer-events-none" />
+                <div className="relative flex flex-1 min-w-0 items-stretch bg-page border border-line rounded-2xl md:rounded-xl group focus-within:ring-2 focus-within:ring-red/25 focus-within:border-red transition-all min-h-[46px] md:min-h-[52px] pl-10 md:pl-12 pr-3">
+                    <MapPin className="absolute left-3 md:left-4 top-1/2 z-[1] -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-slate group-focus-within:text-red transition-colors duration-300 pointer-events-none" />
 
                     <div className="flex flex-1 min-w-0 min-h-[46px] md:min-h-[52px] flex-wrap items-center content-center gap-1.5 py-2 md:py-2.5 pr-2">
                         {(searchQuery || '').split(',').filter(Boolean).map((loc, idx) => (
-                            <div key={idx} className="flex items-center gap-1 bg-slate-200 text-slate-800 text-[11px] md:text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full shrink-0">
+                            <div key={idx} className="flex items-center gap-1 bg-blush-100 border border-line text-ink text-[11px] md:text-xs px-2 md:px-3 py-1 md:py-1.5 rounded-full shrink-0">
                                 <span className="truncate max-w-[120px] md:max-w-xs font-medium">{loc}</span>
                                 <button
                                     type="button"
@@ -276,7 +268,7 @@ export function SmartSearchBar({
                                         const newLocations = (searchQuery || '').split(',').filter(Boolean).filter((_, i) => i !== idx);
                                         setSearchQuery?.(newLocations.join(','));
                                     }}
-                                    className="hover:text-brand-red transition-colors text-slate-500"
+                                    className="hover:text-red transition-colors text-slate"
                                 >
                                     <X className="w-3 h-3 md:w-3.5 md:h-3.5" />
                                 </button>
@@ -332,8 +324,7 @@ export function SmartSearchBar({
                                       ? 'Search property, area or landmark...'
                                       : 'Search property or location...'
                             }
-                            className="flex-1 min-w-[80px] min-h-0 self-center bg-transparent text-slate-900 placeholder:text-slate-400 outline-none text-[13px] md:text-sm leading-normal font-medium"
-                            style={{ fontFamily: "'Montserrat', sans-serif" }}
+                            className="flex-1 min-w-[80px] min-h-0 self-center bg-transparent text-ink placeholder:text-slate outline-none text-[13px] md:text-sm leading-normal font-medium"
                         />
                     </div>
 
@@ -346,7 +337,7 @@ export function SmartSearchBar({
                                 setShowSuggestions(false);
                                 setSuggestionGroups({ properties: [], places: [] });
                             }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 sm:static sm:translate-y-0 sm:self-center text-slate-400 hover:text-slate-700 transition-colors p-1"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 sm:static sm:translate-y-0 sm:self-center text-slate hover:text-ink transition-colors p-1"
                             aria-label="Clear all"
                         >
                             <X className="w-4 h-4 md:w-5 md:h-5" />
@@ -358,10 +349,9 @@ export function SmartSearchBar({
                     type="button"
                     aria-label="Search listings"
                     onClick={onSearchClick}
-                    className="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 px-6 py-2.5 min-h-[46px] md:min-h-[52px] rounded-xl md:rounded-xl bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold tracking-wide shadow-sm transition-all duration-300 hover:shadow-md"
-                    style={{ fontFamily: "'Montserrat', sans-serif" }}
+                    className="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 px-6 py-2.5 min-h-[46px] md:min-h-[52px] rounded-xl bg-red hover:bg-red-hover text-white text-sm font-semibold tracking-wide transition-colors cursor-pointer"
                 >
-                    <Search className="w-4 h-4 md:w-5 md:h-5 pointer-events-none opacity-95" aria-hidden />
+                    <Search className="w-4 h-4 md:w-5 md:h-5 pointer-events-none" aria-hidden />
                     Search
                 </button>
             </div>
