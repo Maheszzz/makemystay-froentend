@@ -1,8 +1,14 @@
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
-import { BRAND_CONTACT, BRAND_EXTENDED, BRAND_SOCIAL_URLS } from '@/lib/brandEntity';
+import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Phone } from 'lucide-react';
+import {
+    BRAND_CONTACT,
+    BRAND_EXTENDED,
+    BRAND_GRIEVANCE_CONTACT,
+    BRAND_SOCIAL_URLS,
+} from '@/lib/brandEntity';
 import { BrandLogo } from '@/components/ui/BrandLogo';
 import { Link } from '@/lib/navigation';
 import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
+import { getWhatsappDigits } from '@/lib/whatsapp';
 
 const REGISTERED_ADDRESS = 'HSR Layout, Sector 7, Bengaluru, Karnataka 560102';
 
@@ -39,14 +45,21 @@ const FOOTER_LEGAL = [
     { label: 'Refund policy', to: '/refund-policy' },
 ] as const;
 
+const DARK_FOCUS_RING =
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-red-900';
+
 export function Footer() {
+    const whatsappHref = `https://wa.me/${getWhatsappDigits()}?text=${encodeURIComponent(
+        'Hi MakeMyStay team, I would like help finding a stay in Bangalore.',
+    )}`;
+
     return (
         <footer className="bg-red-900 text-red-subtitle pt-14 md:pt-16 pb-24 md:pb-12 border-t border-champagne/30">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-champagne/25">
-                    {/* Brand, Contact & Registered Address */}
+                    {/* Column 1: Brand, Phone, Email, WhatsApp, Socials */}
                     <div className="lg:col-span-4 space-y-5 lg:pr-8 lg:border-r lg:border-champagne/20">
-                        <Link to="/" aria-label="MakeMyStay.ai Home" className="inline-flex rounded">
+                        <Link to="/" aria-label="MakeMyStay.ai Home" className={`inline-flex rounded ${DARK_FOCUS_RING}`}>
                             <BrandLogo variant="light" />
                         </Link>
 
@@ -54,88 +67,91 @@ export function Footer() {
                             {BRAND_EXTENDED}
                         </p>
 
-                        <div className="space-y-2.5 text-sm">
-                            <div className="flex items-start gap-2.5">
-                                <MapPin className="w-4 h-4 text-champagne shrink-0 mt-0.5" aria-hidden />
-                                <span>
-                                    <strong className="font-medium text-white">{LEGAL_ENTITY_NAME}</strong>
-                                    <br />
-                                    {REGISTERED_ADDRESS}
-                                </span>
+                        <div className="space-y-1.5 text-sm">
+                            <div className="flex items-center gap-2.5">
+                                <Phone className="w-4 h-4 text-champagne shrink-0" aria-hidden="true" />
+                                <a
+                                    href={`tel:${BRAND_CONTACT.telephone}`}
+                                    className={`inline-flex items-center min-h-[44px] sm:min-h-[28px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums rounded ${DARK_FOCUS_RING}`}
+                                >
+                                    +91 81500 99911
+                                </a>
                             </div>
                             <div className="flex items-center gap-2.5">
-                                <Mail className="w-4 h-4 text-champagne shrink-0" aria-hidden />
+                                <Mail className="w-4 h-4 text-champagne shrink-0" aria-hidden="true" />
                                 <a
                                     href={`mailto:${BRAND_CONTACT.email}`}
-                                    className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
+                                    className={`inline-flex items-center min-h-[44px] sm:min-h-[28px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                 >
                                     {BRAND_CONTACT.email}
                                 </a>
                             </div>
                             <div className="flex items-center gap-2.5">
-                                <Phone className="w-4 h-4 text-champagne shrink-0" aria-hidden />
+                                <MessageCircle className="w-4 h-4 text-champagne shrink-0" aria-hidden="true" />
                                 <a
-                                    href={`tel:${BRAND_CONTACT.telephone}`}
-                                    className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums rounded"
+                                    href={whatsappHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`inline-flex items-center min-h-[44px] sm:min-h-[28px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                 >
-                                    +91 81500 99911
+                                    Chat on WhatsApp
                                 </a>
                             </div>
                         </div>
 
-                        {/* Clean social links (zero tracking parameters) */}
+                        {/* Social icons (40px, clean URLs without tracking params) */}
                         <div className="flex items-center gap-2.5 pt-1">
                             <a
                                 href={BRAND_SOCIAL_URLS.facebook}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Facebook"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
+                                className={`relative w-10 h-10 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors after:absolute after:-inset-0.5 ${DARK_FOCUS_RING}`}
                             >
-                                <Facebook size={16} aria-hidden />
+                                <Facebook size={17} aria-hidden="true" />
                             </a>
                             <a
                                 href={BRAND_SOCIAL_URLS.instagram}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Instagram"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
+                                className={`relative w-10 h-10 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors after:absolute after:-inset-0.5 ${DARK_FOCUS_RING}`}
                             >
-                                <Instagram size={16} aria-hidden />
+                                <Instagram size={17} aria-hidden="true" />
                             </a>
                             <a
                                 href={BRAND_SOCIAL_URLS.linkedin}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on LinkedIn"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
+                                className={`relative w-10 h-10 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors after:absolute after:-inset-0.5 ${DARK_FOCUS_RING}`}
                             >
-                                <Linkedin size={16} aria-hidden />
+                                <Linkedin size={17} aria-hidden="true" />
                             </a>
                             <a
                                 href={BRAND_SOCIAL_URLS.x}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on X"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
+                                className={`relative w-10 h-10 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors after:absolute after:-inset-0.5 ${DARK_FOCUS_RING}`}
                             >
-                                <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                                 </svg>
                             </a>
                         </div>
                     </div>
 
-                    {/* 4 Navigation Columns separated by champagne hairlines */}
+                    {/* Columns 2-5: Explore, Popular areas, Company, Legal */}
                     <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-0 sm:divide-x sm:divide-champagne/20">
                         <div className="sm:pr-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Explore</h2>
-                            <ul className="space-y-2.5 text-sm">
+                            <ul className="space-y-1 text-sm">
                                 {FOOTER_EXPLORE.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
+                                            className={`inline-flex items-center min-h-[44px] sm:min-h-[30px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                         >
                                             {item.label}
                                         </Link>
@@ -146,12 +162,12 @@ export function Footer() {
 
                         <div className="sm:px-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Popular areas</h2>
-                            <ul className="space-y-2.5 text-sm">
+                            <ul className="space-y-1 text-sm">
                                 {FOOTER_POPULAR_AREAS.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
+                                            className={`inline-flex items-center min-h-[44px] sm:min-h-[30px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                         >
                                             {item.label}
                                         </Link>
@@ -162,12 +178,12 @@ export function Footer() {
 
                         <div className="sm:px-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Company</h2>
-                            <ul className="space-y-2.5 text-sm">
+                            <ul className="space-y-1 text-sm">
                                 {FOOTER_COMPANY.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
+                                            className={`inline-flex items-center min-h-[44px] sm:min-h-[30px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                         >
                                             {item.label}
                                         </Link>
@@ -178,25 +194,50 @@ export function Footer() {
 
                         <div className="sm:pl-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Legal</h2>
-                            <ul className="space-y-2.5 text-sm">
+                            <ul className="space-y-1 text-sm">
                                 {FOOTER_LEGAL.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
+                                            className={`inline-flex items-center min-h-[44px] sm:min-h-[30px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
                                         >
                                             {item.label}
                                         </Link>
                                     </li>
                                 ))}
+                                {BRAND_GRIEVANCE_CONTACT && (
+                                    <li>
+                                        <a
+                                            href={BRAND_GRIEVANCE_CONTACT.href}
+                                            className={`inline-flex items-center min-h-[44px] sm:min-h-[30px] text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded ${DARK_FOCUS_RING}`}
+                                        >
+                                            {BRAND_GRIEVANCE_CONTACT.label}
+                                        </a>
+                                    </li>
+                                )}
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-red-subtitle">
+                <div className="pt-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between text-xs text-red-subtitle">
                     <p>&copy; 2026 {LEGAL_ENTITY_NAME}. All rights reserved.</p>
-                    <p>Registered office: {REGISTERED_ADDRESS}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-5">
+                        <p>
+                            Registered office: {LEGAL_ENTITY_NAME}, {REGISTERED_ADDRESS}
+                        </p>
+                        <p>
+                            Skyline photo:{' '}
+                            <a
+                                href="https://commons.wikimedia.org/wiki/File:Skyline_of_Varthur,_Bangalore.jpg"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`text-red-subtitle hover:text-white underline underline-offset-4 rounded ${DARK_FOCUS_RING}`}
+                            >
+                                SlowPhoton, CC BY-SA 4.0
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>
