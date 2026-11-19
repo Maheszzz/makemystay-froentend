@@ -68,7 +68,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-    themeColor: '#C0392B',
+    themeColor: '#C41F25',
 };
 
 /** Cached HTML for hubs/PDPs; client islands hydrate inside Suspense. */

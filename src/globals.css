@@ -1,31 +1,33 @@
 @import "tailwindcss";
  
 @theme {
-    /* ── Oxblood & Blush Red-Led Luxury Palette (single source of truth) ── */
-    --color-oxblood-900: #3A0E14;
-    --color-oxblood-700: #5A1620;
-    --color-red: #C0392B;
-    --color-red-hover: #A82F23;
-    --color-blush-100: #F7ECEA;
-    --color-page: #FBF9F8;
-    --color-line: #E9E1DF;
+    /* ── Brand Red & Blush Luxury Palette (single source of truth) ── */
+    --color-red: #C41F25;
+    --color-red-hover: #A51D21;
+    --color-red-bright: #D82227;
+    --color-red-800: #7F1519;
+    --color-red-900: #5E0F12;
+    --color-blush-100: #FCEBEC;
+    --color-page: #FBF8F8;
+    --color-line: #EADBDC;
     --color-champagne: #B8924A;
     --color-champagne-text: #7A5B22;
     --color-ink: #1A1416;
     --color-slate: #5F5658;
     --color-verified: #1F7A4D;
-    --color-blush-muted: #E6D2CF;
+    --color-red-subtitle: #F6DCDD;
     --color-whatsapp: #25D366;
+    --gradient-brand: linear-gradient(to top right, #D82227 0%, #C41F25 45%, #A51D21 100%);
 
     /* Derived semantic aliases so editing the block above switches the entire site */
     --color-brand-red: var(--color-red);
-    --color-brand-charcoal: var(--color-oxblood-900);
+    --color-brand-charcoal: var(--color-red-900);
     --color-brand-gray: var(--color-page);
-    --color-brand-navy: var(--color-oxblood-900);
+    --color-brand-navy: var(--color-red-800);
     --color-accent-purple: var(--color-red);
     --color-accent-coral: var(--color-red);
     --color-primary: var(--color-red);
-    --color-secondary: var(--color-oxblood-900);
+    --color-secondary: var(--color-red-900);
     --color-background: #FFFFFF;
     --color-brand-gold: var(--color-champagne);
 
@@ -45,39 +47,38 @@
     --color-pdp-cta-hover: var(--color-red-hover);
     --color-pdp-verified: var(--color-verified);
     --color-pdp-verified-bg: var(--color-blush-100);
-    --color-pdp-contrast-bg: var(--color-oxblood-900);
-    --color-pdp-contrast-surface: var(--color-oxblood-700);
-    --color-pdp-contrast-border: color-mix(in srgb, var(--color-champagne) 35%, var(--color-oxblood-900));
-    --color-pdp-contrast-muted: var(--color-blush-muted);
-    --shadow-pdp-card: 0 2px 10px rgba(58, 14, 20, 0.05);
+    --color-pdp-contrast-bg: var(--color-red-800);
+    --color-pdp-contrast-surface: var(--color-red-900);
+    --color-pdp-contrast-border: color-mix(in srgb, var(--color-champagne) 35%, var(--color-red-800));
+    --color-pdp-contrast-muted: var(--color-red-subtitle);
+    --shadow-pdp-card: 0 2px 10px rgba(94, 15, 18, 0.05);
     --radius-pdp: 14px;
 
-    --shadow-glass: 0 4px 16px 0 rgba(58, 14, 20, 0.05);
-    --shadow-glow: 0 2px 12px rgba(192, 57, 43, 0.16);
-    --shadow-card: 0 1px 3px rgba(58, 14, 20, 0.06);
+    --shadow-glass: 0 4px 16px 0 rgba(94, 15, 18, 0.05);
+    --shadow-glow: 0 2px 12px rgba(196, 31, 37, 0.16);
+    --shadow-card: 0 1px 3px rgba(94, 15, 18, 0.06);
 
-    --shadow-listing: 0 1px 3px rgba(58, 14, 20, 0.05);
-    --shadow-listing-hover: 0 6px 20px rgba(58, 14, 20, 0.08);
+    --shadow-listing: 0 1px 3px rgba(94, 15, 18, 0.05);
+    --shadow-listing-hover: 0 6px 20px rgba(94, 15, 18, 0.08);
 }
 
 @layer utilities {
-    .bg-diagonal-grid {
-        background-color: transparent;
-        background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-            linear-gradient(225deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-            linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
-            linear-gradient(315deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%);
-        background-position: 10px 0, 10px 0, 0 0, 0 0;
-        background-size: 20px 20px;
-        background-repeat: repeat;
+    /* Street-map diagonal line SVG pattern layered strictly on brand gradient bands */
+    .bg-brand-band {
+        background-color: var(--color-red);
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M-1 1L1 -1M0 40L40 0M39 41L41 39M0 0L40 40M-1 39L1 41M39 -1L41 1M-1 21L21 -1M19 41L41 19' stroke='%23FFFFFF' stroke-opacity='0.11' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+            var(--gradient-brand);
+        background-size: 40px 40px, 100% 100%;
+        background-repeat: repeat, no-repeat;
     }
 
     .glass-panel {
-        @apply bg-white border border-slate-100 shadow-card;
+        @apply bg-white border border-line shadow-card;
     }
 
     .glass-panel-dark {
-        @apply bg-brand-charcoal border border-white/10 shadow-glass;
+        @apply bg-red-900 border border-white/10 shadow-glass;
     }
 
     .text-gradient {
@@ -336,15 +337,16 @@
     }
 
     .prose-mms a {
-        color: var(--color-pdp-ink);
-        text-decoration: underline;
-        text-underline-offset: 0.2em;
-        text-decoration-thickness: 1px;
+        color: var(--color-red);
+        text-decoration: none;
         transition: color 0.15s ease;
     }
 
     .prose-mms a:hover {
-        color: var(--color-pdp-cta);
+        color: var(--color-red-hover);
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+        text-decoration-thickness: 1px;
     }
 
     .prose-mms strong {

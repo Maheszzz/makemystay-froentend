@@ -33,14 +33,14 @@ export function MobileBottomCTA() {
                 style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)', paddingTop: '8px' }}
             >
                 <div
-                    className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-oxblood-900 border border-oxblood-700 rounded-[18px] p-1.5 min-h-[60px] shadow-md"
+                    className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-red-900 border border-red-800 rounded-[18px] p-1.5 min-h-[60px] shadow-md"
                 >
                     {/* Call */}
                     <a
                         href="tel:+918150099911"
                         aria-label="Call us"
                         onClick={() => console.log('[TRACK] Mobile Bottom Call clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-oxblood-700/70 border border-champagne/30 text-white"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-red-800 border border-champagne/30 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         <Phone className="w-3.5 h-3.5 shrink-0 text-champagne" strokeWidth={2.2} />
@@ -79,7 +79,7 @@ export function MobileBottomCTA() {
                         to="/contact-us"
                         aria-label="Enquire now"
                         onClick={() => console.log('[TRACK] Mobile Bottom Enquire clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-oxblood-700/70 border border-champagne/30 text-white"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-red-800 border border-champagne/30 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         <Mail className="w-3.5 h-3.5 shrink-0 text-champagne" strokeWidth={2.2} />

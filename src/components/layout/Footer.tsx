@@ -1,9 +1,9 @@
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
 import { BRAND_CONTACT, BRAND_EXTENDED, BRAND_SOCIAL_URLS } from '@/lib/brandEntity';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 import { Link } from '@/lib/navigation';
 import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
 
-const LOGO_SRC = '/logo-nav.jpg';
 const REGISTERED_ADDRESS = 'HSR Layout, Sector 7, Bengaluru, Karnataka 560102';
 
 const FOOTER_EXPLORE = [
@@ -41,25 +41,16 @@ const FOOTER_LEGAL = [
 
 export function Footer() {
     return (
-        <footer className="bg-oxblood-900 text-blush-muted pt-14 md:pt-16 pb-24 md:pb-12 border-t border-champagne/30">
+        <footer className="bg-red-900 text-red-subtitle pt-14 md:pt-16 pb-24 md:pb-12 border-t border-champagne/30">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-champagne/25">
                     {/* Brand, Contact & Registered Address */}
                     <div className="lg:col-span-4 space-y-5 lg:pr-8 lg:border-r lg:border-champagne/20">
-                        <div className="flex items-center gap-2.5">
-                            <img
-                                src={LOGO_SRC}
-                                alt="MakeMyStay.ai logo"
-                                width={32}
-                                height={32}
-                                className="w-8 h-8 rounded-lg object-contain bg-white"
-                            />
-                            <span className="text-xl font-bold text-white tracking-tight font-heading">
-                                MakeMyStay<span className="text-champagne font-semibold">.ai</span>
-                            </span>
-                        </div>
+                        <Link to="/" aria-label="MakeMyStay.ai Home" className="inline-flex rounded">
+                            <BrandLogo variant="light" />
+                        </Link>
 
-                        <p className="text-sm leading-relaxed text-blush-muted max-w-sm">
+                        <p className="text-sm leading-relaxed text-red-subtitle max-w-sm">
                             {BRAND_EXTENDED}
                         </p>
 
@@ -76,7 +67,7 @@ export function Footer() {
                                 <Mail className="w-4 h-4 text-champagne shrink-0" aria-hidden />
                                 <a
                                     href={`mailto:${BRAND_CONTACT.email}`}
-                                    className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                    className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
                                 >
                                     {BRAND_CONTACT.email}
                                 </a>
@@ -85,7 +76,7 @@ export function Footer() {
                                 <Phone className="w-4 h-4 text-champagne shrink-0" aria-hidden />
                                 <a
                                     href={`tel:${BRAND_CONTACT.telephone}`}
-                                    className="hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                    className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums rounded"
                                 >
                                     +91 81500 99911
                                 </a>
@@ -99,7 +90,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Facebook"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
                             >
                                 <Facebook size={16} aria-hidden />
                             </a>
@@ -108,7 +99,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Instagram"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
                             >
                                 <Instagram size={16} aria-hidden />
                             </a>
@@ -117,7 +108,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on LinkedIn"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
                             >
                                 <Linkedin size={16} aria-hidden />
                             </a>
@@ -126,7 +117,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on X"
-                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-red-800/70 text-red-subtitle hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors"
                             >
                                 <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -144,7 +135,7 @@ export function Footer() {
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -160,7 +151,7 @@ export function Footer() {
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -176,7 +167,7 @@ export function Footer() {
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -192,7 +183,7 @@ export function Footer() {
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
+                                            className="text-red-subtitle hover:text-white hover:underline underline-offset-4 transition-colors rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -203,7 +194,7 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-blush-muted">
+                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-red-subtitle">
                     <p>&copy; 2026 {LEGAL_ENTITY_NAME}. All rights reserved.</p>
                     <p>Registered office: {REGISTERED_ADDRESS}</p>
                 </div>

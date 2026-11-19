@@ -9,13 +9,13 @@ export function Button({ children, variant = 'primary', className = '', icon: Ic
     const baseStyles = "px-6 py-3 rounded-2xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2";
 
     const variants = {
-        primary: "bg-gradient-to-r from-brand-red to-orange-500 text-white font-semibold shadow-glow hover:shadow-[0_0_25px_rgba(220,38,38,0.5)] active:scale-95",
-        secondary: "bg-white text-slate-900 hover:bg-slate-50 border border-slate-200 shadow-sm",
-        outline: "border-2 border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600",
-        ghost: "text-slate-600 hover:bg-slate-100",
-        dark: "bg-brand-navy text-white hover:bg-brand-dark shadow-glass border border-white/10",
-        link: "text-emerald-600 hover:underline p-0 h-auto",
-        gold: "bg-brand-gold text-white hover:bg-yellow-600 shadow-glow hover:shadow-[0_0_20px_rgba(197,160,33,0.5)]"
+        primary: "bg-red hover:bg-red-hover text-white font-semibold active:scale-95",
+        secondary: "bg-white text-ink hover:bg-blush-100 border border-line shadow-sm",
+        outline: "border border-ink text-ink hover:border-red hover:bg-red hover:text-white",
+        ghost: "text-slate hover:bg-blush-100",
+        dark: "bg-red-800 text-white hover:bg-red-900 shadow-glass border border-champagne/30",
+        link: "text-red hover:underline p-0 h-auto",
+        gold: "bg-red-800 text-white hover:bg-red-900"
     };
 
     return (
