@@ -28,6 +28,12 @@ export interface FreshnessBadgeItem {
     priority: number;
 }
 
+export function formatVerifiedDate(raw?: string | null): string | null {
+    const d = parseDate(raw);
+    if (!d) return null;
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 /**
  * Marketplace freshness labels for cards and PDP (trust + CTR).
  */

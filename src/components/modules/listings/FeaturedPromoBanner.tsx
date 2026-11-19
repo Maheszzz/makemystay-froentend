@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     ArrowRight,
+    Check,
     ChevronLeft,
     ChevronRight,
     MapPin,
@@ -12,6 +13,7 @@ import {
 
 import { Link } from '@/lib/navigation';
 import { formatPropertyTitle } from '@/lib/formatPropertyTitle';
+import { formatVerifiedDate } from '@/lib/freshness';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { getQualifiedRatingSummary } from '@/lib/ratings';
 import { buildPropertyWhatsappUrl } from '@/lib/whatsapp';
@@ -49,21 +51,45 @@ function resolveRealImage(p: Property): string {
     return p.image;
 }
 
+function getFeaturedBadgeLabel(prop: Property): string | null {
+    const ratingSummary = getQualifiedRatingSummary(prop);
+    if (prop.last_verified_at) {
+        const verifiedTime = new Date(prop.last_verified_at).getTime();
+        const ageDays = Number.isFinite(verifiedTime)
+            ? (Date.now() - verifiedTime) / (1000 * 60 * 60 * 24)
+            : Infinity;
+        if (ageDays <= 45) return 'Newly verified';
+    }
+    if (ratingSummary.showRating) return 'Top pick';
+    if (prop.last_verified_at) return 'Verified listing';
+    return null;
+}
+
 export function FeaturedPromoBanner({ properties = [], launchProperty }: FeaturedPromoBannerProps) {
     const [currentSlide, setCurrentSlide] = useState(0);
-    const [isPaused, setIsPaused] = useState(false);
 
     const eligibleSlides = useMemo(() => {
+        const ranked = [...properties]
+            .filter(isEligibleFeaturedProperty)
+            .sort((a, b) => {
+                const aVer = a.last_verified_at ? new Date(a.last_verified_at).getTime() : 0;
+                const bVer = b.last_verified_at ? new Date(b.last_verified_at).getTime() : 0;
+                if (bVer !== aVer) return bVer - aVer;
+                const aRev = getQualifiedRatingSummary(a).showRating ? a.review_count ?? 0 : 0;
+                const bRev = getQualifiedRatingSummary(b).showRating ? b.review_count ?? 0 : 0;
+                return bRev - aRev;
+            });
+
         const candidates: Property[] = [];
         if (isEligibleFeaturedProperty(launchProperty)) {
             candidates.push(launchProperty);
         }
-        for (const p of properties) {
-            if (!isEligibleFeaturedProperty(p)) continue;
+        for (const p of ranked) {
             if (candidates.some((c) => String(c.id) === String(p.id))) continue;
             candidates.push(p);
             if (candidates.length >= 3) break;
         }
+
         return candidates.map((prop) => {
             const title = formatPropertyTitle(prop.title) || prop.title;
             const detailPath = getPropertyDetailPath(prop);
@@ -73,49 +99,41 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                 (prop.type || '').toLowerCase() === 'pg' ||
                 (prop.type || '').toLowerCase() === 'hostel';
             const ratingSummary = getQualifiedRatingSummary(prop);
-            const highlights = [
-                prop.wifi ? 'WiFi' : null,
-                prop.food ? 'Food Available' : null,
-                prop.housekeeping ? 'Housekeeping' : null,
-                prop.power_backup ? 'Power Backup' : null,
-                'Zero Brokerage',
-            ].filter((v): v is string => Boolean(v));
+            const verifiedDate = formatVerifiedDate(prop.last_verified_at);
+
+            const facts: string[] = [];
+            if (prop.type) facts.push(prop.type);
+            if (Array.isArray(prop.sharing) && prop.sharing.length > 0 && prop.category === 'pg') {
+                facts.push(`${prop.sharing.join(' / ')} sharing`);
+            } else if (prop.furnishing) {
+                facts.push(prop.furnishing.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()));
+            }
+            if (prop.food) facts.push('Meals available');
+            else if (prop.wifi) facts.push('WiFi');
+            if (verifiedDate) facts.push(`Verified ${verifiedDate}`);
 
             return {
                 id: String(prop.id),
                 title,
-                type: prop.type || 'Listing',
+                badgeLabel: getFeaturedBadgeLabel(prop),
                 location: prop.location || prop.city || 'Bangalore',
                 image: resolveRealImage(prop),
                 detailPath,
-                priceText: isMonthly ? `${prop.price} /mo` : prop.price,
+                priceText: isMonthly ? `${prop.price}/mo` : prop.price,
                 isMonthly,
                 ratingSummary,
-                highlights: highlights.slice(0, 4),
+                facts: facts.slice(0, 3),
                 waUrl: buildPropertyWhatsappUrl(title, prop.location || '', detailPath),
             };
         });
     }, [properties, launchProperty]);
 
-    useEffect(() => {
-        if (currentSlide >= eligibleSlides.length) {
-            setCurrentSlide(0);
-        }
-    }, [eligibleSlides.length, currentSlide]);
-
-    useEffect(() => {
-        if (isPaused || eligibleSlides.length <= 1) return;
-        const timer = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % eligibleSlides.length);
-        }, 4500);
-        return () => clearInterval(timer);
-    }, [isPaused, eligibleSlides.length]);
-
     if (eligibleSlides.length === 0) {
         return null;
     }
 
-    const activeSlide = eligibleSlides[currentSlide] || eligibleSlides[0];
+    const safeIndex = currentSlide < eligibleSlides.length ? currentSlide : 0;
+    const activeSlide = eligibleSlides[safeIndex] || eligibleSlides[0];
 
     const handlePrev = () => {
         setCurrentSlide((prev) => (prev - 1 + eligibleSlides.length) % eligibleSlides.length);
@@ -126,79 +144,73 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
     };
 
     return (
-        <div className="mb-10 md:mb-14 animate-fade-in">
-            <div
-                className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-900 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.3)] group"
-                onMouseEnter={() => setIsPaused(true)}
-                onMouseLeave={() => setIsPaused(false)}
-            >
-                {/* Real Property Image */}
-                <div className="absolute inset-0 z-0">
-                    <img
-                        src={activeSlide.image}
-                        alt={`${activeSlide.title} in ${activeSlide.location}`}
-                        className="w-full h-full object-cover transition-all duration-700 ease-out transform scale-[1.03] group-hover:scale-[1.06] opacity-75"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-900/30 md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/85 md:to-transparent" />
-                </div>
+        <section aria-label="Featured listing" className="mb-8">
+            <div className="relative overflow-hidden rounded-[var(--radius-pdp)] border border-pdp-border bg-[#14161A] min-h-[288px] md:h-[304px] group">
+                <img
+                    src={activeSlide.image}
+                    alt={`${activeSlide.title} in ${activeSlide.location}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+                {/* Scrim stays behind text column so the right side photo stays clearly visible */}
+                <div
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-[#14161A]/95 via-[#14161A]/80 via-60% to-[#14161A]/20 md:bg-gradient-to-r md:from-[#14161A]/95 md:via-[#14161A]/75 md:via-52% md:to-transparent"
+                />
 
-                {/* Slider Content */}
-                <div className="relative z-10 px-5 pt-6 pb-16 sm:px-8 sm:py-10 md:px-12 md:py-12 lg:py-14 max-w-3xl flex flex-col justify-between min-h-[360px] sm:min-h-[380px]">
+                <div className="relative z-10 h-full min-h-[288px] md:min-h-[304px] px-5 py-6 sm:px-8 md:px-10 max-w-2xl flex flex-col justify-between gap-4">
                     <div>
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 sm:mb-5 pr-20 sm:pr-0">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red text-white text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-md">
-                                Featured {activeSlide.type}
-                            </span>
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
+                            {activeSlide.badgeLabel && (
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-medium">
+                                    <Check className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+                                    {activeSlide.badgeLabel}
+                                </span>
+                            )}
                             {activeSlide.ratingSummary.showRating && (
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-bold">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 text-white text-xs font-medium tabular-nums">
                                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
                                     <span>{activeSlide.ratingSummary.rating.toFixed(1)}</span>
                                     <span className="text-white/75">
-                                        ({activeSlide.ratingSummary.reviewCount} reviews)
+                                        ({activeSlide.ratingSummary.reviewCount})
                                     </span>
                                 </span>
                             )}
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] font-extrabold text-white leading-[1.15] tracking-tight mb-3 font-luxury">
+                        <h2 className="font-serif-display text-2xl sm:text-[32px] font-normal text-white leading-[1.15] tracking-[-0.01em] line-clamp-2 max-w-xl">
                             {activeSlide.title}
                         </h2>
 
-                        <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-200 mb-5">
-                            <MapPin className="w-4 h-4 text-brand-red shrink-0" />
-                            <span>{activeSlide.location}</span>
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/85">
+                            <span className="inline-flex items-center gap-1.5">
+                                <MapPin className="w-3.5 h-3.5 text-white/70 shrink-0" />
+                                <span>{activeSlide.location}</span>
+                            </span>
+                            {activeSlide.facts.map((fact) => (
+                                <span key={fact} className="inline-flex items-center gap-2 text-xs text-white/80">
+                                    <span aria-hidden="true" className="text-white/40">·</span>
+                                    <span>{fact}</span>
+                                </span>
+                            ))}
                         </div>
-
-                        {activeSlide.highlights.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 sm:gap-3 mb-6 sm:mb-8">
-                                {activeSlide.highlights.map((item) => (
-                                    <span
-                                        key={item}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-sm border border-white/15 text-xs sm:text-sm font-bold text-white"
-                                    >
-                                        {item}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 pt-4 border-t border-white/15">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-3 border-t border-white/15">
                         <div>
-                            <p className="text-[10px] uppercase font-black tracking-widest text-slate-300 mb-0.5">
-                                {activeSlide.isMonthly ? 'Starting Rent' : 'Listed Price'}
+                            <p className="text-xs text-white/75 mb-0.5">
+                                {activeSlide.isMonthly ? 'Starting from' : 'Listed price'}
                             </p>
-                            <p className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                            <p className="text-xl sm:text-2xl font-semibold text-white tracking-tight tabular-nums">
                                 {activeSlide.priceText}
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+                        <div className="flex items-center gap-2.5">
                             <Link
                                 to={activeSlide.detailPath}
-                                className="flex-1 sm:flex-initial justify-center px-4 py-3 rounded-xl bg-brand-red hover:bg-red-600 text-white text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-1.5 shrink-0"
+                                className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-cta hover:bg-pdp-cta-hover text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                             >
-                                <span>Book a Visit</span>
+                                <span>View details</span>
                                 <ArrowRight className="w-4 h-4 shrink-0" />
                             </Link>
 
@@ -206,9 +218,10 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 href={activeSlide.waUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex-1 sm:flex-initial justify-center px-4 py-3 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 shrink-0"
+                                aria-label={`Chat on WhatsApp about ${activeSlide.title}`}
+                                className="min-h-[44px] px-4 py-2.5 rounded-[10px] bg-white/10 hover:bg-white/20 border border-white/25 text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                             >
-                                <MessageCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                                <MessageCircle className="w-4 h-4 shrink-0" />
                                 <span>WhatsApp</span>
                             </a>
                         </div>
@@ -216,47 +229,26 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                 </div>
 
                 {eligibleSlides.length > 1 && (
-                    <>
-                        <div className="absolute right-4 top-4 sm:top-auto sm:bottom-8 z-20 flex items-center gap-2">
-                            <button
-                                type="button"
-                                onClick={handlePrev}
-                                aria-label="Previous featured listing"
-                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center transition-all hover:scale-105"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleNext}
-                                aria-label="Next featured listing"
-                                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center transition-all hover:scale-105"
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                        </div>
-
-                        <div className="absolute left-5 bottom-3.5 sm:left-8 sm:bottom-4 z-20 flex items-center gap-1.5 sm:gap-2">
-                            {eligibleSlides.map((slide, idx) => {
-                                const active = idx === currentSlide;
-                                return (
-                                    <button
-                                        key={slide.id}
-                                        type="button"
-                                        onClick={() => setCurrentSlide(idx)}
-                                        aria-label={`View ${slide.title}`}
-                                        className={`h-2 rounded-full transition-all ${
-                                            active
-                                                ? 'w-6 bg-brand-red'
-                                                : 'w-2 bg-white/40 hover:bg-white/70'
-                                        }`}
-                                    />
-                                );
-                            })}
-                        </div>
-                    </>
+                    <div className="hidden sm:flex absolute right-4 bottom-4 z-20 items-center gap-1.5">
+                        <button
+                            type="button"
+                            onClick={handlePrev}
+                            aria-label="Previous highlighted listing"
+                            className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/75 border border-white/20 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleNext}
+                            aria-label="Next highlighted listing"
+                            className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/75 border border-white/20 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                        >
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 )}
             </div>
-        </div>
+        </section>
     );
 }
