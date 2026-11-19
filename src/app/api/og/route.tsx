@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-const BRAND_RED = '#C41F25';
+const BRAND_RED = '#BA1D23';
 const BRAND_DARK = '#5E0F12';
 const BRAND_DEEP = '#7F1519';
 const BRAND_SUBTITLE = '#F6DCDD';

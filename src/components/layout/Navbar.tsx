@@ -326,18 +326,14 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             <Link
                                 to="/contact-us"
                                 aria-current={isContactPage ? 'page' : undefined}
-                                className="hidden md:block"
+                                className={`hidden md:inline-flex items-center justify-center gap-2 min-h-[44px] rounded-[10px] border-[1.5px] border-red px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
+                                    isContactPage
+                                        ? 'bg-red text-white hover:bg-red-hover hover:border-red-hover'
+                                        : 'bg-white text-red hover:bg-red hover:text-white'
+                                }`}
                             >
-                                <Button
-                                    variant="outline"
-                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 transition-colors ${
-                                        isContactPage
-                                            ? 'border-red bg-red text-white hover:bg-red-hover hover:border-red-hover hover:text-white'
-                                            : 'border-ink bg-white text-ink hover:border-red hover:bg-red hover:text-white'
-                                    }`}
-                                >
-                                    Contact Us
-                                </Button>
+                                <Phone className="w-4 h-4 shrink-0" aria-hidden="true" />
+                                Contact Us
                             </Link>
                             <button
                                 aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}

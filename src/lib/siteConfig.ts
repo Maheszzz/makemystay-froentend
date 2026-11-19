@@ -19,7 +19,7 @@ export const TWITTER_SITE_HANDLE = '@Makemystay16268';
 /** Stable publisher fields shared by SSR metadata and client fallback head updates. */
 export const SITE_AUTHOR = 'MakeMyStay Realty';
 export const SITE_PUBLISHER = 'MakeMyStay Realty';
-export const THEME_COLOR = '#C41F25';
+export const THEME_COLOR = '#BA1D23';
 export const GEO_REGION = 'IN-KA';
 export const GEO_PLACENAME = 'Bangalore';
 export const GEO_POSITION = '12.9716;77.5946';

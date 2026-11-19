@@ -133,7 +133,7 @@ export default function QuickPay() {
                     contact: phone
                 },
                 theme: {
-                    color: '#C41F25'
+                    color: '#BA1D23'
                 },
                 modal: {
                     ondismiss: function () {
