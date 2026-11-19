@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { HeroImagePreload } from '@/components/sections/HeroImagePreload';
-import { computeHomeInventorySummary } from '@/lib/homeInventoryStats';
+import { buildHomeFaqs } from '@/data/homePgSeo';
+import { buildHomeInventorySummary } from '@/lib/homePageData';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 import { getQualifiedRatingSummary } from '@/lib/ratings';
 import { buildHomeSEO } from '@/lib/seo';
@@ -36,7 +37,7 @@ export default async function HomePage() {
             city: 'bangalore',
             is_available: true,
             limit: 200,
-            skip: 0,
+            sort_by: 'newest',
         }),
         fetchPropertiesServer({
             city: 'hyderabad',
@@ -54,32 +55,39 @@ export default async function HomePage() {
         bangalorePgRes.status === 'fulfilled' ? bangalorePgRes.value.items : [];
     const bangalorePgTotal =
         bangalorePgRes.status === 'fulfilled' ? bangalorePgRes.value.total : initialProperties.length;
-    const bangaloreAllFirstItems =
-        bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.items : [];
+
+    let bangaloreAllItems: Property[] =
+        bangaloreAllRes.status === 'fulfilled' ? [...bangaloreAllRes.value.items] : [];
     const bangaloreAllTotal =
         bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.total : bangalorePgTotal;
-    const bangalorePropertyCounts =
+    const bangaloreCounts =
         bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.propertyCounts : undefined;
 
-    let allBangaloreItems = [...bangaloreAllFirstItems];
-    if (bangaloreAllTotal > 200 && bangaloreAllFirstItems.length === 200) {
+    if (
+        bangaloreAllRes.status === 'fulfilled' &&
+        bangaloreAllRes.value.total > 200 &&
+        bangaloreAllRes.value.items.length === 200
+    ) {
         try {
             const secondBatch = await fetchPropertiesServer({
                 city: 'bangalore',
                 is_available: true,
-                limit: 200,
                 skip: 200,
+                limit: 200,
+                sort_by: 'newest',
             });
-            allBangaloreItems = [...allBangaloreItems, ...secondBatch.items];
+            bangaloreAllItems = [...bangaloreAllItems, ...secondBatch.items];
         } catch {
-            // Keep first 200 active items if second batch fails
+            // Keep first 200 items if second batch fails
         }
     }
 
-    const homeStats =
-        allBangaloreItems.length > 0
-            ? computeHomeInventorySummary(allBangaloreItems, bangalorePropertyCounts, bangaloreAllTotal)
-            : null;
+    const homeInventory = buildHomeInventorySummary(
+        bangaloreAllItems,
+        bangaloreAllTotal,
+        bangaloreCounts,
+    );
+    const homeFaqs = buildHomeFaqs(homeInventory.pgStats);
 
     const hyderabadCount =
         hyderabadRes.status === 'fulfilled'
@@ -135,7 +143,8 @@ export default async function HomePage() {
             <Home
                 initialProperties={initialProperties}
                 marketplaceStats={marketplaceStats}
-                homeStats={homeStats}
+                homeInventory={homeInventory}
+                homeFaqs={homeFaqs}
             />
         </>
     );

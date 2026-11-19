@@ -1,56 +1,52 @@
-import type { HomeInventorySummary } from '@/lib/homeInventoryStats';
 import type { FaqItem } from '@/lib/schema';
 import { BRAND_FAQ_ITEMS } from '@/lib/brandEntity';
+import type { HomePgStats } from '@/lib/homePageData';
 
-const BOOKING_FAQ: FaqItem = {
-    question: 'How do I book a visit or pay a token?',
+const BOOKING_TOKEN_FAQ: FaqItem = {
+    question: 'How do I book a visit or reserve a room?',
     answer:
-        'Open any listing page, pick your preferred visit date and time to schedule a walkthrough, or chat with us on WhatsApp. Online booking tokens are available only on listings where token booking is enabled.',
+        'Browse listings, shortlist properties, and schedule a visit directly on the property page. Where booking tokens are enabled on a listing, you can reserve your room online with transparent pricing.',
 };
 
 /**
- * Builds up to 8 homepage FAQs backed strictly by factual copy and live API stats.
- * The visible accordion and FAQPage JSON-LD must both consume the exact same array returned here.
+ * Generates visible homepage FAQs and FAQPage JSON-LD from the exact same array.
+ * Rent, WiFi, and meals answers are computed strictly from live API data and hidden when < 10 PG listings.
  */
-export function buildHomeFaqs(summary?: HomeInventorySummary | null): FaqItem[] {
+export function buildHomeFaqs(pgStats: HomePgStats | null): FaqItem[] {
     const items: FaqItem[] = [...BRAND_FAQ_ITEMS];
-    const pgStats = summary?.pgStats;
 
     if (
         pgStats &&
         pgStats.count >= 10 &&
-        pgStats.minStartingPrice !== null &&
-        pgStats.medianStartingPrice !== null
+        pgStats.minRentInr !== null &&
+        pgStats.medianRentInr !== null
     ) {
-        const minStr = `₹${pgStats.minStartingPrice.toLocaleString('en-IN')}`;
-        const medianStr = `₹${pgStats.medianStartingPrice.toLocaleString('en-IN')}`;
-        const updatedPart = pgStats.lastUpdatedLabel ? ` Last updated ${pgStats.lastUpdatedLabel}.` : '';
         items.push({
             question: 'What is the average PG rent in Bangalore?',
-            answer: `Based on ${pgStats.count.toLocaleString('en-IN')} PG listings on MakeMyStay today, rents start at ${minStr}, with a median of ${medianStr}.${updatedPart}`,
+            answer: `Based on ${pgStats.count.toLocaleString('en-IN')} PG listings on MakeMyStay today, rents start at ₹${pgStats.minRentInr.toLocaleString('en-IN')}/month, with a median of ₹${pgStats.medianRentInr.toLocaleString('en-IN')}/month. Last updated ${pgStats.lastUpdatedLabel}.`,
         });
     }
 
-    if (pgStats && pgStats.count > 0 && pgStats.wifiCount > 0) {
+    if (pgStats && pgStats.totalActivePgs >= 10 && pgStats.wifiCount > 0) {
         items.push({
             question: 'Is WiFi included in PG rent?',
-            answer: `${pgStats.wifiCount.toLocaleString('en-IN')} of ${pgStats.count.toLocaleString('en-IN')} PG listings on MakeMyStay.ai include WiFi in their listed amenities. Confirm speed and terms on each property page.`,
+            answer: `${pgStats.wifiCount.toLocaleString('en-IN')} of ${pgStats.totalActivePgs.toLocaleString('en-IN')} active PG listings on MakeMyStay today list WiFi as an included amenity. Confirm speed and usage terms on each listing.`,
         });
     }
 
-    if (pgStats && pgStats.count > 0 && pgStats.foodCount > 0) {
+    if (pgStats && pgStats.totalActivePgs >= 10 && pgStats.foodCount > 0) {
         items.push({
-            question: 'Are food and meals included in PGs?',
-            answer: `${pgStats.foodCount.toLocaleString('en-IN')} of ${pgStats.count.toLocaleString('en-IN')} PG listings on MakeMyStay.ai include food or meals. Meal plans and timings vary by property — check the listing details before visiting.`,
+            question: 'Are food and meals included in PG stays?',
+            answer: `${pgStats.foodCount.toLocaleString('en-IN')} of ${pgStats.totalActivePgs.toLocaleString('en-IN')} active PG listings on MakeMyStay today list meals as available. Check individual property pages for meal schedules and options.`,
         });
     }
 
     if (items.length < 8) {
-        items.push(BOOKING_FAQ);
+        items.push(BOOKING_TOKEN_FAQ);
     }
 
     return items.slice(0, 8);
 }
 
-/** Static fallback for non-homepage callers when live inventory summary is unavailable. */
-export const HOME_PG_FAQS: FaqItem[] = buildHomeFaqs(null);
+/** Static fallback when server-computed stats are unavailable. */
+export const HOME_PG_FAQS: FaqItem[] = [...BRAND_FAQ_ITEMS, BOOKING_TOKEN_FAQ];

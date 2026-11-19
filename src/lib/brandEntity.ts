@@ -1,13 +1,13 @@
 /**
- * Single source of truth for brand positioning (SEO, AEO, Organization/LocalBusiness copy, FAQs, optional entity configs).
+ * Single source of truth for brand positioning (SEO, AEO, Organization/LocalBusiness copy, FAQs).
  */
 
 export const BRAND_ONE_LINER =
-    'MakeMyStay.ai is a Bangalore-first rental and property platform helping you find verified PGs, flats, and coliving spaces.';
+    'MakeMyStay.ai is a Bangalore-focused real estate and rental platform helping users find verified PGs, flats, and coliving spaces.';
 
-export const BRAND_EXTENDED = `${BRAND_ONE_LINER} Listings use real photos and transparent pricing, with zero brokerage for tenants on supported listings — book a visit in minutes.`;
+export const BRAND_EXTENDED = `${BRAND_ONE_LINER} Listings use real photos and transparent pricing with zero brokerage for tenants on supported listings — schedule a visit in minutes.`;
 
-/** Social profile URLs (clean URLs without tracking parameters; keep in sync with Footer). */
+/** Social profile URLs (clean URLs without tracking parameters). */
 export const BRAND_SOCIAL_URLS = {
     facebook: 'https://www.facebook.com/profile.php?id=61569413385115',
     instagram: 'https://www.instagram.com/makemystay_realty',
@@ -27,31 +27,16 @@ export const BRAND_CONTACT = {
     telephone: '+918150099911',
 } as const;
 
-/**
- * Grievance contact config for the footer.
- * Keep null until official grievance officer details are supplied; Footer hides the link when null.
- */
-export const BRAND_GRIEVANCE_CONTACT: { label: string; href: string } | null = null;
+export interface GrievanceContact {
+    label: string;
+    href: string;
+}
 
 /**
- * Founder profile config for /about.
- * Keep photoPath, quote, and linkedinUrl null until approved assets/copy are supplied.
+ * Optional grievance-contact link for the footer bottom bar.
+ * Set to a non-null entry once official grievance officer details are approved.
  */
-export const FOUNDER_PROFILE: {
-    name: string;
-    role: string;
-    bio: string;
-    photoPath: string | null;
-    quote: string | null;
-    linkedinUrl: string | null;
-} = {
-    name: 'Madhava R',
-    role: 'Founder, MakeMyStay',
-    bio: 'Madhava founded MakeMyStay to replace scattered listing information and broker follow-ups with clear pricing, real property photos, and direct visit scheduling.',
-    photoPath: null,
-    quote: null,
-    linkedinUrl: null,
-};
+export const BRAND_GRIEVANCE: GrievanceContact | null = null;
 
 export interface BrandFaqItem {
     question: string;
@@ -66,21 +51,21 @@ export const BRAND_FAQ_ITEMS: BrandFaqItem[] = [
     {
         question: 'Is MakeMyStay.ai zero brokerage?',
         answer:
-            'MakeMyStay.ai offers zero brokerage for tenants on supported listings. Fees and deposit terms can vary by property — always check the listing page and rental agreement before paying any token.',
+            'MakeMyStay.ai offers zero brokerage for tenants on supported listings. Brokerage and fee terms can vary by property — check the listing page and agreement before you pay any token or deposit.',
     },
     {
         question: 'Which areas does MakeMyStay serve?',
         answer:
-            'We focus on Bangalore across major corridors including HSR Layout, Koramangala, Whitefield, Electronic City, Bellandur, Marathahalli, BTM Layout, Indiranagar, and Sarjapur Road.',
+            'We focus on Bangalore with verified PG, flat, and coliving inventory across major corridors including HSR Layout, Koramangala, Whitefield, Electronic City, Bellandur, Marathahalli, BTM, Indiranagar, Sarjapur Road, and more. Hyderabad and Pune hubs are available where listings are live.',
     },
     {
-        question: 'How does MakeMyStay verify listings?',
+        question: 'Are listings on MakeMyStay verified?',
         answer:
-            'Listings go through baseline checks for photo consistency, operator identity on file, and rent or price sanity before going live. Always confirm details during a site visit before paying deposits.',
+            'Listings go through baseline checks for photo consistency, availability, and owner or operator identity before going live, with last-verified dates displayed when verified. Always confirm details on a site visit before paying deposits.',
     },
     {
         question: 'Do you list PGs and flats?',
         answer:
-            'Yes. You can browse PGs, 1BHK and 2BHK flats for rent, homes to buy, and plots on MakeMyStay.ai with filters for budget, area, and amenities.',
+            'Yes. You can browse verified PGs, 1BHK and 2BHK flats for rent, coliving spaces, and other residential categories on MakeMyStay.ai with filters for budget, location, and amenities.',
     },
 ];
