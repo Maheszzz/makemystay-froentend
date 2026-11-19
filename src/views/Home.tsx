@@ -7,7 +7,8 @@ import { Footer } from '@/components/layout/Footer';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
 import { Hero } from '@/components/sections/Hero';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { HOME_PG_FAQS } from '@/data/homePgSeo';
+import { buildHomeFaqs } from '@/data/homePgSeo';
+import type { HomeInventorySummary } from '@/lib/homeInventoryStats';
 import {
     homeHeroSearchUrl,
     homeHeroTabToListingsCategory,
@@ -85,14 +86,18 @@ function HomeUrlSync({ onChange }: { onChange: (q: string, cat: string | null) =
 function HomeInner({
     initialProperties,
     marketplaceStats,
+    homeStats,
 }: {
     initialProperties?: Property[];
     marketplaceStats?: MarketplaceStats;
+    homeStats?: HomeInventorySummary | null;
 }) {
     const router = useRouter();
     useScrollMemory(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [catParam, setCatParam] = useState<string | null>(null);
+
+    const homeFaqs = useMemo(() => buildHomeFaqs(homeStats), [homeStats]);
 
     const heroTab = parseHomeHeroTab(catParam);
     const listingsCategory = useMemo(() => homeHeroTabToListingsCategory(heroTab), [heroTab]);
@@ -178,7 +183,7 @@ function HomeInner({
             <Suspense fallback={null}>
                 <HomeUrlSync onChange={handleUrlChange} />
             </Suspense>
-            <JsonLd data={buildFaqPageSchema(HOME_PG_FAQS)} id="home-faq-schema" />
+            <JsonLd data={buildFaqPageSchema(homeFaqs)} id="home-faq-schema" />
             <JsonLd data={buildHomeOrganizationLocalWebGraph()} id="home-org-local-website-schema" />
 
             <Navbar />
@@ -204,7 +209,8 @@ function HomeInner({
                     setHeroFilters={setHeroFilters}
                     isSafetyPopupOpen={isSafetyPopupOpen}
                     onSafetyClose={() => setIsSafetyPopupOpen(false)}
-                    homeFaqs={HOME_PG_FAQS}
+                    homeFaqs={homeFaqs}
+                    homeStats={homeStats}
                     initialProperties={seededProperties}
                 />
             </main>
@@ -217,6 +223,7 @@ function HomeInner({
 export default function Home(props: {
     initialProperties?: Property[];
     marketplaceStats?: MarketplaceStats;
+    homeStats?: HomeInventorySummary | null;
 }) {
     return <HomeInner {...props} />;
 }

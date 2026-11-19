@@ -2,9 +2,11 @@
 
 import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
 import { About } from '@/components/sections/About';
-import { FaqSection } from '@/components/seo/FaqSection';
+import { HomeFaqSection } from '@/components/sections/HomeFaqSection';
 import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
+import type { HomeInventorySummary } from '@/lib/homeInventoryStats';
 import type { ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
+import type { FaqItem } from '@/lib/schema';
 import type { Property } from '@/types/api';
 import dynamic from 'next/dynamic';
 
@@ -20,7 +22,8 @@ interface HomeBelowFoldProps {
     setHeroFilters: (next: HeroSearchFilters) => void;
     isSafetyPopupOpen: boolean;
     onSafetyClose: () => void;
-    homeFaqs: { question: string; answer: string }[];
+    homeFaqs: FaqItem[];
+    homeStats?: HomeInventorySummary | null;
     initialProperties?: Property[];
 }
 
@@ -32,6 +35,7 @@ export function HomeBelowFold({
     isSafetyPopupOpen,
     onSafetyClose,
     homeFaqs,
+    homeStats,
     initialProperties,
 }: HomeBelowFoldProps) {
     return (
@@ -45,16 +49,9 @@ export function HomeBelowFold({
                 initialProperties={initialProperties}
             />
 
-            <About />
+            <About homeStats={homeStats} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
-                <FaqSection
-                    id="home-faq-heading"
-                    title="Frequently asked questions"
-                    items={homeFaqs}
-                    variant="light"
-                />
-            </div>
+            <HomeFaqSection items={homeFaqs} />
 
             <SafetyPopup isOpen={isSafetyPopupOpen} onClose={onSafetyClose} />
         </>

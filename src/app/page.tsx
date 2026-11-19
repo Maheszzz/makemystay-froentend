@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { HeroImagePreload } from '@/components/sections/HeroImagePreload';
+import { computeHomeInventorySummary } from '@/lib/homeInventoryStats';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 import { getQualifiedRatingSummary } from '@/lib/ratings';
 import { buildHomeSEO } from '@/lib/seo';
@@ -34,7 +35,8 @@ export default async function HomePage() {
         fetchPropertiesServer({
             city: 'bangalore',
             is_available: true,
-            limit: 1,
+            limit: 200,
+            skip: 0,
         }),
         fetchPropertiesServer({
             city: 'hyderabad',
@@ -52,8 +54,32 @@ export default async function HomePage() {
         bangalorePgRes.status === 'fulfilled' ? bangalorePgRes.value.items : [];
     const bangalorePgTotal =
         bangalorePgRes.status === 'fulfilled' ? bangalorePgRes.value.total : initialProperties.length;
+    const bangaloreAllFirstItems =
+        bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.items : [];
     const bangaloreAllTotal =
         bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.total : bangalorePgTotal;
+    const bangalorePropertyCounts =
+        bangaloreAllRes.status === 'fulfilled' ? bangaloreAllRes.value.propertyCounts : undefined;
+
+    let allBangaloreItems = [...bangaloreAllFirstItems];
+    if (bangaloreAllTotal > 200 && bangaloreAllFirstItems.length === 200) {
+        try {
+            const secondBatch = await fetchPropertiesServer({
+                city: 'bangalore',
+                is_available: true,
+                limit: 200,
+                skip: 200,
+            });
+            allBangaloreItems = [...allBangaloreItems, ...secondBatch.items];
+        } catch {
+            // Keep first 200 active items if second batch fails
+        }
+    }
+
+    const homeStats =
+        allBangaloreItems.length > 0
+            ? computeHomeInventorySummary(allBangaloreItems, bangalorePropertyCounts, bangaloreAllTotal)
+            : null;
 
     const hyderabadCount =
         hyderabadRes.status === 'fulfilled'
@@ -106,7 +132,11 @@ export default async function HomePage() {
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(webpageSchema) }}
             />
             <HeroImagePreload />
-            <Home initialProperties={initialProperties} marketplaceStats={marketplaceStats} />
+            <Home
+                initialProperties={initialProperties}
+                marketplaceStats={marketplaceStats}
+                homeStats={homeStats}
+            />
         </>
     );
 }
