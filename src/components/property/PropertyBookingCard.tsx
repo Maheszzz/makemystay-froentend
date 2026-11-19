@@ -308,23 +308,23 @@ export function PropertyBookingCard({
     return (
         <aside
             aria-label="Booking and enquiry"
-            className="bg-pdp-surface border border-pdp-border rounded-[var(--radius-pdp)] p-6 shadow-[var(--shadow-pdp-card)]"
+            className="bg-white border border-line rounded-[var(--radius-pdp)] overflow-hidden"
         >
-            {/* Price (highest-contrast element) */}
-            <div className="pb-5 border-b border-pdp-border">
-                <p className="pdp-type-caption text-pdp-muted mb-1">{priceContextLabel}</p>
+            {/* Oxblood-900 Header Strip with White Newsreader Price */}
+            <div className="bg-oxblood-900 px-6 py-5 border-b border-champagne/30">
+                <p className="pdp-type-caption text-blush-muted mb-1">{priceContextLabel}</p>
                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                    <span className="text-3xl font-semibold text-pdp-ink tracking-tight tabular-nums leading-none">
+                    <span className="font-serif-display text-3xl font-normal text-white tracking-tight tabular-nums leading-none">
                         {property.price || 'Price on request'}
                     </span>
                     {isMonthly && hasNumericPrice && (
-                        <span className="pdp-type-body text-pdp-muted">/month</span>
+                        <span className="pdp-type-body text-blush-muted">/month</span>
                     )}
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 pdp-type-caption">
-                    <span className="text-pdp-muted">Security deposit</span>
+                    <span className="text-blush-muted">Security deposit</span>
                     {depositDisplay ? (
-                        <span className="font-medium text-pdp-ink text-right tabular-nums">
+                        <span className="font-medium text-white text-right tabular-nums">
                             {depositDisplay}
                         </span>
                     ) : (
@@ -332,13 +332,15 @@ export function PropertyBookingCard({
                             href={depositWhatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-cta text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded"
+                            className="font-medium text-white underline decoration-champagne underline-offset-4 hover:text-blush-100 text-right transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                         >
                             Ask for deposit details
                         </a>
                     )}
                 </div>
             </div>
+
+            <div className="px-6 pb-6 pt-1 bg-white">
 
             {/* Sharing Prices (only rows that exist) */}
             {sharingRows.length > 0 && (
@@ -386,7 +388,7 @@ export function PropertyBookingCard({
                             href={whatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full min-h-[44px] px-4 py-2.5 rounded-[10px] border border-pdp-border bg-pdp-surface hover:bg-pdp-bg text-pdp-ink pdp-type-caption font-medium inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                            className="w-full min-h-[44px] px-4 py-2.5 rounded-[10px] border border-ink bg-white hover:bg-blush-100 text-ink pdp-type-caption font-medium inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                         >
                             <MessageCircle className="w-4 h-4 shrink-0" aria-hidden />
                             <span>Message on WhatsApp</span>
@@ -436,10 +438,10 @@ export function PropertyBookingCard({
                                                     onVisitDateChange(selected ? '' : chip.key);
                                                     setCalendarOpen(false);
                                                 }}
-                                                className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink cursor-pointer ${
+                                                className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 cursor-pointer ${
                                                     selected
-                                                        ? 'bg-pdp-ink text-white border-pdp-ink'
-                                                        : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:bg-pdp-bg hover:border-pdp-ink/40'
+                                                        ? 'bg-blush-100 text-red border-red font-semibold'
+                                                        : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
                                                 }`}
                                             >
                                                 {chip.label}
@@ -459,10 +461,10 @@ export function PropertyBookingCard({
                                     aria-expanded={calendarOpen}
                                     aria-controls={calendarPopoverId}
                                     onClick={() => setCalendarOpen((v) => !v)}
-                                    className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink cursor-pointer ${
+                                    className={`min-h-[38px] px-3 py-1.5 rounded-[10px] border pdp-type-caption inline-flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 cursor-pointer ${
                                         isCustomPickedDate || calendarOpen
-                                            ? 'bg-pdp-ink text-white border-pdp-ink'
-                                            : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:bg-pdp-bg hover:border-pdp-ink/40'
+                                            ? 'bg-blush-100 text-red border-red font-semibold'
+                                            : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
                                     }`}
                                 >
                                     <Calendar className="w-3.5 h-3.5 shrink-0" aria-hidden />
@@ -585,12 +587,12 @@ export function PropertyBookingCard({
                                             onClick={() =>
                                                 onVisitTimeChange(selected ? '' : slot.label)
                                             }
-                                            className={`min-h-[44px] px-3 py-2 rounded-[10px] border pdp-type-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink focus-visible:ring-offset-1 ${
+                                            className={`min-h-[44px] px-3 py-2 rounded-[10px] border pdp-type-caption transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
                                                 isPastSlotToday
-                                                    ? 'bg-pdp-bg text-pdp-muted/45 border-pdp-border/60 line-through cursor-not-allowed'
+                                                    ? 'bg-page text-slate/50 border-line line-through cursor-not-allowed font-normal'
                                                     : selected
-                                                      ? 'bg-pdp-ink text-white border-pdp-ink cursor-pointer'
-                                                      : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:bg-pdp-bg hover:border-pdp-ink/40 cursor-pointer'
+                                                      ? 'bg-blush-100 text-red border-red font-semibold cursor-pointer'
+                                                      : 'bg-white text-ink border-line font-medium hover:bg-blush-100 cursor-pointer'
                                             }`}
                                         >
                                             {slot.label}
@@ -630,7 +632,7 @@ export function PropertyBookingCard({
                             href={whatsappHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full min-h-[44px] px-5 py-2.5 rounded-[10px] border border-pdp-border bg-pdp-surface hover:bg-pdp-bg text-pdp-ink pdp-type-caption font-medium inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                            className="w-full min-h-[44px] px-5 py-2.5 rounded-[10px] border border-ink bg-white hover:bg-blush-100 text-ink pdp-type-caption font-medium inline-flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                         >
                             <MessageCircle className="w-4 h-4 shrink-0" aria-hidden />
                             <span>WhatsApp</span>
@@ -691,6 +693,7 @@ export function PropertyBookingCard({
                     </div>
                 </>
             )}
+            </div>
         </aside>
     );
 }

@@ -343,7 +343,12 @@ export default function PropertyDetails({
                     }
                 },
                 prefill: { name: 'Guest User', email: 'guest@example.com', contact: '9999999999' },
-                theme: { color: '#16181D' },
+                theme: {
+                    color:
+                        typeof window !== 'undefined'
+                            ? getComputedStyle(document.documentElement).getPropertyValue('--color-oxblood-900').trim()
+                            : undefined,
+                },
                 modal: { ondismiss: () => setIsPaymentProcessing(false) },
             };
             const rzp = new (window as any).Razorpay(options);
@@ -873,7 +878,7 @@ export default function PropertyDetails({
                                                         className="flex items-start gap-4"
                                                     >
                                                         <span
-                                                            className="w-10 h-10 rounded-full bg-pdp-surface border border-pdp-border flex items-center justify-center shrink-0 text-pdp-ink mt-0.5"
+                                                            className="w-10 h-10 rounded-full bg-blush-100 border border-line flex items-center justify-center shrink-0 text-red mt-0.5"
                                                             aria-hidden
                                                         >
                                                             {getAmenityIcon(item.key)}
@@ -1221,11 +1226,11 @@ export default function PropertyDetails({
                         </div>
                     </div>
 
-                    {/* Single Contrast Band: Location & Nearby Places (#14161A, hidden if no data) */}
+                    {/* Single Contrast Band: Location & Nearby Places (oxblood-900 + champagne hairline) */}
                     {hasLocationData && (
                         <section
                             id="pdp-location"
-                            className="w-full bg-pdp-contrast-bg text-white py-10 lg:py-20 mt-4 scroll-mt-28"
+                            className="w-full bg-oxblood-900 text-white py-10 lg:py-20 mt-4 scroll-mt-28 border-t border-champagne/30"
                             aria-labelledby="pdp-location-heading"
                         >
                             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -1237,8 +1242,9 @@ export default function PropertyDetails({
                                         >
                                             Location and nearby places
                                         </h2>
+                                        <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-2.5" />
                                         {hasValidLocation && (
-                                            <p className="pdp-type-caption text-pdp-contrast-muted mt-1">
+                                            <p className="pdp-type-caption text-blush-muted mt-1">
                                                 {property.location}
                                                 {property.city ? `, ${property.city}` : ''}
                                             </p>

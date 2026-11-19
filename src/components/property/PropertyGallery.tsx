@@ -209,7 +209,7 @@ export function PropertyGallery({ images, title, location }: PropertyGalleryProp
     return (
         <>
             {/* Mobile Swipeable Carousel (1 / N counter, no thumbnail strip) */}
-            <div className="md:hidden relative overflow-hidden rounded-[var(--radius-pdp)] border border-pdp-border bg-[#EAEAE5]">
+            <div className="md:hidden relative overflow-hidden rounded-[var(--radius-pdp)] border border-line bg-blush-100">
                 <div
                     ref={mobileTrackRef}
                     onScroll={handleMobileScroll}
@@ -221,7 +221,7 @@ export function PropertyGallery({ images, title, location }: PropertyGalleryProp
                             key={`${item.url}-${idx}`}
                             type="button"
                             onClick={() => openLightbox(idx)}
-                            className="relative w-full shrink-0 snap-center aspect-[4/3] bg-[#EAEAE5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                            className="relative w-full shrink-0 snap-center aspect-[4/3] bg-blush-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             aria-label={`Open photo ${idx + 1} of ${total} in full view`}
                         >
                             <OptimizedImage
@@ -253,14 +253,14 @@ export function PropertyGallery({ images, title, location }: PropertyGalleryProp
             </div>
 
             {/* Desktop Mosaic Gallery — 480-520px tall, 8px gutter (gap-2), 14px outer radius */}
-            <div className="hidden md:block relative overflow-hidden rounded-[var(--radius-pdp)] border border-pdp-border bg-[#EAEAE5]">
+            <div className="hidden md:block relative overflow-hidden rounded-[var(--radius-pdp)] border border-line bg-blush-100">
                 <div className={`grid gap-2 ${desktopGridClass}`}>
                     {desktopImages.map((item, idx) => (
                         <button
                             key={`${item.url}-${idx}`}
                             type="button"
                             onClick={() => openLightbox(idx)}
-                            className={`group relative w-full overflow-hidden bg-[#EAEAE5] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pdp-ink cursor-pointer ${getTileSpanClass(idx, desktopImages.length)}`}
+                            className={`group relative w-full overflow-hidden bg-blush-100 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red cursor-pointer ${getTileSpanClass(idx, desktopImages.length)}`}
                             aria-label={`View photo ${idx + 1} of ${total}${item.caption ? ` (${item.caption})` : ''}`}
                         >
                             <OptimizedImage

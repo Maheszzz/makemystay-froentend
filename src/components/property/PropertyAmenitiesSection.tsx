@@ -119,9 +119,12 @@ export function PropertyAmenitiesSection({ features }: PropertyAmenitiesSectionP
                             {items.map((item) => (
                                 <li
                                     key={item.lookupKey}
-                                    className="flex items-center gap-3 pdp-type-body text-pdp-ink"
+                                    className="flex items-center gap-3 pdp-type-body text-ink"
                                 >
-                                    <span className="text-pdp-muted shrink-0" aria-hidden>
+                                    <span
+                                        className="w-9 h-9 rounded-full bg-blush-100 border border-line flex items-center justify-center text-red shrink-0"
+                                        aria-hidden
+                                    >
                                         {getAmenityIcon(item.lookupKey)}
                                     </span>
                                     <span className="min-w-0 truncate">{item.label}</span>

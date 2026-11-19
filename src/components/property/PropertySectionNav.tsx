@@ -105,7 +105,7 @@ export function PropertySectionNav({
     return (
         <nav
             aria-label="Property sections"
-            className="fixed top-[45px] sm:top-[49px] inset-x-0 z-40 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border shadow-[0_2px_8px_rgba(22,24,29,0.04)]"
+            className="fixed top-[45px] sm:top-[49px] inset-x-0 z-40 bg-white border-b border-line"
         >
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                 <ul className="flex items-center gap-6 overflow-x-auto no-scrollbar">
@@ -117,17 +117,17 @@ export function PropertySectionNav({
                                     type="button"
                                     aria-current={isActive ? 'location' : undefined}
                                     onClick={() => handleSelect(section.id)}
-                                    className={`relative min-h-[44px] py-3 pdp-type-caption font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded-sm cursor-pointer ${
+                                    className={`relative min-h-[44px] py-3 pdp-type-caption transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded-sm cursor-pointer ${
                                         isActive
-                                            ? 'text-pdp-ink font-semibold'
-                                            : 'text-pdp-muted hover:text-pdp-ink'
+                                            ? 'text-ink font-semibold'
+                                            : 'text-slate font-medium hover:text-ink'
                                     }`}
                                 >
                                     {section.label}
                                     {isActive && (
                                         <span
                                             aria-hidden="true"
-                                            className="absolute inset-x-0 bottom-0 h-[2px] bg-pdp-ink rounded-full"
+                                            className="absolute inset-x-0 bottom-0 h-[2px] bg-red rounded-full"
                                         />
                                     )}
                                 </button>
