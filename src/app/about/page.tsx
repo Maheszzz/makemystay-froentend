@@ -1,5 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import type { Metadata } from 'next';
 import { findPgLocationForArea } from '@/data/pgLocations';
+import { FOUNDER_PROFILE } from '@/lib/brandEntity';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { buildAboutPageSEO } from '@/lib/seo';
@@ -97,7 +100,29 @@ async function getAboutPageInventory(): Promise<{
     }
 }
 
+function resolveFounderPhotoPath(): string | null {
+    if (FOUNDER_PROFILE.photoPath) {
+        const abs = path.join(process.cwd(), 'public', FOUNDER_PROFILE.photoPath.replace(/^\//, ''));
+        if (fs.existsSync(abs)) return FOUNDER_PROFILE.photoPath;
+    }
+    const teamDir = path.join(process.cwd(), 'public', 'images', 'team');
+    if (!fs.existsSync(teamDir)) return null;
+    for (const candidate of ['founder.webp', 'founder.jpg', 'founder.jpeg', 'founder.png']) {
+        if (fs.existsSync(path.join(teamDir, candidate))) {
+            return `/images/team/${candidate}`;
+        }
+    }
+    return null;
+}
+
 export default async function AboutPage() {
     const { heroPhotos, topLocalities } = await getAboutPageInventory();
-    return <About heroPhotos={heroPhotos} topLocalities={topLocalities} />;
+    const founderPhoto = resolveFounderPhotoPath();
+    return (
+        <About
+            heroPhotos={heroPhotos}
+            topLocalities={topLocalities}
+            founderPhoto={founderPhoto}
+        />
+    );
 }
