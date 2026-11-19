@@ -1,53 +1,325 @@
 'use client';
 
+import {
+    ArrowRight,
+    CalendarCheck,
+    Camera,
+    CheckCircle2,
+    IndianRupee,
+    Mail,
+    MapPin,
+    MessageCircle,
+    Phone,
+} from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { SEOHead } from '@/components/seo/SEOHead';
+import { OptimizedImage } from '@/components/ui/OptimizedImage';
+import { BRAND_CONTACT } from '@/lib/brandEntity';
 import { Link } from '@/lib/navigation';
-import { buildBreadcrumbSchema, buildAboutPageSchema } from '@/lib/schema';
+import { buildAboutPageSchema, buildBreadcrumbSchema } from '@/lib/schema';
 import { buildAboutPageSEO, buildPageSEO } from '@/lib/seo';
+import { LEGAL_ENTITY_NAME } from '@/lib/siteConfig';
+import { getWhatsappDigits } from '@/lib/whatsapp';
 
-export default function About() {
+export interface AboutHeroPhoto {
+    url: string;
+    alt: string;
+    href: string;
+}
+
+export interface AboutLocalityItem {
+    name: string;
+    slug: string;
+    count: number;
+}
+
+interface AboutProps {
+    heroPhotos?: AboutHeroPhoto[];
+    topLocalities?: AboutLocalityItem[];
+}
+
+const EXPECTATIONS = [
+    {
+        icon: Camera,
+        title: 'Real property photos',
+        description:
+            'Listings use real photos of the property so you can evaluate spaces before scheduling a visit.',
+    },
+    {
+        icon: IndianRupee,
+        title: 'Transparent pricing',
+        description:
+            'Clear upfront rents and sharing options, with zero brokerage for tenants on supported listings.',
+    },
+    {
+        icon: CalendarCheck,
+        title: 'Fast enquiry and visit booking',
+        description:
+            'Book walkthroughs quickly with direct owner or operator context and fewer middlemen.',
+    },
+    {
+        icon: CheckCircle2,
+        title: 'Last verified dates',
+        description:
+            'Listings are reviewed before going live, with last-verified dates displayed on verified properties.',
+    },
+] as const;
+
+export default function About({ heroPhotos = [], topLocalities = [] }: AboutProps) {
     const helmet = buildPageSEO(buildAboutPageSEO());
     const breadcrumbLd = buildBreadcrumbSchema([
         { name: 'Home', path: '/' },
         { name: 'About', path: '/about' },
     ]);
 
+    const visiblePhotos = heroPhotos.slice(0, 4);
+    const hasPhotos = visiblePhotos.length > 0;
+    const whatsappHref = `https://wa.me/${getWhatsappDigits()}?text=${encodeURIComponent(
+        'Hi MakeMyStay team, I would like help finding a stay in Bangalore.',
+    )}`;
+
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-pdp-bg text-pdp-ink flex flex-col font-sans">
             <SEOHead {...helmet} />
             <JsonLd id="about-breadcrumb" data={breadcrumbLd} />
             <JsonLd id="about-schema" data={buildAboutPageSchema()} />
+
             <Navbar />
-            <main id="main-content" className="flex-grow pt-28 pb-16">
-                <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 prose prose-slate prose-lg">
-                    <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight not-prose mb-6">
-                        About MakeMyStay
-                    </h1>
-                    <p className="lead text-slate-600">
-                        MakeMyStay.ai is a Bangalore-first property discovery platform for{' '}
-                        <strong>verified PGs, rentals, resale homes, and plots</strong> — with transparent pricing,
-                        real photos, and zero brokerage for tenants on supported listings.
-                    </p>
-                    <h2>What we optimise for</h2>
-                    <ul>
-                        <li>Clear locality and category pages so you can compare real inventory, not broker spam.</li>
-                        <li>Fast enquiry and visit booking — fewer middlemen, more direct owner or operator context.</li>
-                        <li>Consistent trust signals: structured data, breadcrumbs, and FAQs across major hubs.</li>
-                    </ul>
-                    <h2>Contact</h2>
-                    <p>
-                        HSR Layout, Sector 7, Bengaluru 560102 ·{' '}
-                        <a href="mailto:connect@makemystay.ai">connect@makemystay.ai</a> ·{' '}
-                        <a href="tel:+918150099911">+91 81500 99911</a>
-                    </p>
-                    <p>
-                        <Link to="/how-we-verify">How we verify listings →</Link>
-                    </p>
-                </article>
+
+            <main id="main-content" className="flex-grow pt-16 sm:pt-20">
+                {/* 1. Hero */}
+                <section className="py-12 sm:py-16 lg:py-20 border-b border-pdp-border">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        <div
+                            className={`grid grid-cols-1 gap-10 lg:gap-12 items-center ${
+                                hasPhotos ? 'lg:grid-cols-12' : ''
+                            }`}
+                        >
+                            <div className={hasPhotos ? 'lg:col-span-7 min-w-0' : 'max-w-[66ch]'}>
+                                <h1 className="pdp-type-title font-serif-display text-pdp-ink">
+                                    Find a verified place to live in Bangalore without a broker
+                                </h1>
+                                <p className="mt-5 pdp-type-body text-pdp-muted max-w-[58ch]">
+                                    MakeMyStay.ai is a Bangalore-first platform for verified PGs, coliving
+                                    spaces, rental flats, resale homes, and plots — with real photos,
+                                    transparent pricing, and zero brokerage for tenants on supported listings.
+                                </p>
+                                <div className="mt-8 flex flex-wrap items-center gap-3">
+                                    <Link
+                                        to="/pg"
+                                        className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-ink text-white pdp-type-caption font-medium inline-flex items-center gap-2 hover:bg-pdp-ink/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                                    >
+                                        <span>Browse PGs</span>
+                                        <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
+                                    </Link>
+                                    <Link
+                                        to="/rent"
+                                        className="min-h-[44px] px-5 py-2.5 rounded-[10px] border border-pdp-border bg-pdp-surface text-pdp-ink pdp-type-caption font-medium inline-flex items-center gap-2 hover:border-pdp-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                                    >
+                                        <span>Browse flats</span>
+                                    </Link>
+                                </div>
+                            </div>
+
+                            {/* Real listing photo mosaic from API (hidden if none) */}
+                            {hasPhotos && (
+                                <div className="lg:col-span-5">
+                                    <div
+                                        className={`grid gap-2 rounded-[var(--radius-pdp)] overflow-hidden border border-pdp-border bg-[#EAEAE5] ${
+                                            visiblePhotos.length === 1
+                                                ? 'grid-cols-1 h-[280px] sm:h-[340px]'
+                                                : visiblePhotos.length === 2
+                                                  ? 'grid-cols-2 h-[280px] sm:h-[340px]'
+                                                  : visiblePhotos.length === 3
+                                                    ? 'grid-cols-2 grid-rows-2 h-[320px] sm:h-[360px]'
+                                                    : 'grid-cols-2 grid-rows-2 h-[320px] sm:h-[360px]'
+                                        }`}
+                                    >
+                                        {visiblePhotos.map((photo, idx) => {
+                                            const tileCls =
+                                                visiblePhotos.length === 3 && idx === 0
+                                                    ? 'row-span-2 h-full'
+                                                    : 'h-full';
+                                            return (
+                                                <Link
+                                                    key={photo.url}
+                                                    to={photo.href}
+                                                    className={`relative w-full overflow-hidden bg-[#EAEAE5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${tileCls}`}
+                                                    aria-label={photo.alt}
+                                                >
+                                                    <OptimizedImage
+                                                        src={photo.url}
+                                                        alt={photo.alt}
+                                                        fill
+                                                        priority={idx === 0}
+                                                        placeholder="blur"
+                                                        size="medium"
+                                                        sizes="(max-width: 1024px) 50vw, 260px"
+                                                        className="object-cover hover:scale-[1.02] transition-transform duration-300 motion-reduce:transition-none"
+                                                    />
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 2. What you can expect (2x2 borderless/numberless grid) */}
+                <section className="py-12 sm:py-16 lg:py-20 border-b border-pdp-border">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="pdp-type-heading text-pdp-ink mb-10">
+                            What you can expect
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10 max-w-4xl">
+                            {EXPECTATIONS.map((item) => {
+                                const Icon = item.icon;
+                                return (
+                                    <div key={item.title} className="flex items-start gap-4">
+                                        <span className="w-10 h-10 rounded-full bg-pdp-surface border border-pdp-border flex items-center justify-center shrink-0 text-pdp-ink mt-0.5">
+                                            <Icon className="w-5 h-5" aria-hidden />
+                                        </span>
+                                        <div className="min-w-0">
+                                            <h3 className="text-lg font-semibold text-pdp-ink">
+                                                {item.title}
+                                            </h3>
+                                            <p className="mt-1.5 pdp-type-body text-pdp-muted">
+                                                {item.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 3. How we verify listings (single #14161A dark contrast band) */}
+                <section className="w-full bg-pdp-contrast-bg text-white py-14 sm:py-16 lg:py-20">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="max-w-[66ch]">
+                            <h2 className="pdp-type-heading text-white">
+                                How we verify listings
+                            </h2>
+                            <p className="mt-4 pdp-type-body text-pdp-contrast-muted">
+                                Listings go through baseline checks for photo consistency, owner or operator
+                                identity on file, and transparent pricing before going live, with last-verified
+                                dates shown when verified.
+                            </p>
+                            <div className="mt-8">
+                                <Link
+                                    to="/how-we-verify"
+                                    className="min-h-[44px] px-5 py-2.5 rounded-[10px] border border-pdp-contrast-border bg-pdp-contrast-surface text-white pdp-type-caption font-medium inline-flex items-center gap-2 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                >
+                                    <span>See how we verify listings</span>
+                                    <ArrowRight className="w-4 h-4 shrink-0" aria-hidden />
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 4. Where we list (top Bangalore localities from API/hub pages sorted by listing count) */}
+                {topLocalities.length > 0 && (
+                    <section className="py-12 sm:py-16 lg:py-20 border-b border-pdp-border">
+                        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                            <h2 className="pdp-type-heading text-pdp-ink mb-3">
+                                Where we list in Bangalore
+                            </h2>
+                            <p className="pdp-type-body text-pdp-muted max-w-[60ch] mb-8">
+                                Explore live inventory across our busiest Bangalore neighbourhoods, ordered by
+                                available listings.
+                            </p>
+                            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 max-w-4xl">
+                                {topLocalities.map((loc) => (
+                                    <li
+                                        key={loc.slug}
+                                        className="flex items-baseline justify-between gap-4 py-2 border-b border-pdp-border"
+                                    >
+                                        <Link
+                                            to={`/pg/${loc.slug}`}
+                                            className="pdp-type-body font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-cta transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded"
+                                        >
+                                            {loc.name}
+                                        </Link>
+                                        <span className="pdp-type-caption text-pdp-muted tabular-nums shrink-0">
+                                            {loc.count.toLocaleString('en-IN')}{' '}
+                                            {loc.count === 1 ? 'listing' : 'listings'}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+                )}
+
+                {/* 5. Talk to us (address, email, phone, WhatsApp button; no hours as none documented) */}
+                <section className="py-12 sm:py-16 lg:py-20 border-b border-pdp-border">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        <h2 className="pdp-type-heading text-pdp-ink mb-6">
+                            Talk to us
+                        </h2>
+                        <div className="space-y-4 pdp-type-body text-pdp-ink max-w-[66ch]">
+                            <p className="flex items-start gap-3">
+                                <MapPin className="w-5 h-5 text-pdp-muted shrink-0 mt-1" aria-hidden />
+                                <span>
+                                    <strong className="font-semibold">{LEGAL_ENTITY_NAME}</strong> — HSR Layout,
+                                    Sector 7, Bengaluru, Karnataka 560102
+                                </span>
+                            </p>
+                            <p className="flex items-center gap-3">
+                                <Mail className="w-5 h-5 text-pdp-muted shrink-0" aria-hidden />
+                                <a
+                                    href={`mailto:${BRAND_CONTACT.email}`}
+                                    className="text-pdp-ink underline underline-offset-4 hover:text-pdp-cta transition-colors"
+                                >
+                                    {BRAND_CONTACT.email}
+                                </a>
+                            </p>
+                            <p className="flex items-center gap-3">
+                                <Phone className="w-5 h-5 text-pdp-muted shrink-0" aria-hidden />
+                                <a
+                                    href={`tel:${BRAND_CONTACT.telephone}`}
+                                    className="text-pdp-ink underline underline-offset-4 hover:text-pdp-cta transition-colors tabular-nums"
+                                >
+                                    +91 81500 99911
+                                </a>
+                            </p>
+                            <div className="pt-2">
+                                <a
+                                    href={whatsappHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="min-h-[44px] px-5 py-2.5 rounded-[10px] border border-pdp-border bg-pdp-surface text-pdp-ink pdp-type-caption font-medium inline-flex items-center gap-2 hover:border-pdp-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                                >
+                                    <MessageCircle className="w-4 h-4 shrink-0" aria-hidden />
+                                    <span>Chat on WhatsApp</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 6. Quiet one-line owner link */}
+                <section className="py-10">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                        <p className="pdp-type-body text-pdp-muted">
+                            Own a property?{' '}
+                            <Link
+                                to="/for-owners"
+                                className="font-medium text-pdp-ink underline underline-offset-4 hover:text-pdp-cta transition-colors"
+                            >
+                                List with MakeMyStay →
+                            </Link>
+                        </p>
+                    </div>
+                </section>
             </main>
+
             <Footer />
         </div>
     );
