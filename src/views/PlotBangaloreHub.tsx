@@ -51,14 +51,14 @@ export default function PlotBangaloreHub() {
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
     return (
-        <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
+        <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="plot-bangalore-hub-ld-json" />
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-sage-100 border-b border-line">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+                <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
                         <BreadcrumbNav
                             items={[
                                 { name: 'Home', path: '/' },
@@ -67,19 +67,17 @@ export default function PlotBangaloreHub() {
                             ]}
                         />
                         <div className="mt-4 max-w-3xl">
-                            <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.08]">
+                            <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
                                 {PAGE_TITLE}
                             </h1>
-                            <p className="mt-2.5 text-pdp-muted text-base md:text-lg leading-relaxed max-w-2xl">
-                                {PAGE_SUBTITLE}
+                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
+                            <p className="text-blush-muted text-base md:text-lg leading-relaxed max-w-2xl">
+                                Residential land and plot listings across Bangalore, with price and last-verified date on every card.
                                 {sqftRange ? (
-                                    <span className="ml-2 text-pdp-ink font-medium tabular-nums">
+                                    <span className="ml-2 text-white font-medium tabular-nums">
                                         ({formatSqftRange(sqftRange.min, sqftRange.max)})
                                     </span>
                                 ) : null}
-                            </p>
-                            <p className="mt-2 text-xs text-pdp-muted">
-                                Cards display current availability and the last-verified date when recorded.
                             </p>
                         </div>
                     </div>

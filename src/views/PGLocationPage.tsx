@@ -82,33 +82,31 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     const isEmptyLocality = initialProperties.length === 0;
 
     return (
-      <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
+      <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
         <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
         <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
 
         <Navbar />
         <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
           {/* Hero Banner */}
-          <header className="bg-sage-100 border-b border-line">
-            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
+          <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
               <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
               <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div className="max-w-2xl">
-                  <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.1]">
+                  <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-white tracking-[-0.015em] leading-[1.1]">
                     {localitySeoProfile.hero.heading}
                   </h1>
-                  <p className="mt-2.5 text-pdp-muted text-base leading-relaxed">
+                  <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
+                  <p className="text-blush-muted text-base leading-relaxed">
                     {localitySeoProfile.hero.subHeading}
-                  </p>
-                  <p className="mt-2 text-xs text-pdp-muted">
-                    Cards display current availability and the last-verified date when recorded.
                   </p>
                 </div>
                 <Link
                   to="/pg/bangalore"
-                  className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-pdp-ink hover:underline underline-offset-4"
+                  className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-white hover:underline underline-offset-4"
                 >
-                  <MapPin className="w-4 h-4 text-pdp-muted" />
+                  <MapPin className="w-4 h-4 text-champagne" />
                   All Bangalore PGs
                   <ChevronRight className="w-4 h-4" />
                 </Link>
@@ -198,7 +196,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
-    <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
+    <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
       <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
@@ -210,19 +208,17 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       <Navbar />
       <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
         {/* Hero Banner */}
-        <header className="bg-sage-100 border-b border-line">
-          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
+        <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
             <BreadcrumbNav items={breadcrumbItems} />
             <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div className="max-w-2xl">
-                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.1]">
+                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-white tracking-[-0.015em] leading-[1.1]">
                   PGs in {name}
                 </h1>
-                <p className="mt-2.5 text-pdp-muted text-base leading-relaxed">
-                  Paying guest accommodations in <strong className="font-medium text-pdp-ink">{name}</strong> — filter by budget, meals, room sharing, and gender.
-                </p>
-                <p className="mt-2 text-xs text-pdp-muted">
-                  Cards display current availability and the last-verified date when recorded.
+                <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
+                <p className="text-blush-muted text-base leading-relaxed">
+                  PGs and coliving stays in {name}, with price and last-verified date on every card.
                 </p>
                 <div className="mt-5 max-w-2xl">
                   <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
@@ -230,9 +226,9 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
               </div>
               <Link
                 to="/pg/bangalore"
-                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-pdp-ink hover:underline underline-offset-4"
+                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-white hover:underline underline-offset-4"
               >
-                <MapPin className="w-4 h-4 text-pdp-muted" />
+                <MapPin className="w-4 h-4 text-champagne" />
                 All Bangalore PGs
                 <ChevronRight className="w-4 h-4" />
               </Link>

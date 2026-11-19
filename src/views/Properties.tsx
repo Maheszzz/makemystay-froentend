@@ -856,7 +856,7 @@ function PropertiesInner({
     const budgetPresets = useMemo(() => getBudgetPresetsForCategory(activeTabKey), [activeTabKey]);
 
     return (
-        <div className="bg-sage-50 min-h-screen text-ink font-sans flex flex-col overflow-x-clip">
+        <div className="bg-page min-h-screen text-ink font-sans flex flex-col overflow-x-clip">
             <Suspense fallback={null}>
                 <PropertiesUrlSync onSync={handleUrlSync} />
             </Suspense>
@@ -865,31 +865,29 @@ function PropertiesInner({
             {!hideChrome && <Navbar />}
 
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
-                {/* 1. Slim Left-Aligned Editorial Header (flat sage-100 band matching filter bar) */}
+                {/* 1. Oxblood-900 to Oxblood-700 Luxury Header Band with 48px Champagne Hairline & Blush Count Pill */}
                 {!hideChrome && (
-                    <header className="bg-sage-100 border-b border-line">
-                        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-ink tracking-[-0.015em] leading-[1.08]">
+                    <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-11 pb-14 md:pb-16">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
                                     {resolvedTitle}
                                 </h1>
                                 {!loading && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white border border-line text-sm font-semibold text-pine-700 tabular-nums">
+                                    <span className="inline-flex items-center px-3 py-0.5 rounded-full bg-blush-100 text-ink text-sm font-semibold tabular-nums">
                                         {displayResultCount.toLocaleString('en-IN')}
                                     </span>
                                 )}
                             </div>
-                            <p className="mt-2.5 text-base text-slate max-w-2xl leading-relaxed">
+                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
+                            <p className="text-base text-blush-muted max-w-2xl leading-relaxed">
                                 {resolvedSubtitle}
-                            </p>
-                            <p className="mt-2 text-xs text-slate">
-                                Cards display current availability and the last-verified date when recorded.
                             </p>
                         </div>
                     </header>
                 )}
 
-                {/* 2. Sticky Filter Bar */}
+                {/* 2. White Overlapping Filter Bar */}
                 <ListingFilterBar
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
@@ -930,14 +928,15 @@ function PropertiesInner({
                     onClearAll={resetFilters}
                     resultCount={displayResultCount}
                     loading={loading}
+                    overlapHeader
                 />
 
-                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-                    {/* 3. Horizontally Scrollable Area Chips with Real Listing Counts */}
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+                    {/* 3. Horizontally Scrollable Area Text Tabs with Counts & Red Underline */}
                     {areaChipsWithHref.length > 0 && (
                         <nav
                             aria-label="Popular areas"
-                            className="mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                            className="mb-7 flex items-center gap-6 border-b border-line overflow-x-auto no-scrollbar"
                         >
                             {areaChipsWithHref.map((chip) => {
                                 const isCurrentArea =
@@ -948,18 +947,15 @@ function PropertiesInner({
                                     <Link
                                         key={`${chip.name}-${chip.href}`}
                                         to={chip.href}
-                                        className={`min-h-[38px] px-3.5 py-1.5 rounded-full border text-xs sm:text-sm whitespace-nowrap inline-flex items-center gap-1.5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
+                                        aria-current={isCurrentArea ? 'page' : undefined}
+                                        className={`min-h-[42px] pb-2.5 text-sm whitespace-nowrap inline-flex items-center gap-1.5 border-b-2 -mb-px transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
                                             isCurrentArea
-                                                ? 'bg-pine-900 text-white border-pine-900 font-semibold'
-                                                : 'bg-white text-ink border-line font-medium hover:bg-sage-100 hover:border-pine-700/50'
+                                                ? 'border-red text-ink font-semibold'
+                                                : 'border-transparent text-slate font-medium hover:text-ink hover:border-line'
                                         }`}
                                     >
                                         <span>{chip.name}</span>
-                                        <span
-                                            className={`tabular-nums text-xs ${
-                                                isCurrentArea ? 'text-pine-muted' : 'text-slate'
-                                            }`}
-                                        >
+                                        <span className="tabular-nums text-xs text-slate">
                                             {chip.count}
                                         </span>
                                     </Link>
@@ -975,14 +971,14 @@ function PropertiesInner({
 
                     {/* 5. Results Heading */}
                     <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                        <h2 className="text-xl sm:text-2xl font-semibold text-pdp-ink tracking-tight tabular-nums">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-ink tracking-tight tabular-nums">
                             {loading && propertyListOrdered.length === 0
                                 ? `Searching ${LISTING_TAB_LABEL[activeTabKey].toLowerCase()} in ${cityLabelDisplay}...`
                                 : formatResultHeading(displayResultCount, activeTabKey, cityLabelDisplay)}
                         </h2>
                         {loadingMore && (
-                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-pdp-muted">
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate">
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin text-red" />
                                 Loading more...
                             </span>
                         )}
@@ -998,20 +994,20 @@ function PropertiesInner({
                             {Array.from({ length: 6 }).map((_, idx) => (
                                 <div
                                     key={idx}
-                                    className="bg-pdp-surface rounded-[var(--radius-pdp)] border border-pdp-border overflow-hidden flex flex-col animate-pulse"
+                                    className="bg-white rounded-[var(--radius-pdp)] border border-line overflow-hidden flex flex-col animate-pulse"
                                 >
-                                    <div className="w-full aspect-[16/10] bg-pdp-bg" />
+                                    <div className="w-full aspect-[4/3] bg-blush-100" />
                                     <div className="p-5 flex flex-col gap-3">
-                                        <div className="h-3 w-16 bg-pdp-bg rounded" />
-                                        <div className="h-5 w-3/4 bg-pdp-bg rounded" />
-                                        <div className="h-4 w-1/2 bg-pdp-bg rounded" />
+                                        <div className="h-3 w-16 bg-blush-100 rounded" />
+                                        <div className="h-5 w-3/4 bg-blush-100 rounded" />
+                                        <div className="h-4 w-1/2 bg-blush-100 rounded" />
                                         <div className="flex gap-2 mt-1">
-                                            <div className="h-6 w-20 bg-pdp-bg rounded-lg" />
-                                            <div className="h-6 w-20 bg-pdp-bg rounded-lg" />
+                                            <div className="h-6 w-20 bg-blush-100 rounded-lg" />
+                                            <div className="h-6 w-20 bg-blush-100 rounded-lg" />
                                         </div>
-                                        <div className="pt-3 mt-2 border-t border-pdp-border flex items-center justify-between">
-                                            <div className="h-6 w-24 bg-pdp-bg rounded" />
-                                            <div className="h-10 w-28 bg-pdp-bg rounded-[10px]" />
+                                        <div className="pt-3 mt-2 border-t border-champagne/40 flex items-center justify-between">
+                                            <div className="h-6 w-24 bg-blush-100 rounded" />
+                                            <div className="h-10 w-28 bg-blush-100 rounded-[10px]" />
                                         </div>
                                     </div>
                                 </div>
@@ -1146,7 +1142,7 @@ function PropertiesInner({
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm">
                     <Link
                         to="/wishlist"
-                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-pine-900 text-white rounded-[var(--radius-pdp)] shadow-sm border border-pine-700"
+                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-oxblood-900 text-white rounded-[var(--radius-pdp)] shadow-sm border border-champagne/35"
                     >
                         <div className="flex items-center gap-3">
                             <Heart className="w-4 h-4 fill-red text-red shrink-0" />
@@ -1154,7 +1150,7 @@ function PropertiesInner({
                                 {wishlist.length} saved {wishlist.length === 1 ? 'listing' : 'listings'}
                             </span>
                         </div>
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-sage-100">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-blush-100">
                             View wishlist
                             <ArrowRight className="w-3.5 h-3.5" />
                         </span>

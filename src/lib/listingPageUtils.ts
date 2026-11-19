@@ -19,28 +19,28 @@ export function getListingHeaderCopy(category: ListingCategoryKey, cityLabel: st
         case 'pg':
             return {
                 title: `PGs in ${cityLabel}`,
-                subtitle: `Paying guest stays and coliving spaces in ${cityLabel}, ordered cleanly by what matters.`,
+                subtitle: `PGs and coliving homes across ${cityLabel}, with price and last-verified date on every card.`,
             };
         case 'rent':
             return {
                 title: `Flats for rent in ${cityLabel}`,
-                subtitle: `Apartments and independent homes for rent across ${cityLabel}.`,
+                subtitle: `Flats and independent homes for rent in ${cityLabel}, with price and last-verified date on every card.`,
             };
         case 'buy':
             return {
                 title: `Homes to buy in ${cityLabel}`,
-                subtitle: `Residential flats and houses listed for sale in ${cityLabel}.`,
+                subtitle: `Residential flats and homes for sale in ${cityLabel}, with price and last-verified date on every card.`,
             };
         case 'plot':
             return {
                 title: `Plots in ${cityLabel}`,
-                subtitle: `Residential land and plot listings across ${cityLabel}.`,
+                subtitle: `Residential land and plot listings across ${cityLabel}, with price and last-verified date on every card.`,
             };
         case 'all':
         default:
             return {
                 title: `Properties in ${cityLabel}`,
-                subtitle: `PGs, flats for rent, homes to buy, and plots across ${cityLabel}.`,
+                subtitle: `PGs, flats for rent, homes to buy, and plots across ${cityLabel}, with price and last-verified date on every card.`,
             };
     }
 }

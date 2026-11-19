@@ -171,26 +171,25 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
         <>
             <Link
                 to={propertyPath}
-                className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded-[var(--radius-pdp)]"
+                className="block h-full group outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded-[var(--radius-pdp)]"
                 aria-label={`View details for ${displayTitle}`}
             >
-                <article className="bg-white rounded-[var(--radius-pdp)] border border-line hover:border-pine-700/60 transition-colors duration-200 h-full flex flex-col overflow-hidden relative">
-                    {/* Image Area - 16:10 Aspect Ratio */}
-                    <div className="relative w-full aspect-[16/10] shrink-0 overflow-hidden bg-sage-100">
+                <article className="bg-white rounded-[var(--radius-pdp)] border border-line hover:border-ink/45 transition-colors duration-200 h-full flex flex-col overflow-hidden relative">
+                    {/* Image Area - 4:3 Aspect Ratio */}
+                    <div className="relative w-full aspect-[4/3] shrink-0 overflow-hidden bg-blush-100">
                         <OptimizedImage
                             src={displayImage}
                             alt={`${displayTitle} in ${property.location || 'Bangalore'}`}
                             fill
                             priority={priority}
                             size="medium"
-                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                            className="object-cover"
                         />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-pine-900/35 via-transparent to-transparent" />
 
                         {/* Top Left Badge (availability or API badge only) */}
                         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pr-14">
                             {!isAvailable ? (
-                                <span className="px-2.5 py-1 bg-pine-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+                                <span className="px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
                                     Fully booked
                                 </span>
                             ) : property.listing_badge ? (
@@ -205,7 +204,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                             type="button"
                             aria-label={wishlisted ? `Remove ${displayTitle} from wishlist` : `Save ${displayTitle} to wishlist`}
                             onClick={handleHeartClick}
-                            className="absolute top-2.5 right-2.5 z-10 w-11 h-11 rounded-full bg-white/95 border border-line flex items-center justify-center transition-colors hover:bg-sage-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                            className="absolute top-2.5 right-2.5 z-10 w-11 h-11 rounded-full bg-white/95 border border-line flex items-center justify-center transition-colors hover:bg-blush-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                         >
                             <Heart
                                 className={`w-4 h-4 transition-colors ${
@@ -218,16 +217,16 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                         {(hasRealRating || hasVideoTour) && (
                             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
                                 {hasRealRating ? (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-pine-900/85 backdrop-blur-sm rounded-full text-xs font-medium text-white tabular-nums">
-                                        <Star className="w-3.5 h-3.5 fill-brass text-brass" />
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white tabular-nums">
+                                        <Star className="w-3.5 h-3.5 fill-champagne text-champagne" />
                                         <span>{ratingVal.toFixed(1)}</span>
-                                        <span className="text-pine-muted">({reviewCount})</span>
+                                        <span className="text-blush-muted">({reviewCount})</span>
                                     </span>
                                 ) : (
                                     <span />
                                 )}
                                 {hasVideoTour && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-pine-900/85 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
                                         <Video className="w-3.5 h-3.5" /> Video tour
                                     </span>
                                 )}
@@ -245,7 +244,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                                 {typeof property.units_remaining === 'number' &&
                                     property.units_remaining > 0 &&
                                     property.units_remaining <= 5 && (
-                                        <span className="text-xs font-semibold text-ink bg-brass/25 border border-brass px-2 py-0.5 rounded-md tabular-nums">
+                                        <span className="text-xs font-semibold text-champagne-text bg-blush-100 border border-champagne px-2 py-0.5 rounded-md tabular-nums">
                                             {property.units_remaining} {property.units_remaining === 1 ? 'unit' : 'units'} left
                                         </span>
                                     )}
@@ -253,14 +252,14 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
 
                             <h3
                                 title={displayTitle}
-                                className="text-[17px] font-semibold text-ink leading-snug line-clamp-2 min-h-[2.85rem] mb-1.5 group-hover:underline decoration-pine-700 underline-offset-4"
+                                className="font-serif-display text-[20px] font-normal text-ink leading-snug line-clamp-2 min-h-[3.3rem] mb-1.5 group-hover:underline decoration-champagne underline-offset-4"
                             >
                                 {displayTitle}
                             </h3>
 
                             <div className="flex items-center gap-2 text-slate text-sm w-full min-h-[1.25rem]">
                                 <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
-                                    <MapPin className="w-3.5 h-3.5 shrink-0 text-pine-700" />
+                                    <MapPin className="w-3.5 h-3.5 shrink-0 text-champagne-text" />
                                     <span className="truncate">{property.location}</span>
                                 </div>
                                 {metroLabel && (
@@ -279,33 +278,33 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                         <div className="flex flex-wrap gap-1.5 mb-4">
                             {isServiceOriented ? (
                                 <>
-                                    <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5">
-                                        <Users className="w-3.5 h-3.5 text-pine-700" />
+                                    <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5">
+                                        <Users className="w-3.5 h-3.5 text-champagne-text" />
                                         {Array.isArray(property.sharing) && property.sharing.length > 0
                                             ? property.sharing.slice(0, 2).join(', ')
                                             : 'Shared'}
                                     </span>
                                     {property.food && (
-                                        <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5">
-                                            <Utensils className="w-3.5 h-3.5 text-pine-700" />
+                                        <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5">
+                                            <Utensils className="w-3.5 h-3.5 text-champagne-text" />
                                             Meals included
                                         </span>
                                     )}
                                 </>
                             ) : isPlot ? (
-                                <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg">
+                                <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg">
                                     {property.sqft && property.sqft !== 'On Request' ? property.sqft : 'Residential plot'}
                                 </span>
                             ) : (
                                 <>
-                                    <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5 tabular-nums">
-                                        <Bed className="w-3.5 h-3.5 text-pine-700" /> {property.beds || 1} Bed
+                                    <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5 tabular-nums">
+                                        <Bed className="w-3.5 h-3.5 text-champagne-text" /> {property.beds || 1} Bed
                                     </span>
-                                    <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5 tabular-nums">
-                                        <Bath className="w-3.5 h-3.5 text-pine-700" /> {property.baths || 1} Bath
+                                    <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg inline-flex items-center gap-1.5 tabular-nums">
+                                        <Bath className="w-3.5 h-3.5 text-champagne-text" /> {property.baths || 1} Bath
                                     </span>
                                     {furnishingLabel && (
-                                        <span className="px-2.5 py-1 bg-sage-50 text-ink text-xs font-medium border border-line rounded-lg">
+                                        <span className="px-2.5 py-1 bg-page text-ink text-xs font-medium border border-line rounded-lg">
                                             {furnishingLabel}
                                         </span>
                                     )}
@@ -313,11 +312,11 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                             )}
                         </div>
 
-                        {/* Factual Last-Verified Status (shown only when API supplies last_verified_at) */}
-                        <div className="min-h-[1.5rem] mb-3 pb-3 border-b border-line flex items-center justify-between gap-2 text-xs">
+                        {/* 1px Champagne Line above Verified-Date Row */}
+                        <div className="min-h-[1.75rem] mb-3 pt-2.5 border-t border-champagne flex items-center justify-between gap-2 text-xs">
                             {verifiedDateLabel ? (
-                                <span className="inline-flex items-center gap-1.5 text-pine-700 font-medium">
-                                    <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-pine-700" />
+                                <span className="inline-flex items-center gap-1.5 text-champagne-text font-medium">
+                                    <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-champagne-text" />
                                     Verified {verifiedDateLabel}
                                 </span>
                             ) : (
@@ -334,7 +333,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                                     {isMonthlyRent ? 'Starting from' : 'Price'}
                                 </p>
                                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                                    <span className="text-lg font-semibold text-ink leading-none whitespace-nowrap tabular-nums">
+                                    <span className="font-serif-display text-xl font-normal text-ink leading-none whitespace-nowrap tabular-nums">
                                         {property.price}
                                     </span>
                                     {isMonthlyRent && hasNumericPrice && (
@@ -357,11 +356,11 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                                         e.stopPropagation();
                                         setIsLeadModalOpen(true);
                                     }}
-                                    className="w-11 h-11 rounded-[10px] border border-line bg-white flex items-center justify-center text-pine-700 hover:bg-sage-100 hover:border-pine-700 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                    className="w-11 h-11 rounded-[10px] border border-line bg-white flex items-center justify-center text-ink hover:bg-blush-100 hover:border-ink/45 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                                 >
                                     <MessageCircle className="w-4 h-4" />
                                 </button>
-                                <span className="h-11 px-4 rounded-[10px] border border-line bg-sage-50 text-ink flex items-center justify-center text-sm font-medium gap-1.5 transition-colors group-hover:bg-pine-900 group-hover:text-white group-hover:border-pine-900 whitespace-nowrap">
+                                <span className="h-11 px-4 rounded-[10px] border border-line bg-page text-ink flex items-center justify-center text-sm font-medium gap-1.5 transition-colors group-hover:bg-red group-hover:text-white group-hover:border-red whitespace-nowrap">
                                     View details
                                     <ArrowRight className="w-3.5 h-3.5" />
                                 </span>

@@ -14,5 +14,5 @@ export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
-  return <Properties key="buy" initialCategory="buy" initialCity="Bangalore" pageTitle="Homes to buy in Bangalore" pageSubtitle="Residential flats and houses listed for sale in Bangalore." />;
+  return <Properties key="buy" initialCategory="buy" initialCity="Bangalore" pageTitle="Homes to buy in Bangalore" pageSubtitle="Residential flats and homes for sale in Bangalore, with price and last-verified date on every card." />;
 }

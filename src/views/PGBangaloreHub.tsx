@@ -86,7 +86,7 @@ export default function PGBangaloreHub() {
     const topSlugs = PG_LOCATIONS.slice(0, 16);
 
     return (
-        <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
+        <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="pg-bangalore-hub-ld-json" />
             {itemListLd ? <JsonLd data={itemListLd} id="pg-bangalore-itemlist-ld-json" /> : null}
@@ -94,8 +94,8 @@ export default function PGBangaloreHub() {
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
                 {/* ── Hero Header ── */}
-                <header className="bg-sage-100 border-b border-line">
-                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+                <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
                         <BreadcrumbNav
                             items={[
                                 { name: 'Home', path: '/' },
@@ -104,14 +104,12 @@ export default function PGBangaloreHub() {
                             ]}
                         />
                         <div className="mt-4 max-w-3xl">
-                            <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.08]">
+                            <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
                                 PGs in Bangalore
                             </h1>
-                            <p className="mt-2.5 text-pdp-muted text-base md:text-lg leading-relaxed max-w-2xl">
-                                Paying guest stays and coliving spaces across Bangalore, including Whitefield, BTM, HSR Layout, and Marathahalli.
-                            </p>
-                            <p className="mt-2 text-xs text-pdp-muted">
-                                Cards display current availability and the last-verified date when recorded.
+                            <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
+                            <p className="text-blush-muted text-base md:text-lg leading-relaxed max-w-2xl">
+                                PGs and coliving homes across Bangalore, with price and last-verified date on every card.
                             </p>
                         </div>
                     </div>

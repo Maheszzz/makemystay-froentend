@@ -27,7 +27,7 @@ export default async function Page() {
             key="all"
             initialCity="Bangalore"
             pageTitle="Properties in Bangalore"
-            pageSubtitle="PGs, flats for rent, homes to buy, and plots across Bangalore."
+            pageSubtitle="PGs, flats for rent, homes to buy, and plots across Bangalore, with price and last-verified date on every card."
             initialProperties={initialProperties}
             initialTotalCount={total}
             initialPropertyCounts={propertyCounts}

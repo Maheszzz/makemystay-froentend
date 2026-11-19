@@ -29,7 +29,7 @@ export default async function Page() {
             initialCategory="pg"
             initialCity="Bangalore"
             pageTitle="PGs in Bangalore"
-            pageSubtitle="Paying guest stays and coliving spaces across Bangalore, ordered cleanly by what matters."
+            pageSubtitle="PGs and coliving homes across Bangalore, with price and last-verified date on every card."
             initialProperties={initialProperties}
             initialTotalCount={total}
             initialPropertyCounts={propertyCounts}
