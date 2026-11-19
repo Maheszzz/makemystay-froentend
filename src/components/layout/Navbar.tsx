@@ -86,8 +86,8 @@ function CityDropdown({ selectedCity, onSelect, calm = false }: CityDropdownProp
                                 }}
                                 className={`w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                                     active
-                                        ? 'bg-slate-900 text-white'
-                                        : 'text-slate-700 hover:bg-slate-50'
+                                        ? 'bg-pine-900 text-white'
+                                        : 'text-ink hover:bg-sage-100'
                                 }`}
                             >
                                 <span className="flex items-center gap-2">
@@ -259,8 +259,8 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
         },
     ];
 
-    const navBarClasses = `fixed w-full z-50 transition-all duration-200 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border ${
-        isScrolled ? 'py-1.5 shadow-[0_1px_8px_rgba(22,24,29,0.04)]' : 'py-2'
+    const navBarClasses = `fixed w-full z-50 transition-all duration-200 bg-white border-b border-line ${
+        isScrolled ? 'py-1.5' : 'py-2'
     }`;
 
     return (
@@ -274,14 +274,14 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                 alt="MakeMyStay.ai logo"
                                 width={28}
                                 height={28}
-                                className="w-7 h-7 max-w-[28px] max-h-[28px] shrink-0 rounded-md object-contain bg-white border border-pdp-border"
+                                className="w-7 h-7 max-w-[28px] max-h-[28px] shrink-0 rounded-md object-contain bg-white border border-line"
                             />
                             <Link
                                 to="/"
                                 aria-label="MakeMyStay Home"
-                                className="text-lg font-bold tracking-tight font-heading transition-colors text-pdp-ink leading-none"
+                                className="text-lg font-bold tracking-tight font-heading transition-colors text-ink leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
                             >
-                                MakeMyStay<span className="text-pdp-muted font-semibold">.ai</span>
+                                MakeMyStay<span className="text-slate font-semibold">.ai</span>
                             </Link>
                         </div>
 
@@ -289,10 +289,10 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
 
                         <div className="hidden md:flex items-center justify-self-center min-w-0 gap-x-4 lg:gap-x-6">
                             {desktopNavItems.map((navItem) => {
-                                const linkCls = `relative py-1 whitespace-nowrap text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink rounded ${
+                                const linkCls = `relative py-1 whitespace-nowrap text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded ${
                                     navItem.active
-                                        ? 'font-semibold text-pdp-ink'
-                                        : 'font-medium text-pdp-muted hover:text-pdp-ink'
+                                        ? 'font-semibold text-pine-700'
+                                        : 'font-medium text-slate hover:text-ink'
                                 }`;
                                 return navItem.isHome ? (
                                     <a
@@ -306,7 +306,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                         {navItem.active && (
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pdp-ink rounded-full"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pine-700 rounded-full"
                                             />
                                         )}
                                     </a>
@@ -321,7 +321,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                         {navItem.active && (
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pdp-ink rounded-full"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pine-700 rounded-full"
                                             />
                                         )}
                                     </Link>
@@ -333,7 +333,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             <Link
                                 to="/for-owners"
                                 aria-label="List your PG or property"
-                                className="md:hidden inline-flex items-center rounded-full border border-pdp-border bg-pdp-surface px-2.5 py-1 text-[11px] font-medium text-pdp-ink hover:bg-pdp-bg transition-colors"
+                                className="md:hidden inline-flex items-center rounded-full border border-pine-700 bg-white px-2.5 py-1 text-[11px] font-medium text-pine-700 hover:bg-sage-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                             >
                                 List PG
                             </Link>
@@ -344,10 +344,10 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             >
                                 <Button
                                     variant="outline"
-                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink transition-colors ${
+                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 transition-colors ${
                                         isContactPage
-                                            ? 'border-pdp-ink bg-pdp-ink text-white hover:bg-pdp-ink/90 hover:text-white hover:border-pdp-ink'
-                                            : 'border-pdp-border bg-transparent text-pdp-ink hover:border-pdp-ink hover:text-pdp-ink hover:bg-pdp-bg'
+                                            ? 'border-pine-900 bg-pine-900 text-white hover:bg-pine-700 hover:text-white hover:border-pine-700'
+                                            : 'border-pine-700 bg-transparent text-pine-700 hover:border-pine-700 hover:text-pine-900 hover:bg-sage-100'
                                     }`}
                                 >
                                     Contact Us
@@ -411,8 +411,8 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                 onClick={() => setIsMenuOpen(false)}
                                 className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
                             >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'rgba(197,160,33,0.15)' }}>
-                                    <Search className="w-4 h-4" style={{ color: '#C5A021' }} />
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-brass/20">
+                                    <Search className="w-4 h-4 text-brass" />
                                 </div>
                                 <div className="flex-1">
                                     <div className="font-semibold text-sm">Find Homes</div>

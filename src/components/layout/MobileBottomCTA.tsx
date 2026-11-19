@@ -33,36 +33,23 @@ export function MobileBottomCTA() {
                 style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)', paddingTop: '8px' }}
             >
                 <div
-                    className="grid grid-cols-3 gap-1.5 sm:gap-2"
-                    style={{
-                        background: 'rgba(10,15,25,0.85)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        borderRadius: '18px',
-                        minHeight: '60px',
-                        padding: '6px',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.38), 0 1px 0 rgba(255,255,255,0.06) inset',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                    }}
+                    className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-pine-900 border border-pine-700 rounded-[18px] p-1.5 min-h-[60px] shadow-lg"
                 >
                     {/* Call */}
                     <a
                         href="tel:+918150099911"
                         aria-label="Call us"
                         onClick={() => console.log('[TRACK] Mobile Bottom Call clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-white/[0.04] border border-white/10"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-pine-700/40 border border-pine-700 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                        <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(197,160,33,0.9)' }} strokeWidth={2.2} />
-                        <span
-                            className="text-[11px] font-bold uppercase tracking-wide truncate"
-                            style={{ color: 'rgba(255,255,255,0.92)', fontFamily: "'Montserrat', sans-serif" }}
-                        >
+                        <Phone className="w-3.5 h-3.5 shrink-0 text-sage-100" strokeWidth={2.2} />
+                        <span className="text-[11px] font-semibold tracking-wide truncate text-white">
                             Call
                         </span>
                     </a>
 
-                    {/* WhatsApp — brand green (#25D366 / #128C7E) */}
+                    {/* WhatsApp — pine-700 solid with white text (7.75:1 contrast) */}
                     <button
                         aria-label="WhatsApp us"
                         onClick={(e) => {
@@ -73,23 +60,16 @@ export function MobileBottomCTA() {
                                 window.location.href = whatsappUrl;
                             }
                         }}
-                        className="flex flex-col items-center justify-center gap-0.5 px-1.5 h-11 rounded-xl active:scale-95 transition-all"
-                        style={{
-                            background: 'linear-gradient(145deg, #25D366 0%, #128C7E 100%)',
-                            boxShadow: '0 4px 18px rgba(37, 211, 102, 0.45)',
-                            WebkitTapHighlightColor: 'transparent',
-                        }}
+                        className="flex flex-col items-center justify-center gap-0.5 px-1.5 h-11 rounded-xl bg-pine-700 hover:bg-pine-700/90 text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         <div className="flex items-center gap-1">
-                            <WhatsAppMark className="w-3.5 h-3.5 shrink-0 text-slate-900" />
-                            <span
-                                className="text-[11px] font-black uppercase tracking-wide text-slate-900 truncate"
-                                style={{ fontFamily: "'Montserrat', sans-serif" }}
-                            >
+                            <WhatsAppMark className="w-3.5 h-3.5 shrink-0 text-white" />
+                            <span className="text-[11px] font-semibold tracking-wide text-white truncate">
                                 WhatsApp
                             </span>
                         </div>
-                        <span className="text-[7.5px] font-bold text-slate-900/90 tracking-wide leading-none truncate max-w-full">
+                        <span className="text-[8px] font-medium text-pine-muted tracking-wide leading-none truncate max-w-full">
                             5 min response
                         </span>
                     </button>
@@ -99,14 +79,11 @@ export function MobileBottomCTA() {
                         to="/contact-us"
                         aria-label="Enquire now"
                         onClick={() => console.log('[TRACK] Mobile Bottom Enquire clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-white/[0.04] border border-white/10"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-pine-700/40 border border-pine-700 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                        <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(197,160,33,0.9)' }} strokeWidth={2.2} />
-                        <span
-                            className="text-[11px] font-bold uppercase tracking-wide truncate"
-                            style={{ color: 'rgba(255,255,255,0.92)', fontFamily: "'Montserrat', sans-serif" }}
-                        >
+                        <Mail className="w-3.5 h-3.5 shrink-0 text-sage-100" strokeWidth={2.2} />
+                        <span className="text-[11px] font-semibold tracking-wide truncate text-white">
                             Enquire
                         </span>
                     </Link>

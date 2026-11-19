@@ -34,21 +34,19 @@ export function WhatsAppWidget() {
 
     return (
         <>
-            {/* ── Floating WhatsApp button ── */}
+            {/* ── Floating WhatsApp button (pine-900 / pine-700 for WCAG AAA against white & sage surfaces) ── */}
             <button
                 onClick={handleDirectWhatsApp}
                 aria-label="Chat with us on WhatsApp"
-                className={`fixed z-[999] hidden md:flex items-center gap-0 rounded-full shadow-xl cursor-pointer transition-all duration-300 active:scale-95 group overflow-hidden ${isPropertyDetailPage ? '' : 'hover:scale-105'}`}
+                className={`fixed z-[999] hidden md:flex items-center gap-0 rounded-full bg-pine-900 hover:bg-pine-700 border border-pine-700 shadow-lg cursor-pointer transition-all duration-300 active:scale-95 group overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${isPropertyDetailPage ? '' : 'hover:scale-105'}`}
                 style={{
                     bottom: '24px',
                     right: '24px',
-                    background: '#25D366',
                     width: '54px',
                     height: '54px',
                     padding: '0 14px',
-                    boxShadow: '0 4px 24px rgba(37,211,102,0.5)',
                     animation: showBounce ? 'waBounce 1s ease' : 'none',
-                    transition: 'width 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s, transform 0.2s',
+                    transition: 'width 0.35s cubic-bezier(0.4,0,0.2,1), background-color 0.2s, transform 0.2s',
                 }}
                 onMouseEnter={(e) => {
                     if (!isPropertyDetailPage) (e.currentTarget as HTMLButtonElement).style.width = '172px';

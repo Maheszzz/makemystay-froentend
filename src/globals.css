@@ -1,20 +1,31 @@
 @import "tailwindcss";
  
 @theme {
-    --color-brand-red: #D92027;
-    --color-brand-charcoal: #2C2C2C;
-    --color-brand-gray: #F5F5F5;
+    /* ── Garden City Palette (single source of truth) ── */
+    --color-pine-900: #0F3B36;
+    --color-pine-700: #1F5C52;
+    --color-sage-100: #E7F0EA;
+    --color-sage-50:  #F3F7F4;
+    --color-line:     #DCE3DE;
+    --color-brass:    #D9A441;
+    --color-red:      #C0392B;
+    --color-red-hover:#A93226;
+    --color-ink:      #16181D;
+    --color-slate:    #5C616B;
+    --color-verified: #1F7A4D;
+    --color-pine-muted: #BFD4C9;
 
-    /* Legacy/Accent Refactoring */
-    --color-brand-navy: var(--color-brand-charcoal);
-    --color-accent-purple: var(--color-brand-red);
-    /* Simplify accent palette */
-    --color-accent-coral: #D92027;
-
-    /* Semantic mapping */
-    --color-primary: var(--color-brand-red);
-    --color-secondary: var(--color-brand-charcoal);
+    /* Derived semantic aliases so switching the palette above updates every view */
+    --color-brand-red: var(--color-red);
+    --color-brand-charcoal: var(--color-pine-900);
+    --color-brand-gray: var(--color-sage-50);
+    --color-brand-navy: var(--color-pine-900);
+    --color-accent-purple: var(--color-red);
+    --color-accent-coral: var(--color-red);
+    --color-primary: var(--color-red);
+    --color-secondary: var(--color-pine-900);
     --color-background: #FFFFFF;
+    --color-brand-gold: var(--color-brass);
 
     --font-heading: var(--font-montserrat), 'Montserrat', sans-serif;
     --font-sans: var(--font-inter), 'Inter', sans-serif;
@@ -22,32 +33,29 @@
     --font-serif-display: var(--font-newsreader), Georgia, serif;
     --font-cormorant: 'Cormorant Garamond', serif;
 
-    /* Calm photography-led PDP tokens */
-    --color-pdp-bg: #F8F8F6;
+    /* Surface & PDP tokens derived from the Garden City palette */
+    --color-pdp-bg: var(--color-sage-50);
     --color-pdp-surface: #FFFFFF;
-    --color-pdp-ink: #16181D;
-    --color-pdp-muted: #5C616B;
-    --color-pdp-border: #E4E4DF;
-    --color-pdp-cta: #C0392B;
-    --color-pdp-cta-hover: #A93226;
-    --color-pdp-verified: #1F7A4D;
-    --color-pdp-verified-bg: #ECF6F0;
-    --color-pdp-contrast-bg: #14161A;
-    --color-pdp-contrast-surface: #1D2026;
-    --color-pdp-contrast-border: #2C313A;
-    --color-pdp-contrast-muted: #A1A7B3;
-    --shadow-pdp-card: 0 4px 20px rgba(22, 24, 29, 0.06);
+    --color-pdp-ink: var(--color-ink);
+    --color-pdp-muted: var(--color-slate);
+    --color-pdp-border: var(--color-line);
+    --color-pdp-cta: var(--color-red);
+    --color-pdp-cta-hover: var(--color-red-hover);
+    --color-pdp-verified: var(--color-verified);
+    --color-pdp-verified-bg: var(--color-sage-100);
+    --color-pdp-contrast-bg: var(--color-pine-900);
+    --color-pdp-contrast-surface: var(--color-pine-700);
+    --color-pdp-contrast-border: color-mix(in srgb, var(--color-sage-100) 20%, var(--color-pine-900));
+    --color-pdp-contrast-muted: var(--color-pine-muted);
+    --shadow-pdp-card: 0 2px 10px rgba(15, 59, 54, 0.04);
     --radius-pdp: 14px;
 
-    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
-    --shadow-glow: 0 0 20px rgba(217, 32, 39, 0.2);
-    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-glass: 0 4px 16px 0 rgba(15, 59, 54, 0.05);
+    --shadow-glow: 0 2px 12px rgba(192, 57, 43, 0.16);
+    --shadow-card: 0 1px 3px rgba(15, 59, 54, 0.06);
 
-    /* Property listing cards: soft layered elevation */
-    --shadow-listing: 0 2px 8px rgba(15, 23, 42, 0.05), 0 12px 32px rgba(15, 23, 42, 0.06);
-    --shadow-listing-hover: 0 8px 24px rgba(15, 23, 42, 0.07), 0 24px 48px rgba(15, 23, 42, 0.09);
-
-    --color-brand-gold: #C5A021;
+    --shadow-listing: 0 1px 3px rgba(15, 59, 54, 0.05);
+    --shadow-listing-hover: 0 6px 20px rgba(15, 59, 54, 0.08);
 }
 
 @layer utilities {
@@ -380,11 +388,16 @@ html {
 
 @layer base {
     body {
-        @apply font-sans bg-slate-50 text-slate-900;
+        @apply font-sans bg-sage-50 text-ink;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         overflow-x: clip;
         max-width: 100vw;
+    }
+
+    *:focus-visible {
+        outline: 2px solid var(--color-pine-700);
+        outline-offset: 2px;
     }
 
     /* Bottom padding for sticky CTA bar on mobile */
