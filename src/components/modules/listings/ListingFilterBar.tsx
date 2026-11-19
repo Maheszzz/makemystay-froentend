@@ -1,9 +1,25 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronDown, MapPin, Search, SlidersHorizontal, X } from 'lucide-react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
-    LISTING_CATEGORY_KEYS,
+    Armchair,
+    BedDouble,
+    Building2,
+    Check,
+    ChevronDown,
+    IndianRupee,
+    LayoutGrid,
+    Layers,
+    MapPin,
+    Search,
+    SlidersHorizontal,
+    Users,
+    Utensils,
+    Home,
+    X,
+} from 'lucide-react';
+import { Link } from '@/lib/navigation';
+import {
     LISTING_TAB_LABEL,
     type AvailableTypeFilters,
     type BudgetPreset,
@@ -17,104 +33,163 @@ export interface ActiveFilterPill {
 }
 
 interface ListingFilterBarProps {
-    searchQuery: string;
-    onSearchChange: (val: string) => void;
     activeTabKey: ListingCategoryKey;
-    onSelectCategory: (cat: ListingCategoryKey) => void;
+    /** Canonical hub URL for a category tab (rendered as a real link). */
+    categoryHref: (cat: ListingCategoryKey) => string;
     propertyCounts?: Partial<Record<ListingCategoryKey, number>>;
+
+    searchQuery: string;
+    /** Applies the typed text query (Search button / Enter). */
+    onSearchSubmit: (q: string) => void;
+
+    metroLabel: string;
+    areaOptions: string[];
+    /** '' means "All of {metro}". */
+    areaValue: string;
+    onAreaChange: (value: string) => void;
+
     minPrice: string;
     maxPrice: string;
     onBudgetApply: (min: string, max: string) => void;
     budgetPresets: BudgetPreset[];
-    sortBy: string;
-    onSortChange: (val: string) => void;
+
     typeFilter: string;
     onTypeFilterChange: (val: string) => void;
     genderFilter?: 'male' | 'female';
-    onGenderToggle: (g: 'male' | 'female') => void;
-    sharingFilter: string;
-    onSharingToggle: (s: string) => void;
+    onGenderChange: (g: 'male' | 'female' | undefined) => void;
     furnishingFilter: string;
-    onFurnishingToggle: (f: string) => void;
+    onFurnishingChange: (f: string) => void;
     foodOn: boolean;
-    onFoodToggle: () => void;
+    onFoodChange: (on: boolean) => void;
     plotSizeFilter: string;
-    onPlotSizeToggle: (bucketId: string) => void;
+    onPlotSizeChange: (bucketId: string) => void;
     availableOptions: AvailableTypeFilters;
-    locationFilter: string;
-    onLocationFilterChange: (val: string) => void;
-    cities: string[];
-    defaultCityLabel: string;
-    hasGeoCoordinates: boolean;
-    showMapPanel: boolean;
-    onMapToggle: () => void;
+
     activeFilterPills: ActiveFilterPill[];
     onClearAll: () => void;
     resultCount: number;
     loading: boolean;
-    overlapHeader?: boolean;
+    /** Overlap the hero above by ~60px (default). Disable for standalone placement. */
+    overlapHero?: boolean;
 }
 
-const MIN_PRIMARY_TAB_LISTINGS = 10;
+const FOCUS_RING =
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2';
+
+const TAB_ICON: Record<ListingCategoryKey, React.ReactNode> = {
+    all: <LayoutGrid className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+    pg: <BedDouble className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+    rent: <Building2 className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+    buy: <Home className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+    plot: <Layers className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />,
+};
+
+const PRIMARY_TABS: ListingCategoryKey[] = ['all', 'pg', 'rent'];
+const MORE_TABS: ListingCategoryKey[] = ['buy', 'plot'];
+
+function SelectControl({
+    icon,
+    label,
+    value,
+    onChange,
+    active,
+    children,
+    className = '',
+}: {
+    icon: React.ReactNode;
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    active: boolean;
+    children: React.ReactNode;
+    className?: string;
+}) {
+    return (
+        <div className={`relative ${className}`}>
+            <span
+                aria-hidden="true"
+                className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
+            >
+                {icon}
+            </span>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                aria-label={label}
+                className={`h-12 w-full min-w-[9.5rem] appearance-none cursor-pointer rounded-[10px] border pl-10 pr-9 text-sm font-medium transition-colors ${FOCUS_RING} ${
+                    active
+                        ? 'border-red bg-blush-100 text-red'
+                        : 'border-line bg-white text-ink hover:border-ink/40'
+                }`}
+            >
+                {children}
+            </select>
+            <ChevronDown
+                aria-hidden="true"
+                className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 ${active ? 'text-red' : 'text-slate'}`}
+            />
+        </div>
+    );
+}
 
 export function ListingFilterBar({
-    searchQuery,
-    onSearchChange,
     activeTabKey,
-    onSelectCategory,
+    categoryHref,
     propertyCounts,
+    searchQuery,
+    onSearchSubmit,
+    metroLabel,
+    areaOptions,
+    areaValue,
+    onAreaChange,
     minPrice,
     maxPrice,
     onBudgetApply,
     budgetPresets,
-    sortBy,
-    onSortChange,
     typeFilter,
     onTypeFilterChange,
     genderFilter,
-    onGenderToggle,
-    sharingFilter,
-    onSharingToggle,
+    onGenderChange,
     furnishingFilter,
-    onFurnishingToggle,
+    onFurnishingChange,
     foodOn,
-    onFoodToggle,
+    onFoodChange,
     plotSizeFilter,
-    onPlotSizeToggle,
+    onPlotSizeChange,
     availableOptions,
-    locationFilter,
-    onLocationFilterChange,
-    cities,
-    defaultCityLabel,
-    hasGeoCoordinates,
-    showMapPanel,
-    onMapToggle,
     activeFilterPills,
     onClearAll,
     resultCount,
     loading,
-    overlapHeader = true,
+    overlapHero = true,
 }: ListingFilterBarProps) {
+    const [draftQuery, setDraftQuery] = useState(searchQuery);
     const [budgetOpen, setBudgetOpen] = useState(false);
-    const [moreCatsOpen, setMoreCatsOpen] = useState(false);
-    const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+    const [moreOpen, setMoreOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const budgetRef = useRef<HTMLDivElement | null>(null);
-    const moreCatsRef = useRef<HTMLDivElement | null>(null);
+    const moreRef = useRef<HTMLDivElement | null>(null);
+    const filtersBtnRef = useRef<HTMLButtonElement | null>(null);
+    const drawerRef = useRef<HTMLDivElement | null>(null);
+    const budgetPanelId = useId();
+    const morePanelId = useId();
 
     useEffect(() => {
-        if (!budgetOpen && !moreCatsOpen) return;
+        setDraftQuery(searchQuery);
+    }, [searchQuery]);
+
+    // Close popovers on outside click / Escape.
+    useEffect(() => {
+        if (!budgetOpen && !moreOpen) return;
         const onDown = (e: MouseEvent) => {
-            if (budgetRef.current && !budgetRef.current.contains(e.target as Node)) {
-                setBudgetOpen(false);
-            }
-            if (moreCatsRef.current && !moreCatsRef.current.contains(e.target as Node)) {
-                setMoreCatsOpen(false);
-            }
+            const t = e.target as Node;
+            if (budgetRef.current && !budgetRef.current.contains(t)) setBudgetOpen(false);
+            if (moreRef.current && !moreRef.current.contains(t)) setMoreOpen(false);
         };
         const onKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
                 setBudgetOpen(false);
-                setMoreCatsOpen(false);
+                setMoreOpen(false);
             }
         };
         document.addEventListener('mousedown', onDown);
@@ -123,40 +198,56 @@ export function ListingFilterBar({
             document.removeEventListener('mousedown', onDown);
             document.removeEventListener('keydown', onKey);
         };
-    }, [budgetOpen, moreCatsOpen]);
+    }, [budgetOpen, moreOpen]);
+
+    // Drawer: Escape closes, Tab is trapped, body scroll locked, focus restored.
+    const closeDrawer = useCallback(() => {
+        setDrawerOpen(false);
+        filtersBtnRef.current?.focus();
+    }, []);
 
     useEffect(() => {
-        if (!mobileDrawerOpen) return;
+        if (!drawerOpen) return;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        const panel = drawerRef.current;
+        const focusables = () =>
+            Array.from(
+                panel?.querySelectorAll<HTMLElement>(
+                    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled])',
+                ) ?? [],
+            );
+        focusables()[0]?.focus();
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setMobileDrawerOpen(false);
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeDrawer();
+                return;
+            }
+            if (e.key !== 'Tab') return;
+            const els = focusables();
+            if (els.length === 0) return;
+            const first = els[0];
+            const last = els[els.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         };
         document.addEventListener('keydown', onKey);
-        return () => document.removeEventListener('keydown', onKey);
-    }, [mobileDrawerOpen]);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            document.removeEventListener('keydown', onKey);
+        };
+    }, [drawerOpen, closeDrawer]);
 
-    const { primaryTabs, overflowTabs } = useMemo(() => {
-        const primary: ListingCategoryKey[] = [];
-        const overflow: ListingCategoryKey[] = [];
-        for (const cat of LISTING_CATEGORY_KEYS) {
-            if (cat === 'all') {
-                primary.push(cat);
-                continue;
-            }
-            const count = propertyCounts?.[cat];
-            const isPrimaryCount =
-                typeof count === 'number' ? count >= MIN_PRIMARY_TAB_LISTINGS : cat === 'pg' || cat === 'rent';
-            if (isPrimaryCount) {
-                primary.push(cat);
-            } else {
-                overflow.push(cat);
-            }
-        }
-        return { primaryTabs: primary, overflowTabs: overflow };
-    }, [propertyCounts]);
+    const isMoreActive = MORE_TABS.includes(activeTabKey);
 
-    const isOverflowCategoryActive = overflowTabs.includes(activeTabKey);
-
-    const budgetSummaryLabel = (() => {
+    const isBudgetActive = Boolean(minPrice || maxPrice);
+    const budgetLabel = useMemo(() => {
         const presetMatch = budgetPresets.find((b) => b.min === minPrice && b.max === maxPrice);
         if (presetMatch) return presetMatch.label;
         if (minPrice && maxPrice) {
@@ -165,442 +256,386 @@ export function ListingFilterBar({
         if (minPrice) return `₹${Number(minPrice).toLocaleString('en-IN')}+`;
         if (maxPrice) return `Up to ₹${Number(maxPrice).toLocaleString('en-IN')}`;
         return 'Budget';
-    })();
+    }, [budgetPresets, minPrice, maxPrice]);
 
-    const isBudgetActive = Boolean(minPrice || maxPrice);
+    const budgetUnit = activeTabKey === 'buy' || activeTabKey === 'plot' ? 'Budget (INR)' : 'Monthly rent (INR)';
 
-    const chipClass = (active: boolean) =>
-        `min-h-[38px] lg:min-h-[36px] px-3 py-1.5 rounded-full text-xs border transition-colors inline-flex items-center gap-1.5 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
-            active
-                ? 'bg-blush-100 text-red border-red font-semibold'
-                : 'bg-white text-ink border-line font-medium hover:bg-blush-100 hover:border-ink/30'
-        }`;
+    const submitSearch = (e?: React.FormEvent) => {
+        e?.preventDefault();
+        onSearchSubmit(draftQuery.trim());
+    };
 
-    const drawerChipClass = (active: boolean) =>
-        `min-h-[44px] px-4 py-2 rounded-[10px] text-sm border transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
-            active
-                ? 'bg-blush-100 text-red border-red font-semibold'
-                : 'bg-page text-ink border-line font-medium hover:bg-blush-100'
-        }`;
+    const showPg = activeTabKey === 'pg';
+    const showRentBuy = activeTabKey === 'rent' || activeTabKey === 'buy' || activeTabKey === 'all';
+    const showPlot = activeTabKey === 'plot';
 
-    const showPgChips = activeTabKey === 'pg';
-    const showRentOrBuyChips = activeTabKey === 'rent' || activeTabKey === 'buy' || activeTabKey === 'all';
-    const showPlotChips = activeTabKey === 'plot';
+    const renderBudget = (fullWidth = false) => (
+        <div ref={fullWidth ? undefined : budgetRef} className={`relative ${fullWidth ? '' : 'shrink-0'}`}>
+            <button
+                type="button"
+                aria-expanded={budgetOpen}
+                aria-controls={budgetPanelId}
+                onClick={() => setBudgetOpen((v) => !v)}
+                className={`h-12 w-full min-w-[9.5rem] inline-flex items-center gap-2 rounded-[10px] border pl-3.5 pr-3 text-sm font-medium transition-colors cursor-pointer ${FOCUS_RING} ${
+                    isBudgetActive
+                        ? 'border-red bg-blush-100 text-red'
+                        : 'border-line bg-white text-ink hover:border-ink/40'
+                }`}
+            >
+                <IndianRupee className={`w-4 h-4 shrink-0 ${isBudgetActive ? 'text-red' : 'text-slate'}`} aria-hidden="true" />
+                <span className="flex-1 text-left truncate">{budgetLabel}</span>
+                <ChevronDown className={`w-4 h-4 shrink-0 ${isBudgetActive ? 'text-red' : 'text-slate'}`} aria-hidden="true" />
+            </button>
 
-    const renderDynamicFilterChips = (forDrawer = false) => {
-        const cls = forDrawer ? drawerChipClass : chipClass;
+            {budgetOpen && (
+                <div
+                    id={budgetPanelId}
+                    role="group"
+                    aria-label="Budget range"
+                    className={`z-40 rounded-[14px] border border-line bg-white p-4 shadow-lg ${
+                        fullWidth ? 'mt-2' : 'absolute left-0 top-full mt-2 w-72'
+                    }`}
+                >
+                    <p className="text-xs font-semibold text-slate mb-2.5">{budgetUnit}</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {budgetPresets.map((preset) => {
+                            const active = minPrice === preset.min && maxPrice === preset.max;
+                            return (
+                                <button
+                                    key={preset.id}
+                                    type="button"
+                                    aria-pressed={active}
+                                    onClick={() => {
+                                        onBudgetApply(active ? '' : preset.min, active ? '' : preset.max);
+                                        if (!fullWidth) setBudgetOpen(false);
+                                    }}
+                                    className={`min-h-[44px] px-3 rounded-lg text-sm border transition-colors cursor-pointer ${FOCUS_RING} ${
+                                        active
+                                            ? 'bg-blush-100 text-red border-red font-semibold'
+                                            : 'bg-page text-ink border-line font-medium hover:bg-blush-100'
+                                    }`}
+                                >
+                                    {preset.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                        <input
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            placeholder="Min ₹"
+                            value={minPrice}
+                            onChange={(e) => onBudgetApply(e.target.value, maxPrice)}
+                            aria-label="Minimum price"
+                            className={`h-11 w-full rounded-lg border border-line bg-page px-3 text-sm text-ink tabular-nums ${FOCUS_RING}`}
+                        />
+                        <input
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            placeholder="Max ₹"
+                            value={maxPrice}
+                            onChange={(e) => onBudgetApply(minPrice, e.target.value)}
+                            aria-label="Maximum price"
+                            className={`h-11 w-full rounded-lg border border-line bg-page px-3 text-sm text-ink tabular-nums ${FOCUS_RING}`}
+                        />
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
+    /** Area + type-specific dropdowns, shared by the desktop row 2 and the mobile drawer. */
+    const renderDropdowns = (fullWidth = false) => {
+        const w = fullWidth ? 'w-full' : 'shrink-0';
         return (
             <>
-                {showPgChips &&
-                    availableOptions.pgGenders.map((g) => {
-                        const active = genderFilter === g;
-                        return (
-                            <button
-                                key={`gender-${g}`}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => onGenderToggle(g)}
-                                className={cls(active)}
-                            >
-                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{g === 'male' ? 'Boys' : 'Girls'}</span>
-                            </button>
-                        );
-                    })}
+                <SelectControl
+                    className={w}
+                    icon={<MapPin className="w-4 h-4" />}
+                    label="Filter by area"
+                    value={areaValue}
+                    active={areaValue !== ''}
+                    onChange={onAreaChange}
+                >
+                    <option value="">All of {metroLabel}</option>
+                    {areaOptions.map((a) => (
+                        <option key={a} value={a}>
+                            {a}
+                        </option>
+                    ))}
+                </SelectControl>
 
-                {showPgChips &&
-                    availableOptions.pgSharing.map((s) => {
-                        const active = sharingFilter.toLowerCase() === s.toLowerCase();
-                        return (
-                            <button
-                                key={`sharing-${s}`}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => onSharingToggle(s)}
-                                className={cls(active)}
-                            >
-                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{s} sharing</span>
-                            </button>
-                        );
-                    })}
+                {renderBudget(fullWidth)}
 
-                {showPgChips && availableOptions.hasPgFood && (
-                    <button
-                        type="button"
-                        aria-pressed={foodOn}
-                        onClick={onFoodToggle}
-                        className={cls(foodOn)}
+                {showPg && availableOptions.pgGenders.length > 0 && (
+                    <SelectControl
+                        className={w}
+                        icon={<Users className="w-4 h-4" />}
+                        label="Filter by gender"
+                        value={genderFilter ?? ''}
+                        active={Boolean(genderFilter)}
+                        onChange={(v) => onGenderChange(v === 'male' || v === 'female' ? v : undefined)}
                     >
-                        {foodOn && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                        <span>Meals included</span>
-                    </button>
+                        <option value="">Gender</option>
+                        {availableOptions.pgGenders.map((g) => (
+                            <option key={g} value={g}>
+                                {g === 'male' ? 'Boys' : 'Girls'}
+                            </option>
+                        ))}
+                    </SelectControl>
                 )}
 
-                {showRentOrBuyChips &&
-                    availableOptions.bhkTypes.map((t) => {
-                        const active = typeFilter.toLowerCase() === t.toLowerCase();
-                        return (
-                            <button
-                                key={`type-${t}`}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => onTypeFilterChange(active ? 'all' : t)}
-                                className={cls(active)}
-                            >
-                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{t}</span>
-                            </button>
-                        );
-                    })}
+                {showPg && availableOptions.hasPgFood && (
+                    <SelectControl
+                        className={w}
+                        icon={<Utensils className="w-4 h-4" />}
+                        label="Filter by meals"
+                        value={foodOn ? 'included' : ''}
+                        active={foodOn}
+                        onChange={(v) => onFoodChange(v === 'included')}
+                    >
+                        <option value="">Meals</option>
+                        <option value="included">Meals included</option>
+                    </SelectControl>
+                )}
 
-                {showRentOrBuyChips &&
-                    availableOptions.furnishingOptions.map((opt) => {
-                        const active = furnishingFilter.toLowerCase() === opt.value.toLowerCase();
-                        return (
-                            <button
-                                key={`furn-${opt.value}`}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => onFurnishingToggle(opt.value)}
-                                className={cls(active)}
-                            >
-                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{opt.label}</span>
-                            </button>
-                        );
-                    })}
+                {showRentBuy && availableOptions.bhkTypes.length > 0 && (
+                    <SelectControl
+                        className={w}
+                        icon={<Home className="w-4 h-4" />}
+                        label="Filter by BHK"
+                        value={typeFilter === 'all' ? '' : typeFilter}
+                        active={typeFilter !== 'all' && typeFilter !== ''}
+                        onChange={(v) => onTypeFilterChange(v || 'all')}
+                    >
+                        <option value="">BHK</option>
+                        {availableOptions.bhkTypes.map((t) => (
+                            <option key={t} value={t}>
+                                {t}
+                            </option>
+                        ))}
+                    </SelectControl>
+                )}
 
-                {showPlotChips &&
-                    availableOptions.plotSizeBuckets.map((b) => {
-                        const active = plotSizeFilter === b.id;
-                        return (
-                            <button
-                                key={`plot-${b.id}`}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => onPlotSizeToggle(b.id)}
-                                className={cls(active)}
-                            >
-                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{b.label}</span>
-                            </button>
-                        );
-                    })}
+                {showRentBuy && availableOptions.furnishingOptions.length > 0 && (
+                    <SelectControl
+                        className={w}
+                        icon={<Armchair className="w-4 h-4" />}
+                        label="Filter by furnishing"
+                        value={furnishingFilter}
+                        active={Boolean(furnishingFilter)}
+                        onChange={onFurnishingChange}
+                    >
+                        <option value="">Furnishing</option>
+                        {availableOptions.furnishingOptions.map((o) => (
+                            <option key={o.value} value={o.value}>
+                                {o.label}
+                            </option>
+                        ))}
+                    </SelectControl>
+                )}
+
+                {showPlot && availableOptions.plotSizeBuckets.length > 0 && (
+                    <SelectControl
+                        className={w}
+                        icon={<Layers className="w-4 h-4" />}
+                        label="Filter by plot size"
+                        value={plotSizeFilter}
+                        active={Boolean(plotSizeFilter)}
+                        onChange={onPlotSizeChange}
+                    >
+                        <option value="">Plot size</option>
+                        {availableOptions.plotSizeBuckets.map((b) => (
+                            <option key={b.id} value={b.id}>
+                                {b.label}
+                            </option>
+                        ))}
+                    </SelectControl>
+                )}
             </>
         );
     };
 
-    const mobileActiveCount = activeFilterPills.length;
-    const areaValue =
-        locationFilter.toLowerCase() === defaultCityLabel.toLowerCase() ? 'all' : locationFilter;
+    const searchInput = (id: string) => (
+        <div className="relative flex-1 min-w-0">
+            <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate"
+            />
+            <input
+                id={id}
+                type="search"
+                value={draftQuery}
+                onChange={(e) => setDraftQuery(e.target.value)}
+                placeholder="Search area, property or landmark..."
+                aria-label="Search area, property or landmark"
+                enterKeyHint="search"
+                className={`h-12 w-full rounded-[10px] border border-line bg-page pl-10 pr-10 text-sm text-ink placeholder:text-slate transition-colors focus:bg-white focus:border-red ${FOCUS_RING}`}
+            />
+            {draftQuery && (
+                <button
+                    type="button"
+                    aria-label="Clear search text"
+                    onClick={() => {
+                        setDraftQuery('');
+                        if (searchQuery) onSearchSubmit('');
+                    }}
+                    className={`absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-slate hover:text-ink ${FOCUS_RING}`}
+                >
+                    <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+            )}
+        </div>
+    );
+
+    const tabClass = (active: boolean) =>
+        `min-h-[44px] px-4 rounded-[10px] border text-sm whitespace-nowrap inline-flex items-center gap-2 transition-colors cursor-pointer ${FOCUS_RING} ${
+            active
+                ? 'bg-red border-red text-white font-semibold'
+                : 'bg-white border-line text-ink font-medium hover:bg-blush-100'
+        }`;
 
     return (
         <>
             <div
-                className={`sticky top-[56px] md:top-[60px] z-30 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 w-full ${
-                    overlapHeader ? '-mt-7 md:-mt-8 mb-6' : 'pt-4 mb-6'
-                }`}
+                className={`relative z-20 w-full max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 ${
+                    overlapHero ? '-mt-[60px]' : 'pt-4'
+                } mb-8`}
             >
-                <div className="bg-white rounded-[var(--radius-pdp)] border border-line p-3 sm:p-4">
-                    {/* Row 1: Search + Primary Type Tabs (+ More menu for <10 counts) + Result Count + Sort */}
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-2.5">
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 min-w-0">
-                            {/* Area Search */}
-                            <div className="relative sm:w-56 md:w-64 shrink-0">
-                                <Search className="w-4 h-4 text-slate absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                <input
-                                    type="search"
-                                    value={searchQuery}
-                                    onChange={(e) => onSearchChange(e.target.value)}
-                                    placeholder="Search area or property..."
-                                    aria-label="Search area or property"
-                                    className="w-full h-11 pl-10 pr-9 rounded-[10px] border border-line bg-page text-sm text-ink placeholder:text-slate focus:outline-none focus:bg-white focus:border-red transition-colors"
-                                />
-                                {searchQuery && (
-                                    <button
-                                        type="button"
-                                        onClick={() => onSearchChange('')}
-                                        aria-label="Clear search"
-                                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-slate hover:text-ink"
+                <div className="rounded-[14px] border border-line bg-white p-4 md:p-5 shadow-[0_10px_32px_rgba(94,15,18,0.10)]">
+                    {/* Row 1: type tabs */}
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 py-1">
+                        <nav aria-label="Property categories" className="flex items-center gap-2">
+                            {PRIMARY_TABS.map((cat) => {
+                                const active = activeTabKey === cat;
+                                const count = propertyCounts?.[cat];
+                                return (
+                                    <Link
+                                        key={cat}
+                                        to={categoryHref(cat)}
+                                        aria-current={active ? 'page' : undefined}
+                                        className={tabClass(active)}
                                     >
-                                        <X className="w-3.5 h-3.5" />
-                                    </button>
-                                )}
-                            </div>
+                                        {TAB_ICON[cat]}
+                                        <span>{LISTING_TAB_LABEL[cat]}</span>
+                                        {typeof count === 'number' && (
+                                            <span className={`tabular-nums ${active ? 'text-white' : 'text-slate'}`}>
+                                                ({count.toLocaleString('en-IN')})
+                                            </span>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </nav>
 
-                            {/* Category Switch: active tab = solid red fill + white text; <10 counts grouped under More */}
-                            <div className="flex items-center gap-1.5 min-w-0">
-                                <div
-                                    role="navigation"
-                                    aria-label="Property categories"
-                                    className="flex items-center gap-1 p-1 rounded-[10px] bg-page border border-line overflow-x-auto no-scrollbar"
+                        <div ref={moreRef} className="relative shrink-0">
+                            <button
+                                type="button"
+                                aria-expanded={moreOpen}
+                                aria-controls={morePanelId}
+                                onClick={() => setMoreOpen((v) => !v)}
+                                className={tabClass(isMoreActive)}
+                            >
+                                <Layers className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+                                <span>{isMoreActive ? LISTING_TAB_LABEL[activeTabKey] : 'More'}</span>
+                                <ChevronDown className="w-4 h-4 shrink-0" aria-hidden="true" />
+                            </button>
+                            {moreOpen && (
+                                <ul
+                                    id={morePanelId}
+                                    className="absolute left-0 top-full z-40 mt-2 w-52 rounded-[14px] border border-line bg-white p-1.5 shadow-lg"
                                 >
-                                    {primaryTabs.map((cat) => {
-                                        const isActive = activeTabKey === cat;
+                                    {MORE_TABS.map((cat) => {
+                                        const active = activeTabKey === cat;
                                         const count = propertyCounts?.[cat];
                                         return (
-                                            <button
-                                                key={cat}
-                                                type="button"
-                                                aria-current={isActive ? 'page' : undefined}
-                                                onClick={() => onSelectCategory(cat)}
-                                                className={`min-h-[36px] px-3 py-1.5 rounded-[7px] text-xs sm:text-sm whitespace-nowrap transition-colors inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
-                                                    isActive
-                                                        ? 'bg-red text-white font-semibold'
-                                                        : 'text-ink font-medium hover:bg-blush-100'
-                                                }`}
-                                            >
-                                                <span>{LISTING_TAB_LABEL[cat]}</span>
-                                                {typeof count === 'number' && (
-                                                    <span
-                                                        className={`text-[11px] tabular-nums ${
-                                                            isActive ? 'text-blush-100' : 'text-slate'
-                                                        }`}
-                                                    >
-                                                        {count}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                {overflowTabs.length > 0 && (
-                                    <div ref={moreCatsRef} className="relative shrink-0">
-                                        <button
-                                            type="button"
-                                            aria-expanded={moreCatsOpen}
-                                            aria-haspopup="menu"
-                                            onClick={() => setMoreCatsOpen((v) => !v)}
-                                            className={`min-h-[44px] sm:min-h-[38px] px-3 py-1.5 rounded-[10px] border text-xs sm:text-sm inline-flex items-center gap-1 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
-                                                isOverflowCategoryActive
-                                                    ? 'bg-red text-white border-red font-semibold'
-                                                    : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
-                                            }`}
-                                        >
-                                            <span>
-                                                {isOverflowCategoryActive ? LISTING_TAB_LABEL[activeTabKey] : 'More'}
-                                            </span>
-                                            <ChevronDown className="w-3.5 h-3.5 opacity-80" />
-                                        </button>
-
-                                        {moreCatsOpen && (
-                                            <div
-                                                role="menu"
-                                                aria-label="Additional categories"
-                                                className="absolute left-0 top-full mt-2 w-44 rounded-[var(--radius-pdp)] border border-line bg-white shadow-sm p-1.5 z-40"
-                                            >
-                                                {overflowTabs.map((cat) => {
-                                                    const active = activeTabKey === cat;
-                                                    const count = propertyCounts?.[cat];
-                                                    return (
-                                                        <button
-                                                            key={cat}
-                                                            type="button"
-                                                            role="menuitem"
-                                                            onClick={() => {
-                                                                setMoreCatsOpen(false);
-                                                                onSelectCategory(cat);
-                                                            }}
-                                                            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                                                                active
-                                                                    ? 'bg-blush-100 text-red font-semibold'
-                                                                    : 'text-ink hover:bg-blush-100 font-medium'
-                                                            }`}
-                                                        >
-                                                            <span className="inline-flex items-center gap-1.5">
-                                                                {active && <Check className="w-3.5 h-3.5" aria-hidden />}
-                                                                {LISTING_TAB_LABEL[cat]}
-                                                            </span>
-                                                            {typeof count === 'number' && (
-                                                                <span className="text-xs text-slate tabular-nums">
-                                                                    {count}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Mobile Filters Drawer Button + Desktop Count & Sort */}
-                        <div className="flex items-center justify-between lg:justify-end gap-2 shrink-0">
-                            <button
-                                type="button"
-                                onClick={() => setMobileDrawerOpen(true)}
-                                className="lg:hidden min-h-[44px] px-4 rounded-[10px] border border-line bg-white text-sm font-medium text-ink hover:bg-blush-100 inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
-                            >
-                                <SlidersHorizontal className="w-4 h-4 text-red" />
-                                <span>Filters</span>
-                                {mobileActiveCount > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-red text-white text-[11px] font-semibold tabular-nums leading-none">
-                                        {mobileActiveCount}
-                                    </span>
-                                )}
-                            </button>
-
-                            <div className="flex items-center gap-2.5 ml-auto">
-                                {!loading && (
-                                    <span className="hidden xl:inline text-xs text-slate tabular-nums whitespace-nowrap">
-                                        {resultCount} {resultCount === 1 ? 'result' : 'results'}
-                                    </span>
-                                )}
-
-                                {hasGeoCoordinates && (
-                                    <button
-                                        type="button"
-                                        aria-pressed={showMapPanel}
-                                        onClick={onMapToggle}
-                                        className={`min-h-[44px] lg:min-h-[40px] px-3.5 rounded-[10px] border text-sm inline-flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 ${
-                                            showMapPanel
-                                                ? 'bg-blush-100 text-red border-red font-semibold'
-                                                : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
-                                        }`}
-                                    >
-                                        <MapPin className="w-3.5 h-3.5" />
-                                        <span>Map</span>
-                                    </button>
-                                )}
-
-                                <div className="relative">
-                                    <select
-                                        value={sortBy}
-                                        onChange={(e) => onSortChange(e.target.value)}
-                                        aria-label="Sort results"
-                                        className="min-h-[44px] lg:min-h-[40px] appearance-none pl-3.5 pr-9 rounded-[10px] border border-line bg-white text-sm font-medium text-ink focus:outline-none focus:border-red cursor-pointer"
-                                    >
-                                        <option value="newest">Sort: Newest</option>
-                                        <option value="price_asc">Price: low to high</option>
-                                        <option value="price_desc">Price: high to low</option>
-                                    </select>
-                                    <ChevronDown className="w-4 h-4 text-slate absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Row 2 (Desktop): Area Select + Budget Popover + Type-Specific Chips */}
-                    <div className="hidden lg:flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-line">
-                        {/* Area Select */}
-                        <div className="relative">
-                            <select
-                                value={areaValue}
-                                onChange={(e) => onLocationFilterChange(e.target.value)}
-                                aria-label="Filter by area"
-                                className={`min-h-[36px] appearance-none pl-3 pr-8 rounded-full border text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-red focus:ring-offset-2 ${
-                                    areaValue !== 'all'
-                                        ? 'bg-blush-100 text-red border-red font-semibold'
-                                        : 'bg-white text-ink border-line font-medium hover:bg-blush-100'
-                                }`}
-                            >
-                                <option value="all">All of {defaultCityLabel}</option>
-                                {cities.map((c) => (
-                                    <option key={c} value={c}>
-                                        {c}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown
-                                className={`w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${
-                                    areaValue !== 'all' ? 'text-red' : 'text-slate'
-                                }`}
-                            />
-                        </div>
-
-                        {/* Budget Range Popover */}
-                        <div ref={budgetRef} className="relative">
-                            <button
-                                type="button"
-                                aria-expanded={budgetOpen}
-                                onClick={() => setBudgetOpen((v) => !v)}
-                                className={chipClass(isBudgetActive)}
-                            >
-                                {isBudgetActive && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                <span>{budgetSummaryLabel}</span>
-                                <ChevronDown className="w-3.5 h-3.5 opacity-75" />
-                            </button>
-
-                            {budgetOpen && (
-                                <div className="absolute left-0 top-full mt-2 w-72 rounded-[var(--radius-pdp)] border border-line bg-white shadow-sm p-4 z-40">
-                                    <p className="text-xs font-medium text-slate mb-2.5">
-                                        {activeTabKey === 'buy' || activeTabKey === 'plot'
-                                            ? 'Budget (INR)'
-                                            : 'Monthly rent (INR)'}
-                                    </p>
-                                    <div className="flex flex-wrap gap-1.5 mb-3">
-                                        {budgetPresets.map((preset) => {
-                                            const active = minPrice === preset.min && maxPrice === preset.max;
-                                            return (
-                                                <button
-                                                    key={preset.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        onBudgetApply(active ? '' : preset.min, active ? '' : preset.max);
-                                                        setBudgetOpen(false);
-                                                    }}
-                                                    className={`px-2.5 py-1.5 rounded-lg text-xs border transition-colors ${
+                                            <li key={cat}>
+                                                <Link
+                                                    to={categoryHref(cat)}
+                                                    aria-current={active ? 'page' : undefined}
+                                                    onClick={() => setMoreOpen(false)}
+                                                    className={`flex min-h-[44px] items-center justify-between gap-2 rounded-lg px-3 text-sm ${FOCUS_RING} ${
                                                         active
-                                                            ? 'bg-blush-100 text-red border-red font-semibold'
-                                                            : 'bg-page text-ink border-line font-medium hover:bg-blush-100'
+                                                            ? 'bg-blush-100 font-semibold text-red'
+                                                            : 'font-medium text-ink hover:bg-blush-100'
                                                     }`}
                                                 >
-                                                    {preset.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            placeholder="Min ₹"
-                                            value={minPrice}
-                                            onChange={(e) => onBudgetApply(e.target.value, maxPrice)}
-                                            aria-label="Minimum price"
-                                            className="w-full px-3 py-2 rounded-lg border border-line bg-page text-xs text-ink tabular-nums focus:outline-none focus:border-red"
-                                        />
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            placeholder="Max ₹"
-                                            value={maxPrice}
-                                            onChange={(e) => onBudgetApply(minPrice, e.target.value)}
-                                            aria-label="Maximum price"
-                                            className="w-full px-3 py-2 rounded-lg border border-line bg-page text-xs text-ink tabular-nums focus:outline-none focus:border-red"
-                                        />
-                                    </div>
-                                </div>
+                                                    <span className="inline-flex items-center gap-2">
+                                                        {TAB_ICON[cat]}
+                                                        {LISTING_TAB_LABEL[cat]}
+                                                    </span>
+                                                    {typeof count === 'number' && (
+                                                        <span className="tabular-nums text-slate">({count})</span>
+                                                    )}
+                                                </Link>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
                             )}
                         </div>
-
-                        {renderDynamicFilterChips(false)}
                     </div>
 
-                    {/* Active Removable Filter Pills */}
+                    {/* Row 2 (desktop): search + dropdowns + Search button */}
+                    <form
+                        role="search"
+                        onSubmit={submitSearch}
+                        className="hidden lg:flex items-center gap-3 mt-3 pt-4 border-t border-line"
+                    >
+                        {searchInput('listing-search')}
+                        {renderDropdowns(false)}
+                        <button
+                            type="submit"
+                            className={`h-12 shrink-0 inline-flex items-center justify-center gap-2 rounded-[10px] bg-red px-7 text-sm font-semibold text-white transition-colors hover:bg-red-hover cursor-pointer ${FOCUS_RING}`}
+                        >
+                            <Search className="h-4 w-4" aria-hidden="true" />
+                            Search
+                        </button>
+                    </form>
+
+                    {/* Row 2 (mobile): collapses into a Filters button */}
+                    <div className="lg:hidden mt-3 pt-4 border-t border-line">
+                        <button
+                            ref={filtersBtnRef}
+                            type="button"
+                            aria-haspopup="dialog"
+                            aria-expanded={drawerOpen}
+                            onClick={() => setDrawerOpen(true)}
+                            className={`h-12 w-full inline-flex items-center justify-center gap-2 rounded-[10px] border border-red bg-white text-sm font-semibold text-red hover:bg-blush-100 cursor-pointer ${FOCUS_RING}`}
+                        >
+                            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                            <span>Filters</span>
+                            {activeFilterPills.length > 0 && (
+                                <span className="rounded-full bg-red px-2 py-0.5 text-[11px] font-semibold leading-none text-white tabular-nums">
+                                    {activeFilterPills.length}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+
                     {activeFilterPills.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-line">
+                        <div className="mt-4 flex flex-wrap items-center gap-2">
                             <span className="text-xs text-slate">Active:</span>
                             {activeFilterPills.map((pill) => (
                                 <button
                                     key={pill.key}
                                     type="button"
                                     onClick={pill.onRemove}
-                                    className="min-h-[32px] px-2.5 py-1 rounded-full bg-blush-100 border border-red text-xs font-semibold text-red hover:bg-white inline-flex items-center gap-1.5 cursor-pointer"
+                                    aria-label={`Remove filter ${pill.label}`}
+                                    className={`min-h-[44px] px-3 rounded-full bg-blush-100 border border-red text-xs font-semibold text-red hover:bg-white inline-flex items-center gap-1.5 cursor-pointer ${FOCUS_RING}`}
                                 >
-                                    <Check className="w-3 h-3 shrink-0" aria-hidden />
+                                    <Check className="w-3 h-3 shrink-0" aria-hidden="true" />
                                     <span>{pill.label}</span>
-                                    <X className="w-3 h-3 shrink-0" aria-hidden />
+                                    <X className="w-3 h-3 shrink-0" aria-hidden="true" />
                                 </button>
                             ))}
                             <button
                                 type="button"
                                 onClick={onClearAll}
-                                className="min-h-[32px] px-2.5 py-1 text-xs font-medium text-ink hover:text-red underline underline-offset-4 cursor-pointer"
+                                className={`min-h-[44px] px-3 text-sm font-medium text-ink hover:text-red underline underline-offset-4 cursor-pointer ${FOCUS_RING}`}
                             >
                                 Clear all
                             </button>
@@ -609,120 +644,68 @@ export function ListingFilterBar({
                 </div>
             </div>
 
-            {/* Mobile Filters Drawer */}
-            {mobileDrawerOpen && (
+            {/* Mobile filters drawer */}
+            {drawerOpen && (
                 <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Filter listings"
-                    className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/50 backdrop-blur-xs"
-                    onClick={() => setMobileDrawerOpen(false)}
+                    className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/50"
+                    onClick={closeDrawer}
                 >
                     <div
-                        className="bg-white rounded-t-[20px] border-t border-line max-h-[85vh] flex flex-col overflow-hidden"
+                        ref={drawerRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Filter listings"
+                        className="flex max-h-[88vh] flex-col overflow-hidden rounded-t-[20px] border-t border-line bg-white"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-                            <h2 className="text-base font-semibold text-ink">Filters</h2>
+                        <div className="flex items-center justify-between border-b border-line px-5 py-3">
+                            <h2 className="text-base font-bold text-ink">Filters</h2>
                             <button
                                 type="button"
                                 aria-label="Close filters"
-                                onClick={() => setMobileDrawerOpen(false)}
-                                className="w-11 h-11 rounded-full flex items-center justify-center text-ink hover:bg-blush-100"
+                                onClick={closeDrawer}
+                                className={`flex h-11 w-11 items-center justify-center rounded-full text-ink hover:bg-blush-100 ${FOCUS_RING}`}
                             >
-                                <X className="w-5 h-5" />
+                                <X className="h-5 w-5" aria-hidden="true" />
                             </button>
                         </div>
 
-                        <div className="p-5 overflow-y-auto space-y-6">
-                            <div>
-                                <label htmlFor="mobile-area-select" className="block text-sm font-medium text-ink mb-2">
-                                    Area
+                        <form
+                            onSubmit={(e) => {
+                                submitSearch(e);
+                                closeDrawer();
+                            }}
+                            className="flex min-h-0 flex-1 flex-col"
+                        >
+                            <div className="flex-1 space-y-3 overflow-y-auto p-5">
+                                <label htmlFor="drawer-search" className="block text-sm font-semibold text-ink">
+                                    Search
                                 </label>
-                                <select
-                                    id="mobile-area-select"
-                                    value={areaValue}
-                                    onChange={(e) => onLocationFilterChange(e.target.value)}
-                                    className="w-full min-h-[44px] px-3.5 rounded-[10px] border border-line bg-page text-sm text-ink focus:outline-none focus:border-red"
+                                {searchInput('drawer-search')}
+                                <p className="pt-2 text-sm font-semibold text-ink">Filters</p>
+                                <div className="flex flex-col gap-3">{renderDropdowns(true)}</div>
+                            </div>
+
+                            <div className="flex items-center gap-3 border-t border-line bg-white p-4">
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onClearAll();
+                                        closeDrawer();
+                                    }}
+                                    className={`h-12 rounded-[10px] border border-line px-4 text-sm font-medium text-ink cursor-pointer ${FOCUS_RING}`}
                                 >
-                                    <option value="all">All of {defaultCityLabel}</option>
-                                    {cities.map((c) => (
-                                        <option key={c} value={c}>
-                                            {c}
-                                        </option>
-                                    ))}
-                                </select>
+                                    Clear all
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`h-12 flex-1 inline-flex items-center justify-center gap-2 rounded-[10px] bg-red px-5 text-sm font-semibold text-white hover:bg-red-hover cursor-pointer ${FOCUS_RING}`}
+                                >
+                                    <Search className="h-4 w-4" aria-hidden="true" />
+                                    {loading ? 'Search' : `Show ${resultCount.toLocaleString('en-IN')} results`}
+                                </button>
                             </div>
-
-                            <div>
-                                <p className="text-sm font-medium text-ink mb-2.5">
-                                    {activeTabKey === 'buy' || activeTabKey === 'plot' ? 'Budget (INR)' : 'Monthly rent (INR)'}
-                                </p>
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    {budgetPresets.map((preset) => {
-                                        const active = minPrice === preset.min && maxPrice === preset.max;
-                                        return (
-                                            <button
-                                                key={preset.id}
-                                                type="button"
-                                                onClick={() => onBudgetApply(active ? '' : preset.min, active ? '' : preset.max)}
-                                                className={drawerChipClass(active)}
-                                            >
-                                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
-                                                <span>{preset.label}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                                <div className="grid grid-cols-2 gap-2.5">
-                                    <input
-                                        type="number"
-                                        min={0}
-                                        placeholder="Min ₹"
-                                        value={minPrice}
-                                        onChange={(e) => onBudgetApply(e.target.value, maxPrice)}
-                                        aria-label="Minimum budget"
-                                        className="w-full min-h-[44px] px-3.5 rounded-[10px] border border-line bg-page text-sm text-ink tabular-nums"
-                                    />
-                                    <input
-                                        type="number"
-                                        min={0}
-                                        placeholder="Max ₹"
-                                        value={maxPrice}
-                                        onChange={(e) => onBudgetApply(minPrice, e.target.value)}
-                                        aria-label="Maximum budget"
-                                        className="w-full min-h-[44px] px-3.5 rounded-[10px] border border-line bg-page text-sm text-ink tabular-nums"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <p className="text-sm font-medium text-ink mb-2.5">Property options</p>
-                                <div className="flex flex-wrap gap-2">
-                                    {renderDynamicFilterChips(true)}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="p-4 border-t border-line bg-white flex items-center gap-3">
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    onClearAll();
-                                    setMobileDrawerOpen(false);
-                                }}
-                                className="min-h-[44px] px-4 rounded-[10px] border border-line text-sm font-medium text-ink"
-                            >
-                                Clear all
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setMobileDrawerOpen(false)}
-                                className="flex-1 min-h-[44px] px-5 rounded-[10px] bg-red hover:bg-red-hover text-white text-sm font-medium"
-                            >
-                                Show {loading ? 'results' : `${resultCount} results`}
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}
