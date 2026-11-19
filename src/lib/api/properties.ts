@@ -375,7 +375,7 @@ export function mapRealtyToProperty(item: RealtyProperty): Property {
         triple_price: positivePrice(item.triple_price),
         private_price: positivePrice(item.private_price),
         starting_price: positivePrice(item.starting_price),
-        food: item.property_type === 'PG' || featuresList.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
+        food: featuresList.some(f => f.toLowerCase().includes('food') || f.toLowerCase().includes('meal') || f.toLowerCase().includes('breakfast') || f.toLowerCase().includes('lunch') || f.toLowerCase().includes('dinner')),
         gender: normalizedGender,
         deposit_amount: normalizedDeposit,
         notice_period_days: normalizedNotice,
