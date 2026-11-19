@@ -393,7 +393,7 @@ export default function FAQ() {
                         <span className="inline-block bg-brand-red/10 text-brand-red text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
                             Help Center
                         </span>
-                        <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight">
+                        <h1 className="type-h1 text-slate-900 mb-4">
                             Frequently Asked <span className="text-brand-red">Questions</span>
                         </h1>
                         <p className="text-slate-500 text-base md:text-lg max-w-2xl mx-auto">
@@ -441,7 +441,7 @@ export default function FAQ() {
 
                     {/* Bottom CTA */}
                     <div className="mt-10 rounded-[var(--radius-pdp)] bg-red-800 border border-champagne/30 p-8 text-center text-white">
-                        <h3 className="font-serif-display text-xl md:text-2xl font-normal mb-2 text-white">Still have questions?</h3>
+                        <h3 className="font-heading text-xl md:text-2xl font-bold mb-2 text-white">Still have questions?</h3>
                         <p className="text-red-subtitle mb-5 text-sm md:text-base">
                             Our team is here to help you find the perfect property.
                         </p>

@@ -44,7 +44,7 @@ export default function HowWeVerify() {
             <main id="main-content" className="flex-grow pt-16 sm:pt-20">
                 <section className="w-full bg-red-800 text-white py-12 md:py-20 border-b border-champagne/25">
                     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <h1 className="font-serif-display text-[36px] md:text-[48px] leading-[1.1] font-normal tracking-[-0.015em] text-white">
+                        <h1 className="type-h1 text-white">
                             How we verify listings
                         </h1>
                         <div className="w-12 h-[1px] bg-champagne mt-3 mb-4" aria-hidden="true" />

@@ -108,7 +108,7 @@ export default function ResearchHub({ kind }: ResearchHubProps) {
                             <Icon className="h-4 w-4" aria-hidden />
                             {page.eyebrow}
                         </p>
-                        <h1 className="mt-3 text-3xl md:text-5xl font-black text-slate-950 tracking-tight">
+                        <h1 className="type-h1 mt-3 text-slate-950">
                             {page.title}
                         </h1>
                         <p className="mt-4 max-w-3xl text-base md:text-lg text-slate-600 leading-relaxed">

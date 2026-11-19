@@ -315,7 +315,7 @@ export function PropertyBookingCard({
             <div className="bg-brand-band px-6 py-5 border-b border-champagne/30">
                 <p className="pdp-type-caption text-red-subtitle mb-1">{priceContextLabel}</p>
                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                    <span className="font-serif-display text-3xl font-normal text-white tracking-tight tabular-nums leading-none">
+                    <span className="font-heading text-3xl font-bold text-white tracking-tight tabular-nums leading-none">
                         {property.price || 'Price on request'}
                     </span>
                     {isMonthly && hasNumericPrice && (

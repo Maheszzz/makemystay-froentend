@@ -68,8 +68,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
                     <h1
                         style={{
-                            fontSize: '1.6rem',
-                            fontWeight: 800,
+                            fontSize: '2.25rem',
+                            fontWeight: 700,
+                            fontFamily: 'var(--font-heading)',
                             color: 'var(--color-ink)',
                             marginBottom: '0.5rem',
                         }}

@@ -807,7 +807,7 @@ export default function PropertyDetails({
                                         <h1
                                             data-seo="pdp-h1"
                                             title={displayTitle || property.title}
-                                            className="pdp-type-title font-serif-display font-normal text-pdp-ink line-clamp-2 break-words"
+                                            className="pdp-type-title text-pdp-ink line-clamp-2 break-words"
                                         >
                                             {displayTitle || property.title}
                                         </h1>

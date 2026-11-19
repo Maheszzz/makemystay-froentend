@@ -92,7 +92,7 @@ export default function PgNearMe() {
                                 </span>
                             </div>
 
-                            <h1 className="mt-4 text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                            <h1 className="type-h1 mt-4 text-slate-900">
                                 Find the Best <span className="text-brand-red">PG Near Me</span> in Bangalore
                             </h1>
                             

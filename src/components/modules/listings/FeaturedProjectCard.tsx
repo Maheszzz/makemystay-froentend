@@ -99,7 +99,7 @@ export function FeaturedProjectCard({ property, rank, featured, launch }: Featur
             <div className="flex flex-1 flex-col px-3.5 pt-3.5 pb-3.5">
                 {/* Title + optional Featured badge */}
                 <div className="flex items-start gap-2 mb-0.5">
-                    <h3 title={title} className="flex-1 font-serif-display text-[17px] leading-snug font-normal text-ink line-clamp-2 min-h-[2.6rem] group-hover:underline decoration-champagne underline-offset-4">
+                    <h3 title={title} className="flex-1 font-heading text-[17px] leading-snug font-bold text-ink line-clamp-2 min-h-[2.6rem] group-hover:underline decoration-champagne underline-offset-4">
                         {title}
                     </h3>
                     {featured && (

@@ -19,7 +19,7 @@ export function Solution() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-14">
                     <span className="text-champagne-text font-semibold tracking-wider uppercase text-xs">Our solution</span>
-                    <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mt-2">
+                    <h2 className="font-heading text-3xl md:text-5xl font-bold text-ink mt-2">
                         Full-stack AI growth engine
                     </h2>
                 </div>
@@ -55,7 +55,7 @@ export function Solution() {
                                                 <div className="w-16 h-16 rounded-2xl bg-red-900 flex items-center justify-center mb-8 border border-champagne/30">
                                                     <item.icon className="w-8 h-8 text-champagne" />
                                                 </div>
-                                                <h3 className="font-serif-display text-2xl md:text-3xl font-normal text-white mb-4 md:mb-6">{item.title}</h3>
+                                                <h3 className="font-heading text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">{item.title}</h3>
                                                 <p className="text-base md:text-lg text-red-subtitle mb-6 md:mb-8 leading-relaxed max-w-xl">{item.text}</p>
                                                 <div className="inline-flex items-center px-4 py-2 rounded-full bg-red-900 text-white border border-champagne/35 text-sm font-semibold">
                                                     <CheckCircle2 className="w-4 h-4 mr-2 text-champagne" />

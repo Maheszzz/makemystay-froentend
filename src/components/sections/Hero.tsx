@@ -101,7 +101,7 @@ export function Hero({
                 <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 w-full py-12 lg:py-24">
                     <div className="max-w-[34rem] xl:max-w-2xl w-full">
                         {/* Headline */}
-                        <h1 className="font-heading font-black text-ink leading-[1.06] tracking-tight mb-5 text-[clamp(2.4rem,4.6vw,4rem)]">
+                        <h1 className="type-h1 text-ink mb-5">
                             Verified <span className="text-red">PGs & Flats</span>
                             <br />
                             in Bangalore

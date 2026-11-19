@@ -179,7 +179,7 @@ export function PropertyGrid({
                         <h2
                             className={
                                 cardVariant === 'project'
-                                    ? 'text-2xl sm:text-3xl md:text-[2.15rem] font-bold text-slate-900 tracking-tight font-luxury'
+                                    ? 'text-2xl sm:text-3xl md:text-[2.15rem] font-bold text-slate-900 tracking-tight font-heading'
                                     : 'text-2xl md:text-3xl font-semibold text-stone-900 mb-1 md:mb-2 tracking-tight'
                             }
                         >

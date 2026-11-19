@@ -137,7 +137,7 @@ export default function PgFeatureLandingPage() {
                                 { name: copy.h1 },
                             ]}
                         />
-                        <h1 className="mt-4 text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">{copy.h1}</h1>
+                        <h1 className="type-h1 mt-4 text-slate-900">{copy.h1}</h1>
                         <p className="mt-3 text-lg text-slate-600 leading-relaxed">{copy.lead}</p>
                         <p className="mt-4 text-slate-700 leading-relaxed">{copy.body}</p>
                         <p className="mt-4 text-sm">

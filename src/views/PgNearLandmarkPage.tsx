@@ -71,7 +71,7 @@ export default function PgNearLandmarkPage() {
                             ]}
                         />
                         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">Bangalore · Landmark</p>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+                        <h1 className="type-h1 text-slate-900">
                             PG near {entry.landmark}
                         </h1>
                         <p className="mt-2 text-slate-600 text-sm md:text-base max-w-3xl leading-relaxed">

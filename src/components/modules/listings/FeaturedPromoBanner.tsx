@@ -174,7 +174,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             )}
                         </div>
 
-                        <h2 className="font-serif-display text-2xl sm:text-[30px] font-normal text-white leading-[1.15] tracking-[-0.01em] line-clamp-2">
+                        <h2 className="font-heading text-2xl sm:text-[30px] font-bold text-white leading-[1.15] tracking-[-0.01em] line-clamp-2">
                             {activeSlide.title}
                         </h2>
 
@@ -199,7 +199,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             <p className="text-xs text-red-subtitle mb-0.5">
                                 {activeSlide.isMonthly ? 'Starting from' : 'Listed price'}
                             </p>
-                            <p className="font-serif-display text-2xl font-normal text-white tracking-tight tabular-nums">
+                            <p className="font-heading text-2xl font-bold text-white tracking-tight tabular-nums">
                                 {activeSlide.priceText}
                             </p>
                         </div>

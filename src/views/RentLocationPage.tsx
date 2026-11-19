@@ -84,7 +84,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
                         />
                         <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                             <div className="max-w-2xl">
-                                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-white tracking-[-0.015em] leading-[1.1]">
+                                <h1 className="type-h1 text-white">
                                     Flats for rent in {name}
                                 </h1>
                                 <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />

@@ -111,7 +111,7 @@ export default function BlogIndex() {
                                 <Sparkles className="w-3.5 h-3.5" />
                                 {BLOG_POSTS.length} guides · Bangalore 2026
                             </span>
-                            <h1 className="font-serif-display text-4xl md:text-5xl lg:text-6xl font-normal text-ink tracking-[-0.015em] leading-[1.08]">
+                            <h1 className="type-h1 text-ink">
                                 Guides &amp; <span className="text-red">insights</span>
                             </h1>
                             <p className="mt-5 text-lg md:text-xl text-slate leading-relaxed max-w-2xl">
@@ -193,7 +193,7 @@ export default function BlogIndex() {
                                 <section className="mb-14">
                                     <div className="flex items-end justify-between gap-4 mb-6">
                                         <div>
-                                            <h2 className="font-serif-display text-2xl font-medium text-ink">
+                                            <h2 className="font-heading text-2xl font-bold text-ink">
                                                 Editor&apos;s picks
                                             </h2>
                                             <p className="text-slate text-sm mt-1">
@@ -217,7 +217,7 @@ export default function BlogIndex() {
                                 <section>
                                     <div className="flex items-end justify-between gap-4 mb-8">
                                         <div>
-                                            <h2 className="font-serif-display text-2xl font-medium text-ink">
+                                            <h2 className="font-heading text-2xl font-bold text-ink">
                                                 All articles
                                             </h2>
                                             <p className="text-slate text-sm mt-1 tabular-nums">
@@ -241,7 +241,7 @@ export default function BlogIndex() {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
                             <div>
                                 <BookOpen className="w-10 h-10 text-champagne mb-4" />
-                                <h2 className="font-serif-display text-2xl md:text-3xl font-normal text-white mb-3">
+                                <h2 className="font-heading text-2xl md:text-3xl font-bold text-white mb-3">
                                     Ready to shortlist your stay?
                                 </h2>
                                 <p className="text-red-subtitle max-w-lg leading-relaxed">
@@ -310,7 +310,7 @@ function FeaturedCard({ post, className = '' }: { post: BlogPost; className?: st
                             <Clock className="w-4 h-4" />
                             {post.readTimeMin} min read
                         </div>
-                        <h2 className="font-serif-display text-2xl md:text-3xl lg:text-4xl font-normal text-ink mb-4 group-hover:text-red transition-colors leading-tight">
+                        <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold text-ink mb-4 group-hover:text-red transition-colors leading-tight">
                             {post.title}
                         </h2>
                         <p className="text-slate text-base md:text-lg leading-relaxed line-clamp-3 mb-8">
@@ -370,7 +370,7 @@ function BlogCard({
                         {post.readTimeMin} min
                     </div>
                     <h3
-                        className={`font-serif-display font-normal text-ink mb-2 group-hover:text-red transition-colors leading-snug ${
+                        className={`font-heading font-bold text-ink mb-2 group-hover:text-red transition-colors leading-snug ${
                             compact ? 'text-lg' : 'text-xl'
                         }`}
                     >

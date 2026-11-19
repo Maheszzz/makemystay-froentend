@@ -33,7 +33,7 @@ export function CaseStudy({ caseStudy = null }: CaseStudyProps) {
                         <div className="inline-block px-4 py-1.5 rounded-full bg-red-900 text-red-subtitle border border-champagne/30 text-xs font-semibold uppercase tracking-wider mb-6">
                             Client Case Study
                         </div>
-                        <h2 className="font-serif-display text-2xl md:text-4xl font-normal text-white mb-6">
+                        <h2 className="font-heading text-2xl md:text-4xl font-bold text-white mb-6">
                             {caseStudy.companyName}
                         </h2>
                         <div className="bg-red-900/70 p-6 rounded-[var(--radius-pdp)] border border-champagne/25 mb-8">
@@ -81,7 +81,7 @@ export function CaseStudy({ caseStudy = null }: CaseStudyProps) {
                     {caseStudy.stats && caseStudy.stats.length > 0 && (
                         <div className="md:w-1/2 w-full">
                             <div className="bg-red-900 rounded-[var(--radius-pdp)] p-6 md:p-8 text-white border border-champagne/30">
-                                <h3 className="font-serif-display text-2xl font-normal mb-8">Reported Metrics</h3>
+                                <h3 className="font-heading text-2xl font-bold mb-8">Reported Metrics</h3>
                                 <div className="grid grid-cols-2 gap-6">
                                     {caseStudy.stats.map((stat, i) => (
                                         <div

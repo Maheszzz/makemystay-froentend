@@ -104,7 +104,7 @@ export default function PGBangaloreHub() {
                             ]}
                         />
                         <div className="mt-4 max-w-3xl">
-                            <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
+                            <h1 className="type-h1 text-white">
                                 PGs in Bangalore
                             </h1>
                             <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />

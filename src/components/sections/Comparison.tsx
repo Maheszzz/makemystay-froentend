@@ -17,7 +17,7 @@ export function Comparison() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-14">
                     <span className="inline-block px-4 py-1.5 bg-blush-100 border border-line text-red font-semibold tracking-wide uppercase text-xs rounded-full mb-4">Competitive Analysis</span>
-                    <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mt-2 mb-5">
+                    <h2 className="font-heading text-3xl md:text-5xl font-bold text-ink mt-2 mb-5">
                         Why we win — <span className="text-red">competitive moat</span>
                     </h2>
                     <p className="text-slate max-w-2xl mx-auto text-lg">

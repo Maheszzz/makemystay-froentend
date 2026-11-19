@@ -27,7 +27,7 @@ export function About() {
                     <p className="text-xs font-bold tracking-[0.25em] uppercase mb-4 text-champagne-text">
                         Who We Are
                     </p>
-                    <h2 className="font-serif-display text-3xl sm:text-5xl font-normal text-ink mb-5 leading-tight tracking-[-0.015em]">
+                    <h2 className="font-heading text-3xl sm:text-5xl font-bold text-ink mb-5 leading-tight tracking-[-0.015em]">
                         Redefining how India<br className="hidden sm:block" /> finds homes
                     </h2>
                     <div className="w-12 h-[1px] bg-champagne mx-auto mb-6" aria-hidden="true" />
@@ -42,7 +42,7 @@ export function About() {
                         Finding the right place to stay shouldn't be complicated. Whether you're searching for a rental home, a PG, or an investment opportunity, MakeMyStay helps you explore verified properties, compare options, and make confident decisions — all in one place.
                     </p>
                     <div className="relative inline-block">
-                        <p className="font-serif-display text-xl md:text-2xl font-normal text-ink leading-snug pb-3">
+                        <p className="font-heading text-xl md:text-2xl font-bold text-ink leading-snug pb-3">
                             Our goal is simple: make finding a place to live<br className="hidden sm:block" /> as easy as booking a trip.
                         </p>
                         <div className="mx-auto h-[1px] w-24 bg-champagne" aria-hidden="true" />
@@ -53,7 +53,7 @@ export function About() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 md:mb-20">
                     {trustPillars.map((m, i) => (
                         <div key={i} className="text-center py-6 px-4 rounded-[var(--radius-pdp)] bg-page border border-line">
-                            <p className="font-serif-display text-3xl font-normal mb-1 text-red">{m.value}</p>
+                            <p className="font-heading text-3xl font-bold mb-1 text-red">{m.value}</p>
                             <p className="text-xs text-slate tracking-wide font-medium">{m.label}</p>
                         </div>
                     ))}
@@ -62,7 +62,7 @@ export function About() {
                 {/* ── Our Story ── */}
                 <div className="mb-16 md:mb-20">
                     <div className="rounded-[var(--radius-pdp)] p-7 md:p-12 bg-blush-100 border border-line border-l-4 border-l-champagne">
-                        <h3 className="font-serif-display text-2xl md:text-3xl font-medium text-ink mb-8">
+                        <h3 className="font-heading text-2xl md:text-3xl font-bold text-ink mb-8">
                             Our story
                         </h3>
                         <div className="space-y-5 text-slate leading-[1.8] text-base md:text-[17px]">
@@ -83,7 +83,7 @@ export function About() {
                 {/* ── What We Do ── */}
                 <div className="mb-16 md:mb-20">
                     <div className="text-center mb-10">
-                        <h3 className="font-serif-display text-2xl md:text-3xl font-medium text-ink mb-3">
+                        <h3 className="font-heading text-2xl md:text-3xl font-bold text-ink mb-3">
                             What we do
                         </h3>
                         <p className="text-slate max-w-2xl mx-auto">MakeMyStay simplifies the property journey from search to decision:</p>
@@ -114,7 +114,7 @@ export function About() {
                             <Target className="w-5 h-5 text-white" />
                         </div>
                         <p className="text-xs font-semibold tracking-[0.2em] uppercase text-red-subtitle mb-2">Our vision</p>
-                        <h3 className="font-serif-display text-xl font-normal mb-5 leading-snug text-white">
+                        <h3 className="font-heading text-xl font-bold mb-5 leading-snug text-white">
                             India's most trusted home discovery platform.
                         </h3>
                         <p className="text-red-subtitle leading-[1.8] text-[15px] flex-1">
@@ -127,7 +127,7 @@ export function About() {
                             <Lightbulb className="w-5 h-5 text-champagne" />
                         </div>
                         <p className="text-xs font-semibold tracking-[0.2em] uppercase text-red-subtitle mb-2">Our mission</p>
-                        <h3 className="font-serif-display text-xl font-normal mb-5 leading-snug text-white">
+                        <h3 className="font-heading text-xl font-bold mb-5 leading-snug text-white">
                             Simplify. Empower. Deliver.
                         </h3>
                         <ul className="space-y-4 text-red-subtitle flex-1">
@@ -143,7 +143,7 @@ export function About() {
 
                 {/* ── Founder ── */}
                 <div className="mb-16 md:mb-20 rounded-[var(--radius-pdp)] p-8 md:p-12 bg-page border border-line">
-                    <h3 className="font-serif-display text-2xl md:text-3xl font-medium text-ink mb-10 text-center">Our founder</h3>
+                    <h3 className="font-heading text-2xl md:text-3xl font-bold text-ink mb-10 text-center">Our founder</h3>
                     <div className="max-w-2xl mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-8">
                         {/* Avatar */}
                         <div className="shrink-0">
@@ -183,7 +183,7 @@ export function About() {
                 {/* ── Final CTA (Brand Gradient + SVG Line Pattern Band) ── */}
                 <div className="rounded-3xl p-10 md:p-16 lg:p-20 text-center text-white bg-brand-band border border-champagne/30">
                     <Heart className="w-10 h-10 mx-auto mb-6 text-white" aria-hidden />
-                    <h3 className="font-serif-display text-3xl sm:text-5xl font-normal mb-4 leading-tight text-white">
+                    <h3 className="font-heading text-3xl sm:text-5xl font-bold mb-4 leading-tight text-white">
                         Ready to find<br className="hidden sm:block" />{' '}
                         <em className="italic">your next home?</em>
                     </h3>

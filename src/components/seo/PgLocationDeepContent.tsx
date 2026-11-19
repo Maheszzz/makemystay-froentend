@@ -51,7 +51,7 @@ export function PgLocationDeepContent({ name, profile }: PgLocationDeepContentPr
                 </div>
                 <div className="min-w-0 flex-1">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-champagne-text">Locality &amp; Commute Authority Guide</p>
-                    <h2 className="mt-1.5 font-serif-display text-2xl md:text-[1.65rem] font-normal text-ink tracking-tight leading-tight">
+                    <h2 className="mt-1.5 font-heading text-2xl md:text-[1.65rem] font-bold text-ink tracking-tight leading-tight">
                         Living in ${name} Bangalore: The Ultimate 2026 Locality Guide
                     </h2>
                     <p className="mt-3">

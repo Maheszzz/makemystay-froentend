@@ -49,7 +49,7 @@ export default function PgVsFlatBangalore() {
                             { name: 'PG vs flat' },
                         ]}
                     />
-                    <h1 className="mt-4 text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+                    <h1 className="type-h1 mt-4 text-slate-900">
                         PG vs flat in Bangalore — which is better?
                     </h1>
                     <p className="mt-4 text-lg text-slate-600 leading-relaxed">

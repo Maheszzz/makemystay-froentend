@@ -94,7 +94,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
               <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
               <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div className="max-w-2xl">
-                  <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-white tracking-[-0.015em] leading-[1.1]">
+                  <h1 className="type-h1 text-white">
                     {localitySeoProfile.hero.heading}
                   </h1>
                   <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
@@ -213,7 +213,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             <BreadcrumbNav items={breadcrumbItems} />
             <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div className="max-w-2xl">
-                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-white tracking-[-0.015em] leading-[1.1]">
+                <h1 className="type-h1 text-white">
                   PGs in {name}
                 </h1>
                 <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />

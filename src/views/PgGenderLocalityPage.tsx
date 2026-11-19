@@ -85,7 +85,7 @@ function PgGenderLocalityPageBody({ overrideSlug }: { overrideSlug?: string }) {
                                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">
                                     Bangalore · {audienceLabel}
                                 </p>
-                                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                                <h1 className="type-h1 text-slate-900">
                                     Verified {audienceLabel.toLowerCase()} in {name}
                                 </h1>
                                 <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">

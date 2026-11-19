@@ -252,7 +252,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
 
                             <h3
                                 title={displayTitle}
-                                className="font-serif-display text-[20px] font-normal text-ink leading-snug line-clamp-2 min-h-[3.3rem] mb-1.5 group-hover:underline decoration-champagne underline-offset-4"
+                                className="font-heading text-[20px] font-bold text-ink leading-snug line-clamp-2 min-h-[3.3rem] mb-1.5 group-hover:underline decoration-champagne underline-offset-4"
                             >
                                 {displayTitle}
                             </h3>
@@ -333,7 +333,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                                     {isMonthlyRent ? 'Starting from' : 'Price'}
                                 </p>
                                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                                    <span className="font-serif-display text-xl font-normal text-ink leading-none whitespace-nowrap tabular-nums">
+                                    <span className="font-heading text-xl font-bold text-ink leading-none whitespace-nowrap tabular-nums">
                                         {property.price}
                                     </span>
                                     {isMonthlyRent && hasNumericPrice && (

@@ -173,7 +173,7 @@ export default function QuickPay() {
                     <div className="hidden md:flex md:col-span-2 bg-red-900 relative p-8 md:p-12 flex-col justify-between overflow-hidden border-r border-champagne/25">
                         <div className="relative z-10">
                             <div>
-                                <h2 className="font-serif-display text-3xl md:text-4xl font-normal mb-2">
+                                <h2 className="font-heading text-3xl md:text-4xl font-bold mb-2">
                                     <span className="text-white">MakeMyStay</span>
                                     <span className="text-red-subtitle">.ai</span>
                                 </h2>
@@ -242,7 +242,7 @@ export default function QuickPay() {
                     <div className="md:col-span-3 p-6 md:p-12 bg-white flex flex-col justify-center">
                         <div className="mb-10">
                             <div className="flex items-center justify-between mb-2">
-                                <h1 className="text-3xl md:text-5xl font-bold text-slate-900" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                                <h1 className="type-h1 text-slate-900">
                                     Payment Details
                                 </h1>
                                 <motion.div 
@@ -429,7 +429,7 @@ export default function QuickPay() {
                         <div className="absolute inset-0 bg-brand-gold/20 blur-3xl rounded-full animate-pulse"></div>
                         <LoadingSpinner size={64} className="text-white relative z-10 mb-6" />
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-bold mb-3" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3">
                         Processing Payment
                     </h3>
                     <p className="text-white/70 text-sm md:text-base">Please complete the transaction on your device</p>

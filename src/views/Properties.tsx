@@ -870,7 +870,7 @@ function PropertiesInner({
                     <header className="bg-brand-band">
                         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-11 pb-14 md:pb-16">
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
+                                <h1 className="type-h1 text-white">
                                     {resolvedTitle}
                                 </h1>
                                 {!loading && (
@@ -1046,7 +1046,7 @@ function PropertiesInner({
                                                 <div className="w-12 h-12 rounded-full bg-pdp-bg border border-pdp-border flex items-center justify-center mx-auto mb-4">
                                                     <Search className="w-5 h-5 text-pdp-muted" />
                                                 </div>
-                                                <h3 className="font-serif-display text-2xl sm:text-3xl font-normal text-pdp-ink mb-2">
+                                                <h3 className="font-heading text-2xl sm:text-3xl font-bold text-pdp-ink mb-2">
                                                     No matching listings right now
                                                 </h3>
                                                 <p className="text-sm sm:text-base text-pdp-muted max-w-lg mx-auto mb-6 leading-relaxed">

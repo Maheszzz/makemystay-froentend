@@ -111,7 +111,7 @@ export default function ServiceDetail() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold text-white mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Service Not Found</h1>
+                    <h1 className="type-h1 text-white mb-4">Service Not Found</h1>
                     <button
                         type="button"
                         onClick={goBack}
@@ -160,7 +160,7 @@ export default function ServiceDetail() {
                             </div>
 
                             {/* Headline */}
-                            <h1 className="font-serif-display text-4xl sm:text-5xl md:text-6xl font-normal text-white mb-6 leading-[1.08] tracking-tight">
+                            <h1 className="type-h1 text-white mb-6">
                                 {service.title}
                             </h1>
 
@@ -209,7 +209,7 @@ export default function ServiceDetail() {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
                         {service.stats.map((stat: { value: string; label: string }, i: number) => (
                             <div key={i}>
-                                <p className="font-serif-display text-3xl font-normal mb-1 text-red tabular-nums">{stat.value}</p>
+                                <p className="font-heading text-3xl font-bold mb-1 text-red tabular-nums">{stat.value}</p>
                                 <p className="text-sm text-slate tracking-wide">{stat.label}</p>
                             </div>
                         ))}
@@ -221,7 +221,7 @@ export default function ServiceDetail() {
             <section className="relative py-16 md:py-24 bg-page">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-14">
-                        <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mb-4">
+                        <h2 className="font-heading text-3xl md:text-5xl font-bold text-ink mb-4">
                             What you gain with us
                         </h2>
                         <div className="w-12 h-[1px] bg-champagne mx-auto" />
@@ -248,7 +248,7 @@ export default function ServiceDetail() {
             {/* ── Final CTA Section ── */}
             <section className="py-16 md:py-24 bg-red-800 border-t border-champagne/25">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="font-serif-display text-3xl md:text-5xl font-normal text-white mb-5 leading-tight">
+                    <h2 className="font-heading text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
                         Maximize your property&apos;s{' '}
                         <em className="italic">potential today</em>
                     </h2>

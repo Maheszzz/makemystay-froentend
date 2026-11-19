@@ -73,7 +73,7 @@ export default function BlogPost({ slug: propSlug }: BlogPostProps) {
 
                             <h1
                                 data-seo="blog-h1"
-                                className="pdp-type-title font-serif-display text-pdp-ink max-w-[24ch]"
+                                className="type-h1 text-pdp-ink max-w-[24ch]"
                             >
                                 {hero.heading}
                             </h1>

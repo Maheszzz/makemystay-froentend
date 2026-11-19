@@ -114,7 +114,7 @@ export default async function AuthorityLocalityPage({
                                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-2">
                                     Topical Authority Hub
                                 </p>
-                                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                                <h1 className="type-h1 text-slate-900">
                                     {dynamicTitle}
                                 </h1>
                                 <p className="mt-4 text-slate-600 text-lg leading-relaxed">

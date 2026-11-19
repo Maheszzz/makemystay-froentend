@@ -85,7 +85,7 @@ export function NewLaunchSpotlight({ property }: NewLaunchSpotlightProps) {
                             </span>
                         </div>
 
-                        <h2 className="text-xl sm:text-2xl lg:text-[1.65rem] font-normal text-ink leading-tight tracking-tight font-serif-display">
+                        <h2 className="text-xl sm:text-2xl lg:text-[1.65rem] font-bold text-ink leading-tight tracking-tight font-heading">
                             {FEATURED_LAUNCH.headlineLead}{' '}
                             <span className="text-red italic">{FEATURED_LAUNCH.headlineAccent}</span>
                         </h2>

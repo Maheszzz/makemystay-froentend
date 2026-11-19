@@ -12,7 +12,7 @@ export function CTA() {
     return (
         <section className="py-12 md:py-20 lg:py-24 bg-brand-band text-white relative overflow-hidden">
             <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 text-center relative z-10">
-                <h2 className="font-serif-display text-2xl sm:text-3xl md:text-5xl font-normal mb-4 md:mb-6 leading-tight text-white">
+                <h2 className="font-heading text-2xl sm:text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight text-white">
                     Stop losing profits to brokers.<br className="hidden md:block" />{' '}
                     <span className="italic">Start owning your growth.</span>
                 </h2>
@@ -54,7 +54,7 @@ export function CTA() {
                             <div className="w-16 h-16 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-sm">
                                 <span className="text-xl font-bold text-red">MS</span>
                             </div>
-                            <h3 className="font-serif-display text-2xl font-normal text-white">Talk to a Growth Advisor</h3>
+                            <h3 className="font-heading text-2xl font-bold text-white">Talk to a Growth Advisor</h3>
                             <p className="text-red-subtitle mt-1.5 text-sm">See how operators increase occupancy in 5–10 days.</p>
                         </div>
 

@@ -31,7 +31,7 @@ export default function Wishlist() {
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900">My Wishlist</h1>
+                            <h1 className="type-h1 text-slate-900">My Wishlist</h1>
                             <p className="text-slate-500 mt-1">
                                 {wishlist.length === 0
                                     ? 'No saved properties yet'

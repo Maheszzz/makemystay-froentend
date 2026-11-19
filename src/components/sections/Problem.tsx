@@ -5,7 +5,7 @@ export function Problem() {
         <section id="problem" className="py-12 md:py-20 lg:py-24 bg-blush-100 border-y border-line">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-3xl mx-auto text-center mb-10 md:mb-16">
-                    <h2 className="font-serif-display text-2xl sm:text-4xl font-normal text-ink mb-4">
+                    <h2 className="font-heading text-2xl sm:text-4xl font-bold text-ink mb-4">
                         The problem in India&apos;s rental market
                     </h2>
                     <p className="text-base md:text-lg text-slate mb-3">A ₹5,000+ Cr market growing 25% YoY, yet plagued by inefficiencies.</p>

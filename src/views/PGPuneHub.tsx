@@ -71,7 +71,7 @@ export default function PGPuneHub() {
                                 <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
                                     Maharashtra · Oxford of the East
                                 </p>
-                                <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
+                                <h1 className="type-h1 text-slate-900">
                                     Best PG in Pune
                                     <span className="block text-brand-red text-2xl md:text-3xl mt-2 font-extrabold opacity-90">
                                         ₹5,500 – ₹13,000 /mo

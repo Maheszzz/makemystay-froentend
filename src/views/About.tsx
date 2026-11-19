@@ -98,7 +98,7 @@ export default function About({ heroPhotos = [], topLocalities = [] }: AboutProp
                             }`}
                         >
                             <div className={hasPhotos ? 'lg:col-span-7 min-w-0' : 'max-w-[66ch]'}>
-                                <h1 className="pdp-type-title font-serif-display text-ink">
+                                <h1 className="type-h1 text-ink">
                                     Find a verified place to live in Bangalore without a broker
                                 </h1>
                                 <p className="mt-5 pdp-type-body text-slate max-w-[58ch]">

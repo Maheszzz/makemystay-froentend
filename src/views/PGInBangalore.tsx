@@ -71,7 +71,7 @@ export default function PGInBangalore() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6">
+            <h1 className="type-h1 text-slate-900 mb-6">
               Top-Rated PGs in Bangalore for Gents, Ladies & Unisex Stay
             </h1>
             <p className="text-lg text-slate-600 max-w-3xl">

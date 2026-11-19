@@ -160,7 +160,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                                 );
                             })()}
 
-                            <h3 className="font-serif-display text-[18px] font-normal text-ink leading-snug line-clamp-2 mb-1">{displayTitle}</h3>
+                            <h3 className="font-heading text-[18px] font-bold text-ink leading-snug line-clamp-2 mb-1">{displayTitle}</h3>
 
                             <div className="flex items-center text-slate text-xs gap-1 mb-4">
                                 <MapPin className="w-3.5 h-3.5 shrink-0 text-red" />
@@ -175,7 +175,7 @@ export function MobilePropertyCarousel({ properties }: MobilePropertyCarouselPro
                             <div className="flex flex-col gap-2.5 mb-4">
                                 <div>
                                     <p className="text-xs text-slate leading-tight mb-1">Starting at</p>
-                                    <p className="font-serif-display text-[1.25rem] font-normal leading-tight text-ink tabular-nums">
+                                    <p className="font-heading text-[1.25rem] font-bold leading-tight text-ink tabular-nums">
                                         {property.price}
                                         {isMonthlyRent && hasNumericPrice ? ' /mo' : ''}
                                     </p>

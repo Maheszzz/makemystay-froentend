@@ -74,7 +74,7 @@ export function TechParkSeoProfileSections({
                         </p>
                         <h1
                             data-seo="tech-park-h1"
-                            className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight"
+                            className="type-h1 text-slate-900"
                         >
                             {hero.heading}
                         </h1>

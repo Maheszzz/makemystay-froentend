@@ -34,9 +34,6 @@
 
     --font-heading: var(--font-montserrat), 'Montserrat', sans-serif;
     --font-sans: var(--font-inter), 'Inter', sans-serif;
-    --font-luxury: var(--font-playfair), 'Playfair Display', serif;
-    --font-serif-display: var(--font-newsreader), Georgia, serif;
-    --font-cormorant: 'Cormorant Garamond', serif;
 
     /* Surface & PDP tokens derived from the single block above */
     --color-pdp-bg: var(--color-page);
@@ -84,10 +81,6 @@
 
     .text-gradient-coral {
         @apply text-brand-red;
-    }
-
-    .font-luxury {
-        font-family: 'Playfair Display', serif;
     }
 
     .shadow-listing {
@@ -199,21 +192,48 @@
         animation: pdp-backdrop-in 0.18s ease-out both;
     }
 
-    /* Single site reading & PDP type scale (title, h2 heading, body, caption) */
-    .pdp-type-title {
-        font-family: var(--font-serif-display);
-        font-size: clamp(2.75rem, 4.5vw, 3.5rem); /* 44px - 56px */
+    /* Single site heading scale: bold heading sans (700) everywhere. h1 = 36px mobile / 48px md / 56px xl */
+    .type-h1 {
+        font-family: var(--font-heading);
+        font-size: 2.25rem; /* 36px */
         line-height: 1.1;
-        letter-spacing: -0.01em;
-        font-weight: 400;
+        letter-spacing: -0.015em;
+        font-weight: 700;
+    }
+
+    @media (min-width: 768px) {
+        .type-h1 {
+            font-size: 3rem; /* 48px */
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .type-h1 {
+            font-size: 3.5rem; /* 56px */
+        }
+    }
+
+    /* PDP title: same family and weight, capped at 48px because property names run long */
+    .pdp-type-title {
+        font-family: var(--font-heading);
+        font-size: 2.25rem; /* 36px */
+        line-height: 1.15;
+        letter-spacing: -0.015em;
+        font-weight: 700;
+    }
+
+    @media (min-width: 768px) {
+        .pdp-type-title {
+            font-size: 3rem; /* 48px */
+        }
     }
 
     .pdp-type-heading {
-        font-family: var(--font-serif-display);
+        font-family: var(--font-heading);
         font-size: clamp(1.75rem, 2.5vw, 2rem); /* 28px - 32px */
         line-height: 1.2;
         letter-spacing: -0.01em;
-        font-weight: 500;
+        font-weight: 700;
     }
 
     .pdp-type-body {
@@ -261,32 +281,32 @@
     }
 
     .prose-mms h1 {
-        font-family: var(--font-serif-display);
-        font-size: clamp(2.75rem, 4.5vw, 3.5rem); /* 44px - 56px */
+        font-family: var(--font-heading);
+        font-size: clamp(2.25rem, 4vw, 3rem); /* 36px - 48px */
         line-height: 1.1;
-        letter-spacing: -0.01em;
-        font-weight: 400;
+        letter-spacing: -0.015em;
+        font-weight: 700;
         color: var(--color-pdp-ink);
         margin-top: 0;
         margin-bottom: 0.5em;
     }
 
     .prose-mms h2 {
-        font-family: var(--font-serif-display);
+        font-family: var(--font-heading);
         font-size: clamp(1.75rem, 2.5vw, 2rem); /* 28px - 32px */
         line-height: 1.2;
         letter-spacing: -0.01em;
-        font-weight: 500;
+        font-weight: 700;
         color: var(--color-pdp-ink);
         margin-top: 2.5em;
         margin-bottom: 0.75em;
     }
 
     .prose-mms h3 {
-        font-family: var(--font-sans);
+        font-family: var(--font-heading);
         font-size: clamp(1.125rem, 1.5vw, 1.25rem); /* 18px - 20px */
         line-height: 1.35;
-        font-weight: 600;
+        font-weight: 700;
         color: var(--color-pdp-ink);
         margin-top: 1.75em;
         margin-bottom: 0.5em;
@@ -419,7 +439,20 @@ html {
     h4,
     h5,
     h6 {
-        @apply font-heading;
+        @apply font-heading font-bold;
+    }
+
+    /* Un-classed page titles (legal pages etc.) follow the same h1 scale */
+    h1:not([class]) {
+        font-size: 2.25rem;
+        line-height: 1.1;
+        letter-spacing: -0.015em;
+    }
+
+    @media (min-width: 768px) {
+        h1:not([class]) {
+            font-size: 3rem;
+        }
     }
 }
 

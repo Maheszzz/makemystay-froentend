@@ -99,7 +99,7 @@ export default async function OfficeLandingPage({ slug = '' }: { slug?: string }
         <section className="bg-white border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
             <BreadcrumbNav items={breadcrumbItems} />
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            <h1 className="type-h1 text-slate-900">
               {office.name} Office Hub
             </h1>
             <p className="mt-2 text-slate-500 text-sm md:text-base max-w-2xl">

@@ -150,7 +150,7 @@ export default function ScheduleDemo() {
                                 <span className="w-1.5 h-1.5 rounded-full bg-red inline-block" />
                                 Free Strategy Session · 30 mins
                             </div>
-                            <h1 className="font-serif-display text-3xl md:text-5xl font-normal text-ink mb-4 leading-tight">
+                            <h1 className="type-h1 text-ink mb-4">
                                 Book Your <span className="text-red">Growth Demo</span>
                             </h1>
                             <p className="text-slate max-w-xl mx-auto text-base md:text-lg mb-8">
@@ -171,7 +171,7 @@ export default function ScheduleDemo() {
 
                     {step === 2 && (
                         <div className="text-center mb-8">
-                            <h1 className="font-serif-display text-2xl md:text-3xl font-normal text-ink">
+                            <h1 className="type-h1 text-ink">
                                 Almost there — tell us about you
                             </h1>
                             <p className="text-slate mt-2 text-sm">We'll tailor the demo to your portfolio size.</p>
@@ -410,7 +410,7 @@ export default function ScheduleDemo() {
                                     </div>
 
                                     <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3"
-                                        style={{ fontFamily: "'Playfair Display', serif" }}>
+                                       >
                                         You're All Set, {formData.name.split(' ')[0]}! 🎉
                                     </h2>
                                     <p className="text-slate-500 mb-8 leading-relaxed text-sm">

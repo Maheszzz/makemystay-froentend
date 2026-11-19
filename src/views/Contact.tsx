@@ -85,7 +85,7 @@ export default function Contact() {
                                 <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate">Growth Team Active</span>
                             </div>
                             
-                            <h1 className="font-serif-display text-5xl md:text-7xl font-normal text-ink tracking-tight leading-[1.08] mb-8">
+                            <h1 className="type-h1 text-ink mb-8">
                                 Let&apos;s Scale Your <br />
                                 <span className="text-red">Rental Empire</span>
                             </h1>

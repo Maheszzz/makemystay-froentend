@@ -22,7 +22,7 @@ export default function ForOwners() {
                             <Building2 className="w-3.5 h-3.5" />
                             For PG &amp; Rental Property Owners
                         </span>
-                        <h1 className="font-serif-display text-3xl sm:text-5xl font-normal text-ink tracking-[-0.015em] leading-[1.1] mb-5">
+                        <h1 className="type-h1 text-ink mb-5">
                             Grow occupancy directly.<br className="hidden sm:block" /> Skip broker commissions.
                         </h1>
                         <p className="text-base sm:text-lg text-slate max-w-2xl mx-auto mb-8 leading-relaxed">
@@ -50,7 +50,7 @@ export default function ForOwners() {
 
                 <section id="services" className="py-12 md:py-20 lg:py-24 bg-page max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 text-center">
-                        <h2 className="font-serif-display text-2xl sm:text-3xl font-medium text-ink">Owner services</h2>
+                        <h2 className="font-heading text-2xl sm:text-3xl font-bold text-ink">Owner services</h2>
                         <p className="text-slate mt-2 text-sm sm:text-base">
                             Tools and operations support for PG and rental operators
                         </p>
