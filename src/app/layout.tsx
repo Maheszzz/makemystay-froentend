@@ -61,14 +61,14 @@ export const metadata: Metadata = {
         site: '@Makemystay16268',
     },
     icons: {
-        icon: '/logo.svg',
-        apple: '/logo.svg',
+        icon: '/icon.svg',
+        apple: '/apple-touch-icon.png',
     },
     manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
-    themeColor: '#0F3B36',
+    themeColor: '#C0392B',
 };
 
 /** Cached HTML for hubs/PDPs; client islands hydrate inside Suspense. */

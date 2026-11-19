@@ -33,23 +33,23 @@ export function MobileBottomCTA() {
                 style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)', paddingTop: '8px' }}
             >
                 <div
-                    className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-pine-900 border border-pine-700 rounded-[18px] p-1.5 min-h-[60px] shadow-lg"
+                    className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-oxblood-900 border border-oxblood-700 rounded-[18px] p-1.5 min-h-[60px] shadow-md"
                 >
                     {/* Call */}
                     <a
                         href="tel:+918150099911"
                         aria-label="Call us"
                         onClick={() => console.log('[TRACK] Mobile Bottom Call clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-pine-700/40 border border-pine-700 text-white"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-oxblood-700/70 border border-champagne/30 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                        <Phone className="w-3.5 h-3.5 shrink-0 text-sage-100" strokeWidth={2.2} />
+                        <Phone className="w-3.5 h-3.5 shrink-0 text-champagne" strokeWidth={2.2} />
                         <span className="text-[11px] font-semibold tracking-wide truncate text-white">
                             Call
                         </span>
                     </a>
 
-                    {/* WhatsApp — pine-700 solid with white text (7.75:1 contrast) */}
+                    {/* WhatsApp — WhatsApp green with white ring + ink label (9.16:1 contrast) */}
                     <button
                         aria-label="WhatsApp us"
                         onClick={(e) => {
@@ -60,16 +60,16 @@ export function MobileBottomCTA() {
                                 window.location.href = whatsappUrl;
                             }
                         }}
-                        className="flex flex-col items-center justify-center gap-0.5 px-1.5 h-11 rounded-xl bg-pine-700 hover:bg-pine-700/90 text-white active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                        className="flex flex-col items-center justify-center gap-0.5 px-1.5 h-11 rounded-xl bg-whatsapp ring-1 ring-white text-ink active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                         <div className="flex items-center gap-1">
-                            <WhatsAppMark className="w-3.5 h-3.5 shrink-0 text-white" />
-                            <span className="text-[11px] font-semibold tracking-wide text-white truncate">
+                            <WhatsAppMark className="w-3.5 h-3.5 shrink-0 text-ink" />
+                            <span className="text-[11px] font-semibold tracking-wide text-ink truncate">
                                 WhatsApp
                             </span>
                         </div>
-                        <span className="text-[8px] font-medium text-pine-muted tracking-wide leading-none truncate max-w-full">
+                        <span className="text-[8px] font-medium text-ink/90 tracking-wide leading-none truncate max-w-full">
                             5 min response
                         </span>
                     </button>
@@ -79,10 +79,10 @@ export function MobileBottomCTA() {
                         to="/contact-us"
                         aria-label="Enquire now"
                         onClick={() => console.log('[TRACK] Mobile Bottom Enquire clicked')}
-                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-pine-700/40 border border-pine-700 text-white"
+                        className="flex items-center justify-center gap-1.5 h-11 rounded-xl transition-all active:scale-95 bg-oxblood-700/70 border border-champagne/30 text-white"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                        <Mail className="w-3.5 h-3.5 shrink-0 text-sage-100" strokeWidth={2.2} />
+                        <Mail className="w-3.5 h-3.5 shrink-0 text-champagne" strokeWidth={2.2} />
                         <span className="text-[11px] font-semibold tracking-wide truncate text-white">
                             Enquire
                         </span>

@@ -41,11 +41,11 @@ const FOOTER_LEGAL = [
 
 export function Footer() {
     return (
-        <footer className="bg-pine-900 text-pine-muted pt-14 md:pt-16 pb-24 md:pb-12 border-t border-pine-700/60">
+        <footer className="bg-oxblood-900 text-blush-muted pt-14 md:pt-16 pb-24 md:pb-12 border-t border-champagne/30">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-pine-700/60">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 pb-12 border-b border-champagne/25">
                     {/* Brand, Contact & Registered Address */}
-                    <div className="lg:col-span-4 space-y-5">
+                    <div className="lg:col-span-4 space-y-5 lg:pr-8 lg:border-r lg:border-champagne/20">
                         <div className="flex items-center gap-2.5">
                             <img
                                 src={LOGO_SRC}
@@ -55,17 +55,17 @@ export function Footer() {
                                 className="w-8 h-8 rounded-lg object-contain bg-white"
                             />
                             <span className="text-xl font-bold text-white tracking-tight font-heading">
-                                MakeMyStay<span className="text-pine-muted font-semibold">.ai</span>
+                                MakeMyStay<span className="text-champagne font-semibold">.ai</span>
                             </span>
                         </div>
 
-                        <p className="text-sm leading-relaxed text-pine-muted max-w-sm">
+                        <p className="text-sm leading-relaxed text-blush-muted max-w-sm">
                             {BRAND_EXTENDED}
                         </p>
 
                         <div className="space-y-2.5 text-sm">
                             <div className="flex items-start gap-2.5">
-                                <MapPin className="w-4 h-4 text-pine-muted shrink-0 mt-0.5" aria-hidden />
+                                <MapPin className="w-4 h-4 text-champagne shrink-0 mt-0.5" aria-hidden />
                                 <span>
                                     <strong className="font-medium text-white">{LEGAL_ENTITY_NAME}</strong>
                                     <br />
@@ -73,19 +73,19 @@ export function Footer() {
                                 </span>
                             </div>
                             <div className="flex items-center gap-2.5">
-                                <Mail className="w-4 h-4 text-pine-muted shrink-0" aria-hidden />
+                                <Mail className="w-4 h-4 text-champagne shrink-0" aria-hidden />
                                 <a
                                     href={`mailto:${BRAND_CONTACT.email}`}
-                                    className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                    className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                 >
                                     {BRAND_CONTACT.email}
                                 </a>
                             </div>
                             <div className="flex items-center gap-2.5">
-                                <Phone className="w-4 h-4 text-pine-muted shrink-0" aria-hidden />
+                                <Phone className="w-4 h-4 text-champagne shrink-0" aria-hidden />
                                 <a
                                     href={`tel:${BRAND_CONTACT.telephone}`}
-                                    className="hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                    className="hover:text-white hover:underline underline-offset-4 transition-colors tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                 >
                                     +91 81500 99911
                                 </a>
@@ -99,7 +99,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Facebook"
-                                className="w-9 h-9 rounded-full border border-pine-700 bg-pine-700/40 text-pine-muted hover:text-white hover:bg-pine-700 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             >
                                 <Facebook size={16} aria-hidden />
                             </a>
@@ -108,7 +108,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on Instagram"
-                                className="w-9 h-9 rounded-full border border-pine-700 bg-pine-700/40 text-pine-muted hover:text-white hover:bg-pine-700 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             >
                                 <Instagram size={16} aria-hidden />
                             </a>
@@ -117,7 +117,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on LinkedIn"
-                                className="w-9 h-9 rounded-full border border-pine-700 bg-pine-700/40 text-pine-muted hover:text-white hover:bg-pine-700 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             >
                                 <Linkedin size={16} aria-hidden />
                             </a>
@@ -126,7 +126,7 @@ export function Footer() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label="MakeMyStay on X"
-                                className="w-9 h-9 rounded-full border border-pine-700 bg-pine-700/40 text-pine-muted hover:text-white hover:bg-pine-700 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                className="w-9 h-9 rounded-full border border-champagne/35 bg-oxblood-700/60 text-blush-muted hover:text-white hover:bg-red hover:border-red flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             >
                                 <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -135,16 +135,16 @@ export function Footer() {
                         </div>
                     </div>
 
-                    {/* 4 Navigation Columns */}
-                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
-                        <div>
+                    {/* 4 Navigation Columns separated by champagne hairlines */}
+                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-0 sm:divide-x sm:divide-champagne/20">
+                        <div className="sm:pr-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Explore</h2>
                             <ul className="space-y-2.5 text-sm">
                                 {FOOTER_EXPLORE.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -153,14 +153,14 @@ export function Footer() {
                             </ul>
                         </div>
 
-                        <div>
+                        <div className="sm:px-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Popular areas</h2>
                             <ul className="space-y-2.5 text-sm">
                                 {FOOTER_POPULAR_AREAS.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -169,14 +169,14 @@ export function Footer() {
                             </ul>
                         </div>
 
-                        <div>
+                        <div className="sm:px-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Company</h2>
                             <ul className="space-y-2.5 text-sm">
                                 {FOOTER_COMPANY.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -185,14 +185,14 @@ export function Footer() {
                             </ul>
                         </div>
 
-                        <div>
+                        <div className="sm:pl-6">
                             <h2 className="text-sm font-semibold text-white mb-4">Legal</h2>
                             <ul className="space-y-2.5 text-sm">
                                 {FOOTER_LEGAL.map((item) => (
                                     <li key={item.to}>
                                         <Link
                                             to={item.to}
-                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                            className="hover:text-white hover:underline underline-offset-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                                         >
                                             {item.label}
                                         </Link>
@@ -203,7 +203,7 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-pine-muted">
+                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-blush-muted">
                     <p>&copy; 2026 {LEGAL_ENTITY_NAME}. All rights reserved.</p>
                     <p>Registered office: {REGISTERED_ADDRESS}</p>
                 </div>

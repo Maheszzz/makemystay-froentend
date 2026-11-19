@@ -86,8 +86,8 @@ function CityDropdown({ selectedCity, onSelect, calm = false }: CityDropdownProp
                                 }}
                                 className={`w-full flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                                     active
-                                        ? 'bg-pine-900 text-white'
-                                        : 'text-ink hover:bg-sage-100'
+                                        ? 'bg-oxblood-900 text-white'
+                                        : 'text-ink hover:bg-blush-100'
                                 }`}
                             >
                                 <span className="flex items-center gap-2">
@@ -279,9 +279,9 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             <Link
                                 to="/"
                                 aria-label="MakeMyStay Home"
-                                className="text-lg font-bold tracking-tight font-heading transition-colors text-ink leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded"
+                                className="text-lg font-bold tracking-tight font-heading transition-colors text-ink leading-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded"
                             >
-                                MakeMyStay<span className="text-slate font-semibold">.ai</span>
+                                MakeMyStay<span className="text-red font-semibold">.ai</span>
                             </Link>
                         </div>
 
@@ -289,9 +289,9 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
 
                         <div className="hidden md:flex items-center justify-self-center min-w-0 gap-x-4 lg:gap-x-6">
                             {desktopNavItems.map((navItem) => {
-                                const linkCls = `relative py-1 whitespace-nowrap text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 rounded ${
+                                const linkCls = `relative py-1 whitespace-nowrap text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 rounded ${
                                     navItem.active
-                                        ? 'font-semibold text-pine-700'
+                                        ? 'font-semibold text-ink'
                                         : 'font-medium text-slate hover:text-ink'
                                 }`;
                                 return navItem.isHome ? (
@@ -306,7 +306,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                         {navItem.active && (
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pine-700 rounded-full"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-red rounded-full"
                                             />
                                         )}
                                     </a>
@@ -321,7 +321,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                         {navItem.active && (
                                             <span
                                                 aria-hidden="true"
-                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-pine-700 rounded-full"
+                                                className="absolute inset-x-0 -bottom-[9px] h-[2px] bg-red rounded-full"
                                             />
                                         )}
                                     </Link>
@@ -333,7 +333,7 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             <Link
                                 to="/for-owners"
                                 aria-label="List your PG or property"
-                                className="md:hidden inline-flex items-center rounded-full border border-pine-700 bg-white px-2.5 py-1 text-[11px] font-medium text-pine-700 hover:bg-sage-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
+                                className="md:hidden inline-flex items-center rounded-full border border-ink bg-white px-2.5 py-1 text-[11px] font-medium text-ink hover:bg-red hover:border-red hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                             >
                                 List PG
                             </Link>
@@ -344,10 +344,10 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                             >
                                 <Button
                                     variant="outline"
-                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 transition-colors ${
+                                    className={`rounded-[10px] border px-4 py-1.5 text-sm font-medium shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 transition-colors ${
                                         isContactPage
-                                            ? 'border-pine-900 bg-pine-900 text-white hover:bg-pine-700 hover:text-white hover:border-pine-700'
-                                            : 'border-pine-700 bg-transparent text-pine-700 hover:border-pine-700 hover:text-pine-900 hover:bg-sage-100'
+                                            ? 'border-red bg-red text-white hover:bg-red-hover hover:border-red-hover hover:text-white'
+                                            : 'border-ink bg-white text-ink hover:border-red hover:bg-red hover:text-white'
                                     }`}
                                 >
                                     Contact Us
@@ -411,8 +411,8 @@ export function Navbar({ city, variant: _variant }: { city?: string; variant?: '
                                 onClick={() => setIsMenuOpen(false)}
                                 className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-colors group"
                             >
-                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-brass/20">
-                                    <Search className="w-4 h-4 text-brass" />
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-oxblood-700 border border-champagne/30">
+                                    <Search className="w-4 h-4 text-champagne" />
                                 </div>
                                 <div className="flex-1">
                                     <div className="font-semibold text-sm">Find Homes</div>
