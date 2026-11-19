@@ -67,11 +67,14 @@
         background-image: var(--gradient-brand);
     }
 
-    /* Street-map diagonal line motif from BrandLogo at ~10% opacity */
-    .bg-logo-line-pattern {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M-1 1L1 -1M0 40L40 0M39 41L41 39M0 0L40 40M-1 39L1 41M39 -1L41 1M-1 21L21 -1M19 41L41 19' stroke='%23FFFFFF' stroke-opacity='0.10' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-        background-size: 40px 40px;
-        background-repeat: repeat;
+    /* Homepage CTA band: brand gradient + subtle 10% diagonal logo line pattern */
+    .bg-cta-band {
+        background-color: var(--color-red);
+        background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M-1 1L1 -1M0 40L40 0M39 41L41 39M0 0L40 40M-1 39L1 41M39 -1L41 1M-1 21L21 -1M19 41L41 19' stroke='%23FFFFFF' stroke-opacity='0.10' stroke-width='1' fill='none'/%3E%3C/svg%3E"),
+            var(--gradient-brand);
+        background-size: 40px 40px, 100% 100%;
+        background-repeat: repeat, no-repeat;
     }
 
     /* Listing hero fallback when the skyline photo is missing: flat --color-hero-deep to --color-red */

@@ -1,13 +1,17 @@
 'use client';
 
-import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
-import { About } from '@/components/sections/About';
-import { FaqSection } from '@/components/seo/FaqSection';
-import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
-import type { ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
-import type { HomeInventorySummary } from '@/lib/homePageData';
-import type { Property } from '@/types/api';
 import dynamic from 'next/dynamic';
+import { InvestmentCalculator } from '@/components/modules/calculator/InvestmentCalculator';
+import { PropertyGrid } from '@/components/modules/listings/PropertyGrid';
+import type { HeroSearchFilters } from '@/components/modules/search/SmartSearchBar';
+import { FounderSection } from '@/components/sections/FounderSection';
+import { HomeCtaBand } from '@/components/sections/home/HomeCtaBand';
+import { HomeFaqSection } from '@/components/sections/home/HomeFaqSection';
+import { HomeIntro } from '@/components/sections/home/HomeIntro';
+import { HowItWorks } from '@/components/sections/home/HowItWorks';
+import type { HomeInventorySummary } from '@/lib/homePageData';
+import type { ListingsCategoryKey } from '@/lib/listingsCategoryHubs';
+import type { Property } from '@/types/api';
 
 const SafetyPopup = dynamic(
     () => import('@/components/modals/SafetyPopup').then((m) => ({ default: m.SafetyPopup })),
@@ -34,6 +38,7 @@ export function HomeBelowFold({
     isSafetyPopupOpen,
     onSafetyClose,
     homeFaqs,
+    homeInventory,
     initialProperties,
 }: HomeBelowFoldProps) {
     return (
@@ -47,16 +52,17 @@ export function HomeBelowFold({
                 initialProperties={initialProperties}
             />
 
-            <About />
+            <HomeIntro summary={homeInventory} />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 md:py-16">
-                <FaqSection
-                    id="home-faq-heading"
-                    title="Frequently asked questions"
-                    items={homeFaqs}
-                    variant="light"
-                />
-            </div>
+            <InvestmentCalculator />
+
+            <HowItWorks tokenEnabledCount={homeInventory?.tokenEnabledCount ?? 0} />
+
+            <FounderSection bgClass="bg-page" />
+
+            <HomeCtaBand />
+
+            <HomeFaqSection items={homeFaqs} />
 
             <SafetyPopup isOpen={isSafetyPopupOpen} onClose={onSafetyClose} />
         </>
