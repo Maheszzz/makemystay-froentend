@@ -66,8 +66,12 @@ export interface UsePropertiesOptions {
     pageSize?: number;
     /** 1-based crawlable page (e.g. `?page=2`). Initial fetch uses skip = (page-1)*pageSize when infiniteScroll. */
     initialListingPage?: number;
-    /** Seed properties from SSR/ISR to prevent duplicate initial client fetch */
+    /** SSR-seeded properties to render initial page without waterfall */
     initialProperties?: Property[];
+    /** Total matching count from SSR response */
+    initialTotalCount?: number;
+    /** Category counts map from SSR response */
+    initialPropertyCounts?: Record<string, number>;
 }
 
 export interface UsePropertiesResult {
@@ -97,6 +101,8 @@ export function useProperties(
         pageSize = DEFAULT_PAGE_SIZE,
         initialListingPage = 1,
         initialProperties,
+        initialTotalCount,
+        initialPropertyCounts,
     } = options;
     const startPage = Math.max(1, Math.min(500, initialListingPage || 1));
 
@@ -114,15 +120,19 @@ export function useProperties(
             pages: [
                 {
                     items: initialProperties,
-                    // If SSR returned a full page without explicit total, allow Load More to probe page 2.
-                    total: initialProperties.length >= pageSize ? undefined : initialProperties.length,
-                    propertyCounts: undefined,
+                    total:
+                        typeof initialTotalCount === 'number'
+                            ? initialTotalCount
+                            : initialProperties.length >= pageSize
+                              ? undefined
+                              : initialProperties.length,
+                    propertyCounts: initialPropertyCounts,
                     skip: 0,
                 } satisfies PropertiesPagePayload,
             ],
             pageParams: [1],
         };
-    }, [hasInitialData, startPage, initialProperties, pageSize]);
+    }, [hasInitialData, startPage, initialProperties, initialTotalCount, initialPropertyCounts, pageSize]);
 
     const {
         data,

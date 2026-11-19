@@ -69,6 +69,10 @@ interface PropertiesProps {
     showMapPanel?: boolean;
     /** SSR-seeded properties to render listing cards in initial HTML. */
     initialProperties?: Property[];
+    /** Total live matching count from SSR payload. */
+    initialTotalCount?: number;
+    /** Live category counts from SSR payload. */
+    initialPropertyCounts?: Record<string, number>;
 }
 
 function PropertiesUrlSync({ onSync }: { onSync: (qs: string) => void }) {
@@ -103,6 +107,8 @@ function PropertiesInner({
     forcedGenderFilter,
     showMapPanel: initialMapProp = false,
     initialProperties,
+    initialTotalCount,
+    initialPropertyCounts,
 }: PropertiesProps) {
     const router = useRouter();
     const location = useLocation();
@@ -303,6 +309,9 @@ function PropertiesInner({
         maxPrice === initialMaxPrice &&
         sortBy === 'newest' &&
         !searchQuery.trim() &&
+        !sharingFilter &&
+        !furnishingFilter &&
+        !plotSizeFilter &&
         listingPageNum === 1 &&
         !priceTier;
 
@@ -322,6 +331,8 @@ function PropertiesInner({
         pageSize: PAGE_SIZE,
         initialListingPage: listingPageNum,
         initialProperties: isDefaultSeededState ? initialProperties : undefined,
+        initialTotalCount: isDefaultSeededState ? initialTotalCount : undefined,
+        initialPropertyCounts: isDefaultSeededState ? initialPropertyCounts : undefined,
     });
 
     const syncedFullUrl = urlQueryString ? `${location.pathname}?${urlQueryString}` : location.pathname;

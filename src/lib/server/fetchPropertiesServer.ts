@@ -28,7 +28,7 @@ export interface ServerPropertyQuery {
 export async function fetchPropertiesServer(
     params: ServerPropertyQuery = {},
     timeoutMs = 15000,
-): Promise<{ items: Property[]; total: number }> {
+): Promise<{ items: Property[]; total: number; propertyCounts?: Record<string, number> }> {
     const queryParams = new URLSearchParams();
     if (params.skip !== undefined) queryParams.append('skip', params.skip.toString());
     if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
@@ -61,6 +61,14 @@ export async function fetchPropertiesServer(
     }
 
     const { rows, total } = normalizePropertyListResponse(response);
+    const propertyCounts =
+        !Array.isArray(response) &&
+        response &&
+        typeof response === 'object' &&
+        (response as Record<string, unknown>).property_counts &&
+        typeof (response as Record<string, unknown>).property_counts === 'object'
+            ? ((response as Record<string, unknown>).property_counts as Record<string, number>)
+            : undefined;
     const items: Property[] = [];
     for (const row of rows) {
         try {
@@ -70,6 +78,6 @@ export async function fetchPropertiesServer(
         }
     }
 
-    return { items, total };
+    return { items, total, propertyCounts };
 }
 

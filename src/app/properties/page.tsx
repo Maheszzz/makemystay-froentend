@@ -15,7 +15,7 @@ export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-    const { items: initialProperties } = await fetchPropertiesServer({
+    const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer({
         city: 'bangalore',
         is_available: true,
         limit: 24,
@@ -29,6 +29,8 @@ export default async function Page() {
             pageTitle="Properties in Bangalore"
             pageSubtitle="PGs, flats for rent, homes to buy, and plots across Bangalore."
             initialProperties={initialProperties}
+            initialTotalCount={total}
+            initialPropertyCounts={propertyCounts}
         />
     );
 }

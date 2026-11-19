@@ -372,7 +372,11 @@ export function ListingFilterBar({
                         {/* Area Select */}
                         <div className="relative">
                             <select
-                                value={locationFilter}
+                                value={
+                                    locationFilter.toLowerCase() === defaultCityLabel.toLowerCase()
+                                        ? 'all'
+                                        : locationFilter
+                                }
                                 onChange={(e) => onLocationFilterChange(e.target.value)}
                                 aria-label="Filter by area"
                                 className={`min-h-[36px] appearance-none pl-3 pr-8 rounded-full border text-xs font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-pdp-ink ${

@@ -17,7 +17,7 @@ export const metadata: Metadata = pageSeoToMetadata(
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-    const { items: rentItems } = await fetchPropertiesServer({
+    const rentRes = await fetchPropertiesServer({
         category: 'rent',
         city: 'bangalore',
         is_available: true,
@@ -25,17 +25,15 @@ export default async function Page() {
         sort_by: 'newest',
     });
 
-    const initialProperties =
-        rentItems.length > 0
-            ? rentItems
-            : (
-                  await fetchPropertiesServer({
-                      city: 'bangalore',
-                      is_available: true,
-                      limit: 24,
-                      sort_by: 'newest',
-                  })
-              ).items;
+    const fallbackRes =
+        rentRes.items.length > 0
+            ? rentRes
+            : await fetchPropertiesServer({
+                  city: 'bangalore',
+                  is_available: true,
+                  limit: 24,
+                  sort_by: 'newest',
+              });
 
     return (
         <Properties
@@ -44,7 +42,9 @@ export default async function Page() {
             initialCity="Bangalore"
             pageTitle="Flats for rent in Bangalore"
             pageSubtitle="Apartments and independent homes for rent across Bangalore."
-            initialProperties={initialProperties}
+            initialProperties={fallbackRes.items}
+            initialTotalCount={fallbackRes.total}
+            initialPropertyCounts={fallbackRes.propertyCounts}
         />
     );
 }

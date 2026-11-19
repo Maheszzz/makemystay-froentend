@@ -104,7 +104,14 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
             const facts: string[] = [];
             if (prop.type) facts.push(prop.type);
             if (Array.isArray(prop.sharing) && prop.sharing.length > 0 && prop.category === 'pg') {
-                facts.push(`${prop.sharing.join(' / ')} sharing`);
+                const formatted = prop.sharing.map((s) =>
+                    s.toLowerCase() === 'shared' ? 'Shared room' : s,
+                );
+                facts.push(
+                    formatted.length === 1 && formatted[0] === 'Shared room'
+                        ? 'Shared room'
+                        : `${formatted.join(' / ')} sharing`,
+                );
             } else if (prop.furnishing) {
                 facts.push(prop.furnishing.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase()));
             }
