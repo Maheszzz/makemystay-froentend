@@ -7,14 +7,14 @@ import Properties from '@/views/Properties';
 export const metadata: Metadata = pageSeoToMetadata(
     listingsPageSeo({
         pathname: '/rent',
-        pageTitle: 'Flats & Houses for Rent in Bangalore',
-        pageSubtitle: 'Verified 1BHK, 2BHK & furnished rental homes in Bangalore with zero brokerage',
+        pageTitle: 'Flats for rent in Bangalore',
+        pageSubtitle: 'Apartments and independent homes for rent across Bangalore',
         category: 'rent',
         cityLabel: 'Bangalore',
     }),
 );
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function Page() {
     const { items: rentItems } = await fetchPropertiesServer({
@@ -22,7 +22,7 @@ export default async function Page() {
         city: 'bangalore',
         is_available: true,
         limit: 24,
-        sort_by: 'review_count_desc',
+        sort_by: 'newest',
     });
 
     const initialProperties =
@@ -33,7 +33,7 @@ export default async function Page() {
                       city: 'bangalore',
                       is_available: true,
                       limit: 24,
-                      sort_by: 'review_count_desc',
+                      sort_by: 'newest',
                   })
               ).items;
 
@@ -42,8 +42,8 @@ export default async function Page() {
             key="rent"
             initialCategory="rent"
             initialCity="Bangalore"
-            pageTitle="Flats & Houses for Rent in Bangalore"
-            pageSubtitle="Verified 1BHK, 2BHK & furnished rental homes in Bangalore with transparent pricing"
+            pageTitle="Flats for rent in Bangalore"
+            pageSubtitle="Apartments and independent homes for rent across Bangalore."
             initialProperties={initialProperties}
         />
     );

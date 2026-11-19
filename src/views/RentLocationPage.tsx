@@ -66,66 +66,54 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
     const [] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+        <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="rent-location-ld-json" />
             {itemListLd ? <JsonLd data={itemListLd} id="rent-location-itemlist-ld-json" /> : null}
             <Navbar />
 
-            <main id="main-content" className="flex-grow pt-20 pb-16">
-                <div className="bg-white border-b border-slate-100">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+            <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
+                <header className="bg-pdp-surface border-b border-pdp-border">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
                         <BreadcrumbNav
                             items={[
                                 { name: 'Home', path: '/' },
-                                { name: 'Rent', path: '/rent/bangalore' },
-                                { name: `Rent in ${name}` },
+                                { name: 'Flats', path: '/rent/bangalore' },
+                                { name: `Flats for rent in ${name}` },
                             ]}
                         />
-                        <div className="mt-3 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                            <div>
-                                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">
-                                    Bangalore · Rent
-                                </p>
-                                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                                    Flats &amp; houses for rent in {name}
+                        <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                            <div className="max-w-2xl">
+                                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.1]">
+                                    Flats for rent in {name}
                                 </h1>
-                                <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">
-                                    Verified apartments and independent homes in{' '}
-                                    <strong className="text-slate-700">{name}</strong> — transparent rent, real photos, and
-                                    options with zero brokerage on many listings.
+                                <p className="mt-2.5 text-pdp-muted text-base leading-relaxed">
+                                    Apartments and independent homes in{' '}
+                                    <strong className="font-medium text-pdp-ink">{name}</strong> — filter by BHK, furnishing, and monthly budget.
                                 </p>
-                                <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-3 text-sm text-slate-700 max-w-2xl">
-                                    <p className="font-semibold text-slate-900">Quick facts</p>
-                                    <p className="mt-1">
-                                        <span className="font-medium">Best for:</span> working professionals, small families,
-                                        roommate-free 1BHK seekers.
-                                    </p>
-                                    <p className="mt-1">
-                                        <span className="font-medium">Typical 1BHK band in {name}:</span> ₹18,000–₹38,000/mo
-                                        (furnishing and society dues vary).
-                                    </p>
-                                </div>
+                                <p className="mt-2 text-xs text-pdp-muted">
+                                    Cards display current availability and the last-verified date when recorded.
+                                </p>
                             </div>
                             <Link
                                 to={`/pg/${slug}`}
-                                className="inline-flex items-center gap-1.5 shrink-0 text-xs font-bold text-brand-red hover:underline"
+                                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-pdp-ink hover:underline underline-offset-4"
                             >
-                                <Home className="w-3.5 h-3.5" aria-hidden />
-                                PG in {name}
-                                <ChevronRight className="w-3.5 h-3.5" aria-hidden />
+                                <Home className="w-4 h-4 text-pdp-muted" aria-hidden />
+                                PGs in {name}
+                                <ChevronRight className="w-4 h-4" aria-hidden />
                             </Link>
                         </div>
                     </div>
-                </div>
+                </header>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+                <div>
                     <Properties
                         hideChrome
                         initialCategory="rent"
                         initialCity={name}
-                        pageTitle={`Rent in ${name}`}
-                        pageSubtitle={`Verified flats & houses in ${name} — filter by BHK and budget.`}
+                        pageTitle={`Flats for rent in ${name}`}
+                        pageSubtitle={`Flats & houses in ${name} — filter by BHK and budget.`}
                         onDisplayedListingsForSeo={onDisplayedListingsForSeo}
                     />
                 </div>

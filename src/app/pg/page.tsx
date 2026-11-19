@@ -6,13 +6,13 @@ import Properties from '@/views/Properties';
 
 export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
     pathname: '/pg',
-    pageTitle: 'PG Accommodations in Bangalore',
-    pageSubtitle: 'Verified paying guest stays & coliving spaces in Bangalore',
+    pageTitle: 'PGs in Bangalore',
+    pageSubtitle: 'Paying guest stays and coliving spaces in Bangalore',
     category: 'pg',
     cityLabel: 'Bangalore',
 }));
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function Page() {
     const { items: initialProperties } = await fetchPropertiesServer({
@@ -20,7 +20,7 @@ export default async function Page() {
         city: 'bangalore',
         is_available: true,
         limit: 24,
-        sort_by: 'review_count_desc',
+        sort_by: 'newest',
     });
 
     return (
@@ -28,8 +28,8 @@ export default async function Page() {
             key="pg"
             initialCategory="pg"
             initialCity="Bangalore"
-            pageTitle="PG Accommodations in Bangalore"
-            pageSubtitle="Comfortable & verified PG options in Bangalore with zero brokerage"
+            pageTitle="PGs in Bangalore"
+            pageSubtitle="Paying guest stays and coliving spaces across Bangalore, ordered cleanly by what matters."
             initialProperties={initialProperties}
         />
     );

@@ -6,28 +6,28 @@ import Properties from '@/views/Properties';
 
 export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
     pathname: '/properties',
-    pageTitle: 'Properties in Bangalore — PG, Flats & Plots',
-    pageSubtitle: 'Verified PGs, coliving spaces, 1BHK/2BHK rental homes & plots in Bangalore',
+    pageTitle: 'Properties in Bangalore',
+    pageSubtitle: 'PGs, flats for rent, homes to buy, and plots across Bangalore',
     category: 'all',
     cityLabel: 'Bangalore',
 }));
 
-export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function Page() {
     const { items: initialProperties } = await fetchPropertiesServer({
         city: 'bangalore',
         is_available: true,
         limit: 24,
-        sort_by: 'review_count_desc',
+        sort_by: 'newest',
     });
 
     return (
         <Properties
             key="all"
             initialCity="Bangalore"
-            pageTitle="Properties in Bangalore — PG, Flats & Plots"
-            pageSubtitle="Browse verified PGs, coliving spaces, 1BHK/2BHK rental homes, and plots across Bangalore"
+            pageTitle="Properties in Bangalore"
+            pageSubtitle="PGs, flats for rent, homes to buy, and plots across Bangalore."
             initialProperties={initialProperties}
         />
     );

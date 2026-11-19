@@ -5,8 +5,8 @@ import Properties from '@/views/Properties';
 
 export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
     pathname: '/buy',
-    pageTitle: 'Properties for Sale',
-    pageSubtitle: 'Verified homes to buy in Bangalore',
+    pageTitle: 'Homes to buy in Bangalore',
+    pageSubtitle: 'Residential flats and houses listed for sale in Bangalore',
     category: 'buy',
     cityLabel: 'Bangalore',
 }));
@@ -14,5 +14,5 @@ export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
-  return <Properties key="buy" initialCategory="buy" initialCity="Bangalore" pageTitle="Properties for Sale" pageSubtitle="Find your dream home to buy in Bangalore" />;
+  return <Properties key="buy" initialCategory="buy" initialCity="Bangalore" pageTitle="Homes to buy in Bangalore" pageSubtitle="Residential flats and houses listed for sale in Bangalore." />;
 }

@@ -7,7 +7,6 @@ import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
 import { QuickAnswer } from '@/components/seo/QuickAnswer';
-import { LocalityTrustStrip } from '@/components/trust/LocalityTrustStrip';
 import { LOCALITY_CONTENT } from '@/data/localityContent';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from '@/lib/pgLocalityContent';
@@ -83,76 +82,64 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     const isEmptyLocality = initialProperties.length === 0;
 
     return (
-      <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+      <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
         <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
         <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
 
         <Navbar />
-        <main id="main-content" className="flex-grow pt-20 pb-16">
+        <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
           {/* Hero Banner */}
-          <div className="bg-white border-b border-slate-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          <header className="bg-pdp-surface border-b border-pdp-border">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
               <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">
-                    Bangalore · PG
-                  </p>
-                  <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div className="max-w-2xl">
+                  <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.1]">
                     {localitySeoProfile.hero.heading}
                   </h1>
-                  <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">
+                  <p className="mt-2.5 text-pdp-muted text-base leading-relaxed">
                     {localitySeoProfile.hero.subHeading}
                   </p>
-                  <p className="mt-1.5 text-slate-600 text-xs italic">
-                    {localitySeoProfile.hero.seoIntro}
+                  <p className="mt-2 text-xs text-pdp-muted">
+                    Cards display current availability and the last-verified date when recorded.
                   </p>
-                  <div className="mt-4 max-w-2xl space-y-3">
-                    <QuickAnswer locationName={localitySeoProfile.locality.name}>
-                      {localitySeoProfile.quickAnswer}
-                    </QuickAnswer>
-                    <div className="rounded-xl border border-red-100 bg-red-50/60 p-3.5 flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-bold text-brand-red uppercase tracking-wider">Verified Resident Rating</p>
-                        <p className="text-sm text-slate-800 font-semibold mt-0.5">{localitySeoProfile.reviewsSummary.summaryText}</p>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <span className="text-xl font-extrabold text-slate-900">{localitySeoProfile.reviewsSummary.averageRating} ★</span>
-                        <p className="text-[11px] text-slate-500">{localitySeoProfile.reviewsSummary.totalReviews} reviews</p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <Link
                   to="/pg/bangalore"
-                  className="inline-flex items-center gap-1.5 shrink-0 text-xs font-bold text-brand-red hover:underline"
+                  className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-pdp-ink hover:underline underline-offset-4"
                 >
-                  <MapPin className="w-3.5 h-3.5" />
-                  Full Bangalore PG guide
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <MapPin className="w-4 h-4 text-pdp-muted" />
+                  All Bangalore PGs
+                  <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
+              <div className="mt-5 max-w-2xl">
+                <QuickAnswer locationName={localitySeoProfile.locality.name}>
+                  {localitySeoProfile.quickAnswer}
+                </QuickAnswer>
+              </div>
             </div>
-          </div>
+          </header>
 
           {/* Initial Property Cards rendered on the server for SEO */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {initialProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
+          {initialProperties.length > 0 && (
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {initialProperties.map((property, idx) => (
+                  <PropertyCard key={property.id} property={property} priority={idx === 0} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Client-side interactive listing component */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+          <div className="mt-4">
             <Properties
               hideChrome
               initialCategory="pg"
               initialCity={localitySeoProfile.locality.name}
               pageTitle={localitySeoProfile.hero.heading}
               pageSubtitle={localitySeoProfile.hero.subHeading}
-              showMapPanel
             />
           </div>
 
@@ -211,7 +198,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+    <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
       <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
@@ -221,58 +208,57 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
 
       <Navbar />
-      <main id="main-content" className="flex-grow pt-20 pb-16">
+      <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
         {/* Hero Banner */}
-        <div className="bg-white border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <header className="bg-pdp-surface border-b border-pdp-border">
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
             <BreadcrumbNav items={breadcrumbItems} />
-            <div className="mt-3 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-1">
-                  Bangalore · PG
-                </p>
-                <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                  PG in {name}
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+              <div className="max-w-2xl">
+                <h1 className="font-serif-display text-[36px] md:text-[44px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.1]">
+                  PGs in {name}
                 </h1>
-                <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">
-                  Verified accommodations in <strong className="text-slate-700">{name}</strong> — transparent pricing,
-                  instant shortlist, and secure online booking.
+                <p className="mt-2.5 text-pdp-muted text-base leading-relaxed">
+                  Paying guest accommodations in <strong className="font-medium text-pdp-ink">{name}</strong> — filter by budget, meals, room sharing, and gender.
                 </p>
-                <div className="mt-4 max-w-2xl space-y-3">
+                <p className="mt-2 text-xs text-pdp-muted">
+                  Cards display current availability and the last-verified date when recorded.
+                </p>
+                <div className="mt-5 max-w-2xl">
                   <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
-                  <LocalityTrustStrip slug={locationSlug} name={name} />
                 </div>
               </div>
               <Link
                 to="/pg/bangalore"
-                className="inline-flex items-center gap-1.5 shrink-0 text-xs font-bold text-brand-red hover:underline"
+                className="inline-flex items-center gap-1.5 shrink-0 text-sm font-medium text-pdp-ink hover:underline underline-offset-4"
               >
-                <MapPin className="w-3.5 h-3.5" />
-                Full Bangalore PG guide
-                <ChevronRight className="w-3.5 h-3.5" />
+                <MapPin className="w-4 h-4 text-pdp-muted" />
+                All Bangalore PGs
+                <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Initial Property Cards rendered on the server for SEO */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {initialProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
+        {initialProperties.length > 0 && (
+          <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {initialProperties.map((property, idx) => (
+                <PropertyCard key={property.id} property={property} priority={idx === 0} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Client‑side interactive listing component */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div className="mt-4">
           <Properties
             hideChrome
             initialCategory="pg"
             initialCity={name}
             pageTitle={pageTitle}
             pageSubtitle={pageSubtitle}
-            showMapPanel
           />
         </div>
 
