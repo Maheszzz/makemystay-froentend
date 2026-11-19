@@ -9,12 +9,12 @@ import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
 import { useProperties, useListingLocalityOptions, useScrollMemory } from '@/hooks';
-import { Search, Filter, ChevronDown, Heart, RefreshCw, ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight, ChevronDown, Heart, MessageCircle, RefreshCw, Search } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
-import { PremiumTrustStrip } from '@/components/trust/PremiumTrustStrip';
+import { ListingFilterBar, type ActiveFilterPill } from '@/components/modules/listings/ListingFilterBar';
 import { useWishlist } from '@/context/WishlistContext';
-import { PROPERTY_CITY_OPTIONS } from '@/data/pgLocations';
+import { PROPERTY_CITY_OPTIONS, findPgLocationForArea } from '@/data/pgLocations';
 import {
     normalizePgGenderParam,
     propertyMatchesPgFeatureFilters,
@@ -26,33 +26,21 @@ import {
     pathnameToActiveListingsTab,
     listingsHubTabNavigateUrl,
 } from '@/lib/listingsCategoryHubs';
+import { computeRentPlotStatsFromListings, plotSqftFromProperty } from '@/lib/listingInventoryStats';
 import {
-    computeRentPlotStatsFromListings,
-} from '@/lib/listingInventoryStats';
+    LISTING_TAB_LABEL,
+    buildEmptyFilterWhatsappMessage,
+    deriveAvailableFilterOptions,
+    formatFurnishingLabel,
+    formatResultHeading,
+    getBudgetPresetsForCategory,
+    getListingHeaderCopy,
+    parsePropertyPriceInr,
+    type ListingCategoryKey,
+} from '@/lib/listingPageUtils';
+import { getWhatsappDigits } from '@/lib/whatsapp';
 import type { Property } from '@/types/api';
-
 import { SITE_NAME, SITE_URL } from '@/lib/siteConfig';
-
-/** Neighbourhood chips for `/rent/bangalore` hub (canonical `/rent/{slug}`). */
-const RENT_BANGALORE_AREA_CHIPS: { label: string; to: string }[] = [
-    { label: 'Koramangala', to: '/rent/koramangala' },
-    { label: 'Whitefield', to: '/rent/whitefield' },
-    { label: 'Bellandur', to: '/rent/bellandur' },
-    { label: 'Marathahalli', to: '/rent/marathahalli' },
-    { label: 'HSR Layout', to: '/rent/hsr-layout' },
-    { label: 'Electronic City', to: '/rent/electronic-city' },
-];
-
-const CATEGORY_KEYS = ['all', 'pg', 'rent', 'buy', 'plot'] as const;
-type CategoryKey = (typeof CATEGORY_KEYS)[number];
-
-const CATEGORY_TAB_LABEL: Record<CategoryKey, string> = {
-    all: 'All',
-    pg: 'PG',
-    rent: 'Rent',
-    buy: 'Buy',
-    plot: 'Plot',
-};
 
 interface PropertiesProps {
     initialCategory?: 'all' | 'pg' | 'rent' | 'buy' | 'plot';
@@ -64,22 +52,22 @@ interface PropertiesProps {
     initialMaxPrice?: string;
     /** Embed listing UI inside another page (no Helmet, Navbar, Footer). */
     hideChrome?: boolean;
-    /** When set with `hideChrome`, show `/rent/bangalore` area chips (hub shell provides hero + SEO). */
+    /** Preserved for caller compatibility with rent hub embeds. */
     embedRentHubUi?: boolean;
-    /** When set with `hideChrome`, plot hub shell can read live sqft span from loaded plot listings. */
+    /** Preserved for caller compatibility with plot hub embeds. */
     embedPlotHubUi?: boolean;
     /** Live min/max rent (INR) for embedded rent hub hero — updated from loaded listings. */
     onRentHubInventoryRange?: (min: number | null, max: number | null) => void;
     /** Live min/max plot sqft for embedded plot hub hero. */
     onPlotHubInventoryRange?: (min: number | null, max: number | null) => void;
     onEmptyResultsChange?: (isEmpty: boolean) => void;
-    /** Hub shells (e.g. PG city page) can mirror visible inventory into ItemList JSON-LD — max 100 items. */
+    /** Hub shells can mirror visible inventory into ItemList JSON-LD — max 100 items. */
     onDisplayedListingsForSeo?: (list: Property[]) => void;
-    /** When set (e.g. `/pg-for-boys-in-*` hubs), filter PG listings client-side without relying on `?gender=`. */
+    /** When set (e.g. `/pg-for-boys-in-*` hubs), filter PG listings without relying on `?gender=`. */
     forcedGenderFilter?: 'male' | 'female';
-    /** Locality hubs can show a map alongside listings above the fold. */
+    /** Preserved for caller compatibility; map only displays when coordinates exist in API data. */
     showMapPanel?: boolean;
-    /** SSR-seeded properties to render listing cards in static HTML. */
+    /** SSR-seeded properties to render listing cards in initial HTML. */
     initialProperties?: Property[];
 }
 
@@ -92,12 +80,17 @@ function PropertiesUrlSync({ onSync }: { onSync: (qs: string) => void }) {
     return null;
 }
 
+function normalizeSortParam(raw: string | null): 'newest' | 'price_asc' | 'price_desc' {
+    if (raw === 'price_asc' || raw === 'price_desc' || raw === 'newest') return raw;
+    return 'newest';
+}
+
 function PropertiesInner({
     initialCategory = 'all',
     initialTypeFilter = 'all',
     initialCity = 'all',
-    pageTitle = 'Find Your Perfect Stay',
-    pageSubtitle = 'Verified PG, Coliving & Rental Homes in Bangalore',
+    pageTitle,
+    pageSubtitle,
     hideChrome = false,
     embedRentHubUi = false,
     embedPlotHubUi = false,
@@ -108,7 +101,7 @@ function PropertiesInner({
     onEmptyResultsChange,
     onDisplayedListingsForSeo,
     forcedGenderFilter,
-    showMapPanel = false,
+    showMapPanel: initialMapProp = false,
     initialProperties,
 }: PropertiesProps) {
     const router = useRouter();
@@ -119,27 +112,34 @@ function PropertiesInner({
     const searchParams = useMemo(() => new URLSearchParams(urlQueryString), [urlQueryString]);
     const { wishlist } = useWishlist();
 
-    // 1. Initialize state from Props (URL synced on client via PropertiesUrlSync leaf)
-    const [category, setCategory] = useState<'all' | 'pg' | 'rent' | 'buy' | 'plot'>(initialCategory);
+    const [category, setCategory] = useState<ListingCategoryKey>(initialCategory);
     const [locationFilter, setLocationFilter] = useState(initialCity);
     const [typeFilter, setTypeFilter] = useState(initialTypeFilter);
     const [minPrice, setMinPrice] = useState(initialMinPrice);
     const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
-    const [sortBy, setSortBy] = useState('review_count_desc');
+    const [sortBy, setSortBy] = useState<'newest' | 'price_asc' | 'price_desc'>('newest');
     const [searchQuery, setSearchQuery] = useState('');
+    const [sharingFilter, setSharingFilter] = useState('');
+    const [furnishingFilter, setFurnishingFilter] = useState('');
+    const [plotSizeFilter, setPlotSizeFilter] = useState('');
+    const [mapOpen, setMapOpen] = useState(initialMapProp);
 
     const handleUrlSync = useCallback(
         (qs: string) => {
             setUrlQueryString(qs);
             const sp = new URLSearchParams(qs);
-            const cat = sp.get('cat') as 'all' | 'pg' | 'rent' | 'buy' | 'plot' | null;
+            const cat = sp.get('cat') as ListingCategoryKey | null;
             setCategory(cat ?? initialCategory);
             setLocationFilter(sp.get('city') ?? initialCity);
             setTypeFilter(sp.get('type') ?? initialTypeFilter);
             setMinPrice(sp.get('min') ?? initialMinPrice);
             setMaxPrice(sp.get('max') ?? initialMaxPrice);
-            setSortBy(sp.get('sort') ?? 'review_count_desc');
+            setSortBy(normalizeSortParam(sp.get('sort')));
             setSearchQuery(sp.get('q') ?? '');
+            setSharingFilter(sp.get('sharing') ?? '');
+            setFurnishingFilter(sp.get('furnishing') ?? '');
+            setPlotSizeFilter(sp.get('plot_size') ?? '');
+            if (sp.has('map')) setMapOpen(sp.get('map') === '1');
             setHasUrlSynced(true);
         },
         [initialCategory, initialCity, initialTypeFilter, initialMinPrice, initialMaxPrice],
@@ -150,7 +150,8 @@ function PropertiesInner({
             next: URLSearchParams | Record<string, string> | ((prev: URLSearchParams) => URLSearchParams),
             options?: { replace?: boolean },
         ) => {
-            const currentQs = typeof window !== 'undefined' ? window.location.search.replace(/^\?/, '') : urlQueryString;
+            const currentQs =
+                typeof window !== 'undefined' ? window.location.search.replace(/^\?/, '') : urlQueryString;
             let params: URLSearchParams;
             if (typeof next === 'function') {
                 params = next(new URLSearchParams(currentQs));
@@ -171,7 +172,7 @@ function PropertiesInner({
         },
         [router, location.pathname, urlQueryString],
     );
-    
+
     const pageQueryParam = searchParams.get('page');
     const listingPageNum = useMemo(() => {
         if (!pageQueryParam || !isValidListingPageParam(pageQueryParam)) return 1;
@@ -180,9 +181,7 @@ function PropertiesInner({
         return Math.max(1, Math.min(100, n));
     }, [pageQueryParam]);
 
-    const [showFilters, setShowFilters] = useState(false);
- 
-    // 2. Sync URL with state (debounced). `cat` only on `/properties` — hubs use path, not ?cat= (SEO).
+    // Sync state changes to URL (debounced) without forcing default `?city=Bangalore`
     useEffect(() => {
         if (!hasUrlSynced) return;
         const timer = setTimeout(() => {
@@ -191,23 +190,25 @@ function PropertiesInner({
             if (onPropertiesIndex && category !== 'all') {
                 params.cat = category;
             }
-            const embeddedDefaultCity =
-                hideChrome &&
+            const isDefaultCity =
                 initialCity !== 'all' &&
                 locationFilter.trim().toLowerCase() === String(initialCity).trim().toLowerCase();
-            if (locationFilter !== 'all' && !embeddedDefaultCity) params.city = locationFilter;
+            if (locationFilter !== 'all' && !isDefaultCity) params.city = locationFilter;
             if (typeFilter !== 'all') params.type = typeFilter;
             if (minPrice) params.min = minPrice;
             if (maxPrice) params.max = maxPrice;
-            if (sortBy !== 'review_count_desc') params.sort = sortBy;
+            if (sortBy !== 'newest') params.sort = sortBy;
             if (searchQuery) params.q = searchQuery;
+            if (sharingFilter) params.sharing = sharingFilter;
+            if (furnishingFilter) params.furnishing = furnishingFilter;
+            if (plotSizeFilter) params.plot_size = plotSizeFilter;
 
             const pageRaw = searchParams.get('page');
             if (isValidListingPageParam(pageRaw) && pageRaw && parseInt(pageRaw, 10) > 1) {
                 params.page = pageRaw.trim();
             }
 
-            for (const key of ['wifi', 'food', 'ac', 'price', 'gender'] as const) {
+            for (const key of ['wifi', 'food', 'ac', 'price', 'gender', 'map'] as const) {
                 const v = searchParams.get(key);
                 if (v) params[key] = v;
             }
@@ -216,7 +217,7 @@ function PropertiesInner({
             if (JSON.stringify(params) !== JSON.stringify(currentParams)) {
                 setSearchParams(params, { replace: true });
             }
-        }, 400);
+        }, 300);
 
         return () => clearTimeout(timer);
     }, [
@@ -228,7 +229,9 @@ function PropertiesInner({
         maxPrice,
         sortBy,
         searchQuery,
-        hideChrome,
+        sharingFilter,
+        furnishingFilter,
+        plotSizeFilter,
         initialCity,
         hasUrlSynced,
         setSearchParams,
@@ -236,43 +239,17 @@ function PropertiesInner({
         pageQueryParam,
     ]);
 
-    const typeOptions = useMemo(() => {
-        switch (category) {
-            case 'pg':
-                return [{ id: 'all', label: 'All Types' }, { id: 'PG', label: 'PG / Hostel' }, { id: 'Co-living', label: 'Co-living' }];
-            case 'plot':
-                return [{ id: 'all', label: 'All Types' }, { id: 'Plot', label: 'Plots / Land' }];
-            case 'all':
-            default:
-                return [
-                    { id: 'all', label: 'All Types' },
-                    { id: '1RK', label: 'Studio (1 RK)' },
-                    { id: '1BHK', label: '1 BHK' },
-                    { id: '2BHK', label: '2 BHK' },
-                    { id: '1 & 2 BHK', label: '1 & 2 BHK' },
-                    { id: '3BHK', label: '3 BHK' },
-                    { id: 'Villa', label: 'Villa / Row House' },
-                    { id: 'PG', label: 'PG / Hostel' },
-                    { id: 'Plot', label: 'Plots / Land' }
-                ];
-        }
-    }, [category]);
-
-
-    // Update state if category props change (from App.tsx routes)
     useEffect(() => {
         if (initialCategory !== category && !searchParams.get('cat')) {
             setCategory(initialCategory);
         }
     }, [initialCategory]);
 
-    /** Metro slug when "Entire Bangalore" / hub default applies (not all-India). */
     const defaultMetroSlug = useMemo(() => {
         return normalizeCitySlug(initialCity !== 'all' ? initialCity : undefined) ?? 'bangalore';
     }, [initialCity]);
 
-    /** Tab highlight follows URL so back/forward and deep links stay correct. */
-    const activeTabKey = useMemo((): CategoryKey => {
+    const activeTabKey = useMemo((): ListingCategoryKey => {
         if (location.pathname === '/properties') return category;
         const implied = pathnameToActiveListingsTab(location.pathname);
         if (implied !== null) return implied;
@@ -292,16 +269,14 @@ function PropertiesInner({
     const acOn = searchParams.get('ac') === 'true';
     const priceTier = searchParams.get('price');
 
-    /**
-     * City sent to API — normalized slug; never mixed into `search` (text query stays in `q` only).
-     * Filter value `all` means "Entire Bangalore" (all areas in the metro), not all cities globally.
-     */
     const apiCity = useMemo(() => {
         if (locationFilter === 'all') return defaultMetroSlug;
-        return normalizeCitySlug(locationFilter) ?? String(locationFilter).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        return (
+            normalizeCitySlug(locationFilter) ??
+            String(locationFilter).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+        );
     }, [locationFilter, defaultMetroSlug]);
 
-    // 4. API Parameters (Derived from URL/State)
     const apiParams = useMemo(() => {
         const q = searchQuery.trim() || undefined;
         let min_price = minPrice ? parseFloat(minPrice) : undefined;
@@ -312,10 +287,8 @@ function PropertiesInner({
             max_price = 16000;
         }
         if (!min_price && !max_price && priceTier === 'high') min_price = 14000;
-        const sort_by = sortBy;
 
-        const base = { search: q, min_price, max_price, city: apiCity, sort_by };
-
+        const base = { search: q, min_price, max_price, city: apiCity, sort_by: sortBy };
         if (category === 'all') {
             return { ...base, property_type: typeFilter === 'all' ? undefined : typeFilter };
         }
@@ -328,7 +301,7 @@ function PropertiesInner({
         typeFilter === initialTypeFilter &&
         minPrice === initialMinPrice &&
         maxPrice === initialMaxPrice &&
-        sortBy === 'review_count_desc' &&
+        sortBy === 'newest' &&
         !searchQuery.trim() &&
         listingPageNum === 1 &&
         !priceTier;
@@ -351,9 +324,7 @@ function PropertiesInner({
         initialProperties: isDefaultSeededState ? initialProperties : undefined,
     });
 
-    const syncedFullUrl = urlQueryString
-        ? `${location.pathname}?${urlQueryString}`
-        : location.pathname;
+    const syncedFullUrl = urlQueryString ? `${location.pathname}?${urlQueryString}` : location.pathname;
     useScrollMemory(hasUrlSynced && !loading, { urlKey: syncedFullUrl });
 
     const genderFilter = useMemo(() => {
@@ -376,6 +347,9 @@ function PropertiesInner({
                 wifiOn,
                 foodOn,
                 acOn,
+                sharingFilter,
+                furnishingFilter,
+                plotSizeFilter,
                 genderKey: genderFilter ?? '',
             }),
         [
@@ -390,8 +364,11 @@ function PropertiesInner({
             wifiOn,
             foodOn,
             acOn,
+            sharingFilter,
+            furnishingFilter,
+            plotSizeFilter,
             genderFilter,
-        ]
+        ],
     );
 
     const listingFilterKeyPrev = useRef<string | null>(null);
@@ -409,14 +386,27 @@ function PropertiesInner({
                 next.delete('page');
                 return next;
             },
-            { replace: true }
+            { replace: true },
         );
     }, [listingFilterKey, searchParams, setSearchParams]);
+
+    const availableFilterOptions = useMemo(
+        () =>
+            deriveAvailableFilterOptions(Array.isArray(properties) ? properties : [], {
+                gender: genderFilter,
+                sharing: sharingFilter,
+                food: foodOn,
+                typeFilter,
+                furnishing: furnishingFilter,
+                plotSize: plotSizeFilter,
+            }),
+        [properties, genderFilter, sharingFilter, foodOn, typeFilter, furnishingFilter, plotSizeFilter],
+    );
 
     const propertyListFiltered = useMemo(() => {
         try {
             const rawList = Array.isArray(properties) ? properties : [];
-            let list = rawList.filter((p) => !!p); // Always strip nulls/undefined
+            let list = rawList.filter((p) => !!p);
 
             const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
             if (wifiOn || foodOn || acOn) {
@@ -425,6 +415,29 @@ function PropertiesInner({
 
             if (category === 'pg' && genderFilter) {
                 list = list.filter((p) => propertyMatchesPgGenderFilter(p, genderFilter));
+            }
+
+            if (category === 'pg' && sharingFilter) {
+                const target = sharingFilter.toLowerCase();
+                list = list.filter(
+                    (p) => Array.isArray(p.sharing) && p.sharing.some((s) => s.trim().toLowerCase() === target),
+                );
+            }
+
+            if (furnishingFilter) {
+                const target = furnishingFilter.toLowerCase();
+                list = list.filter((p) => (p.furnishing || '').trim().toLowerCase() === target);
+            }
+
+            if (plotSizeFilter) {
+                list = list.filter((p) => {
+                    const sq = plotSqftFromProperty(p);
+                    if (sq == null) return false;
+                    if (plotSizeFilter === 'under-1200') return sq < 1200;
+                    if (plotSizeFilter === '1200-2400') return sq >= 1200 && sq <= 2400;
+                    if (plotSizeFilter === '2400-plus') return sq > 2400;
+                    return true;
+                });
             }
 
             if (category !== 'all') {
@@ -453,31 +466,64 @@ function PropertiesInner({
 
             return list;
         } catch (e) {
-            console.error('[Properties] Filtering crash:', e);
+            console.error('[Properties] Filtering error:', e);
             return [];
         }
-    }, [properties, wifiOn, foodOn, acOn, category, genderFilter, typeFilter]);
+    }, [
+        properties,
+        wifiOn,
+        foodOn,
+        acOn,
+        category,
+        genderFilter,
+        sharingFilter,
+        furnishingFilter,
+        plotSizeFilter,
+        typeFilter,
+    ]);
 
-    /** Client-side ordering fallback when API order is weak. */
     const propertyListOrdered = useMemo(() => {
-        try {
-            const list = [...propertyListFiltered];
-            // If there is a search query, trust the backend's exact-match relevance sorting completely.
-            if (searchQuery) return list;
-            
-            if (sortBy === 'review_count_desc' || sortBy === 'rating_desc') {
-                return list; // The backend already includes priority sorting before these sorts.
-            }
-            return list;
-        } catch (e) {
-            console.error('[Properties] Sorting crash:', e);
-            return propertyListFiltered;
+        const list = [...propertyListFiltered];
+        if (sortBy === 'price_asc') {
+            return list.sort((a, b) => {
+                const pa = parsePropertyPriceInr(a.price);
+                const pb = parsePropertyPriceInr(b.price);
+                if (pa == null && pb == null) return 0;
+                if (pa == null) return 1;
+                if (pb == null) return -1;
+                return pa - pb;
+            });
         }
+        if (sortBy === 'price_desc') {
+            return list.sort((a, b) => {
+                const pa = parsePropertyPriceInr(a.price);
+                const pb = parsePropertyPriceInr(b.price);
+                if (pa == null && pb == null) return 0;
+                if (pa == null) return 1;
+                if (pb == null) return -1;
+                return pb - pa;
+            });
+        }
+        return list;
     }, [propertyListFiltered, sortBy]);
+
+    const hasGeoCoordinates = useMemo(
+        () =>
+            propertyListFiltered.some(
+                (p) =>
+                    typeof p.latitude === 'number' &&
+                    Number.isFinite(p.latitude) &&
+                    typeof p.longitude === 'number' &&
+                    Number.isFinite(p.longitude),
+            ),
+        [propertyListFiltered],
+    );
+
+    const showMap = hasGeoCoordinates && mapOpen;
 
     const inventoryStats = useMemo(
         () => computeRentPlotStatsFromListings(propertyListFiltered),
-        [propertyListFiltered]
+        [propertyListFiltered],
     );
 
     useEffect(() => {
@@ -490,12 +536,31 @@ function PropertiesInner({
         onPlotHubInventoryRange(inventoryStats.plotSqftMin, inventoryStats.plotSqftMax);
     }, [embedPlotHubUi, onPlotHubInventoryRange, inventoryStats.plotSqftMin, inventoryStats.plotSqftMax]);
 
+    const cityLabelDisplay = useMemo(() => {
+        if (locationFilter === 'all') {
+            if (initialCity && initialCity !== 'all') {
+                return initialCity.charAt(0).toUpperCase() + initialCity.slice(1);
+            }
+            return 'Bangalore';
+        }
+        const s = String(locationFilter).trim();
+        if (!s) return 'Bangalore';
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }, [locationFilter, initialCity]);
+
+    const headerCopy = useMemo(
+        () => getListingHeaderCopy(activeTabKey, cityLabelDisplay),
+        [activeTabKey, cityLabelDisplay],
+    );
+    const resolvedTitle = pageTitle || headerCopy.title;
+    const resolvedSubtitle = pageSubtitle || headerCopy.subtitle;
+
     const listingsHelmet = useMemo(() => {
         if (hideChrome) return null;
         const page = listingsPageSeo({
             pathname: location.pathname,
-            pageTitle,
-            pageSubtitle,
+            pageTitle: resolvedTitle,
+            pageSubtitle: resolvedSubtitle,
             category,
             cityLabel: locationFilter === 'all' ? 'all' : locationFilter,
             totalCount: totalCount ?? undefined,
@@ -508,8 +573,8 @@ function PropertiesInner({
     }, [
         hideChrome,
         location.pathname,
-        pageTitle,
-        pageSubtitle,
+        resolvedTitle,
+        resolvedSubtitle,
         category,
         locationFilter,
         totalCount,
@@ -517,7 +582,6 @@ function PropertiesInner({
     ]);
 
     useEffect(() => {
-        // Only signal empty results when the API succeeded — never on error/loading state
         if (error) return;
         const shouldNoindexEmptyResults = !loading && !error && propertyListOrdered.length === 0;
         onEmptyResultsChange?.(shouldNoindexEmptyResults);
@@ -529,7 +593,6 @@ function PropertiesInner({
         onDisplayedListingsForSeo(propertyListOrdered.slice(0, 100));
     }, [onDisplayedListingsForSeo, loading, propertyListOrdered]);
 
-    // Infinite scroll observer
     const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
     useEffect(() => {
         if (!sentinelEl || !hasMore || loading || loadingMore) return;
@@ -539,57 +602,204 @@ function PropertiesInner({
                     void loadMore();
                 }
             },
-            { root: null, rootMargin: '600px', threshold: 0 }
+            { root: null, rootMargin: '600px', threshold: 0 },
         );
         obs.observe(sentinelEl);
         return () => obs.disconnect();
     }, [sentinelEl, hasMore, loading, loadingMore, loadMore]);
 
-    const { areas: localitiesFromApi } = useListingLocalityOptions(
-        initialCity !== 'all' ? initialCity : undefined
+    const { areas: localitiesFromApi, areaCounts } = useListingLocalityOptions(
+        initialCity !== 'all' ? initialCity : undefined,
+        activeTabKey,
+        defaultMetroSlug,
     );
     const cities = localitiesFromApi.length > 0 ? localitiesFromApi : PROPERTY_CITY_OPTIONS;
+
+    const updateParamKey = useCallback(
+        (key: string, value: string | null) => {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                if (value) next.set(key, value);
+                else next.delete(key);
+                return next;
+            }, { replace: true });
+        },
+        [setSearchParams],
+    );
 
     const resetFilters = useCallback(() => {
         setMinPrice('');
         setMaxPrice('');
-        setLocationFilter('all');
-        setSortBy('review_count_desc');
+        setLocationFilter(initialCity);
+        setSortBy('newest');
         setSearchQuery('');
         setTypeFilter('all');
+        setSharingFilter('');
+        setFurnishingFilter('');
+        setPlotSizeFilter('');
         setSearchParams({}, { replace: true });
-    }, [setSearchParams]);
+    }, [initialCity, setSearchParams]);
 
     const handleCategoryTab = useCallback(
-        (cat: CategoryKey) => {
+        (cat: ListingCategoryKey) => {
             const url = listingsHubTabNavigateUrl(cat, apiCity, searchQuery);
             navigate(url);
         },
-        [apiCity, searchQuery, navigate]
+        [apiCity, searchQuery, navigate],
     );
 
-    const showRentBangaloreHubBlocks =
-        initialCategory === 'rent' &&
-        String(initialCity ?? '').toLowerCase() === 'bangalore' &&
-        (!hideChrome || embedRentHubUi);
+    const hasClientFilters = Boolean(
+        wifiOn || foodOn || acOn || genderFilter || sharingFilter || furnishingFilter || plotSizeFilter || (typeFilter && typeFilter !== 'all'),
+    );
+    const displayResultCount = hasClientFilters
+        ? propertyListOrdered.length
+        : (totalCount ?? propertyListOrdered.length);
 
-    const cityLabelDisplay = useMemo(() => {
-        if (locationFilter === 'all') return 'Bangalore';
-        const s = String(locationFilter).trim();
-        if (!s) return 'Bangalore';
-        return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-    }, [locationFilter]);
+    const activeFilterPills = useMemo<ActiveFilterPill[]>(() => {
+        const pills: ActiveFilterPill[] = [];
+        if (searchQuery.trim()) {
+            pills.push({
+                key: 'q',
+                label: `"${searchQuery.trim()}"`,
+                onRemove: () => setSearchQuery(''),
+            });
+        }
+        const isDefaultCity =
+            locationFilter === 'all' ||
+            (initialCity !== 'all' && locationFilter.toLowerCase() === initialCity.toLowerCase());
+        if (!isDefaultCity) {
+            pills.push({
+                key: 'city',
+                label: locationFilter,
+                onRemove: () => setLocationFilter(initialCity),
+            });
+        }
+        if (minPrice || maxPrice) {
+            const label =
+                minPrice && maxPrice
+                    ? `₹${Number(minPrice).toLocaleString('en-IN')} – ₹${Number(maxPrice).toLocaleString('en-IN')}`
+                    : minPrice
+                      ? `₹${Number(minPrice).toLocaleString('en-IN')}+`
+                      : `Up to ₹${Number(maxPrice).toLocaleString('en-IN')}`;
+            pills.push({
+                key: 'budget',
+                label,
+                onRemove: () => {
+                    setMinPrice('');
+                    setMaxPrice('');
+                    updateParamKey('price', null);
+                },
+            });
+        }
+        if (typeFilter && typeFilter !== 'all') {
+            pills.push({
+                key: 'type',
+                label: typeFilter,
+                onRemove: () => setTypeFilter('all'),
+            });
+        }
+        if (genderFilter && !forcedGenderFilter) {
+            pills.push({
+                key: 'gender',
+                label: genderFilter === 'male' ? 'Boys' : 'Girls',
+                onRemove: () => updateParamKey('gender', null),
+            });
+        }
+        if (sharingFilter) {
+            pills.push({
+                key: 'sharing',
+                label: `${sharingFilter} sharing`,
+                onRemove: () => setSharingFilter(''),
+            });
+        }
+        if (furnishingFilter) {
+            pills.push({
+                key: 'furnishing',
+                label: formatFurnishingLabel(furnishingFilter),
+                onRemove: () => setFurnishingFilter(''),
+            });
+        }
+        if (foodOn) {
+            pills.push({
+                key: 'food',
+                label: 'Meals included',
+                onRemove: () => updateParamKey('food', null),
+            });
+        }
+        if (wifiOn) {
+            pills.push({
+                key: 'wifi',
+                label: 'WiFi',
+                onRemove: () => updateParamKey('wifi', null),
+            });
+        }
+        if (acOn) {
+            pills.push({
+                key: 'ac',
+                label: 'AC',
+                onRemove: () => updateParamKey('ac', null),
+            });
+        }
+        if (plotSizeFilter) {
+            const bucket = availableFilterOptions.plotSizeBuckets.find((b) => b.id === plotSizeFilter);
+            pills.push({
+                key: 'plot_size',
+                label: bucket?.label || plotSizeFilter,
+                onRemove: () => setPlotSizeFilter(''),
+            });
+        }
+        return pills;
+    }, [
+        searchQuery,
+        locationFilter,
+        initialCity,
+        minPrice,
+        maxPrice,
+        typeFilter,
+        genderFilter,
+        forcedGenderFilter,
+        sharingFilter,
+        furnishingFilter,
+        foodOn,
+        wifiOn,
+        acOn,
+        plotSizeFilter,
+        availableFilterOptions.plotSizeBuckets,
+        updateParamKey,
+    ]);
 
-    const emptyResultsSummary = useMemo(() => {
-        const q = searchQuery.trim();
-        if (q) return `text search "${q}"`;
-        if (locationFilter !== 'all') return `city / filters for ${cityLabelDisplay}`;
-        return 'your criteria';
-    }, [searchQuery, locationFilter, cityLabelDisplay]);
+    const emptyWhatsappHref = useMemo(() => {
+        const msg = buildEmptyFilterWhatsappMessage({
+            categoryLabel: LISTING_TAB_LABEL[activeTabKey].toLowerCase(),
+            areaOrCity: cityLabelDisplay,
+            searchQuery,
+            minPrice,
+            maxPrice,
+            typeFilter,
+            genderFilter,
+            sharingFilter,
+            furnishingFilter,
+            foodOn,
+            wifiOn,
+        });
+        return `https://wa.me/${getWhatsappDigits()}?text=${encodeURIComponent(msg)}`;
+    }, [
+        activeTabKey,
+        cityLabelDisplay,
+        searchQuery,
+        minPrice,
+        maxPrice,
+        typeFilter,
+        genderFilter,
+        sharingFilter,
+        furnishingFilter,
+        foodOn,
+        wifiOn,
+    ]);
 
     const mapQuery = useMemo(() => {
         const categoryLabel = category === 'pg' ? 'PG' : 'property';
-        return encodeURIComponent(`${categoryLabel} in ${cityLabelDisplay} Bangalore`);
+        return encodeURIComponent(`${categoryLabel} in ${cityLabelDisplay}`);
     }, [category, cityLabelDisplay]);
 
     const listingPageLd = useMemo(() => {
@@ -602,33 +812,40 @@ function PropertiesInner({
                     '@type': 'CollectionPage',
                     '@id': `${url}#collection`,
                     url,
-                    name: pageTitle,
-                    description: pageSubtitle,
+                    name: resolvedTitle,
+                    description: resolvedSubtitle,
                     isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
                 },
                 {
                     '@type': 'BreadcrumbList',
                     itemListElement: [
-                        {
-                            '@type': 'ListItem',
-                            position: 1,
-                            name: 'Home',
-                            item: SITE_URL,
-                        },
-                        {
-                            '@type': 'ListItem',
-                            position: 2,
-                            name: pageTitle,
-                            item: url,
-                        },
+                        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+                        { '@type': 'ListItem', position: 2, name: resolvedTitle, item: url },
                     ],
                 },
             ],
         };
-    }, [location.pathname, pageTitle, pageSubtitle]);
+    }, [location.pathname, resolvedTitle, resolvedSubtitle]);
+
+    const areaChipsWithHref = useMemo(() => {
+        return areaCounts.slice(0, 14).map((area) => {
+            const loc = area.slug ? { slug: area.slug } : findPgLocationForArea(area.name);
+            let href: string;
+            if (activeTabKey === 'pg' && loc?.slug) {
+                href = `/pg/${loc.slug}`;
+            } else if (activeTabKey === 'rent' && loc?.slug) {
+                href = `/rent/${loc.slug}`;
+            } else {
+                href = listingsHubTabNavigateUrl(activeTabKey, defaultMetroSlug, area.name);
+            }
+            return { ...area, href };
+        });
+    }, [areaCounts, activeTabKey, defaultMetroSlug]);
+
+    const budgetPresets = useMemo(() => getBudgetPresetsForCategory(activeTabKey), [activeTabKey]);
 
     return (
-        <div className="bg-slate-50 min-h-screen font-sans flex flex-col overflow-x-hidden">
+        <div className="bg-pdp-bg min-h-screen text-pdp-ink font-sans flex flex-col overflow-x-clip">
             <Suspense fallback={null}>
                 <PropertiesUrlSync onSync={handleUrlSync} />
             </Suspense>
@@ -636,489 +853,301 @@ function PropertiesInner({
             <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
 
-            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-20 pb-20 flex-grow'}>
-                {/* 1. Hero Section (Only if not hidden) */}
+            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
+                {/* 1. Slim Left-Aligned Editorial Header (Standalone listing pages) */}
                 {!hideChrome && (
-                    <section className="relative pt-12 md:pt-20 pb-8 bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
-                        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                            <div className="animate-fade-in-up">
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] tracking-tight leading-tight mb-4">
-                                    {pageTitle}
+                    <header className="bg-pdp-surface border-b border-pdp-border">
+                        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.08]">
+                                    {resolvedTitle}
                                 </h1>
-                                <p className="text-gray-500 text-lg md:text-xl max-w-2xl mx-auto font-medium mb-8">
-                                    {pageSubtitle}
-                                </p>
-                                
-                                {/* Premium Filter Chips */}
-                                <div className="flex flex-wrap justify-center gap-3">
-                                    {[
-                                        'Verified',
-                                        'Zero Brokerage',
-                                        'Instant Booking',
-                                        'Owner Verified',
-                                        'Ready to Move',
-                                        'Furnished'
-                                    ].map((chip) => (
-                                        <div key={chip} className="flex items-center gap-1.5 px-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:shadow-md cursor-pointer">
-                                            <span className="text-emerald-500 font-bold">✓</span> {chip}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
-                <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${hideChrome ? 'mt-0 md:mt-2' : 'mt-8 relative z-20'}`}>
-                    
-                    {/* 2. Floating Filter Bar */}
-                    <div className={`bg-white/95 backdrop-blur-xl p-3 md:p-5 rounded-[2rem] shadow-[0_20px_50px_-20px_rgba(15,23,42,0.2)] border border-slate-200/60 mb-16 transition-all ring-1 ring-slate-900/[0.02] ${hideChrome ? 'relative z-10' : 'sticky top-24 z-30'}`}>
-                        <div className="flex flex-col lg:flex-row gap-3 md:gap-4 items-stretch">
-                            
-                            {/* Search and Category Tabs Wrapper */}
-                            <div className="flex-grow flex flex-col md:flex-row gap-3">
-                                {/* Search Input */}
-                                <div className="relative md:w-1/3 lg:w-1/4">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search area..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-100 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-red/10 focus:bg-white transition-all text-sm font-medium"
-                                    />
-                                </div>
-
-                                {/* Category Pills */}
-                                <div className="flex-grow flex items-center p-1.5 bg-slate-100/80 rounded-2xl overflow-x-auto no-scrollbar scroll-smooth">
-                                    {CATEGORY_KEYS.map((cat) => {
-                                        const count = propertyCounts?.[cat];
-                                        const isActive = activeTabKey === cat;
-                                        return (
-                                            <button
-                                                key={cat}
-                                                type="button"
-                                                onClick={() => handleCategoryTab(cat)}
-                                                className={`flex-1 min-w-[70px] md:min-w-[90px] px-3 py-2.5 rounded-xl text-[11px] md:text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                                                    isActive 
-                                                        ? 'bg-white text-brand-red shadow-md scale-[1.02]' 
-                                                        : 'text-slate-500 hover:text-slate-900 hover:bg-white/50'
-                                                }`}
-                                            >
-                                                <span>{CATEGORY_TAB_LABEL[cat]}</span>
-                                                {count !== undefined && (
-                                                    <span className={`px-1.5 py-0.5 rounded-md text-[9px] tabular-nums ${
-                                                        isActive ? 'bg-brand-red/10 text-brand-red' : 'bg-slate-200 text-slate-500'
-                                                    }`}>
-                                                        {count}
-                                                    </span>
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Filter and Refetch Actions */}
-                            <div className="flex items-center gap-2 shrink-0">
-                                <button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className={`flex-1 lg:w-32 py-3.5 rounded-2xl border font-bold text-[11px] md:text-xs transition-all flex items-center justify-center gap-2 ${
-                                        showFilters 
-                                            ? 'bg-brand-red border-brand-red text-white shadow-glow' 
-                                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:shadow-sm'
-                                    }`}
-                                >
-                                    <Filter className="w-3.5 h-3.5" />
-                                    More Filters
-                                </button>
-                                <button 
-                                    onClick={refetch} 
-                                    className="p-3.5 rounded-2xl bg-slate-50 text-slate-400 hover:text-brand-red hover:bg-white hover:shadow-sm border border-slate-100 transition-all"
-                                    aria-label="Refresh results"
-                                >
-                                    <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Expandable Advanced Filters */}
-                        {showFilters && (
-                            <div className="mt-6 overflow-hidden animate-filter-panel">
-                                    <div className="pt-6 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        {/* Sort Options */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Sort Preference</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={sortBy}
-                                                    onChange={(e) => setSortBy(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
-                                                >
-                                                    <option value="review_count_desc">Popularity</option>
-                                                    <option value="rating_desc">Top Rated</option>
-                                                    <option value="price_asc">Lowest Price</option>
-                                                    <option value="price_desc">Highest Price</option>
-                                                    <option value="newest">Recently Added</option>
-                                                </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                                            </div>
-                                        </div>
-
-                                        {/* Price Range */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Monthly Budget (₹)</label>
-                                            <div className="flex items-center gap-2">
-                                                <input 
-                                                    type="number" 
-                                                    placeholder="Min" 
-                                                    value={minPrice} 
-                                                    onChange={(e) => setMinPrice(e.target.value)} 
-                                                    className="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold focus:bg-white focus:ring-4 focus:ring-brand-red/5 outline-none transition-all" 
-                                                />
-                                                <span className="text-slate-300 font-bold">/</span>
-                                                <input 
-                                                    type="number" 
-                                                    placeholder="Max" 
-                                                    value={maxPrice} 
-                                                    onChange={(e) => setMaxPrice(e.target.value)} 
-                                                    className="w-full px-3 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold focus:bg-white focus:ring-4 focus:ring-brand-red/5 outline-none transition-all" 
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Locality Selection */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">City / Area</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={locationFilter}
-                                                    onChange={(e) => setLocationFilter(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
-                                                >
-                                                    <option value="all">Entire Bangalore</option>
-                                                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                                                </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                                            </div>
-                                        </div>
-
-                                        {/* Specific Type */}
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 pl-1">Home Type</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={typeFilter}
-                                                    onChange={(e) => setTypeFilter(e.target.value)}
-                                                    className="w-full appearance-none px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-brand-red/5 outline-none pr-10 transition-all"
-                                                >
-                                                    {typeOptions.map(opt => (
-                                                        <option key={opt.id} value={opt.id}>{opt.label}</option>
-                                                    ))}
-                                                </select>
-                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="mt-6 pt-6 border-t border-slate-100 flex justify-between items-center">
-                                        <button 
-                                            onClick={resetFilters}
-                                            className="text-[11px] font-bold text-slate-400 hover:text-brand-red transition-colors uppercase tracking-widest"
-                                        >
-                                            Clear all filters
-                                        </button>
-                                        <button 
-                                            onClick={() => setShowFilters(false)}
-                                            className="px-6 py-2 bg-slate-900 text-white text-[11px] font-bold rounded-xl hover:bg-brand-charcoal transition-all uppercase tracking-widest"
-                                        >
-                                            Show Results
-                                        </button>
-                                    </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* 3. Area Chips (Hub context) */}
-                    {showRentBangaloreHubBlocks && (
-                        <div className="mb-10 p-1 bg-white rounded-2xl border border-slate-200/60 shadow-sm flex items-center overflow-hidden">
-                            <div className="hidden md:flex items-center px-4 py-2 border-r border-slate-100 text-[10px] font-black uppercase tracking-widest text-slate-400 shrink-0">
-                                Popular Areas
-                            </div>
-                            <div className="flex flex-nowrap gap-2 overflow-x-auto no-scrollbar py-2 px-3">
-                                {RENT_BANGALORE_AREA_CHIPS.map((c) => (
-                                    <Link
-                                        key={c.to}
-                                        to={c.to}
-                                        className="whitespace-nowrap px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-[11px] font-bold text-slate-600 hover:bg-brand-red hover:text-white hover:border-brand-red transition-all"
-                                    >
-                                        {c.label}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* 4. Results Header */}
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 mt-4">
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <h2 className="text-2xl font-bold text-slate-900">
-                                    {loading ? 'Searching...' : `Available Properties`}
-                                </h2>
                                 {!loading && (
-                                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-xs font-bold tabular-nums">
-                                        {totalCount}
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-pdp-bg border border-pdp-border text-sm font-medium text-pdp-muted tabular-nums">
+                                        {displayResultCount.toLocaleString('en-IN')}
                                     </span>
                                 )}
                             </div>
-                            <p className="text-slate-500 text-sm font-medium">
-                                {loading 
-                                    ? 'Curating verified listings for you...' 
-                                    : `Verified ${category !== 'all' ? CATEGORY_TAB_LABEL[category] : 'Home'} listings in ${cityLabelDisplay}`}
+                            <p className="mt-2.5 text-base text-pdp-muted max-w-2xl leading-relaxed">
+                                {resolvedSubtitle}
+                            </p>
+                            <p className="mt-2 text-xs text-pdp-muted">
+                                Cards display current availability and the last-verified date when recorded.
                             </p>
                         </div>
-                        
-                        {loadingMore && (
-                            <div className="flex items-center gap-2 text-brand-red">
-                                <RefreshCw className="w-3 h-3 animate-spin" />
-                                <span className="text-[10px] font-black uppercase tracking-widest">Updating listings...</span>
-                            </div>
-                        )}
-                        {!loadingMore && (
-                            <label className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sort</span>
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-transparent text-xs font-bold text-slate-700 outline-none"
-                                    aria-label="Sort properties"
-                                >
-                                    <option value="review_count_desc">Popularity</option>
-                                    <option value="rating_desc">Top Rated</option>
-                                    <option value="price_asc">Lowest Price</option>
-                                    <option value="price_desc">Highest Price</option>
-                                    <option value="newest">Recently Added</option>
-                                </select>
-                            </label>
-                        )}
-                    </div>
+                    </header>
+                )}
 
-                    {/* Featured Promotion Banner (Auto Slider + High Demand Ekta Infinity) */}
-                    {!loading && propertyListOrdered.length > 0 && !hideChrome && (
+                {/* 2. Sticky Filter Bar */}
+                <ListingFilterBar
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    activeTabKey={activeTabKey}
+                    onSelectCategory={handleCategoryTab}
+                    propertyCounts={propertyCounts}
+                    minPrice={minPrice}
+                    maxPrice={maxPrice}
+                    onBudgetApply={(min, max) => {
+                        setMinPrice(min);
+                        setMaxPrice(max);
+                        if (priceTier) updateParamKey('price', null);
+                    }}
+                    budgetPresets={budgetPresets}
+                    sortBy={sortBy}
+                    onSortChange={(val) => setSortBy(normalizeSortParam(val))}
+                    typeFilter={typeFilter}
+                    onTypeFilterChange={setTypeFilter}
+                    genderFilter={genderFilter}
+                    onGenderToggle={(g) => updateParamKey('gender', genderFilter === g ? null : g)}
+                    sharingFilter={sharingFilter}
+                    onSharingToggle={(s) => setSharingFilter((prev) => (prev.toLowerCase() === s.toLowerCase() ? '' : s))}
+                    furnishingFilter={furnishingFilter}
+                    onFurnishingToggle={(f) => setFurnishingFilter((prev) => (prev.toLowerCase() === f.toLowerCase() ? '' : f))}
+                    foodOn={foodOn}
+                    onFoodToggle={() => updateParamKey('food', foodOn ? null : 'true')}
+                    plotSizeFilter={plotSizeFilter}
+                    onPlotSizeToggle={(b) => setPlotSizeFilter((prev) => (prev === b ? '' : b))}
+                    availableOptions={availableFilterOptions}
+                    locationFilter={locationFilter}
+                    onLocationFilterChange={setLocationFilter}
+                    cities={cities}
+                    defaultCityLabel={initialCity !== 'all' ? initialCity : 'Bangalore'}
+                    hasGeoCoordinates={hasGeoCoordinates}
+                    showMapPanel={showMap}
+                    onMapToggle={() => setMapOpen((v) => !v)}
+                    activeFilterPills={activeFilterPills}
+                    onClearAll={resetFilters}
+                    resultCount={displayResultCount}
+                    loading={loading}
+                />
+
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+                    {/* 3. Horizontally Scrollable Area Chips with Real Listing Counts */}
+                    {areaChipsWithHref.length > 0 && (
+                        <nav
+                            aria-label="Popular areas"
+                            className="mb-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                        >
+                            {areaChipsWithHref.map((chip) => {
+                                const isCurrentArea =
+                                    searchQuery.trim().toLowerCase() === chip.name.toLowerCase() ||
+                                    locationFilter.trim().toLowerCase() === chip.name.toLowerCase() ||
+                                    location.pathname === chip.href;
+                                return (
+                                    <Link
+                                        key={`${chip.name}-${chip.href}`}
+                                        to={chip.href}
+                                        className={`min-h-[38px] px-3.5 py-1.5 rounded-full border text-xs sm:text-sm font-medium whitespace-nowrap inline-flex items-center gap-1.5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+                                            isCurrentArea
+                                                ? 'bg-pdp-ink text-white border-pdp-ink'
+                                                : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                                        }`}
+                                    >
+                                        <span>{chip.name}</span>
+                                        <span
+                                            className={`tabular-nums text-xs ${
+                                                isCurrentArea ? 'text-white/75' : 'text-pdp-muted'
+                                            }`}
+                                        >
+                                            {chip.count}
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </nav>
+                    )}
+
+                    {/* 4. Featured Highlight Card */}
+                    {!loading && propertyListOrdered.length > 0 && !hideChrome && activeFilterPills.length === 0 && (
                         <FeaturedPromoBanner properties={propertyListOrdered} />
                     )}
 
-                    {/* 5. Main Content Grid */}
+                    {/* 5. Results Heading */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                        <h2 className="text-xl sm:text-2xl font-semibold text-pdp-ink tracking-tight tabular-nums">
+                            {loading && propertyListOrdered.length === 0
+                                ? `Searching ${LISTING_TAB_LABEL[activeTabKey].toLowerCase()} in ${cityLabelDisplay}...`
+                                : formatResultHeading(displayResultCount, activeTabKey, cityLabelDisplay)}
+                        </h2>
+                        {loadingMore && (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-pdp-muted">
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                Loading more...
+                            </span>
+                        )}
+                    </div>
+
+                    {/* 6. Results Grid & States */}
                     {loading && propertyListOrdered.length === 0 ? (
                         <div
-                            className={`grid gap-6 md:gap-8 ${
-                                hideChrome
-                                    ? showMapPanel
-                                        ? 'md:grid-cols-2'
-                                        : 'md:grid-cols-2 xl:grid-cols-3'
-                                    : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                            }`}
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                             aria-busy="true"
-                            aria-label="Loading properties"
+                            aria-label="Loading listings"
                         >
-                            {Array.from({ length: 8 }).map((_, idx) => (
+                            {Array.from({ length: 6 }).map((_, idx) => (
                                 <div
                                     key={idx}
-                                    className="bg-white rounded-[24px] border border-gray-200 overflow-hidden flex flex-col animate-pulse"
+                                    className="bg-pdp-surface rounded-[var(--radius-pdp)] border border-pdp-border overflow-hidden flex flex-col animate-pulse"
                                 >
-                                    <div className="w-full aspect-[16/10] bg-slate-200" />
+                                    <div className="w-full aspect-[16/10] bg-pdp-bg" />
                                     <div className="p-5 flex flex-col gap-3">
-                                        <div className="h-3 w-24 bg-slate-200 rounded" />
-                                        <div className="h-5 w-3/4 bg-slate-200 rounded" />
-                                        <div className="h-3.5 w-1/2 bg-slate-100 rounded" />
+                                        <div className="h-3 w-16 bg-pdp-bg rounded" />
+                                        <div className="h-5 w-3/4 bg-pdp-bg rounded" />
+                                        <div className="h-4 w-1/2 bg-pdp-bg rounded" />
                                         <div className="flex gap-2 mt-1">
-                                            <div className="h-6 w-16 bg-slate-100 rounded-md" />
-                                            <div className="h-6 w-20 bg-slate-100 rounded-md" />
+                                            <div className="h-6 w-20 bg-pdp-bg rounded-lg" />
+                                            <div className="h-6 w-20 bg-pdp-bg rounded-lg" />
                                         </div>
-                                        <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between">
-                                            <div className="h-6 w-20 bg-slate-200 rounded" />
-                                            <div className="h-9 w-28 bg-slate-200 rounded-full" />
+                                        <div className="pt-3 mt-2 border-t border-pdp-border flex items-center justify-between">
+                                            <div className="h-6 w-24 bg-pdp-bg rounded" />
+                                            <div className="h-10 w-28 bg-pdp-bg rounded-[10px]" />
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : error ? (
-                        <div className="py-20">
+                        <div className="py-12">
                             <ErrorMessage message={error.message} detail={error.detail} onRetry={refetch} />
                         </div>
                     ) : (
-                        <div className="space-y-12">
-                            <div className={showMapPanel ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px] items-start' : ''}>
-                                {/* Grid */}
+                        <div className="space-y-10">
+                            <div
+                                className={
+                                    showMap
+                                        ? 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] items-start'
+                                        : ''
+                                }
+                            >
                                 <div
-                                    className={`grid gap-6 md:gap-8 ${
-                                        hideChrome
-                                            ? showMapPanel
-                                                ? 'md:grid-cols-2'
-                                                : 'md:grid-cols-2 xl:grid-cols-3'
-                                            : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                                    }`}
+                                    className={`grid grid-cols-1 ${
+                                        showMap ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'
+                                    } gap-6`}
                                 >
                                     {propertyListOrdered.length > 0 ? (
                                         propertyListOrdered.map((prop, idx) => {
                                             if (!prop || !prop.id) return null;
                                             return (
-                                                <div
-                                                    key={`${prop.id}-${idx}`}
-                                                    className="animate-card-in"
-                                                    style={{ animationDelay: `${Math.min(idx * 35, 280)}ms` }}
-                                                >
-                                                    <PropertyCard property={prop} />
+                                                <div key={`${prop.id}-${idx}`} className="h-full">
+                                                    <PropertyCard property={prop} priority={idx === 0} />
                                                 </div>
                                             );
                                         })
                                     ) : (
-                                        <div className="col-span-full space-y-12">
-                                            <div className="py-16 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
-                                                <div className="bg-brand-red/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ring-8 ring-brand-red/10">
-                                                    <Search className="w-10 h-10 text-brand-red" />
+                                        <div className="col-span-full space-y-8">
+                                            <div className="bg-pdp-surface rounded-[var(--radius-pdp)] border border-pdp-border p-8 md:p-12 text-center">
+                                                <div className="w-12 h-12 rounded-full bg-pdp-bg border border-pdp-border flex items-center justify-center mx-auto mb-4">
+                                                    <Search className="w-5 h-5 text-pdp-muted" />
                                                 </div>
-                                                <h3 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">No Exact Matches</h3>
-                                                <p className="text-slate-500 max-w-md mx-auto text-lg mb-8 leading-relaxed font-medium">
-                                                    {`We couldn't find listings matching ${emptyResultsSummary}, but there are great options nearby.`}
+                                                <h3 className="font-serif-display text-2xl sm:text-3xl font-normal text-pdp-ink mb-2">
+                                                    No matching listings right now
+                                                </h3>
+                                                <p className="text-sm sm:text-base text-pdp-muted max-w-lg mx-auto mb-6 leading-relaxed">
+                                                    No listings matched those exact filters in {cityLabelDisplay}. Clear a filter to broaden the results or ask our team on WhatsApp for upcoming availability.
                                                 </p>
-                                                <div className="flex flex-wrap items-center justify-center gap-4">
-                                                    <button 
-                                                        onClick={resetFilters} 
-                                                        className="px-6 py-3 bg-brand-red text-white font-bold rounded-xl shadow-glow hover:scale-[1.03] transition-all"
+                                                <div className="flex flex-wrap items-center justify-center gap-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={resetFilters}
+                                                        className="min-h-[44px] px-5 py-2.5 rounded-[10px] border border-pdp-border bg-pdp-bg hover:border-pdp-ink text-sm font-medium text-pdp-ink transition-colors cursor-pointer"
                                                     >
-                                                        Clear Filters
+                                                        Clear filters
                                                     </button>
-                                                    <button 
-                                                        onClick={() => setLocationFilter('all')} 
-                                                        className="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-all"
+                                                    <a
+                                                        href={emptyWhatsappHref}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-cta hover:bg-pdp-cta-hover text-white text-sm font-medium inline-flex items-center gap-2 transition-colors"
                                                     >
-                                                        Explore All {cityLabelDisplay}
-                                                    </button>
+                                                        <MessageCircle className="w-4 h-4" />
+                                                        Ask on WhatsApp
+                                                    </a>
                                                 </div>
                                             </div>
 
-                                            <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm">
-                                                <h4 className="text-xl font-bold text-slate-900 mb-6">Popular Locations in Bangalore</h4>
-                                                <div className="flex flex-wrap gap-3">
-                                                    {['Koramangala', 'HSR Layout', 'Indiranagar', 'Whitefield', 'Marathahalli', 'Bellandur', 'Electronic City'].map(loc => (
-                                                        <button 
-                                                            key={loc}
-                                                            onClick={() => { setLocationFilter(loc); window.scrollTo(0, 0); }}
-                                                            className="px-4 py-2 bg-slate-50 border border-slate-200 text-sm font-bold text-slate-700 rounded-xl hover:border-brand-red hover:text-brand-red transition-colors"
-                                                        >
-                                                            {loc}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                <div className="bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
-                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                                        <MapPin className="w-5 h-5 text-brand-red" /> 
-                                                        Nearby Properties
+                                            {areaChipsWithHref.length > 0 && (
+                                                <div className="bg-pdp-surface rounded-[var(--radius-pdp)] p-6 border border-pdp-border">
+                                                    <h4 className="text-base font-semibold text-pdp-ink mb-4">
+                                                        Browse active areas in Bangalore
                                                     </h4>
-                                                    <p className="text-sm text-slate-600 mb-4">Check out premium verified PGs and coliving spaces in adjacent localities with similar rent.</p>
-                                                    <Link to={`/pg/${apiCity}`} className="text-brand-red font-bold text-sm hover:underline flex items-center gap-1">
-                                                        View all in {cityLabelDisplay} <ArrowRight className="w-4 h-4" />
-                                                    </Link>
-                                                </div>
-                                                <div className="bg-slate-50 rounded-[2rem] p-8 border border-slate-100">
-                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                                        <Search className="w-5 h-5 text-brand-red" /> 
-                                                        Related Searches
-                                                    </h4>
-                                                    <div className="flex flex-col gap-2">
-                                                        <Link to="/pg-for-boys" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Boys PG in {cityLabelDisplay}</Link>
-                                                        <Link to="/pg-for-girls" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Girls PG in {cityLabelDisplay}</Link>
-                                                        <Link to="/pg-single-room" className="text-sm font-medium text-slate-600 hover:text-brand-red hover:underline">Single Room PG in {cityLabelDisplay}</Link>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {areaChipsWithHref.slice(0, 8).map((area) => (
+                                                            <Link
+                                                                key={area.name}
+                                                                to={area.href}
+                                                                className="min-h-[38px] px-3.5 py-1.5 rounded-full border border-pdp-border bg-pdp-bg text-xs sm:text-sm font-medium text-pdp-ink hover:border-pdp-ink inline-flex items-center gap-1.5"
+                                                            >
+                                                                <span>{area.name}</span>
+                                                                <span className="text-xs text-pdp-muted tabular-nums">{area.count}</span>
+                                                            </Link>
+                                                        ))}
                                                     </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
 
-                                {showMapPanel && (
-                                    <aside className="lg:sticky lg:top-28 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                                        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100">
-                                            <div className="min-w-0">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Map view</p>
-                                                <h2 className="text-sm font-bold text-slate-900 truncate">PGs around {cityLabelDisplay}</h2>
-                                            </div>
-                                            <MapPin className="w-4 h-4 text-brand-red shrink-0" aria-hidden />
+                                {showMap && (
+                                    <aside className="lg:sticky lg:top-36 rounded-[var(--radius-pdp)] border border-pdp-border bg-pdp-surface overflow-hidden">
+                                        <div className="px-4 py-3 border-b border-pdp-border">
+                                            <p className="text-xs text-pdp-muted">Map view</p>
+                                            <h3 className="text-sm font-semibold text-pdp-ink truncate">
+                                                {LISTING_TAB_LABEL[activeTabKey]} in {cityLabelDisplay}
+                                            </h3>
                                         </div>
-                                        <div className="aspect-[4/3] bg-slate-100">
+                                        <div className="aspect-[4/3] bg-pdp-bg">
                                             <iframe
-                                                title={`Map of PGs in ${cityLabelDisplay}`}
+                                                title={`Map of listings in ${cityLabelDisplay}`}
                                                 src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
                                                 className="h-full w-full border-0"
                                                 loading="lazy"
                                                 referrerPolicy="no-referrer-when-downgrade"
                                             />
                                         </div>
-                                        <div className="px-4 py-3 text-xs text-slate-500 leading-relaxed">
-                                            Use listing cards for verified photos, pricing, and availability. Map pins are a locality guide, not live inventory.
-                                        </div>
                                     </aside>
                                 )}
                             </div>
 
-                            {/* Load More Trigger */}
                             {hasMore && (
-                                <div className="pt-8 pb-12 flex flex-col items-center">
-                                    <div ref={setSentinelEl} className="h-10 w-full mb-8" aria-hidden />
-                                    <button 
-                                        onClick={() => void loadMore()} 
+                                <div className="pt-4 pb-8 flex flex-col items-center">
+                                    <div ref={setSentinelEl} className="h-6 w-full" aria-hidden />
+                                    <button
+                                        type="button"
+                                        onClick={() => void loadMore()}
                                         disabled={loadingMore}
-                                        className="group relative px-10 py-4 rounded-2xl bg-white border border-slate-200 text-sm font-bold text-slate-900 hover:border-brand-red transition-all shadow-sm overflow-hidden"
+                                        className="min-h-[44px] px-6 py-2.5 rounded-[10px] bg-pdp-surface border border-pdp-border text-sm font-medium text-pdp-ink hover:border-pdp-ink transition-colors inline-flex items-center gap-2 cursor-pointer"
                                     >
-                                        <span className="relative z-10 flex items-center gap-2">
-                                            {loadingMore ? 'Loading...' : 'Discover More Properties'}
-                                            {!loadingMore && <ChevronDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />}
-                                        </span>
+                                        <span>{loadingMore ? 'Loading more...' : 'Show more listings'}</span>
+                                        {!loadingMore && <ChevronDown className="w-4 h-4" />}
                                     </button>
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
-                
-                {/* Premium Trust Strip */}
-                <PremiumTrustStrip />
             </main>
 
             {!hideChrome && <Footer />}
 
-            {/* Floating Wishlist Button (Mobile focused) */}
+            {/* Floating Wishlist Shortcut */}
             {wishlist.length > 0 && (
-                <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm animate-slide-up">
-                        <Link 
-                            to="/wishlist"
-                            className="flex items-center justify-between p-4 bg-brand-charcoal text-white rounded-2xl shadow-2xl border border-white/10 backdrop-blur-md group"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="relative">
-                                    <div className="bg-brand-red p-2.5 rounded-xl shadow-glow group-hover:scale-110 transition-transform">
-                                        <Heart className="w-5 h-5 fill-white" />
-                                    </div>
-                                    <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-brand-red text-[10px] font-black rounded-full flex items-center justify-center shadow-md">
-                                        {wishlist.length}
-                                    </span>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-bold">Your Selection</p>
-                                    <p className="text-[11px] text-slate-400">View saved properties</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-xl text-xs font-bold group-hover:bg-brand-red transition-colors">
-                                View Wishlist
-                                <ArrowRight className="w-3 h-3" />
-                            </div>
-                        </Link>
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm">
+                    <Link
+                        to="/wishlist"
+                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-[#14161A] text-white rounded-[var(--radius-pdp)] shadow-xl border border-white/15"
+                    >
+                        <div className="flex items-center gap-3">
+                            <Heart className="w-4 h-4 fill-pdp-cta text-pdp-cta shrink-0" />
+                            <span className="text-sm font-medium tabular-nums">
+                                {wishlist.length} saved {wishlist.length === 1 ? 'listing' : 'listings'}
+                            </span>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-white/90">
+                            View wishlist
+                            <ArrowRight className="w-3.5 h-3.5" />
+                        </span>
+                    </Link>
                 </div>
             )}
         </div>
