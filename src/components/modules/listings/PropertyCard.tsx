@@ -189,7 +189,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                         {/* Top Left Badge (availability or API badge only) */}
                         <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pr-14">
                             {!isAvailable ? (
-                                <span className="px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+                                <span className="px-2.5 py-1 bg-red-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
                                     Fully booked
                                 </span>
                             ) : property.listing_badge ? (
@@ -204,7 +204,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                             type="button"
                             aria-label={wishlisted ? `Remove ${displayTitle} from wishlist` : `Save ${displayTitle} to wishlist`}
                             onClick={handleHeartClick}
-                            className="absolute top-2.5 right-2.5 z-10 w-11 h-11 rounded-full bg-white/95 border border-line flex items-center justify-center transition-colors hover:bg-blush-100 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                            className="absolute top-2.5 right-2.5 z-10 w-11 h-11 rounded-full bg-white/95 border border-line flex items-center justify-center transition-colors hover:bg-blush-100 cursor-pointer"
                         >
                             <Heart
                                 className={`w-4 h-4 transition-colors ${
@@ -217,16 +217,16 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                         {(hasRealRating || hasVideoTour) && (
                             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-2">
                                 {hasRealRating ? (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white tabular-nums">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white tabular-nums">
                                         <Star className="w-3.5 h-3.5 fill-champagne text-champagne" />
                                         <span>{ratingVal.toFixed(1)}</span>
-                                        <span className="text-blush-muted">({reviewCount})</span>
+                                        <span className="text-red-subtitle">({reviewCount})</span>
                                     </span>
                                 ) : (
                                     <span />
                                 )}
                                 {hasVideoTour && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-oxblood-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-900/90 backdrop-blur-sm rounded-full text-xs font-medium text-white">
                                         <Video className="w-3.5 h-3.5" /> Video tour
                                     </span>
                                 )}

@@ -94,7 +94,7 @@ export default function PGBangaloreHub() {
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
                 {/* ── Hero Header ── */}
-                <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                <header className="bg-brand-band">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-14 md:pb-16">
                         <BreadcrumbNav
                             items={[
@@ -108,7 +108,7 @@ export default function PGBangaloreHub() {
                                 PGs in Bangalore
                             </h1>
                             <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                            <p className="text-blush-muted text-base md:text-lg leading-relaxed max-w-2xl">
+                            <p className="text-red-subtitle text-base md:text-lg leading-relaxed max-w-2xl">
                                 PGs and coliving homes across Bangalore, with price and last-verified date on every card.
                             </p>
                         </div>

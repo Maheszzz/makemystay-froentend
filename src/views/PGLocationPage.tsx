@@ -89,7 +89,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
         <Navbar />
         <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
           {/* Hero Banner */}
-          <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+          <header className="bg-brand-band">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
               <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
               <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -98,7 +98,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
                     {localitySeoProfile.hero.heading}
                   </h1>
                   <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                  <p className="text-blush-muted text-base leading-relaxed">
+                  <p className="text-red-subtitle text-base leading-relaxed">
                     {localitySeoProfile.hero.subHeading}
                   </p>
                 </div>
@@ -208,7 +208,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       <Navbar />
       <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
         {/* Hero Banner */}
-        <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+        <header className="bg-brand-band">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
             <BreadcrumbNav items={breadcrumbItems} />
             <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -217,7 +217,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
                   PGs in {name}
                 </h1>
                 <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                <p className="text-blush-muted text-base leading-relaxed">
+                <p className="text-red-subtitle text-base leading-relaxed">
                   PGs and coliving stays in {name}, with price and last-verified date on every card.
                 </p>
                 <div className="mt-5 max-w-2xl">

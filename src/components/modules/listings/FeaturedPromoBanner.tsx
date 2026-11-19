@@ -152,8 +152,8 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
 
     return (
         <section aria-label="Featured listing" className="mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] overflow-hidden rounded-[var(--radius-pdp)] border border-line bg-oxblood-900">
-                {/* Left 40% Oxblood Panel */}
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] overflow-hidden rounded-[var(--radius-pdp)] border border-line bg-red-900">
+                {/* Left 40% Deep Red Panel */}
                 <div className="p-6 sm:p-7 md:p-8 flex flex-col justify-between gap-5 border-b md:border-b-0 md:border-r border-champagne/30">
                     <div>
                         <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -164,10 +164,10 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 </span>
                             )}
                             {activeSlide.ratingSummary.showRating && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-oxblood-700 border border-champagne/35 text-white text-xs font-medium tabular-nums">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-800 border border-champagne/35 text-white text-xs font-medium tabular-nums">
                                     <Star className="w-3.5 h-3.5 text-champagne fill-champagne shrink-0" />
                                     <span>{activeSlide.ratingSummary.rating.toFixed(1)}</span>
-                                    <span className="text-blush-muted">
+                                    <span className="text-red-subtitle">
                                         ({activeSlide.ratingSummary.reviewCount})
                                     </span>
                                 </span>
@@ -180,13 +180,13 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
 
                         <div aria-hidden="true" className="w-10 h-[1px] bg-champagne my-3" />
 
-                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-blush-muted">
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-red-subtitle">
                             <span className="inline-flex items-center gap-1.5">
                                 <MapPin className="w-3.5 h-3.5 text-champagne shrink-0" />
                                 <span>{activeSlide.location}</span>
                             </span>
                             {activeSlide.facts.map((fact) => (
-                                <span key={fact} className="inline-flex items-center gap-2 text-xs text-blush-muted">
+                                <span key={fact} className="inline-flex items-center gap-2 text-xs text-red-subtitle">
                                     <span aria-hidden="true" className="text-champagne">·</span>
                                     <span>{fact}</span>
                                 </span>
@@ -196,7 +196,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
 
                     <div className="pt-4 border-t border-champagne/25 space-y-4">
                         <div>
-                            <p className="text-xs text-blush-muted mb-0.5">
+                            <p className="text-xs text-red-subtitle mb-0.5">
                                 {activeSlide.isMonthly ? 'Starting from' : 'Listed price'}
                             </p>
                             <p className="font-serif-display text-2xl font-normal text-white tracking-tight tabular-nums">
@@ -228,7 +228,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                 </div>
 
                 {/* Right 60% Unobstructed Photo + Carousel Controls */}
-                <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[300px] bg-oxblood-700 overflow-hidden">
+                <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[300px] bg-red-800 overflow-hidden">
                     <img
                         src={activeSlide.image}
                         alt={`${activeSlide.title} in ${activeSlide.location}`}
@@ -241,7 +241,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 type="button"
                                 onClick={handlePrev}
                                 aria-label="Previous highlighted listing"
-                                className="w-10 h-10 rounded-full bg-oxblood-900/85 hover:bg-oxblood-900 border border-white/30 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 cursor-pointer"
+                                className="w-10 h-10 rounded-full bg-red-900/85 hover:bg-red-900 border border-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -249,7 +249,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 type="button"
                                 onClick={handleNext}
                                 aria-label="Next highlighted listing"
-                                className="w-10 h-10 rounded-full bg-oxblood-900/85 hover:bg-oxblood-900 border border-white/30 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2 cursor-pointer"
+                                className="w-10 h-10 rounded-full bg-red-900/85 hover:bg-red-900 border border-white/30 text-white flex items-center justify-center transition-colors cursor-pointer"
                             >
                                 <ChevronRight className="w-4 h-4" />
                             </button>

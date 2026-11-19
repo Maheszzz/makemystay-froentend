@@ -73,7 +73,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                <header className="bg-brand-band">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 md:pt-9 pb-14 md:pb-16">
                         <BreadcrumbNav
                             items={[
@@ -88,7 +88,7 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
                                     Flats for rent in {name}
                                 </h1>
                                 <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                                <p className="text-blush-muted text-base leading-relaxed">
+                                <p className="text-red-subtitle text-base leading-relaxed">
                                     Flats and independent homes for rent in {name}, with price and last-verified date on every card.
                                 </p>
                             </div>

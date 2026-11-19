@@ -865,9 +865,9 @@ function PropertiesInner({
             {!hideChrome && <Navbar />}
 
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
-                {/* 1. Oxblood-900 to Oxblood-700 Luxury Header Band with 48px Champagne Hairline & Blush Count Pill */}
+                {/* 1. Brand Gradient + Street-Map Line Pattern Header Band */}
                 {!hideChrome && (
-                    <header className="bg-gradient-to-b from-oxblood-900 to-oxblood-700">
+                    <header className="bg-brand-band">
                         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-11 pb-14 md:pb-16">
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                                 <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-white tracking-[-0.015em] leading-[1.08]">
@@ -880,7 +880,7 @@ function PropertiesInner({
                                 )}
                             </div>
                             <div aria-hidden="true" className="w-12 h-[1px] bg-champagne my-3.5" />
-                            <p className="text-base text-blush-muted max-w-2xl leading-relaxed">
+                            <p className="text-base text-red-subtitle max-w-2xl leading-relaxed">
                                 {resolvedSubtitle}
                             </p>
                         </div>
@@ -1142,7 +1142,7 @@ function PropertiesInner({
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm">
                     <Link
                         to="/wishlist"
-                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-oxblood-900 text-white rounded-[var(--radius-pdp)] shadow-sm border border-champagne/35"
+                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-red-900 text-white rounded-[var(--radius-pdp)] shadow-sm border border-champagne/35"
                     >
                         <div className="flex items-center gap-3">
                             <Heart className="w-4 h-4 fill-red text-red shrink-0" />
