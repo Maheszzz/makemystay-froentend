@@ -66,14 +66,14 @@ export default function RentLocationPage({ overrideSlug }: { overrideSlug?: stri
     const [] = useState(false);
 
     return (
-        <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
+        <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="rent-location-ld-json" />
             {itemListLd ? <JsonLd data={itemListLd} id="rent-location-itemlist-ld-json" /> : null}
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-pdp-surface border-b border-pdp-border">
+                <header className="bg-sage-100 border-b border-line">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
                         <BreadcrumbNav
                             items={[

@@ -856,7 +856,7 @@ function PropertiesInner({
     const budgetPresets = useMemo(() => getBudgetPresetsForCategory(activeTabKey), [activeTabKey]);
 
     return (
-        <div className="bg-pdp-bg min-h-screen text-pdp-ink font-sans flex flex-col overflow-x-clip">
+        <div className="bg-sage-50 min-h-screen text-ink font-sans flex flex-col overflow-x-clip">
             <Suspense fallback={null}>
                 <PropertiesUrlSync onSync={handleUrlSync} />
             </Suspense>
@@ -865,24 +865,24 @@ function PropertiesInner({
             {!hideChrome && <Navbar />}
 
             <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
-                {/* 1. Slim Left-Aligned Editorial Header (Standalone listing pages) */}
+                {/* 1. Slim Left-Aligned Editorial Header (flat sage-100 band matching filter bar) */}
                 {!hideChrome && (
-                    <header className="bg-pdp-surface border-b border-pdp-border">
+                    <header className="bg-sage-100 border-b border-line">
                         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
                             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
-                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-pdp-ink tracking-[-0.015em] leading-[1.08]">
+                                <h1 className="font-serif-display text-[40px] md:text-[48px] font-normal text-ink tracking-[-0.015em] leading-[1.08]">
                                     {resolvedTitle}
                                 </h1>
                                 {!loading && (
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-pdp-bg border border-pdp-border text-sm font-medium text-pdp-muted tabular-nums">
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white border border-line text-sm font-semibold text-pine-700 tabular-nums">
                                         {displayResultCount.toLocaleString('en-IN')}
                                     </span>
                                 )}
                             </div>
-                            <p className="mt-2.5 text-base text-pdp-muted max-w-2xl leading-relaxed">
+                            <p className="mt-2.5 text-base text-slate max-w-2xl leading-relaxed">
                                 {resolvedSubtitle}
                             </p>
-                            <p className="mt-2 text-xs text-pdp-muted">
+                            <p className="mt-2 text-xs text-slate">
                                 Cards display current availability and the last-verified date when recorded.
                             </p>
                         </div>
@@ -948,16 +948,16 @@ function PropertiesInner({
                                     <Link
                                         key={`${chip.name}-${chip.href}`}
                                         to={chip.href}
-                                        className={`min-h-[38px] px-3.5 py-1.5 rounded-full border text-xs sm:text-sm font-medium whitespace-nowrap inline-flex items-center gap-1.5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+                                        className={`min-h-[38px] px-3.5 py-1.5 rounded-full border text-xs sm:text-sm whitespace-nowrap inline-flex items-center gap-1.5 transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
                                             isCurrentArea
-                                                ? 'bg-pdp-ink text-white border-pdp-ink'
-                                                : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                                                ? 'bg-pine-900 text-white border-pine-900 font-semibold'
+                                                : 'bg-white text-ink border-line font-medium hover:bg-sage-100 hover:border-pine-700/50'
                                         }`}
                                     >
                                         <span>{chip.name}</span>
                                         <span
                                             className={`tabular-nums text-xs ${
-                                                isCurrentArea ? 'text-white/75' : 'text-pdp-muted'
+                                                isCurrentArea ? 'text-pine-muted' : 'text-slate'
                                             }`}
                                         >
                                             {chip.count}
@@ -1146,15 +1146,15 @@ function PropertiesInner({
                 <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-sm">
                     <Link
                         to="/wishlist"
-                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-[#14161A] text-white rounded-[var(--radius-pdp)] shadow-xl border border-white/15"
+                        className="min-h-[52px] flex items-center justify-between px-4 py-3 bg-pine-900 text-white rounded-[var(--radius-pdp)] shadow-sm border border-pine-700"
                     >
                         <div className="flex items-center gap-3">
-                            <Heart className="w-4 h-4 fill-pdp-cta text-pdp-cta shrink-0" />
+                            <Heart className="w-4 h-4 fill-red text-red shrink-0" />
                             <span className="text-sm font-medium tabular-nums">
                                 {wishlist.length} saved {wishlist.length === 1 ? 'listing' : 'listings'}
                             </span>
                         </div>
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-white/90">
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-sage-100">
                             View wishlist
                             <ArrowRight className="w-3.5 h-3.5" />
                         </span>

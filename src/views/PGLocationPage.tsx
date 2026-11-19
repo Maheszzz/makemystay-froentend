@@ -82,14 +82,14 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     const isEmptyLocality = initialProperties.length === 0;
 
     return (
-      <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
+      <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
         <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
         <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
 
         <Navbar />
         <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
           {/* Hero Banner */}
-          <header className="bg-pdp-surface border-b border-pdp-border">
+          <header className="bg-sage-100 border-b border-line">
             <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
               <BreadcrumbNav items={localitySeoProfile.breadcrumb} />
               <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -198,7 +198,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   const pageSubtitle = `Verified paying guest stays in ${name} — filter by budget, food plan, and room type.`;
 
   return (
-    <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
+    <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
       <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
       <JsonLd data={combinedLd} id="pg-location-ld" />
       <BreadcrumbSchema items={breadcrumbItems} />
@@ -210,7 +210,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       <Navbar />
       <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
         {/* Hero Banner */}
-        <header className="bg-pdp-surface border-b border-pdp-border">
+        <header className="bg-sage-100 border-b border-line">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-7 md:py-9">
             <BreadcrumbNav items={breadcrumbItems} />
             <div className="mt-4 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">

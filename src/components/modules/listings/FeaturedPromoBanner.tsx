@@ -152,32 +152,32 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
 
     return (
         <section aria-label="Featured listing" className="mb-8">
-            <div className="relative overflow-hidden rounded-[var(--radius-pdp)] border border-pdp-border bg-[#14161A] min-h-[288px] md:h-[304px] group">
+            <div className="relative overflow-hidden rounded-[var(--radius-pdp)] border border-line bg-pine-900 min-h-[288px] md:h-[304px] group">
                 <img
                     src={activeSlide.image}
                     alt={`${activeSlide.title} in ${activeSlide.location}`}
                     className="absolute inset-0 w-full h-full object-cover"
                 />
-                {/* Scrim stays behind text column so the right side photo stays clearly visible */}
+                {/* Scrim stays behind text column using pine-900 tint so the photo remains visible */}
                 <div
                     aria-hidden="true"
-                    className="absolute inset-0 bg-gradient-to-t from-[#14161A]/95 via-[#14161A]/80 via-60% to-[#14161A]/20 md:bg-gradient-to-r md:from-[#14161A]/95 md:via-[#14161A]/75 md:via-52% md:to-transparent"
+                    className="absolute inset-0 bg-gradient-to-t from-pine-900/92 via-pine-900/75 via-60% to-pine-900/15 md:bg-gradient-to-r md:from-pine-900/90 md:via-pine-900/75 md:via-52% md:to-transparent"
                 />
 
                 <div className="relative z-10 h-full min-h-[288px] md:min-h-[304px] px-5 py-6 sm:px-8 md:px-10 max-w-2xl flex flex-col justify-between gap-4">
                     <div>
                         <div className="flex flex-wrap items-center gap-2 mb-3">
                             {activeSlide.badgeLabel && (
-                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-medium">
-                                    <Check className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brass text-ink text-xs font-semibold">
+                                    <Check className="w-3.5 h-3.5 text-ink shrink-0" />
                                     {activeSlide.badgeLabel}
                                 </span>
                             )}
                             {activeSlide.ratingSummary.showRating && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 text-white text-xs font-medium tabular-nums">
-                                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-pine-900/80 backdrop-blur-sm border border-sage-100/20 text-white text-xs font-medium tabular-nums">
+                                    <Star className="w-3.5 h-3.5 text-brass fill-brass shrink-0" />
                                     <span>{activeSlide.ratingSummary.rating.toFixed(1)}</span>
-                                    <span className="text-white/75">
+                                    <span className="text-pine-muted">
                                         ({activeSlide.ratingSummary.reviewCount})
                                     </span>
                                 </span>
@@ -188,23 +188,23 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             {activeSlide.title}
                         </h2>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/85">
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-sage-100">
                             <span className="inline-flex items-center gap-1.5">
-                                <MapPin className="w-3.5 h-3.5 text-white/70 shrink-0" />
+                                <MapPin className="w-3.5 h-3.5 text-pine-muted shrink-0" />
                                 <span>{activeSlide.location}</span>
                             </span>
                             {activeSlide.facts.map((fact) => (
-                                <span key={fact} className="inline-flex items-center gap-2 text-xs text-white/80">
-                                    <span aria-hidden="true" className="text-white/40">·</span>
+                                <span key={fact} className="inline-flex items-center gap-2 text-xs text-pine-muted">
+                                    <span aria-hidden="true" className="text-sage-100/40">·</span>
                                     <span>{fact}</span>
                                 </span>
                             ))}
                         </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-3 border-t border-white/15">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-3 border-t border-sage-100/15">
                         <div>
-                            <p className="text-xs text-white/75 mb-0.5">
+                            <p className="text-xs text-pine-muted mb-0.5">
                                 {activeSlide.isMonthly ? 'Starting from' : 'Listed price'}
                             </p>
                             <p className="text-xl sm:text-2xl font-semibold text-white tracking-tight tabular-nums">
@@ -215,7 +215,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                         <div className="flex items-center gap-2.5">
                             <Link
                                 to={activeSlide.detailPath}
-                                className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-pdp-cta hover:bg-pdp-cta-hover text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                className="min-h-[44px] px-5 py-2.5 rounded-[10px] bg-red hover:bg-red-hover text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                             >
                                 <span>View details</span>
                                 <ArrowRight className="w-4 h-4 shrink-0" />
@@ -226,7 +226,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 aria-label={`Chat on WhatsApp about ${activeSlide.title}`}
-                                className="min-h-[44px] px-4 py-2.5 rounded-[10px] bg-white/10 hover:bg-white/20 border border-white/25 text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                                className="min-h-[44px] px-4 py-2.5 rounded-[10px] bg-pine-700/60 hover:bg-pine-700 border border-sage-100/30 text-white text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                             >
                                 <MessageCircle className="w-4 h-4 shrink-0" />
                                 <span>WhatsApp</span>
@@ -241,7 +241,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             type="button"
                             onClick={handlePrev}
                             aria-label="Previous highlighted listing"
-                            className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/75 border border-white/20 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                            className="w-10 h-10 rounded-full bg-pine-900/80 hover:bg-pine-900 border border-sage-100/25 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                         >
                             <ChevronLeft className="w-4 h-4" />
                         </button>
@@ -249,7 +249,7 @@ export function FeaturedPromoBanner({ properties = [], launchProperty }: Feature
                             type="button"
                             onClick={handleNext}
                             aria-label="Next highlighted listing"
-                            className="w-10 h-10 rounded-full bg-black/50 hover:bg-black/75 border border-white/20 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                            className="w-10 h-10 rounded-full bg-pine-900/80 hover:bg-pine-900 border border-sage-100/25 text-white flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                         >
                             <ChevronRight className="w-4 h-4" />
                         </button>

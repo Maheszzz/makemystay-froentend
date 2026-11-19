@@ -56,13 +56,13 @@ export default function RentBangaloreHub() {
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Bangalore');
 
     return (
-        <div className="min-h-screen bg-pdp-bg text-pdp-ink font-sans flex flex-col">
+        <div className="min-h-screen bg-sage-50 text-ink font-sans flex flex-col">
             <SEOHead {...helmet} />
             <JsonLd data={combinedLd} id="rent-bangalore-hub-ld-json" />
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
-                <header className="bg-pdp-surface border-b border-pdp-border">
+                <header className="bg-sage-100 border-b border-line">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
                         <BreadcrumbNav
                             items={[

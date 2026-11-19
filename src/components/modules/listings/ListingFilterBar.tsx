@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, MapPin, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Check, ChevronDown, MapPin, Search, SlidersHorizontal, X } from 'lucide-react';
 import {
     LISTING_CATEGORY_KEYS,
     LISTING_TAB_LABEL,
@@ -134,17 +134,17 @@ export function ListingFilterBar({
     const isBudgetActive = Boolean(minPrice || maxPrice);
 
     const chipClass = (active: boolean) =>
-        `min-h-[38px] lg:min-h-[36px] px-3 py-1.5 rounded-full text-xs font-medium border transition-colors inline-flex items-center gap-1.5 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+        `min-h-[38px] lg:min-h-[36px] px-3 py-1.5 rounded-full text-xs border transition-colors inline-flex items-center gap-1.5 shrink-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
             active
-                ? 'bg-pdp-ink text-white border-pdp-ink'
-                : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                ? 'bg-sage-100 text-pine-700 border-pine-700 font-semibold'
+                : 'bg-white text-ink border-line font-medium hover:bg-sage-100 hover:border-pine-700/50'
         }`;
 
     const drawerChipClass = (active: boolean) =>
-        `min-h-[44px] px-4 py-2 rounded-[10px] text-sm font-medium border transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+        `min-h-[44px] px-4 py-2 rounded-[10px] text-sm border transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
             active
-                ? 'bg-pdp-ink text-white border-pdp-ink'
-                : 'bg-pdp-bg text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                ? 'bg-sage-100 text-pine-700 border-pine-700 font-semibold'
+                : 'bg-sage-50 text-ink border-line font-medium hover:bg-sage-100'
         }`;
 
     const showPgChips = activeTabKey === 'pg';
@@ -156,17 +156,21 @@ export function ListingFilterBar({
         return (
             <>
                 {showPgChips &&
-                    availableOptions.pgGenders.map((g) => (
-                        <button
-                            key={`gender-${g}`}
-                            type="button"
-                            aria-pressed={genderFilter === g}
-                            onClick={() => onGenderToggle(g)}
-                            className={cls(genderFilter === g)}
-                        >
-                            {g === 'male' ? 'Boys' : 'Girls'}
-                        </button>
-                    ))}
+                    availableOptions.pgGenders.map((g) => {
+                        const active = genderFilter === g;
+                        return (
+                            <button
+                                key={`gender-${g}`}
+                                type="button"
+                                aria-pressed={active}
+                                onClick={() => onGenderToggle(g)}
+                                className={cls(active)}
+                            >
+                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                <span>{g === 'male' ? 'Boys' : 'Girls'}</span>
+                            </button>
+                        );
+                    })}
 
                 {showPgChips &&
                     availableOptions.pgSharing.map((s) => {
@@ -179,7 +183,8 @@ export function ListingFilterBar({
                                 onClick={() => onSharingToggle(s)}
                                 className={cls(active)}
                             >
-                                {s} sharing
+                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                <span>{s} sharing</span>
                             </button>
                         );
                     })}
@@ -191,7 +196,8 @@ export function ListingFilterBar({
                         onClick={onFoodToggle}
                         className={cls(foodOn)}
                     >
-                        Meals included
+                        {foodOn && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                        <span>Meals included</span>
                     </button>
                 )}
 
@@ -206,7 +212,8 @@ export function ListingFilterBar({
                                 onClick={() => onTypeFilterChange(active ? 'all' : t)}
                                 className={cls(active)}
                             >
-                                {t}
+                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                <span>{t}</span>
                             </button>
                         );
                     })}
@@ -222,7 +229,8 @@ export function ListingFilterBar({
                                 onClick={() => onFurnishingToggle(opt.value)}
                                 className={cls(active)}
                             >
-                                {opt.label}
+                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                <span>{opt.label}</span>
                             </button>
                         );
                     })}
@@ -238,7 +246,8 @@ export function ListingFilterBar({
                                 onClick={() => onPlotSizeToggle(b.id)}
                                 className={cls(active)}
                             >
-                                {b.label}
+                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                <span>{b.label}</span>
                             </button>
                         );
                     })}
@@ -250,28 +259,28 @@ export function ListingFilterBar({
 
     return (
         <>
-            <div className="sticky top-[52px] md:top-[56px] z-30 bg-pdp-surface/95 backdrop-blur-md border-b border-pdp-border">
+            <div className="sticky top-[52px] md:top-[56px] z-30 bg-sage-100 border-b border-line">
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
                     {/* Primary Row: Area Search + Category Switch + Mobile Filters + Right Sort */}
                     <div className="flex flex-col lg:flex-row lg:items-center gap-2.5">
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1 min-w-0">
                             {/* Area Search */}
                             <div className="relative sm:w-56 md:w-64 shrink-0">
-                                <Search className="w-4 h-4 text-pdp-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                <Search className="w-4 h-4 text-slate absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                 <input
                                     type="search"
                                     value={searchQuery}
                                     onChange={(e) => onSearchChange(e.target.value)}
                                     placeholder="Search area or property..."
                                     aria-label="Search area or property"
-                                    className="w-full h-11 pl-10 pr-9 rounded-[10px] border border-pdp-border bg-pdp-bg text-sm text-pdp-ink placeholder:text-pdp-muted focus:outline-none focus:bg-pdp-surface focus:border-pdp-ink transition-colors"
+                                    className="w-full h-11 pl-10 pr-9 rounded-[10px] border border-line bg-white text-sm text-ink placeholder:text-slate focus:outline-none focus:border-pine-700 transition-colors"
                                 />
                                 {searchQuery && (
                                     <button
                                         type="button"
                                         onClick={() => onSearchChange('')}
                                         aria-label="Clear search"
-                                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-pdp-muted hover:text-pdp-ink"
+                                        className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-slate hover:text-ink"
                                     >
                                         <X className="w-3.5 h-3.5" />
                                     </button>
@@ -282,7 +291,7 @@ export function ListingFilterBar({
                             <div
                                 role="navigation"
                                 aria-label="Property categories"
-                                className="flex items-center gap-1 p-1 rounded-[10px] bg-pdp-bg border border-pdp-border overflow-x-auto no-scrollbar"
+                                className="flex items-center gap-1 p-1 rounded-[10px] bg-white border border-line overflow-x-auto no-scrollbar"
                             >
                                 {LISTING_CATEGORY_KEYS.map((cat) => {
                                     const isActive = activeTabKey === cat;
@@ -293,15 +302,19 @@ export function ListingFilterBar({
                                             type="button"
                                             aria-current={isActive ? 'page' : undefined}
                                             onClick={() => onSelectCategory(cat)}
-                                            className={`min-h-[36px] px-3 py-1.5 rounded-[7px] text-xs sm:text-sm font-medium whitespace-nowrap transition-colors inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+                                            className={`min-h-[36px] px-3 py-1.5 rounded-[7px] text-xs sm:text-sm whitespace-nowrap transition-colors inline-flex items-center gap-1.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
                                                 isActive
-                                                    ? 'bg-pdp-surface text-pdp-ink shadow-xs border border-pdp-border/60'
-                                                    : 'text-pdp-muted hover:text-pdp-ink'
+                                                    ? 'bg-pine-900 text-white font-semibold'
+                                                    : 'text-ink font-medium hover:bg-sage-100'
                                             }`}
                                         >
                                             <span>{LISTING_TAB_LABEL[cat]}</span>
                                             {typeof count === 'number' && (
-                                                <span className="text-[11px] text-pdp-muted tabular-nums">
+                                                <span
+                                                    className={`text-[11px] tabular-nums ${
+                                                        isActive ? 'text-pine-muted' : 'text-slate'
+                                                    }`}
+                                                >
                                                     {count}
                                                 </span>
                                             )}
@@ -316,12 +329,12 @@ export function ListingFilterBar({
                             <button
                                 type="button"
                                 onClick={() => setMobileDrawerOpen(true)}
-                                className="lg:hidden min-h-[44px] px-4 rounded-[10px] border border-pdp-border bg-pdp-surface text-sm font-medium text-pdp-ink inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink"
+                                className="lg:hidden min-h-[44px] px-4 rounded-[10px] border border-line bg-white text-sm font-medium text-ink hover:bg-sage-100 inline-flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2"
                             >
-                                <SlidersHorizontal className="w-4 h-4 text-pdp-muted" />
+                                <SlidersHorizontal className="w-4 h-4 text-pine-700" />
                                 <span>Filters</span>
                                 {mobileActiveCount > 0 && (
-                                    <span className="px-1.5 py-0.5 rounded-full bg-pdp-ink text-white text-[11px] tabular-nums leading-none">
+                                    <span className="px-1.5 py-0.5 rounded-full bg-pine-900 text-white text-[11px] font-semibold tabular-nums leading-none">
                                         {mobileActiveCount}
                                     </span>
                                 )}
@@ -329,7 +342,7 @@ export function ListingFilterBar({
 
                             <div className="flex items-center gap-2.5 ml-auto">
                                 {!loading && (
-                                    <span className="hidden xl:inline text-xs text-pdp-muted tabular-nums whitespace-nowrap">
+                                    <span className="hidden xl:inline text-xs text-slate tabular-nums whitespace-nowrap">
                                         {resultCount} {resultCount === 1 ? 'result' : 'results'}
                                     </span>
                                 )}
@@ -339,10 +352,10 @@ export function ListingFilterBar({
                                         type="button"
                                         aria-pressed={showMapPanel}
                                         onClick={onMapToggle}
-                                        className={`min-h-[44px] lg:min-h-[40px] px-3.5 rounded-[10px] border text-sm font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pdp-ink ${
+                                        className={`min-h-[44px] lg:min-h-[40px] px-3.5 rounded-[10px] border text-sm inline-flex items-center gap-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-700 focus-visible:ring-offset-2 ${
                                             showMapPanel
-                                                ? 'bg-pdp-ink text-white border-pdp-ink'
-                                                : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                                                ? 'bg-pine-900 text-white border-pine-900 font-semibold'
+                                                : 'bg-white text-ink border-line font-medium hover:bg-sage-100 hover:border-pine-700'
                                         }`}
                                     >
                                         <MapPin className="w-3.5 h-3.5" />
@@ -355,20 +368,20 @@ export function ListingFilterBar({
                                         value={sortBy}
                                         onChange={(e) => onSortChange(e.target.value)}
                                         aria-label="Sort results"
-                                        className="min-h-[44px] lg:min-h-[40px] appearance-none pl-3.5 pr-9 rounded-[10px] border border-pdp-border bg-pdp-surface text-sm font-medium text-pdp-ink focus:outline-none focus:border-pdp-ink cursor-pointer"
+                                        className="min-h-[44px] lg:min-h-[40px] appearance-none pl-3.5 pr-9 rounded-[10px] border border-line bg-white text-sm font-medium text-ink focus:outline-none focus:border-pine-700 cursor-pointer"
                                     >
                                         <option value="newest">Sort: Newest</option>
                                         <option value="price_asc">Price: low to high</option>
                                         <option value="price_desc">Price: high to low</option>
                                     </select>
-                                    <ChevronDown className="w-4 h-4 text-pdp-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                    <ChevronDown className="w-4 h-4 text-slate absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Desktop Secondary Row: Area Select + Budget Popover + Real Data Type Chips */}
-                    <div className="hidden lg:flex flex-wrap items-center gap-2 mt-2.5 pt-2.5 border-t border-pdp-border/70">
+                    <div className="hidden lg:flex flex-wrap items-center gap-2 mt-2.5 pt-2.5 border-t border-line">
                         {/* Area Select */}
                         <div className="relative">
                             <select
@@ -379,10 +392,10 @@ export function ListingFilterBar({
                                 }
                                 onChange={(e) => onLocationFilterChange(e.target.value)}
                                 aria-label="Filter by area"
-                                className={`min-h-[36px] appearance-none pl-3 pr-8 rounded-full border text-xs font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-pdp-ink ${
+                                className={`min-h-[36px] appearance-none pl-3 pr-8 rounded-full border text-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-pine-700 focus:ring-offset-2 ${
                                     locationFilter !== 'all' && locationFilter.toLowerCase() !== defaultCityLabel.toLowerCase()
-                                        ? 'bg-pdp-ink text-white border-pdp-ink'
-                                        : 'bg-pdp-surface text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                                        ? 'bg-sage-100 text-pine-700 border-pine-700 font-semibold'
+                                        : 'bg-white text-ink border-line font-medium hover:bg-sage-100 hover:border-pine-700/50'
                                 }`}
                             >
                                 <option value="all">All of {defaultCityLabel}</option>
@@ -395,8 +408,8 @@ export function ListingFilterBar({
                             <ChevronDown
                                 className={`w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${
                                     locationFilter !== 'all' && locationFilter.toLowerCase() !== defaultCityLabel.toLowerCase()
-                                        ? 'text-white/80'
-                                        : 'text-pdp-muted'
+                                        ? 'text-pine-700'
+                                        : 'text-slate'
                                 }`}
                             />
                         </div>
@@ -409,13 +422,14 @@ export function ListingFilterBar({
                                 onClick={() => setBudgetOpen((v) => !v)}
                                 className={chipClass(isBudgetActive)}
                             >
+                                {isBudgetActive && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
                                 <span>{budgetSummaryLabel}</span>
                                 <ChevronDown className="w-3.5 h-3.5 opacity-75" />
                             </button>
 
                             {budgetOpen && (
-                                <div className="absolute left-0 top-full mt-2 w-72 rounded-[var(--radius-pdp)] border border-pdp-border bg-pdp-surface shadow-lg p-4 z-40">
-                                    <p className="text-xs font-medium text-pdp-muted mb-2.5">
+                                <div className="absolute left-0 top-full mt-2 w-72 rounded-[var(--radius-pdp)] border border-line bg-white shadow-sm p-4 z-40">
+                                    <p className="text-xs font-medium text-slate mb-2.5">
                                         {activeTabKey === 'buy' || activeTabKey === 'plot' ? 'Budget (INR)' : 'Monthly rent (INR)'}
                                     </p>
                                     <div className="flex flex-wrap gap-1.5 mb-3">
@@ -429,10 +443,10 @@ export function ListingFilterBar({
                                                         onBudgetApply(active ? '' : preset.min, active ? '' : preset.max);
                                                         setBudgetOpen(false);
                                                     }}
-                                                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                                                    className={`px-2.5 py-1.5 rounded-lg text-xs border transition-colors ${
                                                         active
-                                                            ? 'bg-pdp-ink text-white border-pdp-ink'
-                                                            : 'bg-pdp-bg text-pdp-ink border-pdp-border hover:border-pdp-ink/40'
+                                                            ? 'bg-sage-100 text-pine-700 border-pine-700 font-semibold'
+                                                            : 'bg-sage-50 text-ink border-line font-medium hover:bg-sage-100'
                                                     }`}
                                                 >
                                                     {preset.label}
@@ -448,7 +462,7 @@ export function ListingFilterBar({
                                             value={minPrice}
                                             onChange={(e) => onBudgetApply(e.target.value, maxPrice)}
                                             aria-label="Minimum price"
-                                            className="w-full px-3 py-2 rounded-lg border border-pdp-border bg-pdp-bg text-xs text-pdp-ink tabular-nums focus:outline-none focus:border-pdp-ink"
+                                            className="w-full px-3 py-2 rounded-lg border border-line bg-sage-50 text-xs text-ink tabular-nums focus:outline-none focus:border-pine-700"
                                         />
                                         <input
                                             type="number"
@@ -457,7 +471,7 @@ export function ListingFilterBar({
                                             value={maxPrice}
                                             onChange={(e) => onBudgetApply(minPrice, e.target.value)}
                                             aria-label="Maximum price"
-                                            className="w-full px-3 py-2 rounded-lg border border-pdp-border bg-pdp-bg text-xs text-pdp-ink tabular-nums focus:outline-none focus:border-pdp-ink"
+                                            className="w-full px-3 py-2 rounded-lg border border-line bg-sage-50 text-xs text-ink tabular-nums focus:outline-none focus:border-pine-700"
                                         />
                                     </div>
                                 </div>
@@ -470,23 +484,23 @@ export function ListingFilterBar({
 
                     {/* Active Removable Filter Pills */}
                     {activeFilterPills.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-2 border-t border-pdp-border/60">
-                            <span className="text-xs text-pdp-muted">Active:</span>
+                        <div className="flex flex-wrap items-center gap-2 mt-2.5 pt-2 border-t border-line">
+                            <span className="text-xs text-slate">Active:</span>
                             {activeFilterPills.map((pill) => (
                                 <button
                                     key={pill.key}
                                     type="button"
                                     onClick={pill.onRemove}
-                                    className="min-h-[32px] px-2.5 py-1 rounded-full bg-pdp-bg border border-pdp-border text-xs font-medium text-pdp-ink hover:border-pdp-ink/40 inline-flex items-center gap-1.5 cursor-pointer"
+                                    className="min-h-[32px] px-2.5 py-1 rounded-full bg-white border border-pine-700 text-xs font-semibold text-pine-700 hover:bg-sage-100 inline-flex items-center gap-1.5 cursor-pointer"
                                 >
                                     <span>{pill.label}</span>
-                                    <X className="w-3 h-3 text-pdp-muted" />
+                                    <X className="w-3 h-3 text-pine-700" />
                                 </button>
                             ))}
                             <button
                                 type="button"
                                 onClick={onClearAll}
-                                className="min-h-[32px] px-2.5 py-1 text-xs font-medium text-pdp-muted hover:text-pdp-ink underline underline-offset-4 cursor-pointer"
+                                className="min-h-[32px] px-2.5 py-1 text-xs font-medium text-pine-700 hover:text-pine-900 underline underline-offset-4 cursor-pointer"
                             >
                                 Clear all
                             </button>
@@ -527,9 +541,13 @@ export function ListingFilterBar({
                                 </label>
                                 <select
                                     id="mobile-area-select"
-                                    value={locationFilter}
+                                    value={
+                                        locationFilter.toLowerCase() === defaultCityLabel.toLowerCase()
+                                            ? 'all'
+                                            : locationFilter
+                                    }
                                     onChange={(e) => onLocationFilterChange(e.target.value)}
-                                    className="w-full min-h-[44px] px-3.5 rounded-[10px] border border-pdp-border bg-pdp-bg text-sm text-pdp-ink"
+                                    className="w-full min-h-[44px] px-3.5 rounded-[10px] border border-line bg-sage-50 text-sm text-ink focus:outline-none focus:border-pine-700"
                                 >
                                     <option value="all">All of {defaultCityLabel}</option>
                                     {cities.map((c) => (
@@ -554,7 +572,8 @@ export function ListingFilterBar({
                                                 onClick={() => onBudgetApply(active ? '' : preset.min, active ? '' : preset.max)}
                                                 className={drawerChipClass(active)}
                                             >
-                                                {preset.label}
+                                                {active && <Check className="w-3.5 h-3.5 shrink-0" aria-hidden />}
+                                                <span>{preset.label}</span>
                                             </button>
                                         );
                                     })}
