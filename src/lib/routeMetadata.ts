@@ -192,6 +192,18 @@ export async function resolveRentSlugMetadata(slug: string): Promise<Metadata> {
     if (param === 'hyderabad') return pageSeoToMetadata(rentHyderabadHubSeo());
     if (param === 'pune') return pageSeoToMetadata(rentPuneHubSeo());
 
+    const { RENT_BHK_TYPES } = await import('@/lib/rentBhkTypes');
+    const bhk = RENT_BHK_TYPES[param];
+    if (bhk) {
+        const targetPath = `/rent/${param}/bangalore`;
+        return pageSeoToMetadata({
+            title: `${bhk.label} for Rent in Bangalore — Verified | MakeMyStay`,
+            description: `Browse verified ${bhk.searchLabel.toLowerCase()} for rent in Bangalore. Real photos, transparent pricing, zero brokerage. Book a site visit on MakeMyStay.ai.`,
+            path: targetPath,
+            canonicalUrl: `${SITE_URL}${targetPath}`,
+        });
+    }
+
     const loc = getPgLocationBySlug(param) ?? getLocalitySeoProfile(param)?.locality;
     if (loc) {
         const meta = pageSeoToMetadata(rentLocationHubSeo(loc.name, loc.slug));

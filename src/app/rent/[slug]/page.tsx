@@ -8,9 +8,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return resolveRentSlugMetadata(slug);
 }
 
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import RentSlugRoute from '@/routes/RentSlugRoute';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { RENT_BHK_TYPES } from '@/lib/rentBhkTypes';
 import PropertyDetails from '@/views/PropertyDetails';
 
 export const revalidate = 3600;
@@ -18,6 +19,10 @@ export const revalidate = 3600;
 export default async function RentSlugPage({ params }: PageProps) {
     const { slug } = await params;
     const param = (slug || '').toLowerCase();
+
+    if (RENT_BHK_TYPES[param]) {
+        redirect(`/rent/${param}/bangalore`);
+    }
 
     if (['bangalore', 'hyderabad', 'pune'].includes(param)) {
         return <RentSlugRoute />;

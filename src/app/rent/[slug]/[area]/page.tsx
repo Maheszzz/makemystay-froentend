@@ -4,24 +4,13 @@ import type { ReactNode } from 'react';
 import Properties from '@/views/Properties';
 import { getPgLocationBySlug } from '@/data/pgLocations';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { RENT_BHK_TYPES } from '@/lib/rentBhkTypes';
 import { SITE_URL } from '@/lib/siteConfig';
 import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 
 export const revalidate = 3600;
 
-// Allowed BHK/flat types → display label + API property_type value
-const BHK_TYPES: Record<string, { label: string; apiType: string; searchLabel: string }> = {
-    '1bhk': { label: '1BHK', apiType: '1BHK', searchLabel: '1BHK Flats' },
-    '2bhk': { label: '2BHK', apiType: '2BHK', searchLabel: '2BHK Flats' },
-    '3bhk': { label: '3BHK', apiType: '3BHK', searchLabel: '3BHK Flats' },
-    furnished: { label: 'Furnished', apiType: 'furnished', searchLabel: 'Furnished Flats' },
-    '1rk': { label: '1RK', apiType: '1RK', searchLabel: '1RK Rooms' },
-    flat: { label: 'Flat', apiType: 'flat', searchLabel: 'Flats' },
-    apartment: { label: 'Apartment', apiType: 'apartment', searchLabel: 'Apartments' },
-    'service-apartment': { label: 'Service Apartment', apiType: 'service_apartment', searchLabel: 'Service Apartments' },
-};
-
-type PageProps = { params: Promise<{ type: string; area: string }> };
+type PageProps = { params: Promise<{ slug: string; area: string }> };
 
 function resolveArea(areaSlug: string): { slug: string; name: string } | null {
     if (areaSlug === 'bangalore') return { slug: 'bangalore', name: 'Bangalore' };
@@ -31,8 +20,9 @@ function resolveArea(areaSlug: string): { slug: string; name: string } | null {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { type, area } = await params;
-    const bhk = BHK_TYPES[type.toLowerCase()];
+    const { slug, area } = await params;
+    const typeLower = slug.toLowerCase();
+    const bhk = RENT_BHK_TYPES[typeLower];
     const areaInfo = resolveArea(area.toLowerCase());
     if (!bhk || !areaInfo) {
         return pageSeoToMetadata({
@@ -47,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const { name: areaName, slug: areaSlug } = areaInfo;
     const isCity = areaSlug === 'bangalore';
     const locationLabel = isCity ? 'Bangalore' : `${areaName}, Bangalore`;
-    const path = `/rent/${type}/${areaSlug}`;
+    const path = `/rent/${typeLower}/${areaSlug}`;
 
     return pageSeoToMetadata({
         title: `${label} for Rent in ${locationLabel} — Verified | MakeMyStay`,
@@ -57,13 +47,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     });
 }
 
-export default async function RentTypePage({ params }: PageProps): Promise<ReactNode> {
-    const { type, area } = await params;
-    const typeLower = type.toLowerCase();
+export default async function RentTypeAreaPage({ params }: PageProps): Promise<ReactNode> {
+    const { slug, area } = await params;
+    const typeLower = slug.toLowerCase();
     const areaLower = area.toLowerCase();
 
     // Redirect invalid type to city hub
-    const bhk = BHK_TYPES[typeLower];
+    const bhk = RENT_BHK_TYPES[typeLower];
     if (!bhk) {
         redirect('/rent/bangalore');
     }
@@ -75,14 +65,12 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
     }
 
     const { label, apiType, searchLabel } = bhk;
-    // areaInfo is guaranteed non-null here (we redirected above if null)
-    const areaSlug = areaInfo!.slug;
-    const areaName = areaInfo!.name;
+    const { slug: areaSlug, name: areaName } = areaInfo;
     const isCity = areaSlug === 'bangalore';
     const locationLabel = isCity ? 'Bangalore' : `${areaName}, Bangalore`;
     const cityParam = isCity ? 'bangalore' : areaName;
 
-    // Check inventory — noindex if empty
+    // Check inventory — show fallback subtitle if empty
     let hasInventory = true;
     try {
         const { total } = await fetchPropertiesServer({
@@ -97,20 +85,6 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
         // Non-blocking — render the page anyway
     }
 
-    if (!hasInventory) {
-        // Return a noindexed empty page rather than 404 (inventory may appear later)
-        return (
-            <Properties
-                key={`rent-${typeLower}-${areaSlug}`}
-                initialCategory="rent"
-                initialCity={cityParam}
-                initialTypeFilter={apiType}
-                pageTitle={`${label} for Rent in ${locationLabel}`}
-                pageSubtitle={`Verified ${searchLabel.toLowerCase()} — checking back for new listings`}
-            />
-        );
-    }
-
     return (
         <Properties
             key={`rent-${typeLower}-${areaSlug}`}
@@ -118,7 +92,12 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
             initialCity={cityParam}
             initialTypeFilter={apiType}
             pageTitle={`${label} for Rent in ${locationLabel}`}
-            pageSubtitle={`Verified ${searchLabel.toLowerCase()} with real photos and transparent pricing`}
+            pageSubtitle={
+                hasInventory
+                    ? `Verified ${searchLabel.toLowerCase()} with real photos and transparent pricing`
+                    : `Verified ${searchLabel.toLowerCase()} — checking back for new listings`
+            }
         />
     );
 }
+
