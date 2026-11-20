@@ -10,15 +10,18 @@ import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 export const revalidate = 3600;
 
 // Allowed BHK/flat types → display label + API property_type value
-const BHK_TYPES: Record<string, { label: string; apiType: string; searchLabel: string }> = {
+// apiType: null means "no property_type filter" — shows all rent listings (used for flat/apartment/service-apartment
+// which don't have a dedicated DB type; they map to the full rent inventory)
+const BHK_TYPES: Record<string, { label: string; apiType: string | null; searchLabel: string }> = {
     '1bhk': { label: '1BHK', apiType: '1BHK', searchLabel: '1BHK Flats' },
     '2bhk': { label: '2BHK', apiType: '2BHK', searchLabel: '2BHK Flats' },
     '3bhk': { label: '3BHK', apiType: '3BHK', searchLabel: '3BHK Flats' },
     furnished: { label: 'Furnished', apiType: 'furnished', searchLabel: 'Furnished Flats' },
     '1rk': { label: '1RK', apiType: '1RK', searchLabel: '1RK Rooms' },
-    flat: { label: 'Flat', apiType: 'flat', searchLabel: 'Flats' },
-    apartment: { label: 'Apartment', apiType: 'apartment', searchLabel: 'Apartments' },
-    'service-apartment': { label: 'Service Apartment', apiType: 'service_apartment', searchLabel: 'Service Apartments' },
+    // "flat", "apartment", "service-apartment" have no dedicated DB type — show full rent inventory
+    flat: { label: 'Flat', apiType: null, searchLabel: 'Flats' },
+    apartment: { label: 'Apartment', apiType: null, searchLabel: 'Apartments' },
+    'service-apartment': { label: 'Service Apartment', apiType: null, searchLabel: 'Service Apartments' },
 };
 
 type PageProps = { params: Promise<{ type: string; area: string }> };
@@ -83,15 +86,17 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
     const cityParam = isCity ? 'bangalore' : areaName;
 
     // Check inventory — noindex if empty
+    // For null apiType (flat/apartment/service-apartment), no type filter = show all rent listings
     let hasInventory = true;
     try {
-        const { total } = await fetchPropertiesServer({
+        const query: Parameters<typeof fetchPropertiesServer>[0] = {
             category: 'rent',
             city: cityParam,
-            property_type: apiType,
             is_available: true,
             limit: 1,
-        });
+        };
+        if (apiType) query.property_type = apiType;
+        const { total } = await fetchPropertiesServer(query);
         hasInventory = total > 0;
     } catch {
         // Non-blocking — render the page anyway
@@ -104,7 +109,7 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
                 key={`rent-${typeLower}-${areaSlug}`}
                 initialCategory="rent"
                 initialCity={cityParam}
-                initialTypeFilter={apiType}
+                {...(apiType ? { initialTypeFilter: apiType } : {})}
                 pageTitle={`${label} for Rent in ${locationLabel}`}
                 pageSubtitle={`Verified ${searchLabel.toLowerCase()} — checking back for new listings`}
             />
@@ -116,7 +121,7 @@ export default async function RentTypePage({ params }: PageProps): Promise<React
             key={`rent-${typeLower}-${areaSlug}`}
             initialCategory="rent"
             initialCity={cityParam}
-            initialTypeFilter={apiType}
+            {...(apiType ? { initialTypeFilter: apiType } : {})}
             pageTitle={`${label} for Rent in ${locationLabel}`}
             pageSubtitle={`Verified ${searchLabel.toLowerCase()} with real photos and transparent pricing`}
         />
