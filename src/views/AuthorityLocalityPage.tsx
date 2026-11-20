@@ -5,7 +5,6 @@ import { Footer } from '@/components/layout/Footer';
 import { BreadcrumbNav } from '@/components/seo/BreadcrumbNav';
 import { FaqSection } from '@/components/seo/FaqSection';
 import { JsonLd } from '@/components/seo/JsonLd';
-import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { Link } from '@/lib/navigation';
 import { buildAuthorityGraph, buildAuthorityBreadcrumbs, getAuthorityFaqs } from '@/lib/authorityContent';
 import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
@@ -53,7 +52,7 @@ export default async function AuthorityLocalityPage({
     overrideFeature 
 }: AuthorityLocalityPageProps) {
     let programmaticModifier = '';
-    let filterObj: any = { category: 'pg', city: profile.name, is_available: true, limit: 8 };
+    let filterObj: any = { category: 'pg', city: profile.name, is_available: true, limit: 24, sort_by: 'newest' };
     
     if (overrideMaxPrice) {
         programmaticModifier = ` under ₹${overrideMaxPrice}`;
@@ -96,7 +95,7 @@ export default async function AuthorityLocalityPage({
     
     const faqs = getAuthorityFaqs(profile);
 
-    const { items: initialProperties } = await fetchPropertiesServer(filterObj);
+    const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer(filterObj);
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
@@ -129,8 +128,34 @@ export default async function AuthorityLocalityPage({
                     </div>
                 </div>
 
+                {/* ── Properties Widget (Full-Width, Displayed First — Above Content) ── */}
+                <section
+                    aria-labelledby="properties-heading"
+                    className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8"
+                >
+                    <div className="mb-4 flex items-center justify-between">
+                        <h2 id="properties-heading" className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            <Building2 className="w-6 h-6 text-brand-red" />
+                            Top PGs in {profile.name}
+                        </h2>
+                    </div>
+                    <Properties
+                        hideChrome
+                        initialCategory="pg"
+                        initialCity={profile.name}
+                        initialMaxPrice={overrideMaxPrice}
+                        forcedGenderFilter={overrideGender ? (overrideGender.toLowerCase() as 'male' | 'female') : undefined}
+                        pageTitle={`Explore all options in ${profile.name}${programmaticModifier}`}
+                        pageSubtitle="Filter by budget, sharing type, and food plan."
+                        initialProperties={initialProperties}
+                        initialTotalCount={total}
+                        initialPropertyCounts={propertyCounts}
+                        showMapPanel
+                    />
+                </section>
+
                 {/* ── Content Grid ── */}
-                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 flex gap-8 relative items-start">
+                <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 mt-14 flex gap-8 relative items-start">
                     
                     {/* Main Content Column */}
                     <div className="flex-1 space-y-16 min-w-0">
@@ -239,33 +264,6 @@ export default async function AuthorityLocalityPage({
                         </div>
                     </div>
 
-                    {/* Properties Widget */}
-                    <section aria-labelledby="properties-heading">
-                        <div className="mb-6 flex items-center justify-between">
-                            <h2 id="properties-heading" className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                                <Building2 className="w-6 h-6 text-brand-red" />
-                                Top PGs in {profile.name}
-                            </h2>
-                        </div>
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                            {initialProperties.map((property) => (
-                                <PropertyCard key={property.id} property={property} />
-                            ))}
-                        </div>
-                        <div className="mt-8">
-                            <Properties
-                                hideChrome
-                                initialCategory="pg"
-                                initialCity={profile.name}
-                                initialMaxPrice={overrideMaxPrice}
-                                forcedGenderFilter={overrideGender ? (overrideGender.toLowerCase() as 'male' | 'female') : undefined}
-                                pageTitle={`Explore all options in ${profile.name}${programmaticModifier}`}
-                                pageSubtitle="Filter by budget, sharing type, and food plan."
-                                showMapPanel
-                            />
-                        </div>
-                    </section>
-                    
                     {/* Internal Linking Hub */}
                     <AuthorityInternalLinkHub profile={profile} />
 

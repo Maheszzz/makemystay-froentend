@@ -67,11 +67,12 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
   const localitySeoProfile = getLocalitySeoProfile(actualSlug);
   if (localitySeoProfile) {
-    const { items: initialProperties } = await fetchPropertiesServer({
+    const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer({
       category: 'pg',
       city: localitySeoProfile.locality.name,
       is_available: true,
-      limit: 20,
+      limit: 24,
+      sort_by: 'newest',
     });
 
     const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality);
@@ -93,6 +94,8 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             pageTitle={localitySeoProfile.hero.heading}
             pageSubtitle={localitySeoProfile.hero.subHeading}
             initialProperties={initialProperties}
+            initialTotalCount={total}
+            initialPropertyCounts={propertyCounts}
             hero={{
               breadcrumbs: localitySeoProfile.breadcrumb,
               title: localitySeoProfile.hero.heading,
@@ -153,11 +156,12 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   ];
   const combinedLd = buildLocalityAeoGraph(profile, faqs, breadcrumbItems, canonicalListingPath);
 
-  const { items: initialProperties } = await fetchPropertiesServer({
+  const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer({
     category: 'pg',
     city: name,
     is_available: true,
-    limit: 20,
+    limit: 24,
+    sort_by: 'newest',
   });
 
   const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
@@ -186,6 +190,8 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           pageTitle={pageTitle}
           pageSubtitle={pageSubtitle}
           initialProperties={initialProperties}
+          initialTotalCount={total}
+          initialPropertyCounts={propertyCounts}
           hero={{
             breadcrumbs: [
               { name: 'Home', path: '/' },
