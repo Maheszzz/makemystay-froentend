@@ -8,7 +8,12 @@ import { JsonLd } from '@/components/seo/JsonLd';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { useProperties, useListingLocalityOptions, useScrollMemory } from '@/hooks';
+import { useProperties, useCuratedPgProperties, useListingLocalityOptions, useScrollMemory } from '@/hooks';
+import {
+    deriveCuratedPgAreas,
+    filterCuratedPgProperties,
+    sortCuratedPgProperties,
+} from '@/lib/curatedPgListings';
 import { ArrowRight, ChevronDown, Heart, MessageCircle, RefreshCw, Search } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
 import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
@@ -81,6 +86,8 @@ interface PropertiesProps {
     };
     /** Live category counts from SSR payload. */
     initialPropertyCounts?: Record<string, number>;
+    /** Restrict to the curated 16 PG properties in exact required order. */
+    curatedPgOnly?: boolean;
 }
 
 const KNOWN_METRO_SLUGS = ['bangalore', 'hyderabad', 'pune'];
@@ -119,6 +126,7 @@ function PropertiesInner({
     initialProperties,
     initialTotalCount,
     initialPropertyCounts,
+    curatedPgOnly = false,
     hero,
 }: PropertiesProps) {
     const router = useRouter();
@@ -331,25 +339,58 @@ function PropertiesInner({
         listingPageNum === 1 &&
         !priceTier;
 
+    const isCuratedPgMode = Boolean(
+        curatedPgOnly ||
+            (category === 'pg' &&
+                !forcedGenderFilter &&
+                (location.pathname === '/pg' ||
+                    location.pathname === '/pg/bangalore' ||
+                    location.pathname === '/properties')),
+    );
+
     const PAGE_SIZE = 24;
+    const [curatedVisibleCount, setCuratedVisibleCount] = useState(
+        () => Math.max(1, listingPageNum) * PAGE_SIZE,
+    );
+
     const {
-        properties,
-        totalCount,
-        propertyCounts,
-        loading,
-        error,
-        refetch,
-        loadMore,
-        hasMore,
-        loadingMore,
+        properties: genericProperties,
+        totalCount: genericTotalCount,
+        propertyCounts: genericPropertyCounts,
+        loading: genericLoading,
+        error: genericError,
+        refetch: genericRefetch,
+        loadMore: genericLoadMore,
+        hasMore: genericHasMore,
+        loadingMore: genericLoadingMore,
     } = useProperties(apiParams, {
         infiniteScroll: true,
         pageSize: PAGE_SIZE,
         initialListingPage: listingPageNum,
-        initialProperties: isDefaultSeededState ? initialProperties : undefined,
-        initialTotalCount: isDefaultSeededState ? initialTotalCount : undefined,
-        initialPropertyCounts: isDefaultSeededState ? initialPropertyCounts : undefined,
+        initialProperties: !isCuratedPgMode && isDefaultSeededState ? initialProperties : undefined,
+        initialTotalCount: !isCuratedPgMode && isDefaultSeededState ? initialTotalCount : undefined,
+        initialPropertyCounts: !isCuratedPgMode && isDefaultSeededState ? initialPropertyCounts : undefined,
+        enabled: !isCuratedPgMode,
     });
+
+    const curatedQuery = useCuratedPgProperties({
+        enabled: isCuratedPgMode,
+        initialProperties: isCuratedPgMode ? initialProperties : undefined,
+        initialPropertyCounts: isCuratedPgMode ? initialPropertyCounts : undefined,
+    });
+
+    const properties = isCuratedPgMode ? curatedQuery.properties : genericProperties;
+    const totalCount = isCuratedPgMode ? curatedQuery.properties.length : genericTotalCount;
+    const propertyCounts = useMemo(() => {
+        if (!isCuratedPgMode) return genericPropertyCounts;
+        const base = curatedQuery.propertyCounts ?? initialPropertyCounts;
+        if (!base) return { pg: curatedQuery.properties.length };
+        return { ...base, pg: curatedQuery.properties.length };
+    }, [isCuratedPgMode, genericPropertyCounts, curatedQuery.propertyCounts, initialPropertyCounts, curatedQuery.properties.length]);
+    const loading = isCuratedPgMode ? curatedQuery.loading : genericLoading;
+    const error = isCuratedPgMode ? curatedQuery.error : genericError;
+    const refetch = isCuratedPgMode ? curatedQuery.refetch : genericRefetch;
+    const loadingMore = isCuratedPgMode ? false : genericLoadingMore;
 
     const syncedFullUrl = urlQueryString ? `${location.pathname}?${urlQueryString}` : location.pathname;
     useScrollMemory(hasUrlSynced && !loading, { urlKey: syncedFullUrl });
@@ -406,6 +447,7 @@ function PropertiesInner({
         }
         if (listingFilterKeyPrev.current === listingFilterKey) return;
         listingFilterKeyPrev.current = listingFilterKey;
+        setCuratedVisibleCount(PAGE_SIZE);
         if (!searchParams.get('page')) return;
         setSearchParams(
             (prev) => {
@@ -433,6 +475,23 @@ function PropertiesInner({
     const propertyListFiltered = useMemo(() => {
         try {
             const rawList = Array.isArray(properties) ? properties : [];
+            if (isCuratedPgMode) {
+                return filterCuratedPgProperties(rawList, {
+                    searchQuery,
+                    area: locationFilter,
+                    minPrice,
+                    maxPrice,
+                    priceTier,
+                    genderFilter,
+                    sharingFilter,
+                    furnishingFilter,
+                    typeFilter,
+                    wifiOn,
+                    foodOn,
+                    acOn,
+                });
+            }
+
             let list = rawList.filter((p) => !!p);
 
             const flags = { wifi: wifiOn, food: foodOn, ac: acOn };
@@ -497,7 +556,13 @@ function PropertiesInner({
             return [];
         }
     }, [
+        isCuratedPgMode,
         properties,
+        searchQuery,
+        locationFilter,
+        minPrice,
+        maxPrice,
+        priceTier,
         wifiOn,
         foodOn,
         acOn,
@@ -509,7 +574,10 @@ function PropertiesInner({
         typeFilter,
     ]);
 
-    const propertyListOrdered = useMemo(() => {
+    const propertyListSortedAll = useMemo(() => {
+        if (isCuratedPgMode) {
+            return sortCuratedPgProperties(propertyListFiltered, sortBy);
+        }
         const list = [...propertyListFiltered];
         if (sortBy === 'price_asc') {
             return list.sort((a, b) => {
@@ -532,7 +600,24 @@ function PropertiesInner({
             });
         }
         return list;
-    }, [propertyListFiltered, sortBy]);
+    }, [isCuratedPgMode, propertyListFiltered, sortBy]);
+
+    const propertyListOrdered = useMemo(() => {
+        if (!isCuratedPgMode) return propertyListSortedAll;
+        return propertyListSortedAll.slice(0, curatedVisibleCount);
+    }, [isCuratedPgMode, propertyListSortedAll, curatedVisibleCount]);
+
+    const hasMore = isCuratedPgMode
+        ? curatedVisibleCount < propertyListSortedAll.length
+        : genericHasMore;
+
+    const loadMore = useCallback(async () => {
+        if (isCuratedPgMode) {
+            setCuratedVisibleCount((c) => c + PAGE_SIZE);
+            return;
+        }
+        await genericLoadMore();
+    }, [isCuratedPgMode, genericLoadMore, PAGE_SIZE]);
 
     const hasGeoCoordinates = useMemo(
         () =>
@@ -635,12 +720,20 @@ function PropertiesInner({
         return () => obs.disconnect();
     }, [sentinelEl, hasMore, loading, loadingMore, loadMore]);
 
-    const { areas: localitiesFromApi, areaCounts, stats: inventoryCoverage } = useListingLocalityOptions(
+    const { areas: localitiesFromApi, areaCounts: apiAreaCounts, stats: apiInventoryCoverage } = useListingLocalityOptions(
         undefined,
         activeTabKey,
         metroSlug,
+        !isCuratedPgMode,
     );
+    const curatedLocalityData = useMemo(
+        () => (isCuratedPgMode ? deriveCuratedPgAreas(Array.isArray(properties) ? properties : []) : null),
+        [isCuratedPgMode, properties],
+    );
+    const areaCounts = curatedLocalityData ? curatedLocalityData.areaCounts : apiAreaCounts;
+    const inventoryCoverage = curatedLocalityData ? curatedLocalityData.stats : apiInventoryCoverage;
     const areaOptions = useMemo(() => {
+        if (curatedLocalityData) return curatedLocalityData.areas;
         if (localitiesFromApi.length > 0) return localitiesFromApi;
         const set = new Set<string>();
         const rows = Array.isArray(properties) ? properties : [];
@@ -653,7 +746,7 @@ function PropertiesInner({
             set.add(findPgLocationForArea(head)?.name ?? head);
         }
         return Array.from(set).sort((a, b) => a.localeCompare(b, 'en-IN'));
-    }, [localitiesFromApi, properties]);
+    }, [curatedLocalityData, localitiesFromApi, properties]);
 
     const updateParamKey = useCallback(
         (key: string, value: string | null) => {
@@ -699,9 +792,11 @@ function PropertiesInner({
     const hasClientFilters = Boolean(
         wifiOn || foodOn || acOn || genderFilter || sharingFilter || furnishingFilter || plotSizeFilter || (typeFilter && typeFilter !== 'all'),
     );
-    const displayResultCount = hasClientFilters
-        ? propertyListOrdered.length
-        : (totalCount ?? propertyListOrdered.length);
+    const displayResultCount = isCuratedPgMode
+        ? propertyListFiltered.length
+        : hasClientFilters
+          ? propertyListOrdered.length
+          : (totalCount ?? propertyListOrdered.length);
 
     const activeFilterPills = useMemo<ActiveFilterPill[]>(() => {
         const pills: ActiveFilterPill[] = [];
@@ -1082,7 +1177,11 @@ function PropertiesInner({
                                             if (!prop || !prop.id) return null;
                                             return (
                                                 <div key={`${prop.id}-${idx}`} className="h-full">
-                                                    <PropertyCard property={prop} priority={idx === 0} />
+                                                    <PropertyCard
+                                                        property={prop}
+                                                        priority={idx === 0}
+                                                        categoryLabel={isCuratedPgMode ? 'PG' : undefined}
+                                                    />
                                                 </div>
                                             );
                                         })

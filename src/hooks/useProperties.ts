@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { propertyApi } from '@/lib/api';
+import { fetchCuratedPgPropertiesClient } from '@/lib/curatedPgListings';
 import { inferPropertyTypeFromPath, parsePropertySlugParam } from '@/lib/propertyRouting';
 import type { Property, PropertyId, ApiError, PaginationParams } from '@/types/api';
 
@@ -72,6 +73,8 @@ export interface UsePropertiesOptions {
     initialTotalCount?: number;
     /** Category counts map from SSR response */
     initialPropertyCounts?: Record<string, number>;
+    /** Disable query execution when another source (e.g. curated PG mode) handles fetching */
+    enabled?: boolean;
 }
 
 export interface UsePropertiesResult {
@@ -103,6 +106,7 @@ export function useProperties(
         initialProperties,
         initialTotalCount,
         initialPropertyCounts,
+        enabled = true,
     } = options;
     const startPage = Math.max(1, Math.min(500, initialListingPage || 1));
 
@@ -160,6 +164,7 @@ export function useProperties(
             return startPage + allPages.length;
         },
         initialData,
+        enabled,
     });
 
     const properties = useMemo(
@@ -206,11 +211,55 @@ export function useProperties(
         totalCount,
         propertyCounts,
         shownCount: properties.length,
-        loading: isLoading,
+        loading: enabled ? isLoading : false,
         loadingMore: isFetchingNextPage,
-        error: toApiError(queryError, 'Failed to load properties'),
+        error: enabled ? toApiError(queryError, 'Failed to load properties') : null,
         hasMore: infiniteScroll ? Boolean(hasNextPage) : false,
         loadMore,
+        refetch,
+    };
+}
+
+/**
+ * Fetches and caches the curated 16 PG properties from the live API.
+ */
+export function useCuratedPgProperties(options: {
+    enabled?: boolean;
+    initialProperties?: Property[];
+    initialPropertyCounts?: Record<string, number>;
+} = {}): {
+    properties: Property[];
+    propertyCounts?: Record<string, number>;
+    loading: boolean;
+    error: ApiError | null;
+    refetch: () => Promise<void>;
+} {
+    const { enabled = true, initialProperties, initialPropertyCounts } = options;
+    const hasInitial = Boolean(initialProperties && initialProperties.length > 0);
+
+    const { data, isLoading, error, refetch: queryRefetch } = useQuery({
+        queryKey: ['properties', 'curated-pg-16'],
+        queryFn: fetchCuratedPgPropertiesClient,
+        enabled,
+        initialData: hasInitial
+            ? {
+                  items: initialProperties as Property[],
+                  total: (initialProperties as Property[]).length,
+                  propertyCounts: initialPropertyCounts,
+              }
+            : undefined,
+        staleTime: 60_000,
+    });
+
+    const refetch = useCallback(async () => {
+        await queryRefetch();
+    }, [queryRefetch]);
+
+    return {
+        properties: data?.items ?? [],
+        propertyCounts: data?.propertyCounts ?? initialPropertyCounts,
+        loading: enabled ? isLoading : false,
+        error: enabled ? toApiError(error, 'Failed to load PG properties') : null,
         refetch,
     };
 }

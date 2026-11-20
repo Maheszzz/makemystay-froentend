@@ -4,6 +4,10 @@ import {
     normalizePropertyListResponse,
     REALTY_PATH,
 } from '@/lib/api/properties';
+import {
+    CURATED_PG_PROPERTY_IDS,
+    mergeCuratedFirstPgProperties,
+} from '@/lib/curatedPgListings';
 import type { Property, RealtyProperty } from '@/types/api';
 
 export interface ServerPropertyQuery {
@@ -79,5 +83,70 @@ export async function fetchPropertiesServer(
     }
 
     return { items, total, propertyCounts };
+}
+
+/**
+ * Server-side fetcher for the PG listing page: returns the 16 priority properties first
+ * in exact order, followed by all remaining Bangalore PG properties.
+ */
+export async function fetchCuratedPgPropertiesServer(
+    timeoutMs = 15000,
+): Promise<{ items: Property[]; total: number; propertyCounts?: Record<string, number> }> {
+    const first = await fetchPropertiesServer(
+        {
+            city: 'bangalore',
+            is_available: true,
+            limit: 500,
+            skip: 0,
+            sort_by: 'newest',
+        },
+        timeoutMs,
+    );
+
+    const allItems: Property[] = [...first.items];
+    let skip = first.items.length;
+    while (first.total > allItems.length && skip < first.total && skip < 2000) {
+        const nextBatch = await fetchPropertiesServer(
+            {
+                city: 'bangalore',
+                is_available: true,
+                limit: 500,
+                skip,
+                sort_by: 'newest',
+            },
+            timeoutMs,
+        );
+        if (nextBatch.items.length === 0) break;
+        allItems.push(...nextBatch.items);
+        skip += nextBatch.items.length;
+    }
+
+    const foundIds = new Set(allItems.map((p) => Number(p.id)));
+    const missingIds = CURATED_PG_PROPERTY_IDS.filter((id) => !foundIds.has(id));
+    if (missingIds.length > 0) {
+        const extras = await Promise.allSettled(
+            missingIds.map((id) => api.get<RealtyProperty>(`${REALTY_PATH}/${id}`, { timeout: timeoutMs })),
+        );
+        for (const res of extras) {
+            if (res.status === 'fulfilled' && res.value && res.value.id != null) {
+                try {
+                    allItems.push(mapRealtyToProperty(res.value));
+                } catch {
+                    // Skip malformed fallback item
+                }
+            }
+        }
+    }
+
+    const items = mergeCuratedFirstPgProperties(allItems);
+    const propertyCounts = first.propertyCounts
+        ? { ...first.propertyCounts, pg: items.length }
+        : { pg: items.length };
+
+    return {
+        items,
+        total: items.length,
+        propertyCounts,
+    };
 }
 

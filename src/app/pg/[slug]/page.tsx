@@ -23,6 +23,8 @@ export const revalidate = 3600;
 
 import PgSlugRoute from '@/routes/PgSlugRoute';
 import PGLocationPage from '@/views/PGLocationPage';
+import PGBangaloreHub from '@/views/PGBangaloreHub';
+import { fetchCuratedPgPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 
 export default async function Page({ params }: PageProps) {
     const { slug } = await params;
@@ -34,7 +36,18 @@ export default async function Page({ params }: PageProps) {
         permanentRedirect(staticTo);
     }
 
-    if (['bangalore', 'hyderabad', 'pune'].includes(param) ||
+    if (param === 'bangalore') {
+        const { items: initialProperties, total, propertyCounts } = await fetchCuratedPgPropertiesServer();
+        return (
+            <PGBangaloreHub
+                initialProperties={initialProperties}
+                initialTotalCount={total}
+                initialPropertyCounts={propertyCounts}
+            />
+        );
+    }
+
+    if (['hyderabad', 'pune'].includes(param) ||
         ['pg-with-wifi', 'pg-with-food', 'pg-with-ac'].includes(param) ||
         param === 'pg-vs-flat-bangalore') {
         return <PgSlugRoute />;
