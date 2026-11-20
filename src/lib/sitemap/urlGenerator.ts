@@ -163,7 +163,11 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         { path: '/rent/1rk/electronic-city', category: 'rent' as const },
         { path: '/buy/in/bangalore', category: 'buy' as const },
         { path: '/plots/in/bangalore', category: 'static' as const },
-        { path: '/blog', category: 'blog' as const }
+        { path: '/blog', category: 'blog' as const },
+        // High-priority blog articles targeting head keywords
+        { path: '/blog/1bhk-for-rent-bangalore-guide-2026', category: 'blog' as const },
+        { path: '/blog/cheapest-areas-rent-1bhk-bangalore-2026', category: 'blog' as const },
+        { path: '/blog/pg-vs-flat-bangalore-which-is-better-2026', category: 'blog' as const }
     ];
     for (const item of staticPaths) {
         registerEntry(item.path, item.category);
