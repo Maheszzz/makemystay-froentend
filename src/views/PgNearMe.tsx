@@ -97,11 +97,28 @@ export default function PgNearMe() {
                             </h1>
                             
                             <p className="mt-6 text-slate-600 text-base md:text-xl leading-relaxed max-w-3xl">
-                                Looking for a safe and comfortable stay nearby? We've curated the top-rated <strong>Paying Guest accommodations</strong> in Bangalore's key IT and education hubs. 
-                                Every listing is <strong>verified for hygiene and security</strong>.
+                                Looking for a safe and comfortable PG near you in Bangalore? Browse <strong>verified paying guest accommodations</strong> with WiFi, meals, AC & 24/7 security — in Koramangala, Whitefield, HSR Layout, BTM, Electronic City, Marathahalli and 20+ more areas. Every listing is <strong>physically verified</strong> for hygiene and security.
                             </p>
 
-                            <div className="mt-8 flex flex-wrap gap-4">
+                            {/* Locality quick links — internal linking for SEO */}
+                            <div className="mt-6 flex flex-wrap gap-2">
+                                {[
+                                    { label: 'PG in Koramangala', path: '/pg/koramangala' },
+                                    { label: 'PG in Whitefield', path: '/pg/whitefield' },
+                                    { label: 'PG in HSR Layout', path: '/pg/hsr-layout' },
+                                    { label: 'PG in BTM', path: '/pg/btm' },
+                                    { label: 'PG in Electronic City', path: '/pg/electronic-city' },
+                                    { label: 'PG in Marathahalli', path: '/pg/marathahalli' },
+                                    { label: 'PG in Bellandur', path: '/pg/bellandur' },
+                                    { label: 'PG in Indiranagar', path: '/pg/indiranagar' },
+                                ].map(({ label, path }) => (
+                                    <Link key={path} to={path} className="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-xl hover:bg-brand-red/10 hover:text-brand-red transition-colors">
+                                        {label}
+                                    </Link>
+                                ))}
+                            </div>
+
+                            <div className="mt-6 flex flex-wrap gap-4">
                                 <Link to="/pg" className="px-6 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10">
                                     Browse All Verified PGs
                                 </Link>
@@ -150,7 +167,7 @@ export default function PgNearMe() {
                             <h2 className="text-2xl md:text-3xl font-extrabold mb-6 tracking-tight">How to choose the right PG in Bangalore?</h2>
                             <div className="space-y-6 text-slate-300 leading-relaxed text-sm md:text-base">
                                 <p>
-                                    When searching for a <strong>PG near me</strong>, prioritize commute over cost. Staying in <strong>HSRLayout</strong> for a job in <strong>Whitefield</strong> might save you ₹2,000 in rent, but cost you 3 hours daily in traffic.
+                                    When searching for a <strong>PG near me</strong>, prioritize commute over cost. Staying in <strong>HSR Layout</strong> for a job in <strong>Whitefield</strong> might save you ₹2,000 in rent, but cost you 3 hours daily in traffic.
                                 </p>
                                 <p>
                                     Modern PGs in Bangalore are now called <strong>Coliving Spaces</strong>. They offer more than just a bed; you get high-speed WiFi for WFH, professional housekeeping, and a community of like-minded techies and entrepreneurs.

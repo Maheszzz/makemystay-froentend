@@ -9,13 +9,16 @@ import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 
 export const revalidate = 3600;
 
-// Allowed BHK types → display label + API property_type value
+// Allowed BHK/flat types → display label + API property_type value
 const BHK_TYPES: Record<string, { label: string; apiType: string; searchLabel: string }> = {
     '1bhk': { label: '1BHK', apiType: '1BHK', searchLabel: '1BHK Flats' },
     '2bhk': { label: '2BHK', apiType: '2BHK', searchLabel: '2BHK Flats' },
     '3bhk': { label: '3BHK', apiType: '3BHK', searchLabel: '3BHK Flats' },
     furnished: { label: 'Furnished', apiType: 'furnished', searchLabel: 'Furnished Flats' },
-    '1rk':  { label: '1RK', apiType: '1RK', searchLabel: '1RK Rooms' },
+    '1rk': { label: '1RK', apiType: '1RK', searchLabel: '1RK Rooms' },
+    flat: { label: 'Flat', apiType: 'flat', searchLabel: 'Flats' },
+    apartment: { label: 'Apartment', apiType: 'apartment', searchLabel: 'Apartments' },
+    'service-apartment': { label: 'Service Apartment', apiType: 'service_apartment', searchLabel: 'Service Apartments' },
 };
 
 type PageProps = { params: Promise<{ type: string; area: string }> };
