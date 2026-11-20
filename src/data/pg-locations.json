@@ -356,5 +356,293 @@
   "description": "Verified PGs in Nanakramguda near Financial District, Waverock, and Gachibowli IT corridor.",
   "rentRange": "₹6,500 - ₹18,000",
   "landmarks": ["Financial District", "Waverock SEZ", "Gachibowli"]
+},
+{
+  "slug": "peenya",
+  "name": "Peenya",
+  "title": "PG in Peenya Bangalore",
+  "description": "Affordable verified PGs in Peenya near Peenya Industrial Area, Yeshwanthpur, and Tumkur Road.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Peenya Industrial Area", "Peenya Metro Station", "Tumkur Road"]
+},
+{
+  "slug": "hulimavu",
+  "name": "Hulimavu",
+  "title": "PG in Hulimavu Bangalore",
+  "description": "Verified PGs in Hulimavu near Bannerghatta Road, JP Nagar, and Electronics City.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Hulimavu Lake", "Bannerghatta Road", "JP Nagar"]
+},
+{
+  "slug": "kondapur",
+  "name": "Kondapur",
+  "title": "PG in Kondapur Hyderabad",
+  "description": "Verified PGs in Kondapur near HITEC City, Gachibowli, and Cyber Towers.",
+  "rentRange": "₹6,000 - ₹17,000",
+  "landmarks": ["HITEC City", "Cyber Towers", "Kondapur Main Road"]
+},
+{
+  "slug": "brigade-road",
+  "name": "Brigade Road",
+  "title": "PG in Brigade Road Bangalore",
+  "description": "Premium verified PGs near Brigade Road in central Bangalore, close to MG Road and Cubbon Park.",
+  "rentRange": "₹8,000 - ₹25,000",
+  "landmarks": ["Brigade Road", "MG Road", "Cubbon Park"]
+},
+{
+  "slug": "arekere",
+  "name": "Arekere",
+  "title": "PG in Arekere Bangalore",
+  "description": "Verified PGs in Arekere near Bannerghatta Road, Meenakshi Mall, and Bommanahalli.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Arekere Gate", "Bannerghatta Road", "Meenakshi Mall"]
+},
+{
+  "slug": "silk-board",
+  "name": "Silk Board",
+  "title": "PG near Silk Board Bangalore",
+  "description": "Verified PGs near Silk Board Junction with quick access to HSR Layout, BTM, and Electronic City.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Silk Board Junction", "HSR Layout", "BTM Layout"]
+},
+{
+  "slug": "ulsoor",
+  "name": "Ulsoor",
+  "title": "PG in Ulsoor Bangalore",
+  "description": "Verified PGs in Ulsoor near Ulsoor Lake, MG Road, and Indiranagar.",
+  "rentRange": "₹7,000 - ₹20,000",
+  "landmarks": ["Ulsoor Lake", "MG Road", "Indiranagar"]
+},
+{
+  "slug": "malleshwaram",
+  "name": "Malleshwaram",
+  "title": "PG in Malleshwaram Bangalore",
+  "description": "Verified PGs in Malleshwaram near Rajajinagar, Yeshwanthpur, and Visvesvaraya Museum.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Malleshwaram Market", "Yeshwanthpur", "Rajajinagar"]
+},
+{
+  "slug": "varthur",
+  "name": "Varthur",
+  "title": "PG in Varthur Bangalore",
+  "description": "Affordable verified PGs in Varthur near Whitefield, ITPL, and Sarjapur Road.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Varthur Lake", "ITPL", "Whitefield"]
+},
+{
+  "slug": "gottigere",
+  "name": "Gottigere",
+  "title": "PG in Gottigere Bangalore",
+  "description": "Verified PGs in Gottigere near Bannerghatta Road, JP Nagar, and IIM Bangalore.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Gottigere Metro", "Bannerghatta Road", "IIM Bangalore"]
+},
+{
+  "slug": "vidyaranyapura",
+  "name": "Vidyaranyapura",
+  "title": "PG in Vidyaranyapura Bangalore",
+  "description": "Verified PGs in Vidyaranyapura near Yelahanka, Hebbal, and Manyata Tech Park.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Vidyaranyapura Bus Stand", "Yelahanka", "Hebbal"]
+},
+{
+  "slug": "kadugodi",
+  "name": "Kadugodi",
+  "title": "PG in Kadugodi Bangalore",
+  "description": "Verified PGs in Kadugodi near Whitefield, ITPL, and Sri Sathya Sai Ashram.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Kadugodi Metro", "ITPL", "Whitefield"]
+},
+{
+  "slug": "frazer-town",
+  "name": "Frazer Town",
+  "title": "PG in Frazer Town Bangalore",
+  "description": "Verified PGs in Frazer Town near MG Road, Banaswadi, and Indiranagar.",
+  "rentRange": "₹7,000 - ₹20,000",
+  "landmarks": ["Frazer Town Park", "MG Road", "Indiranagar"]
+},
+{
+  "slug": "yelahanka",
+  "name": "Yelahanka",
+  "title": "PG in Yelahanka Bangalore",
+  "description": "Verified PGs in Yelahanka near Bangalore International Airport and Manyata Tech Park.",
+  "rentRange": "₹5,000 - ₹14,000",
+  "landmarks": ["Yelahanka Market", "Airport Road", "Manyata Tech Park"]
+},
+{
+  "slug": "jalahalli",
+  "name": "Jalahalli",
+  "title": "PG in Jalahalli Bangalore",
+  "description": "Verified PGs in Jalahalli near Peenya, Yeshwanthpur, and BEL Circle.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Jalahalli Cross", "BEL Circle", "Peenya"]
+},
+{
+  "slug": "panathur",
+  "name": "Panathur",
+  "title": "PG in Panathur Bangalore",
+  "description": "Verified PGs in Panathur near Bellandur, Marathahalli, and RGA Tech Park.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Panathur Lake", "Marathahalli", "RGA Tech Park"]
+},
+{
+  "slug": "shivajinagar",
+  "name": "Shivajinagar",
+  "title": "PG in Shivajinagar Bangalore",
+  "description": "Verified PGs in Shivajinagar near Cubbon Park, MG Road, and Cunningham Road.",
+  "rentRange": "₹7,500 - ₹22,000",
+  "landmarks": ["Shivajinagar Bus Stand", "Cubbon Park", "MG Road"]
+},
+{
+  "slug": "uttarahalli",
+  "name": "Uttarahalli",
+  "title": "PG in Uttarahalli Bangalore",
+  "description": "Verified PGs in Uttarahalli near Banashankari, Kanakapura Road, and JP Nagar.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Uttarahalli Main Road", "Banashankari", "JP Nagar"]
+},
+{
+  "slug": "basavanagudi",
+  "name": "Basavanagudi",
+  "title": "PG in Basavanagudi Bangalore",
+  "description": "Verified PGs in Basavanagudi near Bull Temple, Lalbagh, and Jayanagar.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Bull Temple", "Lalbagh Botanical Garden", "Jayanagar"]
+},
+{
+  "slug": "rt-nagar",
+  "name": "RT Nagar",
+  "title": "PG in RT Nagar Bangalore",
+  "description": "Verified PGs in RT Nagar near Hebbal, Manyata Tech Park, and Yeshwanthpur.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["RT Nagar Market", "Hebbal", "Manyata Tech Park"]
+},
+{
+  "slug": "hosur-road",
+  "name": "Hosur Road",
+  "title": "PG on Hosur Road Bangalore",
+  "description": "Verified PGs on Hosur Road with easy access to Electronic City, Bommanahalli, and Silk Board.",
+  "rentRange": "₹5,500 - ₹15,000",
+  "landmarks": ["Hosur Road", "Electronic City", "Silk Board"]
+},
+{
+  "slug": "haralur",
+  "name": "Haralur",
+  "title": "PG in Haralur Bangalore",
+  "description": "Verified PGs in Haralur near Sarjapur Road, Bellandur, and Marathahalli.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Haralur Road", "Sarjapur Road", "Bellandur"]
+},
+{
+  "slug": "mg-road",
+  "name": "MG Road",
+  "title": "PG near MG Road Bangalore",
+  "description": "Premium verified PGs near MG Road in the heart of Bangalore, close to Cubbon Park and Brigade Road.",
+  "rentRange": "₹9,000 - ₹28,000",
+  "landmarks": ["MG Road Metro", "Cubbon Park", "Brigade Road"]
+},
+{
+  "slug": "ejipura",
+  "name": "Ejipura",
+  "title": "PG in Ejipura Bangalore",
+  "description": "Verified PGs in Ejipura near Koramangala, Indiranagar, and Domlur.",
+  "rentRange": "₹7,000 - ₹19,000",
+  "landmarks": ["Ejipura Main Road", "Koramangala", "Indiranagar"]
+},
+{
+  "slug": "rr-nagar",
+  "name": "RR Nagar",
+  "title": "PG in RR Nagar Bangalore",
+  "description": "Verified PGs in Rajarajeshwari Nagar near Mysore Road, Kengeri, and Peenya.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["RR Nagar Metro", "Mysore Road", "Kengeri"]
+},
+{
+  "slug": "kengeri",
+  "name": "Kengeri",
+  "title": "PG in Kengeri Bangalore",
+  "description": "Verified PGs in Kengeri near Mysore Road, RR Nagar, and BMS College of Engineering.",
+  "rentRange": "₹4,500 - ₹12,000",
+  "landmarks": ["Kengeri Bus Terminal", "Mysore Road", "RR Nagar"]
+},
+{
+  "slug": "nelamangala",
+  "name": "Nelamangala",
+  "title": "PG in Nelamangala Bangalore",
+  "description": "Verified PGs in Nelamangala near Tumkur Road, Peenya, and Bangalore North.",
+  "rentRange": "₹4,500 - ₹11,000",
+  "landmarks": ["Nelamangala Town", "Tumkur Road", "Peenya"]
+},
+{
+  "slug": "sadashivanagar",
+  "name": "Sadashivanagar",
+  "title": "PG in Sadashivanagar Bangalore",
+  "description": "Premium verified PGs in Sadashivanagar near Sankey Tank, Malleshwaram, and Palace Grounds.",
+  "rentRange": "₹8,000 - ₹25,000",
+  "landmarks": ["Sankey Tank", "Palace Grounds", "Malleshwaram"]
+},
+{
+  "slug": "magadi-road",
+  "name": "Magadi Road",
+  "title": "PG on Magadi Road Bangalore",
+  "description": "Verified PGs on Magadi Road near Rajajinagar, Yeshwanthpur, and Peenya.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Magadi Road", "Rajajinagar", "Peenya"]
+},
+{
+  "slug": "bagalur",
+  "name": "Bagalur",
+  "title": "PG in Bagalur Bangalore",
+  "description": "Verified PGs in Bagalur near Yelahanka, Bangalore International Airport, and Devanahalli.",
+  "rentRange": "₹4,500 - ₹12,000",
+  "landmarks": ["Bagalur Cross", "Bangalore Airport", "Yelahanka"]
+},
+{
+  "slug": "tavarekere",
+  "name": "Tavarekere",
+  "title": "PG in Tavarekere Bangalore",
+  "description": "Verified PGs in Tavarekere near BTM Layout, Silk Board, and HSR Layout.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Tavarekere Main Road", "BTM Layout", "Silk Board"]
+},
+{
+  "slug": "new-bel-road",
+  "name": "New BEL Road",
+  "title": "PG on New BEL Road Bangalore",
+  "description": "Verified PGs on New BEL Road near BEL Circle, Yeshwanthpur, and Rajajinagar.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["BEL Circle", "ISRO", "Yeshwanthpur"]
+},
+{
+  "slug": "koramangala-1st-block",
+  "name": "Koramangala 1st Block",
+  "title": "PG in Koramangala 1st Block Bangalore",
+  "description": "Verified PGs in Koramangala 1st Block near Sony Signal, Ejipura, and Forum Mall.",
+  "rentRange": "₹8,000 - ₹24,000",
+  "landmarks": ["Sony Signal", "Forum Mall", "Ejipura"]
+},
+{
+  "slug": "viman-nagar",
+  "name": "Viman Nagar",
+  "title": "PG in Viman Nagar Pune",
+  "description": "Verified PGs and coliving spaces in Viman Nagar near Pune Airport, Kalyani Nagar, and Nagar Road.",
+  "rentRange": "₹7,000 - ₹20,000",
+  "landmarks": ["Pune Airport", "Kalyani Nagar", "Nagar Road"]
+},
+{
+  "slug": "akshaya-nagar",
+  "name": "Akshaya Nagar",
+  "title": "PG in Akshaya Nagar Bangalore",
+  "description": "Verified PGs in Akshaya Nagar near Bannerghatta Road, Electronic City, and Hulimavu.",
+  "rentRange": "₹5,500 - ₹14,000",
+  "landmarks": ["Akshaya Nagar Main Road", "Bannerghatta Road", "Electronic City"]
+},
+{
+  "slug": "begur",
+  "name": "Begur",
+  "title": "PG in Begur Bangalore",
+  "description": "Verified PGs in Begur near Electronic City, Bommanahalli, and Hosur Road.",
+  "rentRange": "₹5,000 - ₹13,000",
+  "landmarks": ["Begur Road", "Electronic City", "Bommanahalli"]
 }
 ]
