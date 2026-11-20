@@ -77,7 +77,10 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
     const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality);
     const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
     const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
-    const isEmptyLocality = initialProperties.length === 0;
+    // Only noindex empty pages if they are also programmatic (filtered) variants.
+    // Clean canonical locality pages (/pg/[area]) are kept indexable even with 0 listings
+    // so Google can discover them and they can rank as the area gets listings added.
+    const isEmptyLocality = isProgrammatic && initialProperties.length === 0;
 
     return (
       <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
@@ -162,7 +165,8 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
   const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
   const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
-  const isEmptyLocality = initialProperties.length === 0;
+  // Only noindex empty pages if they are also programmatic (filtered) variants.
+  const isEmptyLocality = isProgrammatic && initialProperties.length === 0;
 
   const pageTitle = `PGs in ${name}`;
   const pageSubtitle = `PGs and coliving stays in ${name} — filter by budget, meals, and gender.`;
