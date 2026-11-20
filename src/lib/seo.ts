@@ -189,8 +189,8 @@ function buildPropertyMetaDescription(property: Property): string {
     const price = (property.price || '').trim();
     const hasPrice = Boolean(price) && !/request|negotiable/i.test(price);
 
-    const priceText = hasPrice ? ` starting from ${price}/month` : '';
-    return `Explore ${name}, a verified ${type} for rent in ${location}${priceText}. View photos and book online with makemystay.ai.`.slice(0, 155);
+    const priceText = hasPrice ? ` from ${price}/month` : '';
+    return `${name} is a verified ${type} for rent in ${location}${priceText}. Real photos, zero brokerage. Book a site visit on MakeMyStay.ai.`.slice(0, 160);
 }
 
 /** Meta + canonical for detail pages (handled via /pg/ or /rent/ routers). */
