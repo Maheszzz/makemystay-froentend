@@ -32,6 +32,8 @@ import type { Property } from '@/types/api';
 interface PropertyCardProps {
     property: Property;
     priority?: boolean;
+    /** Optional category label override (e.g., "PG" on curated PG listing page). */
+    categoryLabel?: string;
 }
 
 function getFallbackImageForType(type?: string): string {
@@ -89,7 +91,7 @@ function formatFurnishingLabel(raw?: string): string | null {
     return clean.charAt(0).toUpperCase() + clean.slice(1);
 }
 
-function PropertyCardComponent({ property, priority = false }: PropertyCardProps) {
+function PropertyCardComponent({ property, priority = false, categoryLabel }: PropertyCardProps) {
     let wishlisted = false;
     let toggleWishlist = (_p: Property) => {};
     try {
@@ -239,7 +241,7 @@ function PropertyCardComponent({ property, priority = false }: PropertyCardProps
                         <div className="mb-3">
                             <div className="flex items-center justify-between gap-2 mb-1.5">
                                 <span className="text-xs font-medium text-slate">
-                                    {property.type || 'Listing'}
+                                    {categoryLabel || property.type || 'Listing'}
                                 </span>
                                 {typeof property.units_remaining === 'number' &&
                                     property.units_remaining > 0 &&

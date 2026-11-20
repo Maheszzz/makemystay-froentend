@@ -74,15 +74,20 @@ export function useListingLocalityOptions(
     seedArea?: string,
     category: 'all' | 'pg' | 'rent' | 'buy' | 'plot' = 'pg',
     citySlug = 'bangalore',
+    enabled = true,
 ) {
     const cacheKey = `${category}::${citySlug}::${seedArea || ''}`;
     const cached = localityCache.get(cacheKey);
     const [areas, setAreas] = useState<string[]>(cached?.areas ?? []);
     const [areaCounts, setAreaCounts] = useState<AreaInventoryCount[]>(cached?.areaCounts ?? []);
     const [stats, setStats] = useState<ListingInventoryStats | null>(cached?.stats ?? null);
-    const [loading, setLoading] = useState(!cached);
+    const [loading, setLoading] = useState(enabled && !cached);
 
     useEffect(() => {
+        if (!enabled) {
+            setLoading(false);
+            return;
+        }
         let cancelled = false;
         if (localityCache.has(cacheKey)) {
             const hit = localityCache.get(cacheKey)!;
@@ -123,7 +128,7 @@ export function useListingLocalityOptions(
         return () => {
             cancelled = true;
         };
-    }, [cacheKey, seedArea, category, citySlug]);
+    }, [cacheKey, seedArea, category, citySlug, enabled]);
 
     return { areas, areaCounts, stats, loading };
 }

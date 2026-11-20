@@ -64,6 +64,22 @@ const HYDERABAD_PG_LINKS = [
     { label: 'PG in Nanakramguda', to: '/pg/nanakramguda' },
 ] as const;
 
+const POPULAR_SEO_SEARCHES = [
+    { label: '1BHK for Rent', to: '/1bhk' },
+    { label: '1RK for Rent', to: '/1rk-for-rent' },
+    { label: 'Flat for Rent', to: '/flats-in-bangalore' },
+    { label: '2BHK for Rent', to: '/2bhk' },
+    { label: 'Apartment for Rent', to: '/apartment-for-rent' },
+    { label: 'Service Apartment for Rent', to: '/service-apartment-for-rent' },
+    { label: 'PG in Bangalore', to: '/pg/bangalore' },
+    { label: 'PG Nearby', to: '/pg-nearby' },
+    { label: 'PG Near Me', to: '/pg-near-me' },
+    { label: '1BHK in Whitefield', to: '/1bhk/whitefield' },
+    { label: '1BHK in Marathahalli', to: '/1bhk/marathahalli' },
+    { label: '1BHK in Bellandur', to: '/1bhk/bellandur' },
+    { label: '1BHK in HSR Layout', to: '/1bhk/hsr-layout' },
+] as const;
+
 const FOOTER_EXPLORE = [
     { label: 'PGs', to: '/pg' },
     { label: 'Flats', to: '/rent' },
@@ -171,6 +187,25 @@ export function Footer() {
                         </p>
                     </div>
                 </div>
+
+                {/* ── Popular Searches (SEO Internal Links) ── */}
+                <nav
+                    aria-label="Popular rental and PG searches"
+                    className="mt-7 pt-6 border-t border-white/10"
+                >
+                    <h2 className="text-sm font-semibold text-white mb-2.5">
+                        Popular Searches
+                    </h2>
+                    <ul className="list-none m-0 p-0 flex flex-wrap gap-x-5 gap-y-1.5">
+                        {POPULAR_SEO_SEARCHES.map((item) => (
+                            <li key={item.to}>
+                                <Link to={item.to} className={DIR_LINK_CLS}>
+                                    {item.label}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
 
                 {/* ── 3. MIDDLE / BOTTOM SECTION — Symmetrical 3-Column Company Block ── */}
                 <div className="mt-8 pt-8 border-t border-white/15 grid grid-cols-1 md:grid-cols-3 gap-10 items-start">

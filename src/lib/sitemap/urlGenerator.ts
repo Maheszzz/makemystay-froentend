@@ -134,8 +134,21 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         '/pg-with-food',
         '/pg-with-ac',
         '/pg-near-me',
+        '/pg-nearby',
+        '/1bhk',
         '/1-bhk',
-        '/2bhk'
+        '/1rk-for-rent',
+        '/2bhk',
+        '/apartment-for-rent',
+        '/service-apartment-for-rent',
+        '/1bhk/whitefield',
+        '/1bhk/marathahalli',
+        '/1bhk/bellandur',
+        '/1bhk/hsr-layout',
+        '/1bhk/koramangala',
+        '/1bhk/btm',
+        '/1bhk/electronic-city',
+        '/1bhk/indiranagar',
     ];
     for (const p of categoryPaths) {
         registerEntry(p, 'category');

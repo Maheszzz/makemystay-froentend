@@ -50,7 +50,17 @@ const HUB_FAQS = [
     },
 ];
 
-export default function PGBangaloreHub() {
+interface PGBangaloreHubProps {
+    initialProperties?: Property[];
+    initialTotalCount?: number;
+    initialPropertyCounts?: Record<string, number>;
+}
+
+export default function PGBangaloreHub({
+    initialProperties,
+    initialTotalCount,
+    initialPropertyCounts,
+}: PGBangaloreHubProps = {}) {
     const helmet = buildPageSEO(pgBangaloreHubSeo());
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
@@ -94,10 +104,14 @@ export default function PGBangaloreHub() {
             <main id="main-content" className="flex-grow pt-[52px] md:pt-[56px] pb-16">
                 <Properties
                     hideChrome
+                    curatedPgOnly
                     initialCategory="pg"
                     initialCity="Bangalore"
                     pageTitle="PGs in Bangalore"
                     pageSubtitle="PGs and coliving homes across Bangalore — filter by area, budget, and amenities."
+                    initialProperties={initialProperties}
+                    initialTotalCount={initialTotalCount}
+                    initialPropertyCounts={initialPropertyCounts}
                     hero={{
                         breadcrumbs: [
                             { name: 'Home', path: '/' },

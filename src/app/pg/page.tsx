@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
 import { listingsPageSeo } from '@/lib/seo';
-import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
+import { fetchCuratedPgPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import Properties from '@/views/Properties';
 
 export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
@@ -15,17 +15,12 @@ export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
 export const dynamic = 'force-dynamic';
 
 export default async function Page() {
-    const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer({
-        category: 'pg',
-        city: 'bangalore',
-        is_available: true,
-        limit: 24,
-        sort_by: 'newest',
-    });
+    const { items: initialProperties, total, propertyCounts } = await fetchCuratedPgPropertiesServer();
 
     return (
         <Properties
             key="pg"
+            curatedPgOnly
             initialCategory="pg"
             initialCity="Bangalore"
             pageTitle="PGs in Bangalore"

@@ -1,6 +1,7 @@
 // Barrel exports for custom hooks
 export {
     useProperties,
+    useCuratedPgProperties,
     useProperty,
     usePropertyFromRoute,
     usePropertyBySlug,

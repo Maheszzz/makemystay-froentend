@@ -26,6 +26,20 @@ export const metadata: Metadata = {
     },
     description:
         'Find verified PGs and flats on rent in Bangalore with real photos, transparent pricing, and zero brokerage. Book a visit in 60 seconds on MakeMyStay.ai.',
+    keywords: [
+        '1bhk for rent',
+        '1rk for rent',
+        'flat for rent',
+        '2bhk for rent',
+        'apartment for rent',
+        'service apartment for rent',
+        'pg in bangalore',
+        'pg nearby',
+        'pg near me',
+        '1bhk in bangalore',
+        'verified pg bangalore',
+        'zero brokerage flats bangalore',
+    ],
     openGraph: {
         type: 'website',
         locale: 'en_IN',
