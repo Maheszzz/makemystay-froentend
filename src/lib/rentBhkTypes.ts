@@ -1,6 +1,7 @@
 export interface RentBhkTypeConfig {
     label: string;
-    apiType: string;
+    /** null = no property_type filter (flat/apartment/service-apartment have no DB type) */
+    apiType: string | null;
     searchLabel: string;
 }
 
@@ -11,11 +12,12 @@ export const RENT_BHK_TYPES: Record<string, RentBhkTypeConfig> = {
     '3bhk': { label: '3BHK', apiType: '3BHK', searchLabel: '3BHK Flats' },
     furnished: { label: 'Furnished', apiType: 'furnished', searchLabel: 'Furnished Flats' },
     '1rk': { label: '1RK', apiType: '1RK', searchLabel: '1RK Rooms' },
-    flat: { label: 'Flat', apiType: 'flat', searchLabel: 'Flats' },
-    apartment: { label: 'Apartment', apiType: 'apartment', searchLabel: 'Apartments' },
+    // No dedicated DB property_type for these — null = show full rent inventory
+    flat: { label: 'Flat', apiType: null, searchLabel: 'Flats' },
+    apartment: { label: 'Apartment', apiType: null, searchLabel: 'Apartments' },
     'service-apartment': {
         label: 'Service Apartment',
-        apiType: 'service_apartment',
+        apiType: null,
         searchLabel: 'Service Apartments',
     },
 };
