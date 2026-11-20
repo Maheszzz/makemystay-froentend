@@ -21,11 +21,20 @@ export default async function TechParkPillarPage({ parkPath }: TechParkPillarPag
     const profile = generateTechParkLandingProfile(parkPath);
     if (!profile) notFound();
 
-    // SSR property fetch — use primary hub locality
+    // SSR property fetch — use primary hub locality (with Bangalore PG fallback)
     let initialProperties: any[] = [];
     try {
-        const result = await propertyApi.getAll({ city: profile.park.hubSlug, limit: 8 });
+        const localityQuery = (profile.park.hubSlug || '').replace(/-/g, ' ').trim();
+        const result = await propertyApi.getAll({
+            category: 'pg',
+            city: localityQuery || 'bangalore',
+            limit: 8,
+        });
         initialProperties = result.items ?? [];
+        if (initialProperties.length === 0 && localityQuery && localityQuery.toLowerCase() !== 'bangalore') {
+            const fallback = await propertyApi.getAll({ category: 'pg', city: 'bangalore', limit: 8 });
+            initialProperties = fallback.items ?? [];
+        }
     } catch {
         // Graceful degradation — page renders without properties
     }

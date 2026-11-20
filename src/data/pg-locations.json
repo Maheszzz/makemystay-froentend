@@ -284,5 +284,77 @@
   "description": "PGs in Banashankari with good connectivity and amenities.",
   "rentRange": "₹5,500 - ₹15,000",
   "landmarks": ["Banashankari Temple", "KR Puram"]
+},
+{
+  "slug": "aecs-layout",
+  "name": "AECS Layout",
+  "title": "PG in AECS Layout Bangalore",
+  "description": "Verified PGs and coliving spaces in AECS Layout near Brookefield and Whitefield IT hubs.",
+  "rentRange": "₹6,500 - ₹18,000",
+  "landmarks": ["AECS Layout Main Road", "Brookefield", "ITPL"]
+},
+{
+  "slug": "beml-layout",
+  "name": "BEML Layout",
+  "title": "PG in BEML Layout Bangalore",
+  "description": "Verified PGs in BEML Layout near Brigade Tech Gardens and Whitefield.",
+  "rentRange": "₹6,500 - ₹18,000",
+  "landmarks": ["Brigade Tech Gardens", "Brookefield", "Kundalahalli"]
+},
+{
+  "slug": "bommanahalli",
+  "name": "Bommanahalli",
+  "title": "PG in Bommanahalli Bangalore",
+  "description": "Affordable verified PGs in Bommanahalli with quick access to Hosur Road, Silk Board, and Electronic City.",
+  "rentRange": "₹5,500 - ₹15,000",
+  "landmarks": ["Bommanahalli Junction", "Silk Board", "Hosur Road"]
+},
+{
+  "slug": "bannerghatta",
+  "name": "Bannerghatta",
+  "title": "PG in Bannerghatta Bangalore",
+  "description": "Verified PGs on Bannerghatta Road near IIM Bangalore, JP Nagar, and major tech campuses.",
+  "rentRange": "₹6,000 - ₹16,500",
+  "landmarks": ["Bannerghatta Road", "IIM Bangalore", "Meenakshi Mall"]
+},
+{
+  "slug": "halasuru",
+  "name": "Halasuru",
+  "title": "PG in Halasuru Bangalore",
+  "description": "Verified PGs in Halasuru near Halasuru Metro Station, Indiranagar, and MG Road.",
+  "rentRange": "₹7,500 - ₹20,000",
+  "landmarks": ["Halasuru Metro Station", "Ulsoor Lake", "Indiranagar"]
+},
+{
+  "slug": "veerannapalya",
+  "name": "Veerannapalya",
+  "title": "PG in Veerannapalya Bangalore",
+  "description": "Verified PGs in Veerannapalya close to Manyata Tech Park, Hebbal, and Nagavara.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Manyata Tech Park", "Nagavara", "Outer Ring Road"]
+},
+{
+  "slug": "hafeezpet",
+  "name": "Hafeezpet",
+  "title": "PG in Hafeezpet Hyderabad",
+  "description": "Verified PGs and coliving spaces in Hafeezpet near HITEC City, Kondapur, and Miyapur.",
+  "rentRange": "₹6,000 - ₹16,000",
+  "landmarks": ["Hafeezpet MMTS", "Kondapur", "HITEC City"]
+},
+{
+  "slug": "gachibowli",
+  "name": "Gachibowli",
+  "title": "PG in Gachibowli Hyderabad",
+  "description": "Verified PGs and coliving spaces in Gachibowli near DLF Cyber City and Financial District.",
+  "rentRange": "₹6,500 - ₹18,000",
+  "landmarks": ["DLF Cyber City", "Gachibowli Stadium", "Outer Ring Road"]
+},
+{
+  "slug": "nanakramguda",
+  "name": "Nanakramguda",
+  "title": "PG in Nanakramguda Hyderabad",
+  "description": "Verified PGs in Nanakramguda near Financial District, Waverock, and Gachibowli IT corridor.",
+  "rentRange": "₹6,500 - ₹18,000",
+  "landmarks": ["Financial District", "Waverock SEZ", "Gachibowli"]
 }
 ]

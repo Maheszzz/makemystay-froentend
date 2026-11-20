@@ -806,10 +806,10 @@ export default function PropertyDetails({
                                     <header className="pt-8 pb-8 border-b border-pdp-border">
                                         <h1
                                             data-seo="pdp-h1"
-                                            title={seoHeading}
+                                            title={displayTitle || property.title}
                                             className="pdp-type-title text-pdp-ink line-clamp-2 break-words"
                                         >
-                                            {seoHeading}
+                                            {displayTitle || property.title}
                                         </h1>
 
                                         {property.location && (

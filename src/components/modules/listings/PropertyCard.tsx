@@ -329,13 +329,13 @@ function PropertyCardComponent({ property, priority = false, categoryLabel }: Pr
                         </div>
 
                         {/* Price & Action */}
-                        <div className="mt-auto flex items-end justify-between gap-3">
+                        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-3 gap-y-2.5">
                             <div className="min-w-0">
                                 <p className="text-xs text-slate mb-0.5">
                                     {isMonthlyRent ? 'Starting from' : 'Price'}
                                 </p>
                                 <div className="flex items-baseline gap-1.5 flex-wrap">
-                                    <span className="font-heading text-xl font-bold text-ink leading-none whitespace-nowrap tabular-nums">
+                                    <span className="font-heading text-lg sm:text-xl font-bold text-ink leading-none whitespace-nowrap tabular-nums">
                                         {property.price}
                                     </span>
                                     {isMonthlyRent && hasNumericPrice && (
@@ -349,7 +349,7 @@ function PropertyCardComponent({ property, priority = false, categoryLabel }: Pr
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 shrink-0">
+                            <div className="flex items-center gap-2 shrink-0 ml-auto">
                                 <button
                                     type="button"
                                     aria-label={`Chat on WhatsApp about ${displayTitle}`}
@@ -358,11 +358,11 @@ function PropertyCardComponent({ property, priority = false, categoryLabel }: Pr
                                         e.stopPropagation();
                                         setIsLeadModalOpen(true);
                                     }}
-                                    className="w-11 h-11 rounded-[10px] border border-line bg-white flex items-center justify-center text-ink hover:bg-blush-100 hover:border-ink/45 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
+                                    className="w-10 h-10 rounded-[10px] border border-line bg-white flex items-center justify-center text-ink hover:bg-blush-100 hover:border-ink/45 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-2"
                                 >
                                     <MessageCircle className="w-4 h-4" />
                                 </button>
-                                <span className="h-11 px-4 rounded-[10px] border border-line bg-page text-ink flex items-center justify-center text-sm font-medium gap-1.5 transition-colors group-hover:bg-red group-hover:text-white group-hover:border-red whitespace-nowrap">
+                                <span className="h-10 px-3.5 rounded-[10px] border border-line bg-page text-ink flex items-center justify-center text-sm font-medium gap-1.5 transition-colors group-hover:bg-red group-hover:text-white group-hover:border-red whitespace-nowrap">
                                     View details
                                     <ArrowRight className="w-3.5 h-3.5" />
                                 </span>

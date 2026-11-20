@@ -16,6 +16,7 @@ import {
 } from '@/lib/curatedPgListings';
 import { ArrowRight, ChevronDown, Heart, MessageCircle, RefreshCw, Search } from 'lucide-react';
 import { PropertyCard } from '@/components/modules/listings/PropertyCard';
+import { NearbyLocalityListings } from '@/components/modules/listings/NearbyLocalityListings';
 import { FeaturedPromoBanner } from '@/components/modules/listings/FeaturedPromoBanner';
 import { ListingFilterBar, type ActiveFilterPill } from '@/components/modules/listings/ListingFilterBar';
 import { ListingHero, type HeroClaimKey, type HeroBreadcrumb } from '@/components/modules/listings/ListingHero';
@@ -978,12 +979,22 @@ function PropertiesInner({
                 href = `/pg/${loc.slug}`;
             } else if (activeTabKey === 'rent' && loc?.slug) {
                 href = `/rent/${loc.slug}`;
+            } else if (location.pathname === '/properties') {
+                const p = new URLSearchParams();
+                if (activeTabKey !== 'all') p.set('cat', activeTabKey);
+                p.set('city', area.name);
+                href = `/properties?${p.toString()}`;
             } else {
                 href = listingsHubTabNavigateUrl(activeTabKey, defaultMetroSlug, area.name);
             }
             return { ...area, href };
         });
-    }, [areaCounts, activeTabKey, defaultMetroSlug]);
+    }, [areaCounts, activeTabKey, defaultMetroSlug, location.pathname]);
+
+    const displayedListingIds = useMemo(
+        () => new Set(propertyListOrdered.map((p) => String(p.id))),
+        [propertyListOrdered],
+    );
 
     const heroBreadcrumbs = useMemo<HeroBreadcrumb[]>(() => {
         if (hero?.breadcrumbs && hero.breadcrumbs.length > 0) return hero.breadcrumbs;
@@ -1274,6 +1285,19 @@ function PropertiesInner({
                                         {!loadingMore && <ChevronDown className="w-4 h-4" />}
                                     </button>
                                 </div>
+                            )}
+
+                            {/* 7. Geo-Location Nearby Places (shown after exact selected locality results) */}
+                            {areaSelectValue && !loading && (
+                                <NearbyLocalityListings
+                                    selectedArea={areaSelectValue}
+                                    category={category}
+                                    excludeIds={displayedListingIds}
+                                    onSelectArea={(nextArea) => {
+                                        setSearchQuery('');
+                                        setLocationFilter(nextArea);
+                                    }}
+                                />
                             )}
                         </div>
                     )}

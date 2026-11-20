@@ -99,6 +99,29 @@ export function TechParkSeoProfileSections({
                 </div>
             </div>
 
+            {/* ── SSR Property Listings ── */}
+            {initialProperties.length > 0 && (
+                <section aria-labelledby="properties-heading">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 id="properties-heading" className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Verified PG Listings near {park.name}
+                        </h2>
+                        <Link
+                            to={`/pg/${park.hubSlug || 'whitefield'}`}
+                            className="text-sm font-semibold text-brand-red hover:underline flex items-center gap-1"
+                        >
+                            View all PGs in {park.locality.split(',')[0]}
+                            <ChevronRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {initialProperties.map((prop) => (
+                            <PropertyCard key={prop.id} property={prop} />
+                        ))}
+                    </div>
+                </section>
+            )}
+
             {/* ── Overview + Companies ── */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left: Description & Who Should Stay */}
@@ -286,29 +309,6 @@ export function TechParkSeoProfileSections({
                     </ul>
                 </section>
             </div>
-
-            {/* ── SSR Property Listings ── */}
-            {initialProperties.length > 0 && (
-                <section aria-labelledby="properties-heading">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 id="properties-heading" className="text-2xl font-bold text-slate-900 tracking-tight">
-                            Verified PG Listings near {park.name}
-                        </h2>
-                        <Link
-                            to={`/pg/${park.hubSlug || 'whitefield'}`}
-                            className="text-sm font-semibold text-brand-red hover:underline flex items-center gap-1"
-                        >
-                            View all PGs in {park.locality.split(',')[0]}
-                            <ChevronRight className="w-4 h-4" />
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {initialProperties.map((prop) => (
-                            <PropertyCard key={prop.id} property={prop} />
-                        ))}
-                    </div>
-                </section>
-            )}
 
             {/* ── FAQs ── */}
             {faqs.length > 0 && (

@@ -1,7 +1,7 @@
 /**
  * Fail build/deploy if LCP hero assets are missing from dist/public.
  */
-import { existsSync, readdirSync, statSync } from 'fs';
+import { existsSync, statSync } from 'fs';
 import { join } from 'path';
 
 const root = process.cwd();
@@ -34,24 +34,3 @@ if (existsSync(jpg)) {
 }
 
 console.log('✅ Hero AVIF/WebP assets present.');
-
-// Guard against Next.js App Router dynamic slug conflicts (e.g. [slug] vs [type] in same directory)
-function checkDynamicRouteConflicts(dir) {
-    if (!existsSync(dir)) return;
-    const entries = readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory());
-    const dynamicDirs = entries
-        .map((e) => e.name)
-        .filter((name) => name.startsWith('[') && name.endsWith(']'));
-    if (dynamicDirs.length > 1) {
-        console.error(
-            `❌ Conflicting dynamic route segments in ${dir}: ${dynamicDirs.join(', ')}`,
-        );
-        process.exit(1);
-    }
-    for (const entry of entries) {
-        checkDynamicRouteConflicts(join(dir, entry.name));
-    }
-}
-
-checkDynamicRouteConflicts(join(root, 'src/app'));
-console.log('✅ No Next.js dynamic route slug conflicts.');

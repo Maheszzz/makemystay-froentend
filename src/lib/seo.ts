@@ -371,7 +371,19 @@ export function buildPgNearMeSEO(): PageSEOInput {
         title: 'PG Near Me in Bangalore — Verified PG Rooms with WiFi & Food',
         description:
             'Find verified PG near you in Bangalore — rooms with WiFi, meals, AC & 24/7 security in Koramangala, Whitefield, HSR, BTM & more. Real photos, zero brokerage on MakeMyStay.ai.',
+        keywords: 'pg near me, pg nearby, pg in bangalore, paying guest near me, coliving near me',
         path: '/pg-near-me',
+    };
+}
+
+/** `/pg-nearby` */
+export function buildPgNearbySEO(): PageSEOInput {
+    return {
+        title: 'PG Nearby in Bangalore | Verified Paying Guest Stays Near You',
+        description:
+            'Find verified PG nearby with real photos, transparent monthly rent, WiFi, meals, and zero brokerage across top Bangalore localities.',
+        keywords: 'pg nearby, pg near me, pg in bangalore, nearby pg for boys, nearby pg for girls',
+        path: '/pg-nearby',
     };
 }
 
@@ -379,7 +391,8 @@ export function buildFlatsInBangaloreSEO(): PageSEOInput {
     return {
         title: 'Flats for Rent in Bangalore — Verified 1BHK, 2BHK & 3BHK | MakeMyStay',
         description:
-            'Browse verified flats for rent in Bangalore — 1BHK, 2BHK, 3BHK and furnished apartments. Real photos, transparent pricing, zero brokerage. Book a site visit on MakeMyStay.ai.',
+            'Browse verified flats for rent in Bangalore — 1BHK, 1RK, 2BHK, 3BHK and furnished apartments. Real photos, transparent pricing, zero brokerage. Book a site visit on MakeMyStay.ai.',
+        keywords: 'flat for rent, flat for rent in bangalore, apartment for rent, 1bhk for rent, 2bhk for rent',
         path: '/flats-in-bangalore',
     };
 }
@@ -389,7 +402,27 @@ export function build1BhkSEO(): PageSEOInput {
         title: '1BHK for Rent in Bangalore — Verified Flats with Real Photos | MakeMyStay',
         description:
             'Find verified 1BHK flats for rent in Bangalore — Koramangala, Whitefield, HSR, BTM & more. Transparent pricing, zero brokerage. Book a site visit on MakeMyStay.ai.',
+        keywords: '1bhk for rent, 1bhk in bangalore, 1bhk flat for rent, verified 1bhk bangalore',
         path: '/1-bhk',
+    };
+}
+
+export function build1BhkLocalitySEO(localityName: string, slug: string): PageSEOInput {
+    return {
+        title: `1BHK in ${localityName} | 1BHK for Rent in ${localityName}, Bangalore`,
+        description: `Browse verified 1BHK in ${localityName} for rent. Compare furnished and semi-furnished 1BHK flats in ${localityName} with real photos and transparent rent.`,
+        keywords: `1bhk in ${localityName.toLowerCase()}, 1bhk for rent in ${localityName.toLowerCase()}, flat for rent in ${localityName.toLowerCase()}`,
+        path: `/1bhk/${slug}`,
+    };
+}
+
+export function build1RkSEO(): PageSEOInput {
+    return {
+        title: '1RK for Rent in Bangalore | Verified Studio & Single Room Flats',
+        description:
+            'Explore verified 1RK for rent in Bangalore ideal for working professionals and students. Furnished and semi-furnished 1RK flats with transparent pricing.',
+        keywords: '1rk for rent, 1rk for rent in bangalore, studio room for rent, 1rk flat for rent',
+        path: '/1rk-for-rent',
     };
 }
 
@@ -398,7 +431,28 @@ export function build2BhkSEO(): PageSEOInput {
         title: '2BHK for Rent in Bangalore — Verified Apartments & Homes | MakeMyStay',
         description:
             'Browse verified 2BHK flats and homes for rent in Bangalore. Real photos, transparent rent, zero brokerage. Compare across Koramangala, Whitefield, HSR & Indiranagar on MakeMyStay.ai.',
+        keywords: '2bhk for rent, 2bhk flat for rent bangalore, 2bhk apartment for rent',
         path: '/2bhk',
+    };
+}
+
+export function buildApartmentForRentSEO(): PageSEOInput {
+    return {
+        title: 'Apartment for Rent in Bangalore | Verified 1BHK, 2BHK & 3BHK Apartments',
+        description:
+            'Find verified apartment for rent in Bangalore across gated communities and prime IT corridors. Real photos, transparent rent, and instant visit booking.',
+        keywords: 'apartment for rent, apartment for rent in bangalore, flat for rent, 1bhk for rent, 2bhk for rent',
+        path: '/apartment-for-rent',
+    };
+}
+
+export function buildServiceApartmentForRentSEO(): PageSEOInput {
+    return {
+        title: 'Service Apartment for Rent in Bangalore | Fully Furnished Serviced Stays',
+        description:
+            'Book a verified service apartment for rent in Bangalore with WiFi, housekeeping, kitchen, and flexible monthly stays near major tech parks.',
+        keywords: 'service apartment for rent, serviced apartment bangalore, furnished apartment for rent, corporate stay bangalore',
+        path: '/service-apartment-for-rent',
     };
 }
 
