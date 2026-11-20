@@ -76,7 +76,7 @@ export default async function RentTypeAreaPage({ params }: PageProps): Promise<R
         const { total } = await fetchPropertiesServer({
             category: 'rent',
             city: cityParam,
-            property_type: apiType,
+            property_type: apiType ?? undefined,
             is_available: true,
             limit: 1,
         });
@@ -90,7 +90,7 @@ export default async function RentTypeAreaPage({ params }: PageProps): Promise<R
             key={`rent-${typeLower}-${areaSlug}`}
             initialCategory="rent"
             initialCity={cityParam}
-            initialTypeFilter={apiType}
+            initialTypeFilter={apiType ?? undefined}
             pageTitle={`${label} for Rent in ${locationLabel}`}
             pageSubtitle={
                 hasInventory
