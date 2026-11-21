@@ -445,6 +445,15 @@ export function build2BhkLocalitySEO(localityName: string, slug: string): PageSE
     };
 }
 
+export function build3BhkLocalitySEO(localityName: string, slug: string): PageSEOInput {
+    return {
+        title: `3 BHK for Rent in ${localityName} Bangalore | Verified Flats — MakeMyStay`,
+        description: `Find verified 3 BHK flats for rent in ${localityName}, Bangalore. Real photos, transparent rent, zero brokerage. Spacious 3 BHK apartments in ${localityName} for families and professionals — book an instant site visit.`,
+        keywords: `3 bhk for rent in ${localityName.toLowerCase()}, 3 bhk in ${localityName.toLowerCase()}, 3bhk flat for rent ${localityName.toLowerCase()}, flat for rent in ${localityName.toLowerCase()} bangalore`,
+        path: `/3bhk/${slug}`,
+    };
+}
+
 export function buildApartmentForRentSEO(): PageSEOInput {
     return {
         title: 'Apartment for Rent in Bangalore | Verified 1BHK, 2BHK & 3BHK Apartments',
