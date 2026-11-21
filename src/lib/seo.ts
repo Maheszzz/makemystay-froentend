@@ -399,19 +399,19 @@ export function buildFlatsInBangaloreSEO(): PageSEOInput {
 
 export function build1BhkSEO(): PageSEOInput {
     return {
-        title: '1BHK for Rent in Bangalore — Verified Flats with Real Photos | MakeMyStay',
+        title: '1 BHK for Rent in Bangalore — Verified Flats, Zero Brokerage | MakeMyStay',
         description:
-            'Find verified 1BHK flats for rent in Bangalore — Koramangala, Whitefield, HSR, BTM & more. Transparent pricing, zero brokerage. Book a site visit on MakeMyStay.ai.',
-        keywords: '1bhk for rent, 1bhk in bangalore, 1bhk flat for rent, verified 1bhk bangalore',
-        path: '/1-bhk',
+            'Find verified 1 BHK flats for rent in Bangalore — Koramangala, Whitefield, HSR Layout, BTM, Indiranagar & more. Real photos, transparent pricing, zero brokerage. Book a free site visit on MakeMyStay.ai.',
+        keywords: '1 bhk for rent in bangalore, 1 bhk flat for rent bangalore, 1bhk in bangalore, furnished 1bhk bangalore, 1 bhk apartments bangalore',
+        path: '/1bhk',
     };
 }
 
 export function build1BhkLocalitySEO(localityName: string, slug: string): PageSEOInput {
     return {
-        title: `1BHK in ${localityName} | 1BHK for Rent in ${localityName}, Bangalore`,
-        description: `Browse verified 1BHK in ${localityName} for rent. Compare furnished and semi-furnished 1BHK flats in ${localityName} with real photos and transparent rent.`,
-        keywords: `1bhk in ${localityName.toLowerCase()}, 1bhk for rent in ${localityName.toLowerCase()}, flat for rent in ${localityName.toLowerCase()}`,
+        title: `1 BHK for Rent in ${localityName} Bangalore | Verified Flats — MakeMyStay`,
+        description: `Find verified 1 BHK flats for rent in ${localityName}, Bangalore. Real photos, transparent rent, zero brokerage. Compare furnished & semi-furnished 1 BHK options in ${localityName} and book an instant site visit.`,
+        keywords: `1 bhk for rent in ${localityName.toLowerCase()}, 1 bhk in ${localityName.toLowerCase()}, 1bhk flat for rent ${localityName.toLowerCase()}, flat for rent in ${localityName.toLowerCase()} bangalore`,
         path: `/1bhk/${slug}`,
     };
 }
