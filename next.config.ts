@@ -63,6 +63,7 @@ const nextConfig: NextConfig = {
             { source: '/hsr-layout-vs-bellandur', destination: '/compare/hsr-layout-vs-bellandur', permanent: true },
             { source: '/whitefield-vs-marathahalli', destination: '/compare/whitefield-vs-marathahalli', permanent: true },
             { source: '/koramangala-vs-indiranagar', destination: '/compare/koramangala-vs-indiranagar', permanent: true },
+            { source: '/1-bhk', destination: '/1bhk', permanent: true },
             { source: '/buy/bangalore', destination: '/buy/in/bangalore', permanent: true },
             { source: '/plot/bangalore', destination: '/plots/in/bangalore', permanent: true },
             { source: '/properties/id/:id', destination: '/properties/:id', permanent: true },
