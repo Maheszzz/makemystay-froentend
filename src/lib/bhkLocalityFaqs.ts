@@ -39,6 +39,41 @@ export function build1BhkLocalityFaqs(name: string, rentRange?: string): FaqItem
     ];
 }
 
+/** Generates rich FAQs for 3BHK locality pages. */
+export function build3BhkLocalityFaqs(name: string, rentRange?: string): FaqItem[] {
+    const range = rentRange ?? '₹22,000 - ₹65,000';
+    return [
+        {
+            question: `What is the rent for 3 BHK flat in ${name}?`,
+            answer: `3 BHK flats for rent in ${name} typically range from ${range} per month. Rent depends on furnishing level, society amenities, floor, and proximity to metro or IT corridors. MakeMyStay lists verified 3 BHK flats in ${name} with real photos and transparent pricing — no hidden charges.`,
+        },
+        {
+            question: `Are there spacious 3 BHK flats for families in ${name}?`,
+            answer: `Yes. ${name} has gated societies and apartment complexes offering spacious 3 BHK flats ideal for larger families. These homes typically feature 3 bedrooms, a living room, a kitchen, and 2–3 bathrooms. MakeMyStay verifies each listing with real photos so families see exactly what they are renting.`,
+        },
+        {
+            question: `Is ${name} a good location for renting a 3 BHK?`,
+            answer: `${name} is a well-connected Bangalore locality with schools, hospitals, supermarkets, and parks accessible nearby. 3 BHK flats in ${name} suit larger families, executives, or professionals sharing a home. MakeMyStay helps you find verified options with zero brokerage and instant site visits.`,
+        },
+        {
+            question: `What amenities do 3 BHK flats in ${name} typically include?`,
+            answer: `3 BHK flats in ${name} in gated societies commonly include covered parking for two cars, 24-hour security, power backup, lift, and a clubhouse. Premium flats also offer a gym, swimming pool, and landscaped gardens. MakeMyStay listings detail all amenities clearly before you book a visit.`,
+        },
+        {
+            question: `How much is the security deposit for a 3 BHK in ${name}?`,
+            answer: `Security deposits for 3 BHK flats in ${name} are typically 2 to 3 months of rent. Fully furnished or premium 3 BHKs may ask for up to 5 months. MakeMyStay listings always state the exact deposit upfront so there are no surprises at the time of agreement.`,
+        },
+        {
+            question: `Is zero brokerage available for 3 BHK flats in ${name}?`,
+            answer: `Yes. MakeMyStay charges zero brokerage to tenants searching for 3 BHK flats in ${name}. You pay no agent commission — only the rent and security deposit agreed directly with the owner. All 3 BHK listings on MakeMyStay follow this transparent, no-brokerage policy.`,
+        },
+        {
+            question: `Can two families or roommates share a 3 BHK in ${name}?`,
+            answer: `Yes. A 3 BHK flat in ${name} is a popular choice for roommates or two working professionals splitting rent. With three separate bedrooms, everyone gets privacy. MakeMyStay lists 3 BHK flats with detailed room photos so you can assess the layout before visiting.`,
+        },
+    ];
+}
+
 /** Generates rich FAQs for 2BHK locality pages. */
 export function build2BhkLocalityFaqs(name: string, rentRange?: string): FaqItem[] {
     const range = rentRange ?? '₹14,000 - ₹40,000';
