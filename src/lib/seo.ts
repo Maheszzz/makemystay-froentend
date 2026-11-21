@@ -428,11 +428,20 @@ export function build1RkSEO(): PageSEOInput {
 
 export function build2BhkSEO(): PageSEOInput {
     return {
-        title: '2BHK for Rent in Bangalore — Verified Apartments & Homes | MakeMyStay',
+        title: '2 BHK for Rent in Bangalore — Verified Flats & Apartments | MakeMyStay',
         description:
-            'Browse verified 2BHK flats and homes for rent in Bangalore. Real photos, transparent rent, zero brokerage. Compare across Koramangala, Whitefield, HSR & Indiranagar on MakeMyStay.ai.',
-        keywords: '2bhk for rent, 2bhk flat for rent bangalore, 2bhk apartment for rent',
+            'Browse verified 2 BHK flats for rent in Bangalore. Real photos, transparent rent, zero brokerage. Compare furnished & semi-furnished 2 BHK apartments across Koramangala, Whitefield, HSR Layout & Indiranagar on MakeMyStay.ai.',
+        keywords: '2 bhk for rent in bangalore, 2 bhk flat for rent bangalore, 2bhk apartment bangalore, furnished 2bhk bangalore',
         path: '/2bhk',
+    };
+}
+
+export function build2BhkLocalitySEO(localityName: string, slug: string): PageSEOInput {
+    return {
+        title: `2 BHK for Rent in ${localityName} Bangalore | Verified Flats — MakeMyStay`,
+        description: `Find verified 2 BHK flats for rent in ${localityName}, Bangalore. Real photos, transparent rent, zero brokerage. Compare furnished & semi-furnished 2 BHK options in ${localityName} and book an instant site visit.`,
+        keywords: `2 bhk for rent in ${localityName.toLowerCase()}, 2 bhk in ${localityName.toLowerCase()}, 2bhk flat for rent ${localityName.toLowerCase()}, flat for rent in ${localityName.toLowerCase()} bangalore`,
+        path: `/2bhk/${slug}`,
     };
 }
 
