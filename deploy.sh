@@ -120,8 +120,42 @@ for HOST in "${HOSTS[@]}"; do
 
   if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
     echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
-    ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" \
-      "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
+    # DEPLOY_PATH may be a symlink to /var/www/releases/release-* (see scripts/deploy-all.sh).
+    # `chown -R` does not follow a symlink given on the command line, so resolve it first;
+    # otherwise the real directory stays root-owned and rsync fails with "Permission denied".
+    ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" bash -s << PREP
+      set -e
+      sudo mkdir -p '$DEPLOY_PATH'
+      REAL_PATH=\$(readlink -f '$DEPLOY_PATH')
+      sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP "\$REAL_PATH"
+      [ -L '$DEPLOY_PATH' ] && sudo chown -h $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'
+      if [ ! -w "\$REAL_PATH" ]; then
+        echo "❌ $DEPLOY_USER still cannot write \$REAL_PATH"; exit 1
+      fi
+      echo "   writable: \$REAL_PATH"
+PREP
+  fi
+
+  # Next standalone traces sharp's native binary for the build machine (e.g. darwin-arm64 on a Mac).
+  # Swap in the Linux binary matching this server's CPU so image optimisation works on EC2.
+  if [[ "$DEPLOY_SOURCE" != "." && -d "${DEPLOY_SOURCE}/node_modules/sharp" ]]; then
+    REMOTE_ARCH=$(ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" uname -m)
+    case "$REMOTE_ARCH" in
+      x86_64|amd64) SHARP_CPU=x64 ;;
+      aarch64|arm64) SHARP_CPU=arm64 ;;
+      *) echo "❌ Unsupported server arch: $REMOTE_ARCH"; exit 1 ;;
+    esac
+    SHARP_VERSION=$(node -p "require('./node_modules/sharp/package.json').version")
+    SHARP_TMP=$(mktemp -d)
+    echo "🖼️  Installing sharp $SHARP_VERSION for linux-$SHARP_CPU..."
+    npm install --no-save --no-package-lock --silent --prefix "$SHARP_TMP" \
+      --os=linux --cpu="$SHARP_CPU" --libc=glibc "sharp@$SHARP_VERSION"
+    rm -rf "${DEPLOY_SOURCE}"/node_modules/@img/sharp-darwin-* "${DEPLOY_SOURCE}"/node_modules/@img/sharp-libvips-darwin-* \
+           "${DEPLOY_SOURCE}"/node_modules/@img/sharp-linux-* "${DEPLOY_SOURCE}"/node_modules/@img/sharp-libvips-linux-*
+    mkdir -p "${DEPLOY_SOURCE}/node_modules/@img"
+    cp -R "$SHARP_TMP"/node_modules/@img/sharp-linux-"$SHARP_CPU" "$SHARP_TMP"/node_modules/@img/sharp-libvips-linux-"$SHARP_CPU" \
+          "${DEPLOY_SOURCE}/node_modules/@img/"
+    rm -rf "$SHARP_TMP"
   fi
 
   RSYNC_EXTRA=(--exclude '.git')
