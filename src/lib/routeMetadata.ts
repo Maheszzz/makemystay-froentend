@@ -8,6 +8,7 @@ import { getTechParkByPath } from '@/data/techParks';
 import { generateTechParkLandingProfile } from '@/lib/landing';
 import { generateProgrammaticBlogPost } from '@/lib/blog';
 import { getLocalitySeoProfile } from '@/lib/locality';
+import { generateLocalityMetadata } from '@/lib/locality/metadataGenerator';
 import { buildTechParkMeta } from '@/lib/techParkContent';
 import { buildNearbyLandmarkSeo } from '@/lib/seoIntentGenerators';
 import {
@@ -43,7 +44,7 @@ import { getLocalityComparison } from '@/data/localityComparisons';
 import { resolveLocalityProfile } from '@/lib/pgLocalityContent';
 import { buildTextOgImageUrl } from '@/lib/ogImage';
 import { pageSeoToMetadata } from '@/lib/nextMetadata';
-import { applyNoindexIfEmptyLocality } from '@/lib/server/localityInventory';
+import { applyNoindexIfEmptyLocality, fetchPgLocalityStats } from '@/lib/server/localityInventory';
 import { SITE_URL } from '@/lib/siteConfig';
 import { OFFICES } from '@/data/offices';
 
@@ -158,7 +159,13 @@ export async function resolvePgSlugMetadata(slug: string): Promise<Metadata> {
 
     const localitySeoProfile = getLocalitySeoProfile(param);
     if (localitySeoProfile) {
-        return applyNoindexIfEmptyLocality(localitySeoProfile.metadata, param, 'pg');
+        const stats = await fetchPgLocalityStats(param);
+        if (!stats) {
+            // API unavailable: keep static metadata and the existing inventory check.
+            return applyNoindexIfEmptyLocality(localitySeoProfile.metadata, param, 'pg');
+        }
+        const meta = generateLocalityMetadata(localitySeoProfile.locality, stats);
+        return stats.count > 0 ? meta : { ...meta, robots: { index: false, follow: true } };
     }
 
     const loc = getPgLocationBySlug(param);

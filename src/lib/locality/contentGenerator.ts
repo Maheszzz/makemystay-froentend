@@ -7,6 +7,10 @@
 
 import { getAllAmenities, type Amenity } from '@/data/amenities';
 import type { HydratedLocality } from '@/data/localities';
+import type { PgLocalityStats } from '@/lib/listingInventoryStats';
+
+const inr = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+const inrRange = (r: { min: number; max: number }) => (r.min === r.max ? inr(r.min) : `${inr(r.min)} – ${inr(r.max)}`);
 
 export interface LocalityHeroContent {
     /** Primary H1 heading */
@@ -73,7 +77,7 @@ export function generateLocalityHero(locality: HydratedLocality): LocalityHeroCo
     const seoIntro = `Find verified PGs in ${locality.name} with WiFi, food, housekeeping, AC and flexible rental options near ${mainTechPark}.`;
 
     return {
-        heading: `Best PG in ${locality.name}, Bangalore`,
+        heading: `PG in ${locality.name}, Bangalore`,
         subHeading: `Verified coliving spaces & paying guest accommodations in ${locality.name} with homely meals, high-speed Wi-Fi, and zero brokerage.`,
         ctaText: `Explore PGs in ${locality.name}`,
         ctaUrl: `/properties?location=${locality.slug}`,
@@ -85,13 +89,22 @@ export function generateLocalityHero(locality: HydratedLocality): LocalityHeroCo
  * Generate a concise 80–120 word Quick Answer optimized for Google AI Overviews,
  * Featured Snippets, and Speakable Schema.
  */
-export function generateLocalityQuickAnswer(locality: HydratedLocality): string {
+export function generateLocalityQuickAnswer(locality: HydratedLocality, stats?: PgLocalityStats | null): string {
     const techParkNames = locality.nearbyTechParks.map((tp) => tp.name).slice(0, 2).join(' and ');
     const metroText = locality.nearbyMetroStations[0]
         ? `Connectivity is enhanced by ${locality.nearbyMetroStations[0].name} on the ${locality.nearbyMetroStations[0].line} Line.`
         : 'The area is well-connected by BMTC buses and ORR arterial routes.';
     const hubText = techParkNames ? `near major employment hubs like ${techParkNames}` : `in the heart of ${locality.city}`;
 
+    if (stats && stats.count > 0 && stats.minPrice != null) {
+        const tiers = [
+            stats.triple && `triple sharing ${inrRange(stats.triple)}`,
+            stats.double && `double sharing ${inrRange(stats.double)}`,
+            stats.single && `single rooms ${inrRange(stats.single)}`,
+        ].filter(Boolean).join(', ');
+        const tierText = tiers ? ` Current rents on MakeMyStay: ${tiers} per month.` : '';
+        return `${locality.name} is one of Bangalore's most sought-after areas for PGs and coliving, located ${hubText}. MakeMyStay currently lists ${stats.count} verified ${stats.count === 1 ? 'PG' : 'PGs'} in ${locality.name}, starting from ${inr(stats.minPrice)} per month.${tierText} ${metroText} Every listing is verified by our team, with zero brokerage on supported listings.`;
+    }
     return `${locality.name} is one of Bangalore's most sought-after residential and IT hubs for paying guest accommodations and coliving spaces. Located ${hubText}, shared PG rooms in ${locality.name} typically cost between ₹8,000 and ₹14,000 per month including food, high-speed Wi-Fi, and daily housekeeping, while single private rooms range from ₹15,000 to ₹22,000. ${metroText} Residents benefit from 24/7 security, power backup, and walking-distance commutes to leading corporate offices.`;
 }
 
@@ -99,17 +112,27 @@ export function generateLocalityQuickAnswer(locality: HydratedLocality): string 
  * Generate comprehensive "About Area" SEO narrative content.
  */
 export function generateLocalityAbout(locality: HydratedLocality): string {
-    const primaryKw = locality.keywords.primary;
-    const secondaryKw = locality.keywords.secondary.slice(0, 2).join(', ');
     const companies = locality.nearbyCompanies.map((c) => c.name).slice(0, 4).join(', ');
 
-    return `${locality.description} Finding a reliable ${primaryKw} has become essential as thousands of professionals and students relocate to work with leading corporations such as ${companies || 'global IT firms'}. Whether you are looking for ${secondaryKw} or professionally managed coliving communities, ${locality.name} offers vibrant nightlife, retail malls, multispecialty healthcare, and seamless transit options across Bangalore.`;
+    const employers = companies ? `Major employers nearby include ${companies}, so many residents can reach work in a short commute.` : `The area is well connected to Bangalore's main IT corridors.`;
+    return `${locality.description} ${employers} Most PGs in ${locality.name} are a mix of owner-run houses and professionally managed coliving buildings, so it pays to compare food, room type and distance to your office before you shortlist. ${locality.name} also has good access to hospitals, shopping and public transport.`;
 }
 
 /**
  * Generate a structured rental pricing guide across all occupancy tiers.
  */
-export function generateLocalityRentalGuide(_locality?: HydratedLocality): LocalityRentalGuide {
+export function generateLocalityRentalGuide(_locality?: HydratedLocality, stats?: PgLocalityStats | null): LocalityRentalGuide {
+    const guide = baseRentalGuide();
+    if (!stats || stats.count === 0) return guide;
+    if (stats.minPrice != null) guide.averageRent = `From ${inr(stats.minPrice)} / month`;
+    if (stats.single) guide.singleSharing.priceRange = `${inrRange(stats.single)} / month`;
+    if (stats.double) guide.doubleSharing.priceRange = `${inrRange(stats.double)} / month`;
+    if (stats.triple) guide.tripleSharing.priceRange = `${inrRange(stats.triple)} / month`;
+    guide.note = `Prices are based on ${stats.count} live ${stats.count === 1 ? 'listing' : 'listings'} on MakeMyStay and are updated regularly. Inclusions (meals, electricity, housekeeping) vary by property — check each listing for details.`;
+    return guide;
+}
+
+function baseRentalGuide(): LocalityRentalGuide {
     return {
         averageRent: '₹8,500 – ₹18,000 / month',
         singleSharing: {

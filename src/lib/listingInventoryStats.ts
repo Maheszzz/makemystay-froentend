@@ -66,3 +66,48 @@ export function formatSqftRange(min: number, max: number): string {
     const b = Math.round(max).toLocaleString('en-IN');
     return min === max ? `${a} sq ft` : `${a} – ${b} sq ft`;
 }
+
+/** Live PG pricing stats for a locality, computed from available listings. */
+export interface PgLocalityStats {
+    count: number;
+    minPrice: number | null;
+    single: { min: number; max: number } | null;
+    double: { min: number; max: number } | null;
+    triple: { min: number; max: number } | null;
+}
+
+function positivePrices(values: Array<number | undefined>): number[] {
+    return values.filter((n): n is number => typeof n === 'number' && Number.isFinite(n) && n > 0);
+}
+
+function range(values: number[]): { min: number; max: number } | null {
+    return values.length ? { min: Math.min(...values), max: Math.max(...values) } : null;
+}
+
+/**
+ * Compute listing count, lowest starting price and per-sharing price ranges for PG listings.
+ * `total` is the API's total count (may exceed `list.length` when paginated).
+ */
+export function computePgLocalityStats(list: Property[], total?: number): PgLocalityStats {
+    const starts: number[] = [];
+    const single: number[] = [];
+    const double: number[] = [];
+    const triple: number[] = [];
+    for (const p of list) {
+        if (!p) continue;
+        const candidates = positivePrices([p.starting_price, p.triple_price, p.double_price, p.single_price, p.private_price]);
+        const fallback = candidates.length ? null : parseMonthlyRentInr(p.price);
+        const start = candidates.length ? Math.min(...candidates) : fallback;
+        if (start != null) starts.push(start);
+        single.push(...positivePrices([p.single_price, p.private_price]));
+        double.push(...positivePrices([p.double_price]));
+        triple.push(...positivePrices([p.triple_price]));
+    }
+    return {
+        count: typeof total === 'number' && total >= list.length ? total : list.length,
+        minPrice: starts.length ? Math.min(...starts) : null,
+        single: range(single),
+        double: range(double),
+        triple: range(triple),
+    };
+}
