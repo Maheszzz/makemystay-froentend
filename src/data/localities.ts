@@ -313,7 +313,7 @@ export const SEO_LOCALITIES: Locality[] = [
             ]
         },
         description:
-            'HSR Layout is widely celebrated as India startup capital and one of Bangalore most planned residential neighborhoods. With leafy avenues, vibrant cafes, and direct access to Koramangala and Bellandur ORR, HSR Layout offers a premium urban living experience.'
+            'HSR Layout is widely celebrated as India\'s startup capital and one of Bangalore\'s most planned residential neighbourhoods. With leafy avenues, vibrant cafes, and direct access to Koramangala and Bellandur ORR, HSR Layout offers a premium urban living experience.'
     },
     {
         id: 'loc-koramangala',

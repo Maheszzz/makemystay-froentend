@@ -29,6 +29,7 @@ import { LocalityInternalLinkHub } from '@/components/seo/LocalityInternalLinkHu
 import { PgRelatedAreasNav } from '@/components/seo/PgRelatedAreasNav';
 import { RelatedSearchesBlock } from '@/components/seo/RelatedSearchesBlock';
 import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
+import { fetchPgLocalityStats } from '@/lib/server/localityInventory';
 import { Link } from '@/lib/navigation';
 import Properties from '@/views/Properties';
 import { ChevronRight, MapPin } from 'lucide-react';
@@ -65,17 +66,25 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       />;
   }
 
-  const localitySeoProfile = getLocalitySeoProfile(actualSlug);
-  if (localitySeoProfile) {
-    const { items: initialProperties, total, propertyCounts } = await fetchPropertiesServer({
-      category: 'pg',
-      city: localitySeoProfile.locality.name,
-      is_available: true,
-      limit: 24,
-      sort_by: 'newest',
-    });
+  const baseLocalityProfile = getLocalitySeoProfile(actualSlug);
+  if (baseLocalityProfile) {
+    const [{ items: initialProperties, total, propertyCounts }, liveStats] = await Promise.all([
+      fetchPropertiesServer({
+        category: 'pg',
+        city: baseLocalityProfile.locality.name,
+        is_available: true,
+        limit: 24,
+        sort_by: 'newest',
+      }),
+      fetchPgLocalityStats(actualSlug),
+    ]);
+    // Re-generate the profile with live pricing so the quick answer, rental guide,
+    // FAQ and FAQ schema reflect real listings instead of generic ranges.
+    const localitySeoProfile = liveStats
+      ? getLocalitySeoProfile(actualSlug, liveStats) ?? baseLocalityProfile
+      : baseLocalityProfile;
 
-    const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality);
+    const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality, liveStats);
     const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
     const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
     // Only noindex empty pages if they are also programmatic (filtered) variants.

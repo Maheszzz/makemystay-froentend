@@ -8,11 +8,12 @@
 import type { HydratedLocality } from '@/data/localities';
 import type { FaqItem } from '@/lib/schema';
 import { SITE_NAME } from '@/lib/siteConfig';
+import type { PgLocalityStats } from '@/lib/listingInventoryStats';
 
 /**
  * Generate 15 SEO-friendly FAQs dynamically from the SEO data layer.
  */
-export function generateLocalityFaqs(locality: HydratedLocality): FaqItem[] {
+export function generateLocalityFaqs(locality: HydratedLocality, stats?: PgLocalityStats | null): FaqItem[] {
     const locName = locality.name;
     const topTechPark = locality.nearbyTechParks[0]?.name || 'nearby IT parks';
     const topMetro = locality.nearbyMetroStations[0]?.name || 'the nearest Namma Metro station';
@@ -23,7 +24,7 @@ export function generateLocalityFaqs(locality: HydratedLocality): FaqItem[] {
     return [
         {
             question: `What is the average rent for a PG in ${locName}, Bangalore?`,
-            answer: `The average monthly rent for a PG in ${locName} starts from ₹7,000 for triple sharing, ₹9,500–₹14,500 for double sharing, and ₹15,000–₹22,000 for private single sharing rooms, including meals, Wi-Fi, and daily housekeeping.`
+            answer: liveRentAnswer(locName, stats) ?? `The average monthly rent for a PG in ${locName} starts from ₹7,000 for triple sharing, ₹9,500–₹14,500 for double sharing, and ₹15,000–₹22,000 for private single sharing rooms, including meals, Wi-Fi, and daily housekeeping.`
         },
         {
             question: `Which is the nearest metro station to PGs in ${locName}?`,
@@ -82,4 +83,17 @@ export function generateLocalityFaqs(locality: HydratedLocality): FaqItem[] {
             answer: `${locName} combines proximity to major corporate campuses like ${topTechPark}, excellent metro connectivity, vibrant cafes, and modern managed coliving infrastructure.`
         }
     ];
+}
+
+function liveRentAnswer(locName: string, stats?: PgLocalityStats | null): string | null {
+    if (!stats || stats.count === 0 || stats.minPrice == null) return null;
+    const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`;
+    const rng = (r: { min: number; max: number }) => (r.min === r.max ? fmt(r.min) : `${fmt(r.min)}–${fmt(r.max)}`);
+    const parts = [
+        stats.triple && `${rng(stats.triple)} for triple sharing`,
+        stats.double && `${rng(stats.double)} for double sharing`,
+        stats.single && `${rng(stats.single)} for single rooms`,
+    ].filter(Boolean);
+    const detail = parts.length ? ` Current rents are ${parts.join(', ')} per month.` : '';
+    return `PGs in ${locName} on MakeMyStay start from ${fmt(stats.minPrice)} per month across ${stats.count} verified ${stats.count === 1 ? 'listing' : 'listings'}.${detail} Inclusions such as meals and housekeeping vary by property.`;
 }

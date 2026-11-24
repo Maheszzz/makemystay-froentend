@@ -50,7 +50,7 @@ const AUTHORS: Record<string, AuthorProfile> = {
         avatarUrl: `${SITE_URL}/images/authors/arjun-rao.jpg`,
         organization: LEGAL_ENTITY_NAME,
         socialLinks: {
-            linkedin: 'https://linkedin.com/company/makemystay',
+            linkedin: 'https://www.linkedin.com/company/makemystay-realty/',
             twitter: 'https://twitter.com/Makemystay16268'
         }
     },
@@ -68,7 +68,7 @@ const AUTHORS: Record<string, AuthorProfile> = {
         avatarUrl: `${SITE_URL}/images/authors/priya-sharma.jpg`,
         organization: LEGAL_ENTITY_NAME,
         socialLinks: {
-            linkedin: 'https://linkedin.com/company/makemystay'
+            linkedin: 'https://www.linkedin.com/company/makemystay-realty/'
         }
     }
 };

@@ -3,6 +3,7 @@ import { getLocalityBySlug } from '@/data/localities';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import { SITE_URL } from '@/lib/siteConfig';
+import { computePgLocalityStats, type PgLocalityStats } from '@/lib/listingInventoryStats';
 
 const CITY_SLUGS = new Set(['bangalore', 'hyderabad', 'pune']);
 const NON_LOCALITY_PG_SLUGS = new Set([
@@ -130,4 +131,25 @@ export async function resolveActiveLocalityKeys(
     }
 
     return activeKeys;
+}
+
+/**
+ * Fetch live PG stats (count, lowest price, sharing ranges) for a locality.
+ * Returns null on API failure so callers can fall back to static copy.
+ */
+export async function fetchPgLocalityStats(citySlug: string): Promise<PgLocalityStats | null> {
+    const queryCity = resolveLocalityQueryCity(citySlug);
+    if (!queryCity) return null;
+    try {
+        const { items, total } = await fetchPropertiesServer({
+            category: 'pg',
+            city: queryCity,
+            is_available: true,
+            limit: 100,
+            sort_by: 'newest',
+        });
+        return computePgLocalityStats(items, total);
+    } catch {
+        return null;
+    }
 }

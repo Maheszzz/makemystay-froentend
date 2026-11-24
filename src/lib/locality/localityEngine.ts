@@ -9,6 +9,7 @@
  * - AI content & blog generation pipelines
  */
 
+import type { PgLocalityStats } from '@/lib/listingInventoryStats';
 import type { Metadata } from 'next';
 import { getAllLocalities, getHydratedLocality, type HydratedLocality } from '@/data/localities';
 import type { Amenity } from '@/data/amenities';
@@ -88,15 +89,15 @@ export interface LocalitySeoProfile {
  * Generate a complete, strongly typed SEO profile for any locality slug.
  * Requires only the `localitySlug` (e.g. "whitefield", "bellandur").
  */
-export function generateLocalitySeoProfile(localitySlug: string): LocalitySeoProfile | undefined {
+export function generateLocalitySeoProfile(localitySlug: string, stats?: PgLocalityStats | null): LocalitySeoProfile | undefined {
     const locality = getHydratedLocality(localitySlug);
     if (!locality) return undefined;
 
     // 1. Generate Core Content Sections
     const hero = generateLocalityHero(locality);
-    const quickAnswer = generateLocalityQuickAnswer(locality);
+    const quickAnswer = generateLocalityQuickAnswer(locality, stats);
     const aboutArea = generateLocalityAbout(locality);
-    const rentalGuide = generateLocalityRentalGuide(locality);
+    const rentalGuide = generateLocalityRentalGuide(locality, stats);
     const topAmenities = generateLocalityAmenities(locality);
     const whoShouldStay = generateWhoShouldStay(locality);
     const reviewsSummary = generateReviewsSummary(locality);
@@ -107,10 +108,10 @@ export function generateLocalitySeoProfile(localitySlug: string): LocalitySeoPro
     const internalLinks = generateLocalityInternalLinks(locality);
 
     // 3. Generate FAQs
-    const faqs = generateLocalityFaqs(locality);
+    const faqs = generateLocalityFaqs(locality, stats);
 
     // 4. Generate Metadata & Schema (Reusing existing engines)
-    const metadata = generateLocalityMetadata(locality);
+    const metadata = generateLocalityMetadata(locality, stats);
     const schemaBundle = generateLocalitySchemaBundle(locality, faqs, breadcrumb);
 
     return {
@@ -141,8 +142,8 @@ export function generateLocalitySeoProfile(localitySlug: string): LocalitySeoPro
 /**
  * Helper alias for retrieving a locality SEO profile by slug.
  */
-export function getLocalitySeoProfile(localitySlug: string): LocalitySeoProfile | undefined {
-    return generateLocalitySeoProfile(localitySlug);
+export function getLocalitySeoProfile(localitySlug: string, stats?: PgLocalityStats | null): LocalitySeoProfile | undefined {
+    return generateLocalitySeoProfile(localitySlug, stats);
 }
 
 /**

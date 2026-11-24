@@ -5,6 +5,7 @@
  * FAQ, ItemList, Speakable, and AggregateRating for maximum SERP dominance.
  */
 
+import { BRAND_CONTACT, BRAND_SAME_AS } from '@/lib/brandEntity';
 import type { HydratedLocality } from '@/data/localities';
 import {
     buildBreadcrumbSchema,
@@ -144,29 +145,26 @@ export function generateLocalitySchemaBundle(
         },
         contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+91-80-4123-4567',
+            telephone: BRAND_CONTACT.telephone,
             contactType: 'customer support',
             areaServed: 'IN',
             availableLanguage: ['en', 'hi', 'kn']
         },
-        sameAs: [
-            'https://twitter.com/Makemystay16268',
-            'https://linkedin.com/company/makemystay'
-        ]
+        sameAs: BRAND_SAME_AS
     };
 
     // Compose into a unified @graph
     const graphSchema: Record<string, unknown> = {
         '@context': 'https://schema.org',
+        // Organization / LocalBusiness are emitted once site-wide (root layout); repeating them here
+        // with different values confused Google. The hard-coded AggregateRating node was removed:
+        // ratings in structured data must come from real, visible reviews (Google review-snippet policy).
         '@graph': [
-            schemaNodeWithoutContext(organizationSchema),
             schemaNodeWithoutContext(placeSchema),
-            schemaNodeWithoutContext(localBusinessSchema),
             schemaNodeWithoutContext(breadcrumbSchema),
             schemaNodeWithoutContext(faqSchema),
             schemaNodeWithoutContext(itemListSchema),
-            schemaNodeWithoutContext(speakableSchema),
-            schemaNodeWithoutContext(aggregateRatingSchema)
+            schemaNodeWithoutContext(speakableSchema)
         ]
     };
 

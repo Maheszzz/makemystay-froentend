@@ -106,15 +106,14 @@ export function ListingHero({ breadcrumbs, title, subtitle, count, claims, extra
                         </ol>
                     </nav>
 
-                    <div className="mt-4 md:mt-5">
-                        <h1 className="type-h1 text-white">
-                            <span>{title}</span>
-                            {typeof count === 'number' && (
-                                <span className="ml-3 inline-flex -translate-y-1 align-middle items-center rounded-full bg-white px-3.5 py-1 font-sans text-sm font-semibold tracking-normal text-red tabular-nums">
-                                    {count.toLocaleString('en-IN')} {count === 1 ? 'listing' : 'listings'}
-                                </span>
-                            )}
-                        </h1>
+                    <div className="mt-4 md:mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+                        <h1 className="type-h1 text-white">{title}</h1>
+                        {/* Badge sits outside the H1 so the heading text stays clean for search engines. */}
+                        {typeof count === 'number' && (
+                            <span className="inline-flex items-center rounded-full bg-white px-3.5 py-1 font-sans text-sm font-semibold tracking-normal text-red tabular-nums">
+                                {count.toLocaleString('en-IN')} {count === 1 ? 'listing' : 'listings'}
+                            </span>
+                        )}
                     </div>
 
                     <div aria-hidden="true" className="mt-3 h-[3px] w-14 rounded-full bg-red-subtitle" />
