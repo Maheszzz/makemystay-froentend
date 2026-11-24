@@ -46,7 +46,7 @@ export default function PGPuneHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Pune');
 
-    const topSlugs = PG_LOCATIONS.filter(loc => ['hinjewadi', 'kharadi', 'wakad', 'viman-nagar', 'baner'].includes(loc.slug));
+    const topSlugs = PG_LOCATIONS.filter(loc => ['viman-nagar'].includes(loc.slug));
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">

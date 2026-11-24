@@ -1,11 +1,19 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getPgLocationBySlug } from '@/data/pgLocations';
 import { resolvePgGenderLocalityMetadata } from '@/lib/routeMetadata';
+import { applyQueryNoindex } from '@/lib/nextMetadata';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    return resolvePgGenderLocalityMetadata(slug, 'men');
+    const sp = searchParams ? await searchParams : undefined;
+    const meta = await resolvePgGenderLocalityMetadata(slug, 'men');
+    return applyQueryNoindex(meta, sp);
 }
 
 export const dynamic = 'force-dynamic';
@@ -14,5 +22,9 @@ import PgGenderLocalityPage from '@/views/PgGenderLocalityPage';
 
 export default async function Page({ params }: PageProps) {
     const { slug } = await params;
-    return <PgGenderLocalityPage overrideSlug={slug} />;
+    const param = (slug || '').toLowerCase();
+    if (!getPgLocationBySlug(param)) {
+        notFound();
+    }
+    return <PgGenderLocalityPage overrideSlug={param} />;
 }

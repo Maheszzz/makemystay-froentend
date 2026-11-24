@@ -101,7 +101,6 @@ const FOOTER_LEGAL = [
     { label: 'Terms & conditions', to: '/terms', external: false },
     { label: 'Privacy Policy', to: '/privacy', external: false },
     { label: 'Refund Policy', to: '/refund-policy', external: false },
-    { label: 'Sitemap', to: '/sitemap.xml', external: true },
 ] as const;
 
 const FOOTER_FOCUS =

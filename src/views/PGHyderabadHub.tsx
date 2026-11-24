@@ -38,7 +38,7 @@ export default function PGHyderabadHub() {
         description: 'Find verified PG in Hyderabad near HiTech City and Gachibowli from ₹5,000/month. Zero brokerage, WiFi included, instant online booking.',
         path: '/pg/hyderabad'
     });
-    
+
     const breadcrumbItems = [
         { name: 'Home', path: '/' },
         { name: 'PG', path: '/pg' },
@@ -46,7 +46,7 @@ export default function PGHyderabadHub() {
     ];
     const combinedLd = buildPgLocationCombinedGraph(HUB_FAQS, breadcrumbItems, 'Hyderabad');
 
-    const topSlugs = PG_LOCATIONS.filter(loc => ['hitech-city', 'gachibowli', 'kondapur', 'madhapur', 'kukatpally'].includes(loc.slug));
+    const topSlugs = PG_LOCATIONS.filter(loc => ['gachibowli', 'kondapur', 'hafeezpet', 'nanakramguda'].includes(loc.slug));
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
@@ -55,7 +55,7 @@ export default function PGHyderabadHub() {
             <Navbar />
 
             <main id="main-content" className="flex-grow pt-20 pb-16">
-                
+
                 {/* ── Hero Header ── */}
                 <div className="bg-white border-b border-slate-100">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
@@ -78,7 +78,7 @@ export default function PGHyderabadHub() {
                                     </span>
                                 </h1>
                                 <p className="mt-5 text-slate-600 text-base md:text-lg leading-relaxed max-w-2xl font-medium">
-                                    Find verified PG in Hyderabad near HiTech City and Gachibowli from ₹5,000/month. 
+                                    Find verified PG in Hyderabad near HiTech City and Gachibowli from ₹5,000/month.
                                     Zero brokerage, WiFi included, instant online booking.
                                 </p>
                                 <div className="mt-6 flex flex-wrap gap-4">
@@ -109,7 +109,7 @@ export default function PGHyderabadHub() {
 
                 {/* ── SEO CONTENT & AREA GUIDES (BELOW THE FOLD) ── */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 space-y-16">
-                    
+
                     {/* Area Navigation Grid */}
                     <section aria-labelledby="top-areas-heading">
                         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
@@ -122,7 +122,7 @@ export default function PGHyderabadHub() {
                                 </p>
                             </div>
                         </div>
-                        
+
                         <nav className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4" aria-label="PG areas">
                             {topSlugs.map((loc) => (
                                 <Link
@@ -150,7 +150,7 @@ export default function PGHyderabadHub() {
                                     Make Your Stay in Hyderabad Seamless
                                 </h2>
                                 <p className="text-slate-600 leading-relaxed">
-                                    Hyderabad offers some of the best-managed and most affordable co-living options among major Indian IT hubs. 
+                                    Hyderabad offers some of the best-managed and most affordable co-living options among major Indian IT hubs.
                                     With major employers like <strong>Google, Microsoft, Amazon, Infosys, and TCS</strong> based in the city, the demand for high-quality stays is tremendous.
                                 </p>
                                 <p className="text-slate-600 leading-relaxed">

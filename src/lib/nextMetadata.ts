@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { buildPageSEO, type PageSEOInput } from '@/lib/seo';
+import { absoluteUrl, buildPageSEO, type PageSEOInput } from '@/lib/seo';
 import {
     SITE_AUTHOR,
     SITE_NAME,
@@ -57,5 +57,42 @@ export function pageSeoToMetadata(input: PageSEOInput, options?: PageMetadataOpt
             description: seo.description,
             images: seo.ogImage ? [seo.ogImage] : undefined,
         },
+    };
+}
+
+/**
+ * For any URL requested with query parameters (?city=...&food=true&price=high...),
+ * enforce `<meta name="robots" content="noindex, follow">` and ensure the canonical
+ * tag points to the clean path without parameters.
+ */
+export function applyQueryNoindex(
+    metadata: Metadata,
+    searchParams?: Record<string, string | string[] | undefined> | null,
+    cleanPath?: string,
+): Metadata {
+    if (!searchParams || Object.keys(searchParams).length === 0) {
+        return metadata;
+    }
+    const existingCanonical =
+        typeof metadata.alternates?.canonical === 'string'
+            ? metadata.alternates.canonical.split('?')[0]
+            : undefined;
+    const canonical = cleanPath ? absoluteUrl(cleanPath) : existingCanonical;
+
+    return {
+        ...metadata,
+        robots: {
+            index: false,
+            follow: true,
+            googleBot: { index: false, follow: true },
+        },
+        ...(canonical
+            ? {
+                  alternates: {
+                      ...metadata.alternates,
+                      canonical,
+                  },
+              }
+            : {}),
     };
 }

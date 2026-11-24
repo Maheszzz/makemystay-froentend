@@ -1,9 +1,15 @@
 import React from 'react';
 import { Link } from '@/lib/navigation';
+import { STATIC_410_GONE_PATHS } from '@/lib/seoPropertyRedirects';
 import type { LocalityAuthorityProfile } from '@/data/authority/types';
 
 export function AuthorityInternalLinkHub({ profile }: { profile: LocalityAuthorityProfile }) {
     const { name, nearbyLocalities, nearbyTechParks, slug } = profile;
+    const safeNearby = nearbyLocalities.filter((loc) => !STATIC_410_GONE_PATHS.has(`/pg/${loc.slug}`));
+    const boysPath = `/pg-for-boys-in-${slug}`;
+    const girlsPath = `/pg-for-girls-in-${slug}`;
+    const rentPath = `/rent/${slug}`;
+    const bhkPath = `/1bhk/${slug}`;
 
     return (
         <section
@@ -35,11 +41,11 @@ export function AuthorityInternalLinkHub({ profile }: { profile: LocalityAuthori
                     </div>
                 )}
 
-                {nearbyLocalities.length > 0 && (
+                {safeNearby.length > 0 && (
                     <div>
                         <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-200 pb-2">Nearby Localities</h3>
                         <nav className="flex flex-col gap-2" aria-label="Nearby PG localities">
-                            {nearbyLocalities.map((loc) => (
+                            {safeNearby.map((loc) => (
                                 <Link
                                     key={loc.slug}
                                     to={`/pg/${loc.slug}`}
@@ -55,17 +61,23 @@ export function AuthorityInternalLinkHub({ profile }: { profile: LocalityAuthori
                 <div>
                     <h3 className="text-sm font-bold text-slate-900 mb-3 border-b border-slate-200 pb-2">Specific Searches</h3>
                     <nav className="flex flex-col gap-2">
-                        <Link to={`/pg-for-boys-in-${slug}`} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
-                            Boys PG in {name} →
-                        </Link>
-                        <Link to={`/pg-for-girls-in-${slug}`} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
-                            Girls PG in {name} →
-                        </Link>
-                        <Link to={`/pg-in-${slug}-with-food`} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
-                            PG in {name} with Food →
-                        </Link>
-                        <Link to={`/pg-in-${slug}-under-10000`} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
-                            Budget PG in {name} →
+                        {!STATIC_410_GONE_PATHS.has(boysPath) && (
+                            <Link to={boysPath} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
+                                Boys PG in {name} →
+                            </Link>
+                        )}
+                        {!STATIC_410_GONE_PATHS.has(girlsPath) && (
+                            <Link to={girlsPath} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
+                                Girls PG in {name} →
+                            </Link>
+                        )}
+                        {!STATIC_410_GONE_PATHS.has(rentPath) && (
+                            <Link to={rentPath} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
+                                Flats for Rent in {name} →
+                            </Link>
+                        )}
+                        <Link to={bhkPath} className="text-sm font-medium text-slate-700 hover:text-brand-red transition-colors">
+                            1 BHK in {name} →
                         </Link>
                     </nav>
                 </div>

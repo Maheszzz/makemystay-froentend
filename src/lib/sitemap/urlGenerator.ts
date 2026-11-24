@@ -7,7 +7,7 @@
 
 import { SITE_URL } from '@/lib/siteConfig';
 import { SEO_LOCALITIES } from '@/data/localities';
-import { PG_LOCATIONS } from '@/data/pgLocations';
+import { LEGACY_PG_SLUG_REDIRECTS, PG_LOCATIONS } from '@/data/pgLocations';
 import { TECH_PARKS } from '@/data/techParks';
 import { OFFICES } from '@/data/offices';
 import { BLOG_POSTS } from '@/data/blogPosts';
@@ -39,17 +39,21 @@ export interface SitemapUrlEntry {
     images?: SitemapImageEntry[];
 }
 
+import { STATIC_410_GONE_PATHS } from '@/lib/seoPropertyRedirects';
+
 /**
  * Validates whether a relative path is canonical and eligible for XML indexing.
- * Skips parameterized queries, duplicate prefixes (/pg-in-*), and blocked paths.
+ * Skips parameterized queries, spaces, duplicate prefixes (/pg-in-*), 410 paths, and blocked paths.
  */
 export function isCanonicalIndexablePath(path: string): boolean {
     if (!path) return false;
-    if (path.includes('?') || path.includes('#') || path.includes('=')) return false;
-    if (path.startsWith('/pg-in-')) return false; // Non-canonical duplicate of /pg/*
-    if (path.startsWith('/property/')) return false; // Non-canonical redirect to /pg/:id-:slug or /rent/:id-:slug
-    if (path.startsWith('/buy/') && !path.startsWith('/buy/in/')) return false; // Only /buy/in/[city] exists
-    if (path.startsWith('/api') || path.startsWith('/_next') || path.startsWith('/admin')) return false;
+    if (/[?#=\s]/.test(path) || /%20/i.test(path)) return false;
+    const lower = path.replace(/\/+$/, '').toLowerCase();
+    if (STATIC_410_GONE_PATHS.has(path) || STATIC_410_GONE_PATHS.has(lower)) return false;
+    if (lower.startsWith('/pg-in-')) return false; // Non-canonical duplicate of /pg/*
+    if (lower === '/1-bhk') return false; // Redirects to /1bhk
+    if (lower.startsWith('/buy/') && !lower.startsWith('/buy/in/')) return false; // Only /buy/in/[city] exists
+    if (lower.startsWith('/api') || lower.startsWith('/_next') || lower.startsWith('/admin')) return false;
     return true;
 }
 
@@ -121,87 +125,6 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         { path: '/rent/bangalore', category: 'rent' as const },
         { path: '/rent/hyderabad', category: 'rent' as const },
         { path: '/rent/pune', category: 'rent' as const },
-        // BHK category pages
-        { path: '/rent/1bhk/bangalore', category: 'rent' as const },
-        { path: '/rent/2bhk/bangalore', category: 'rent' as const },
-        { path: '/rent/3bhk/bangalore', category: 'rent' as const },
-        { path: '/rent/furnished/bangalore', category: 'rent' as const },
-        // Area + BHK combos
-        { path: '/rent/1bhk/koramangala', category: 'rent' as const },
-        { path: '/rent/1bhk/whitefield', category: 'rent' as const },
-        { path: '/rent/1bhk/electronic-city', category: 'rent' as const },
-        { path: '/rent/1bhk/hsr-layout', category: 'rent' as const },
-        { path: '/rent/1bhk/btm', category: 'rent' as const },
-        { path: '/rent/1bhk/marathahalli', category: 'rent' as const },
-        { path: '/rent/1bhk/bellandur', category: 'rent' as const },
-        { path: '/rent/1bhk/sarjapur-road', category: 'rent' as const },
-        { path: '/rent/2bhk/koramangala', category: 'rent' as const },
-        { path: '/rent/2bhk/whitefield', category: 'rent' as const },
-        { path: '/rent/2bhk/hsr-layout', category: 'rent' as const },
-        { path: '/rent/2bhk/electronic-city', category: 'rent' as const },
-        { path: '/rent/2bhk/indiranagar', category: 'rent' as const },
-        { path: '/rent/furnished/koramangala', category: 'rent' as const },
-        { path: '/rent/furnished/whitefield', category: 'rent' as const },
-        { path: '/rent/furnished/electronic-city', category: 'rent' as const },
-        // Flat / apartment / 1RK / service-apartment city pages
-        { path: '/rent/flat/bangalore', category: 'rent' as const },
-        { path: '/rent/apartment/bangalore', category: 'rent' as const },
-        { path: '/rent/1rk/bangalore', category: 'rent' as const },
-        { path: '/rent/service-apartment/bangalore', category: 'rent' as const },
-        // Flat combos — top areas
-        { path: '/rent/flat/koramangala', category: 'rent' as const },
-        { path: '/rent/flat/whitefield', category: 'rent' as const },
-        { path: '/rent/flat/hsr-layout', category: 'rent' as const },
-        { path: '/rent/flat/electronic-city', category: 'rent' as const },
-        { path: '/rent/flat/marathahalli', category: 'rent' as const },
-        { path: '/rent/flat/indiranagar', category: 'rent' as const },
-        { path: '/rent/apartment/koramangala', category: 'rent' as const },
-        { path: '/rent/apartment/whitefield', category: 'rent' as const },
-        { path: '/rent/apartment/hsr-layout', category: 'rent' as const },
-        { path: '/rent/1rk/koramangala', category: 'rent' as const },
-        { path: '/rent/1rk/whitefield', category: 'rent' as const },
-        { path: '/rent/1rk/electronic-city', category: 'rent' as const },
-        // 2BHK area combos — missing
-        { path: '/rent/2bhk/btm', category: 'rent' as const },
-        { path: '/rent/2bhk/marathahalli', category: 'rent' as const },
-        { path: '/rent/2bhk/bellandur', category: 'rent' as const },
-        { path: '/rent/2bhk/sarjapur-road', category: 'rent' as const },
-        { path: '/rent/2bhk/hebbal', category: 'rent' as const },
-        { path: '/rent/2bhk/jp-nagar', category: 'rent' as const },
-        { path: '/rent/2bhk/jayanagar', category: 'rent' as const },
-        // 3BHK area combos
-        { path: '/rent/3bhk/koramangala', category: 'rent' as const },
-        { path: '/rent/3bhk/whitefield', category: 'rent' as const },
-        { path: '/rent/3bhk/hsr-layout', category: 'rent' as const },
-        { path: '/rent/3bhk/indiranagar', category: 'rent' as const },
-        { path: '/rent/3bhk/electronic-city', category: 'rent' as const },
-        // Furnished area combos — missing
-        { path: '/rent/furnished/hsr-layout', category: 'rent' as const },
-        { path: '/rent/furnished/indiranagar', category: 'rent' as const },
-        { path: '/rent/furnished/marathahalli', category: 'rent' as const },
-        { path: '/rent/furnished/btm', category: 'rent' as const },
-        { path: '/rent/furnished/bellandur', category: 'rent' as const },
-        // Flat area combos — missing
-        { path: '/rent/flat/btm', category: 'rent' as const },
-        { path: '/rent/flat/bellandur', category: 'rent' as const },
-        { path: '/rent/flat/sarjapur-road', category: 'rent' as const },
-        { path: '/rent/flat/hebbal', category: 'rent' as const },
-        { path: '/rent/flat/jp-nagar', category: 'rent' as const },
-        // Apartment area combos — missing
-        { path: '/rent/apartment/electronic-city', category: 'rent' as const },
-        { path: '/rent/apartment/marathahalli', category: 'rent' as const },
-        { path: '/rent/apartment/btm', category: 'rent' as const },
-        { path: '/rent/apartment/bellandur', category: 'rent' as const },
-        { path: '/rent/apartment/indiranagar', category: 'rent' as const },
-        // 1RK area combos — missing
-        { path: '/rent/1rk/hsr-layout', category: 'rent' as const },
-        { path: '/rent/1rk/btm', category: 'rent' as const },
-        { path: '/rent/1rk/marathahalli', category: 'rent' as const },
-        { path: '/rent/1rk/bellandur', category: 'rent' as const },
-        // Service apartment area combos
-        { path: '/rent/service-apartment/koramangala', category: 'rent' as const },
-        { path: '/rent/service-apartment/whitefield', category: 'rent' as const },
-        { path: '/rent/service-apartment/indiranagar', category: 'rent' as const },
         // PG gender pages — high volume
         { path: '/pg-for-girls-in-bangalore', category: 'category' as const },
         { path: '/pg-for-boys-in-bangalore', category: 'category' as const },
@@ -250,6 +173,7 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         registerEntry(`/rent/${loc.slug}`, 'rent');
     }
     for (const loc of PG_LOCATIONS) {
+        if (LEGACY_PG_SLUG_REDIRECTS[loc.slug]) continue;
         registerEntry(`/pg/${loc.slug}`, 'locality');
         registerEntry(`/rent/${loc.slug}`, 'rent');
         registerEntry(`/pg-for-boys-in-${loc.slug}`, 'locality');

@@ -4,24 +4,38 @@ import type { NextRequest } from 'next/server';
 import { STATIC_410_GONE_PATHS } from '@/lib/seoPropertyRedirects';
 
 /**
- * Middleware for URL normalization and legacy redirects.
+ * Middleware for 410 Gone enforcement, URL normalization, and query-param noindex headers.
  */
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  let decodedPath = pathname;
+  try {
+    decodedPath = decodeURIComponent(pathname);
+  } catch {
+    // Keep raw pathname if malformed percent-encoding
+  }
 
   // Normalize pathname: strip trailing slash (except root '/') and check lowercase
   const cleanPath = pathname.length > 1 && pathname.endsWith('/')
     ? pathname.slice(0, -1)
     : pathname;
   const lowerPath = cleanPath.toLowerCase();
+  const decodedClean = decodedPath.length > 1 && decodedPath.endsWith('/')
+    ? decodedPath.slice(0, -1)
+    : decodedPath;
+  const decodedLower = decodedClean.toLowerCase();
 
   // 0. Immediate 410 Gone check for permanently removed or invalid URLs
   if (
     STATIC_410_GONE_PATHS.has(pathname) ||
     STATIC_410_GONE_PATHS.has(cleanPath) ||
-    STATIC_410_GONE_PATHS.has(lowerPath)
+    STATIC_410_GONE_PATHS.has(lowerPath) ||
+    STATIC_410_GONE_PATHS.has(decodedPath) ||
+    STATIC_410_GONE_PATHS.has(decodedClean) ||
+    STATIC_410_GONE_PATHS.has(decodedLower)
   ) {
-    return new NextResponse('410 Gone - This listing or page has been permanently removed.', {
+    return new NextResponse('Gone', {
       status: 410,
       headers: { 'X-Robots-Tag': 'noindex, nofollow' },
     });
@@ -57,20 +71,28 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  // 3. Filter / parameter URLs must not be indexed (follow links, noindex page)
+  if (
+    searchParams.toString().length > 0 &&
+    !pathname.startsWith('/api') &&
+    !pathname.startsWith('/_next')
+  ) {
+    response.headers.set('X-Robots-Tag', 'noindex, follow');
+  }
+
+  return response;
 }
 
 export const config = {
   matcher: [
-    // Match all routes except _next, api, and static files for the lowercase/www checks
+    // Match all routes except _next, api, and static files
     '/((?!api|_next/static|_next/image|favicon.ico|images|.*\\.).*)',
     '/rent/:path*',
     '/property/:path*',
     '/properties/:path*',
     '/pg/:path*',
-    '/pg-in-:slug*',
-    '/pg-for-boys-in-:slug*',
-    '/pg-for-girls-in-:slug*',
   ],
 };
 

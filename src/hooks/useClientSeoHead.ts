@@ -85,8 +85,10 @@ export function useClientSeoHead({
         const managed: Element[] = [];
         document.title = title;
 
+        const hasQueryParams = typeof window !== 'undefined' && window.location.search.length > 0;
+        const cleanCanonical = canonicalHref ? canonicalHref.split('?')[0] : canonicalHref;
         const existingRobots = document.head.querySelector('meta[name="robots"]')?.getAttribute('content') || '';
-        const effectiveNoindex = Boolean(noindex || existingRobots.includes('noindex'));
+        const effectiveNoindex = Boolean(noindex || hasQueryParams || existingRobots.includes('noindex'));
 
         upsertMeta('description', { name: 'description', content: description }, managed, 'meta[name="description"]');
         upsertMeta(
@@ -104,7 +106,7 @@ export function useClientSeoHead({
         upsertMeta('author', { name: 'author', content: SITE_AUTHOR }, managed);
         upsertMeta('publisher', { name: 'publisher', content: SITE_PUBLISHER }, managed);
         upsertMeta('language', { name: 'language', content: 'en-IN' }, managed);
-        upsertLink('canonical', { rel: 'canonical', href: canonicalHref }, managed, 'link[rel="canonical"]');
+        upsertLink('canonical', { rel: 'canonical', href: cleanCanonical }, managed, 'link[rel="canonical"]');
 
         upsertMeta('og:title', { property: 'og:title', content: title }, managed);
         upsertMeta('og:description', { property: 'og:description', content: description }, managed);

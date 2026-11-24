@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getProgrammaticBlogSlugs } from '@/lib/blog';
+import { generateProgrammaticBlogPost, getProgrammaticBlogSlugs } from '@/lib/blog';
+import { getBlogPost } from '@/data/blogPosts';
 import { resolveBlogSlugMetadata } from '@/lib/routeMetadata';
 import BlogPostView from '@/views/BlogPost';
 
@@ -23,7 +24,9 @@ export const revalidate = 3600;
 
 export default async function Page({ params }: PageProps) {
     const { slug } = await params;
-    if (!slug) notFound();
+    if (!slug || (!generateProgrammaticBlogPost(slug) && !getBlogPost(slug))) {
+        notFound();
+    }
 
     return <BlogPostView slug={slug} />;
 }

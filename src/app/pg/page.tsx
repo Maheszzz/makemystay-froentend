@@ -1,16 +1,24 @@
 import type { Metadata } from 'next';
-import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { applyQueryNoindex, pageSeoToMetadata } from '@/lib/nextMetadata';
 import { listingsPageSeo } from '@/lib/seo';
 import { fetchCuratedPgPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 import Properties from '@/views/Properties';
 
-export const metadata: Metadata = pageSeoToMetadata(listingsPageSeo({
-    pathname: '/pg',
-    pageTitle: 'PGs in Bangalore',
-    pageSubtitle: 'Paying guest stays and coliving spaces in Bangalore',
-    category: 'pg',
-    cityLabel: 'Bangalore',
-}));
+type PageProps = {
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+    const sp = searchParams ? await searchParams : undefined;
+    const base = pageSeoToMetadata(listingsPageSeo({
+        pathname: '/pg',
+        pageTitle: 'PGs in Bangalore',
+        pageSubtitle: 'Paying guest stays and coliving spaces in Bangalore',
+        category: 'pg',
+        cityLabel: 'Bangalore',
+    }));
+    return applyQueryNoindex(base, sp, '/pg');
+}
 
 export const dynamic = 'force-dynamic';
 

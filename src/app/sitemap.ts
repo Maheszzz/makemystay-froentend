@@ -1,165 +1,193 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/siteConfig';
+import { LEGACY_PG_SLUG_REDIRECTS, PG_LOCATIONS } from '@/data/pgLocations';
+import { BLOG_POSTS } from '@/data/blogPosts';
+import { OFFICES } from '@/data/offices';
+import { TECH_PARKS } from '@/data/techParks';
+import { STATIC_410_GONE_PATHS } from '@/lib/seoPropertyRedirects';
+import { getPropertyDetailPath } from '@/lib/propertyRouting';
+import { fetchPropertiesServer } from '@/lib/server/fetchPropertiesServer';
 
-export const revalidate = 86400; // 24h — rarely changes
+export const revalidate = 3600; // Revalidate every hour
 
 const base = SITE_URL.replace(/\/+$/, '');
 
-/**
- * Lightweight sitemap index for /sitemap.xml.
- * Returns the child sitemaps that are already working. No API calls — cannot time out.
- * Next.js serialises this as a <sitemapindex> when it detects the sitemap() return type.
- *
- * NOTE: Next.js App Router sitemap() does NOT support sitemapindex natively.
- * We serve a plain sitemap with all static + rent/pg URLs here.
- * The existing /sitemap-properties.xml, /sitemap-blog.xml etc. are served separately.
- */
-export default function sitemap(): MetadataRoute.Sitemap {
+const DISALLOWED_PREFIXES = [
+    '/_next/',
+    '/api/',
+    '/admin',
+    '/login',
+    '/quick-pay',
+    '/wishlist',
+    '/schedule-demo',
+];
+
+function isValidSitemapPath(rawPath: string): boolean {
+    if (!rawPath || !rawPath.startsWith('/')) return false;
+    // Exclude query parameters, fragments, spaces, and percent-encoded spaces
+    if (/[?#=\s]/.test(rawPath) || /%20/i.test(rawPath)) return false;
+
+    const clean = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+    const lower = clean.toLowerCase();
+    let decoded = lower;
+    try {
+        decoded = decodeURIComponent(lower);
+    } catch {
+        return false;
+    }
+
+    if (/\s/.test(decoded)) return false;
+
+    // Exclude all 410 Gone paths
+    if (
+        STATIC_410_GONE_PATHS.has(rawPath) ||
+        STATIC_410_GONE_PATHS.has(clean) ||
+        STATIC_410_GONE_PATHS.has(lower) ||
+        STATIC_410_GONE_PATHS.has(decoded)
+    ) {
+        return false;
+    }
+
+    // Exclude internal/private/non-canonical prefixes
+    if (DISALLOWED_PREFIXES.some((prefix) => lower.startsWith(prefix))) return false;
+    if (lower.startsWith('/pg-in-')) return false;
+
+    return true;
+}
+
+const TOP_BHK_LOCALITIES = [
+    'whitefield',
+    'marathahalli',
+    'bellandur',
+    'hsr-layout',
+    'koramangala',
+    'btm',
+    'electronic-city',
+    'indiranagar',
+    'sarjapur-road',
+    'hebbal',
+    'jp-nagar',
+    'jayanagar',
+];
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const today = new Date().toISOString().split('T')[0];
+    const seen = new Set<string>();
+    const entries: MetadataRoute.Sitemap = [];
 
-    // Core pages
-    const core: MetadataRoute.Sitemap = [
-        { url: `${base}/`, lastModified: today, changeFrequency: 'daily', priority: 1.0 },
-        { url: `${base}/pg`, lastModified: today, changeFrequency: 'daily', priority: 0.95 },
-        { url: `${base}/rent`, lastModified: today, changeFrequency: 'daily', priority: 0.95 },
-        { url: `${base}/pg/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.95 },
-        { url: `${base}/rent/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.95 },
+    const add = (
+        path: string,
+        changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
+        priority: number,
+        lastModified: string = today,
+    ) => {
+        if (!isValidSitemapPath(path)) return;
+        const normalized = path === '/' ? '/' : path.replace(/\/+$/, '');
+        const url = normalized === '/' ? `${base}/` : `${base}${normalized}`;
+        if (seen.has(url)) return;
+        seen.add(url);
+        entries.push({ url, lastModified, changeFrequency, priority });
+    };
 
-        // BHK city pages
-        { url: `${base}/rent/1bhk/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/2bhk/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/3bhk/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/flat/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/apartment/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/furnished/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/1rk/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/rent/service-apartment/bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
+    // 1. Core static & hub pages (all verified 200 canonical routes)
+    add('/', 'daily', 1.0);
+    add('/pg', 'daily', 0.95);
+    add('/rent', 'daily', 0.95);
+    add('/properties', 'daily', 0.9);
+    add('/buy', 'weekly', 0.8);
+    add('/plots', 'weekly', 0.8);
+    add('/pg/bangalore', 'daily', 0.95);
+    add('/pg/hyderabad', 'daily', 0.85);
+    add('/pg/pune', 'daily', 0.85);
+    add('/rent/bangalore', 'daily', 0.95);
+    add('/rent/hyderabad', 'daily', 0.85);
+    add('/rent/pune', 'daily', 0.85);
+    add('/buy/in/bangalore', 'weekly', 0.8);
+    add('/plots/in/bangalore', 'weekly', 0.8);
 
-        // 1BHK area combos
-        { url: `${base}/rent/1bhk/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/sarjapur-road`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/1bhk/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
+    // 2. Category & feature landing pages
+    add('/1bhk', 'daily', 0.9);
+    add('/2bhk', 'daily', 0.9);
+    add('/1rk-for-rent', 'daily', 0.85);
+    add('/apartment-for-rent', 'daily', 0.85);
+    add('/service-apartment-for-rent', 'weekly', 0.8);
+    add('/flats-in-bangalore', 'weekly', 0.85);
+    add('/pg-vs-flat-bangalore', 'monthly', 0.75);
+    add('/pg-for-boys', 'daily', 0.85);
+    add('/pg-for-girls', 'daily', 0.85);
+    add('/pg-with-wifi', 'weekly', 0.8);
+    add('/pg-with-food', 'weekly', 0.8);
+    add('/pg-with-ac', 'weekly', 0.8);
+    add('/pg-near-me', 'weekly', 0.8);
+    add('/pg-nearby', 'weekly', 0.8);
+    add('/pg-single-room', 'weekly', 0.8);
 
-        // 2BHK area combos
-        { url: `${base}/rent/2bhk/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/sarjapur-road`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/hebbal`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/jp-nagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/2bhk/jayanagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
+    // 3. Locality PG, Rent, and Gender hubs (from PG_LOCATIONS, excluding legacy redirects & 410 list)
+    for (const loc of PG_LOCATIONS) {
+        if (LEGACY_PG_SLUG_REDIRECTS[loc.slug]) continue;
+        add(`/pg/${loc.slug}`, 'daily', 0.88);
+        add(`/rent/${loc.slug}`, 'daily', 0.85);
+        add(`/pg-for-boys-in-${loc.slug}`, 'weekly', 0.8);
+        add(`/pg-for-girls-in-${loc.slug}`, 'weekly', 0.8);
+    }
 
-        // 3BHK area combos
-        { url: `${base}/rent/3bhk/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/3bhk/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/3bhk/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/3bhk/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/3bhk/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
+    // 4. BHK locality pages (/1bhk/[slug], /2bhk/[slug], /3bhk/[slug])
+    const validLocSlugs = new Set(PG_LOCATIONS.map((l) => l.slug));
+    for (const slug of TOP_BHK_LOCALITIES) {
+        if (!validLocSlugs.has(slug)) continue;
+        add(`/1bhk/${slug}`, 'daily', 0.85);
+        add(`/2bhk/${slug}`, 'daily', 0.85);
+        add(`/3bhk/${slug}`, 'weekly', 0.8);
+    }
 
-        // Flat area combos
-        { url: `${base}/rent/flat/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/sarjapur-road`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/hebbal`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/rent/flat/jp-nagar`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
+    // 5. Tech park & office pages
+    for (const tp of TECH_PARKS) {
+        if (tp.path) add(`/${tp.path.replace(/^\/+/, '')}`, 'weekly', 0.8);
+    }
+    for (const off of OFFICES) {
+        if (off.slug) add(`/office/${off.slug}`, 'weekly', 0.75);
+    }
 
-        // Apartment area combos
-        { url: `${base}/rent/apartment/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/apartment/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
+    // 6. Blog posts
+    add('/blog', 'weekly', 0.8);
+    for (const post of BLOG_POSTS) {
+        if (post.slug) add(`/blog/${post.slug}`, 'monthly', 0.8);
+    }
 
-        // Furnished area combos
-        { url: `${base}/rent/furnished/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/furnished/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
+    // 7. Static informational pages
+    add('/about', 'monthly', 0.6);
+    add('/contact-us', 'monthly', 0.6);
+    add('/faq', 'monthly', 0.7);
+    add('/how-we-verify', 'monthly', 0.7);
+    add('/for-owners', 'monthly', 0.7);
+    add('/research', 'monthly', 0.7);
+    add('/reports', 'monthly', 0.7);
+    add('/statistics', 'monthly', 0.7);
 
-        // 1RK area combos
-        { url: `${base}/rent/1rk/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/rent/1rk/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
+    // 8. Dynamic individual listings from database/API -> canonical /property/[slug]
+    try {
+        const first = await fetchPropertiesServer({ is_available: true, limit: 500, skip: 0 }, 8000);
+        const allItems = [...first.items];
+        let skip = first.items.length;
+        while (first.total > allItems.length && skip < first.total && skip < 2000) {
+            const nextBatch = await fetchPropertiesServer(
+                { is_available: true, limit: 500, skip },
+                8000,
+            );
+            if (nextBatch.items.length === 0) break;
+            allItems.push(...nextBatch.items);
+            skip += nextBatch.items.length;
+        }
+        for (const prop of allItems) {
+            if (prop.is_available === false) continue;
+            const detailPath = getPropertyDetailPath(prop);
+            if (detailPath.startsWith('/property/')) {
+                add(detailPath, 'daily', 0.85);
+            }
+        }
+    } catch {
+        // Non-fatal during offline builds: static & locality routes still populate sitemap
+    }
 
-        // Service apartment area combos
-        { url: `${base}/rent/service-apartment/koramangala`, lastModified: today, changeFrequency: 'weekly', priority: 0.8 },
-        { url: `${base}/rent/service-apartment/whitefield`, lastModified: today, changeFrequency: 'weekly', priority: 0.8 },
-        { url: `${base}/rent/service-apartment/indiranagar`, lastModified: today, changeFrequency: 'weekly', priority: 0.8 },
-
-        // PG areas
-        { url: `${base}/pg/koramangala`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/whitefield`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/electronic-city`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/hsr-layout`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/marathahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/btm`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/indiranagar`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg/bellandur`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/pg/hebbal`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/pg/sarjapur-road`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/pg/manyata-tech-park`, lastModified: today, changeFrequency: 'daily', priority: 0.88 },
-        { url: `${base}/pg/kr-puram`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/jp-nagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/jayanagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/rajajinagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/nagawara`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/thanisandra`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/hoodi`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/brookefield`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/domlur`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/cv-raman-nagar`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/banaswadi`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/banashankari`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/kadubeesanahalli`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/mahadevapura`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-        { url: `${base}/pg/yeshwanthpur`, lastModified: today, changeFrequency: 'daily', priority: 0.85 },
-
-        // PG gender landing pages
-        { url: `${base}/pg-for-girls-in-bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-        { url: `${base}/pg-for-boys-in-bangalore`, lastModified: today, changeFrequency: 'daily', priority: 0.9 },
-
-        // Blog
-        { url: `${base}/blog`, lastModified: today, changeFrequency: 'weekly', priority: 0.8 },
-        { url: `${base}/blog/1bhk-for-rent-bangalore-guide-2026`, lastModified: today, changeFrequency: 'monthly', priority: 0.85 },
-        { url: `${base}/blog/cheapest-areas-rent-1bhk-bangalore-2026`, lastModified: today, changeFrequency: 'monthly', priority: 0.85 },
-        { url: `${base}/blog/pg-vs-flat-bangalore-which-is-better-2026`, lastModified: today, changeFrequency: 'monthly', priority: 0.85 },
-
-        // Static
-        { url: `${base}/about`, changeFrequency: 'monthly', priority: 0.6 },
-        { url: `${base}/contact-us`, changeFrequency: 'monthly', priority: 0.6 },
-        { url: `${base}/faq`, changeFrequency: 'monthly', priority: 0.7 },
-        { url: `${base}/how-we-verify`, changeFrequency: 'monthly', priority: 0.7 },
-        { url: `${base}/pg-vs-flat-bangalore`, changeFrequency: 'monthly', priority: 0.75 },
-        { url: `${base}/flats-in-bangalore`, changeFrequency: 'weekly', priority: 0.8 },
-    ];
-
-    return core;
+    return entries;
 }
