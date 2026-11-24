@@ -1,24 +1,14 @@
 User-agent: *
 Allow: /
-Allow: /pg
-Allow: /rent
-Allow: /buy
-Allow: /plots
-Allow: /properties
-Allow: /blog
-Allow: /llms.txt
 
-# Disallow private and utility pages
+# Private and utility pages
 Disallow: /admin
 Disallow: /login
 Disallow: /api/
 Disallow: /quick-pay
 Disallow: /wishlist
 Disallow: /schedule-demo
-Disallow: /_next/static/
 
 Sitemap: https://makemystay.ai/sitemap.xml
 
 # AI / LLM discovery context available at https://makemystay.ai/llms.txt
-# Sitemap files are discovery hints only (not indexable pages).
-# X-Robots-Tag: noindex, follow is set on /sitemap*.xml via Next.js headers
