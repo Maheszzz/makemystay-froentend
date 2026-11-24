@@ -227,8 +227,8 @@ export function PgLocationDeepContent({ name, profile }: PgLocationDeepContentPr
                 <Link to="/pg/bangalore" className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-red hover:underline group">
                     Explore full City Guide <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
-                <Link to={`/pg-in-${name.toLowerCase().replace(/\s+/g, '-')}-under-10000`} className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 hover:text-brand-red decoration-slate-300 hover:decoration-brand-red underline underline-offset-4">
-                    Budget PGs in {name}
+                <Link to="/rent/bangalore" className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-800 hover:text-brand-red decoration-slate-300 hover:decoration-brand-red underline underline-offset-4">
+                    Flats for Rent in Bangalore
                 </Link>
             </div>
         </article>

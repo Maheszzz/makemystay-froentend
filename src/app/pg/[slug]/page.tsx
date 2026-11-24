@@ -1,15 +1,21 @@
 import type { Metadata } from 'next';
 import { resolvePgSlugMetadata } from '@/lib/routeMetadata';
+import { applyQueryNoindex } from '@/lib/nextMetadata';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { getStaticPgPropertyRedirect } from '@/lib/seoPropertyRedirects';
 import PropertyDetails from '@/views/PropertyDetails';
 import { notFound, permanentRedirect } from 'next/navigation';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    return resolvePgSlugMetadata(slug);
+    const sp = searchParams ? await searchParams : undefined;
+    const meta = await resolvePgSlugMetadata(slug);
+    return applyQueryNoindex(meta, sp);
 }
 
 import { getLocalitySlugs } from '@/lib/locality';
@@ -30,7 +36,7 @@ export default async function Page({ params }: PageProps) {
     const { slug } = await params;
     const param = (slug || '').toLowerCase();
 
-    
+
     const staticTo = getStaticPgPropertyRedirect(param);
     if (staticTo) {
         permanentRedirect(staticTo);

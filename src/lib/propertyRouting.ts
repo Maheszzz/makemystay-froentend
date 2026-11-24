@@ -66,43 +66,20 @@ export function buildPropertySeoSlug(
 }
 
 /**
- * Build the canonical property detail path: /properties/{id}-{slug}
- * Using the ID prefix means the detail page can always fetch by ID — no
- * separate slug-lookup needed and links stay valid even if the title changes.
+ * Build the single canonical property detail path: /property/{id}-{slug}
+ * Using `/property/[slug]` as the single canonical path for all individual listings
+ * prevents duplicate indexing across `/pg/`, `/rent/`, `/properties/`, and `/property/`.
  *
  * Examples:
- *   /properties/102-slc-bhk-2
- *   /properties/45-premium-pg-koramangala
+ *   /property/102-slc-bhk-2
+ *   /property/45-premium-pg-koramangala
  */
 export function getPropertyDetailPath(property: Property): string {
     const id = normalizePropertyId(property.id);
     if (!id) return '/properties';
     const slugPart = buildPropertySeoSlug(property);
-    
-    const category = (property.category || '').toLowerCase();
-    const typeLower = (property.type || '').toLowerCase();
-    const isPgType = ['pg', 'hostel', 'coliving'].some(t => typeLower.includes(t));
-
-    // Audit Log: Detect data mismatches for internal cleanup
-    if (isPgType && category === 'rent') {
-        console.warn(`[SEO AUDIT] Category Mismatch: Property ID ${id} is type "${property.type}" but categorized as "rent". Correct prefixing applied.`, { id, title: property.title });
-    }
-
-    // Priority: PG/Hostel types always get /pg prefix
-    // Otherwise follow the category
-    let prefix = '/pg';
-    if (category === 'rent' && !isPgType) {
-        prefix = '/rent';
-    } else if (category === 'buy') {
-        prefix = '/buy';
-    } else if (category === 'plot') {
-        prefix = '/plot';
-    } else if (isPgType || category === 'pg') {
-        prefix = '/pg';
-    }
-    
     const base = slugPart ? `${id}-${slugPart}` : id;
-    return `${prefix}/${base}`;
+    return `/property/${base}`;
 }
 
 /**

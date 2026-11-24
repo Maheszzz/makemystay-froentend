@@ -1,14 +1,3 @@
 User-agent: *
 Allow: /
-
-# Private and utility pages
-Disallow: /admin
-Disallow: /login
-Disallow: /api/
-Disallow: /quick-pay
-Disallow: /wishlist
-Disallow: /schedule-demo
-
 Sitemap: https://makemystay.ai/sitemap.xml
-
-# AI / LLM discovery context available at https://makemystay.ai/llms.txt

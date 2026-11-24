@@ -1,14 +1,20 @@
 import type { Metadata } from 'next';
 import { resolvePropertyPageMetadata } from '@/lib/propertyMetadata';
+import { applyQueryNoindex } from '@/lib/nextMetadata';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
 import { notFound, permanentRedirect } from 'next/navigation';
 import PropertyDetails from '@/views/PropertyDetails';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    return resolvePropertyPageMetadata(slug);
+    const sp = searchParams ? await searchParams : undefined;
+    const meta = await resolvePropertyPageMetadata(slug);
+    return applyQueryNoindex(meta, sp);
 }
 
 export const revalidate = 3600;

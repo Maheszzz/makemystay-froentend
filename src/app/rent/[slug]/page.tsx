@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
 import { resolveRentSlugMetadata } from '@/lib/routeMetadata';
+import { applyQueryNoindex } from '@/lib/nextMetadata';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    return resolveRentSlugMetadata(slug);
+    const sp = searchParams ? await searchParams : undefined;
+    const meta = await resolveRentSlugMetadata(slug);
+    return applyQueryNoindex(meta, sp);
 }
 
 import { notFound, permanentRedirect } from 'next/navigation';

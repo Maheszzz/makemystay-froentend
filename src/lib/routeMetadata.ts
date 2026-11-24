@@ -207,12 +207,16 @@ export async function resolvePgGenderLocalityMetadata(
 ): Promise<Metadata> {
     const param = (slug || '').toLowerCase();
     const canonicalSlug = resolveLegacyPgSlug(param) ?? param;
+    const isBangaloreCity = canonicalSlug === 'bangalore';
     const loc = getPgLocationBySlug(canonicalSlug) ?? getLocalitySeoProfile(canonicalSlug)?.locality;
-    const name = loc?.name ?? canonicalSlug.replace(/-/g, ' ');
+    if (!isBangaloreCity && !loc) {
+        notFound();
+    }
+    const name = isBangaloreCity ? 'Bangalore' : loc!.name;
     const gender =
         variant === 'men' ? 'men' : variant === 'women' ? 'women' : variant === 'boys' ? 'male' : 'female';
     const meta = pageSeoToMetadata(pgGenderLocalitySeo(name, param, gender));
-    return applyNoindexIfEmptyLocality(meta, canonicalSlug, 'pg');
+    return isBangaloreCity ? meta : applyNoindexIfEmptyLocality(meta, canonicalSlug, 'pg');
 }
 
 export function resolveBlogSlugMetadata(slug: string): Metadata {
@@ -232,8 +236,8 @@ export function resolveBlogSlugMetadata(slug: string): Metadata {
     const cover = post.imageUrl?.startsWith('http')
         ? post.imageUrl
         : post.imageUrl
-          ? `${SITE_URL}${post.imageUrl}`
-          : undefined;
+            ? `${SITE_URL}${post.imageUrl}`
+            : undefined;
     return pageSeoToMetadata(
         {
             title: post.title,
@@ -469,10 +473,10 @@ export function resolveCityListingsMetadata(
     const pathname = category === 'rent'
         ? `/rent/in/${city}`
         : category === 'buy'
-          ? `/buy/in/${city}`
-          : category === 'plot'
-            ? `/plots/in/${city}`
-            : `/properties/in/${city}`;
+            ? `/buy/in/${city}`
+            : category === 'plot'
+                ? `/plots/in/${city}`
+                : `/properties/in/${city}`;
     const titles: Record<string, string> = {
         rent: `Flats & Houses for Rent in ${cityLabel} — Verified | MakeMyStay`,
         buy: `Buy Property in ${cityLabel} — Verified Flats & Homes | MakeMyStay`,

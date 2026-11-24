@@ -1,13 +1,19 @@
 import type { Metadata } from 'next';
 import { resolvePgGenderLocalityMetadata } from '@/lib/routeMetadata';
+import { applyQueryNoindex } from '@/lib/nextMetadata';
 import { notFound } from 'next/navigation';
 import { getPgLocationBySlug } from '@/data/pgLocations';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
-    return resolvePgGenderLocalityMetadata(slug, 'boys');
+    const sp = searchParams ? await searchParams : undefined;
+    const meta = await resolvePgGenderLocalityMetadata(slug, 'boys');
+    return applyQueryNoindex(meta, sp);
 }
 
 export const dynamic = 'force-dynamic';

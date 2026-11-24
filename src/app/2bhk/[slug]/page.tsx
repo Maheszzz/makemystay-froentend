@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { MapPin, Home, ChevronRight, CheckCircle2, Users } from 'lucide-react';
 import { getPgLocationBySlug } from '@/data/pgLocations';
-import { pageSeoToMetadata } from '@/lib/nextMetadata';
+import { applyQueryNoindex, pageSeoToMetadata } from '@/lib/nextMetadata';
 import { build2BhkLocalitySEO } from '@/lib/seo';
 import { build2BhkLocalityFaqs } from '@/lib/bhkLocalityFaqs';
 import { buildFaqPageSchema, buildBreadcrumbSchema } from '@/lib/schema';
@@ -14,13 +14,17 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { Link } from '@/lib/navigation';
 import Properties from '@/views/Properties';
 
-type PageProps = { params: Promise<{ slug: string }> };
+type PageProps = {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
     const { slug } = await params;
     const loc = getPgLocationBySlug(slug);
     if (!loc) return {};
-    return pageSeoToMetadata(build2BhkLocalitySEO(loc.name, loc.slug));
+    const sp = searchParams ? await searchParams : undefined;
+    return applyQueryNoindex(pageSeoToMetadata(build2BhkLocalitySEO(loc.name, loc.slug)), sp, `/2bhk/${loc.slug}`);
 }
 
 export const dynamic = 'force-dynamic';

@@ -105,21 +105,23 @@ export function useNavigate() {
 type LegacyTo =
     | string
     | {
-          pathname?: string;
-          search?: string;
-          hash?: string;
-      };
+        pathname?: string;
+        search?: string;
+        hash?: string;
+    };
 
-/** React Router `to` → Next.js `href` string. */
+/** React Router `to` → Next.js `href` string (never emits raw spaces in paths). */
 export function resolveNavigationHref(to: LegacyTo): string {
     if (typeof to === 'string') {
         if (!to || to.includes('[object Object]')) return '/';
-        return to;
+        const [pathPart, rest] = to.split(/(?=[?#])/);
+        const safePath = pathPart.replace(/ /g, '%20');
+        return rest ? `${safePath}${rest}` : safePath;
     }
     if (!to || typeof to !== 'object' || !('pathname' in to || 'search' in to || 'hash' in to)) {
         return '/';
     }
-    const pathname = to.pathname || '/';
+    const pathname = (to.pathname || '/').replace(/ /g, '%20');
     const search = to.search ? (to.search.startsWith('?') ? to.search : `?${to.search}`) : '';
     const hash = to.hash ? (to.hash.startsWith('#') ? to.hash : `#${to.hash}`) : '';
     return `${pathname}${search}${hash}`;
