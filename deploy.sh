@@ -121,7 +121,7 @@ for HOST in "${HOSTS[@]}"; do
   if [[ "$REMOTE_PREP_OWNERSHIP" == true && "$DRY_RUN" != true ]]; then
     echo "🔐 Ensuring deploy user can write $DEPLOY_PATH (sudo on server)..."
     ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" \
-      "sudo mkdir -p '$DEPLOY_PATH' && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'"
+      "TARGET_PATH=\$(readlink -m '$DEPLOY_PATH'); sudo mkdir -p \"\$TARGET_PATH\" && sudo chown -R $DEPLOY_USER:$DEPLOY_GROUP \"\$TARGET_PATH\"; if [ -L '$DEPLOY_PATH' ]; then sudo chown -h $DEPLOY_USER:$DEPLOY_GROUP '$DEPLOY_PATH'; fi"
   fi
 
   RSYNC_EXTRA=(--exclude '.git')
@@ -133,7 +133,7 @@ for HOST in "${HOSTS[@]}"; do
   rsync $RSYNC_FLAGS \
     -e "ssh $SSH_OPTS -i $PEM_KEY" \
     "${RSYNC_EXTRA[@]}" \
-    "$RSYNC_FROM" "$DEPLOY_USER@$HOST:$DEPLOY_PATH"
+    "$RSYNC_FROM" "$DEPLOY_USER@$HOST:${DEPLOY_PATH%/}/"
 
   # -----------------------------
   # REMOTE EXECUTION
@@ -143,15 +143,27 @@ for HOST in "${HOSTS[@]}"; do
   ssh $SSH_OPTS -i "$PEM_KEY" "$DEPLOY_USER@$HOST" << EOF
     set -e
 
-    cd $DEPLOY_PATH
+    cd "$DEPLOY_PATH"
 
     # Remove any legacy static sitemap*.xml files so Next.js dynamic /sitemap.xml is always served
     rm -f public/sitemap*.xml dist/public/sitemap*.xml 2>/dev/null || true
 
     echo "🔁 Restarting Next.js app..."
-    if systemctl list-unit-files makemystay-next.service >/dev/null 2>&1; then
-      sudo systemctl restart makemystay-next
+    if systemctl cat makemystay-next.service >/dev/null 2>&1; then
+      sudo systemctl stop makemystay-next 2>/dev/null || true
+      if sudo fuser 3000/tcp >/dev/null 2>&1; then
+        echo "⚠️  Clearing stray process on port 3000..."
+        sudo fuser -k 3000/tcp >/dev/null 2>&1 || true
+        sleep 1
+      fi
+      sudo systemctl start makemystay-next
+      sleep 2
       sudo systemctl is-active makemystay-next
+      curl -sf -o /dev/null http://127.0.0.1:3000/health.json && echo "Next.js responding on :3000" || {
+        echo "❌ Health check failed on :3000"
+        sudo journalctl -u makemystay-next -n 20 --no-pager
+        exit 1
+      }
     elif [ -f server.js ]; then
       echo "⚠️  makemystay-next.service missing — restarting node server.js (install once: deploy/install-next-on-ec2.sh)"
       pkill -f "${DEPLOY_PATH}/server.js" 2>/dev/null || true
