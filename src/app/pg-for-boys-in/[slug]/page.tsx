@@ -27,5 +27,5 @@ export default async function Page({ params }: PageProps) {
     if (!getPgLocationBySlug(param)) {
         notFound();
     }
-    return <PgGenderLocalityPage overrideSlug={param} />;
+    return <PgGenderLocalityPage overrideSlug={param} variant="boys" />;
 }
