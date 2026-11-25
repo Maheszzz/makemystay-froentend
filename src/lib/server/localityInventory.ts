@@ -55,13 +55,36 @@ export async function hasLocalityInventory(
 }
 
 /**
- * Shared metadata helper: adds `robots: { index: false, follow: true }` when a locality has 0 available listings.
+ * Returns true when the locality page renders real, useful server-side guide content
+ * (>= 300 words: area overview, rent range, commute/landmarks, FAQs).
+ * Only pages with 0 listings AND under 300 words of SSR content should be noindexed.
+ */
+export function hasRichLocalityGuideContent(
+    citySlug: string,
+    _category: LocalityInventoryCategory = 'pg',
+): boolean {
+    const raw = (citySlug || '').trim().toLowerCase();
+    if (!raw) return false;
+    const canonicalSlug = resolveLegacyPgSlug(raw) ?? raw;
+    return Boolean(
+        getPgLocationBySlug(canonicalSlug) ||
+        getLocalityBySlug(canonicalSlug) ||
+        getLocalityBySlug(raw),
+    );
+}
+
+/**
+ * Shared metadata helper: adds `robots: { index: false, follow: true }` ONLY when a locality
+ * has 0 available listings AND lacks rich server-rendered guide content (< 300 words).
  */
 export async function applyNoindexIfEmptyLocality(
     meta: Metadata,
     citySlug: string,
     category: LocalityInventoryCategory = 'pg',
 ): Promise<Metadata> {
+    if (hasRichLocalityGuideContent(citySlug, category)) {
+        return meta;
+    }
     const hasInventory = await hasLocalityInventory(citySlug, category);
     if (!hasInventory) {
         return {

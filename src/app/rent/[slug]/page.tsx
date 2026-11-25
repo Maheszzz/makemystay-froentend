@@ -31,8 +31,34 @@ export default async function RentSlugPage({ params }: PageProps) {
 
     const { getPgLocationBySlug } = await import('@/data/pgLocations');
     const { getLocalitySeoProfile } = await import('@/lib/locality');
-    if (getPgLocationBySlug(param) || getLocalitySeoProfile(param)) {
-        return <RentSlugRoute />;
+    const loc = getPgLocationBySlug(param) ?? getLocalitySeoProfile(param)?.locality;
+    if (loc) {
+        let initialProperties;
+        let initialTotalCount;
+        let initialPropertyCounts;
+        try {
+            const { fetchPropertiesServer } = await import('@/lib/server/fetchPropertiesServer');
+            const res = await fetchPropertiesServer({
+                category: 'rent',
+                city: loc.name,
+                is_available: true,
+                limit: 24,
+                sort_by: 'newest',
+            });
+            initialProperties = res.items;
+            initialTotalCount = res.total;
+            initialPropertyCounts = res.propertyCounts;
+        } catch {
+            // Non-blocking fallback to client fetch
+        }
+        return (
+            <RentSlugRoute
+                overrideSlug={param}
+                initialProperties={initialProperties}
+                initialTotalCount={initialTotalCount}
+                initialPropertyCounts={initialPropertyCounts}
+            />
+        );
     }
 
     const { fetchPropertyAnySlugServer } = await import('@/lib/server/fetchPropertyById');

@@ -53,31 +53,44 @@ export default async function AuthorityLocalityPage({
 }: AuthorityLocalityPageProps) {
     let programmaticModifier = '';
     let filterObj: any = { category: 'pg', city: profile.name, is_available: true, limit: 24, sort_by: 'newest' };
-    
+    const normalizedGender: 'male' | 'female' | undefined =
+        overrideGender?.toLowerCase() === 'female'
+            ? 'female'
+            : overrideGender?.toLowerCase() === 'male'
+              ? 'male'
+              : undefined;
+
     if (overrideMaxPrice) {
         programmaticModifier = ` under ₹${overrideMaxPrice}`;
         filterObj.max_price = Number(overrideMaxPrice) || undefined;
-    } else if (overrideGender) {
-        programmaticModifier = ` for ${overrideGender}`;
-        filterObj.gender = overrideGender.toLowerCase();
+    } else if (normalizedGender) {
+        programmaticModifier = normalizedGender === 'female' ? ' for Girls' : ' for Boys';
+        filterObj.gender = normalizedGender;
     } else if (overrideFeature) {
         programmaticModifier = ` with ${overrideFeature}`;
         if (overrideFeature.toLowerCase() === 'food') filterObj.foodIncluded = true;
         if (overrideFeature.toLowerCase() === 'ac') filterObj.hasAC = true;
     }
 
-    const dynamicTitle = `PG & Coliving in ${profile.name}${programmaticModifier}`;
-    const metaTitle = overrideMaxPrice || overrideGender || overrideFeature 
+    const dynamicTitle = normalizedGender
+        ? `${normalizedGender === 'female' ? 'Girls' : 'Boys'} PG in ${profile.name}`
+        : `PG & Coliving in ${profile.name}${programmaticModifier}`;
+    const metaTitle = overrideMaxPrice || normalizedGender || overrideFeature
         ? `${dynamicTitle} | Verified Stays | MakeMyStay.ai`
         : profile.metaTitle;
-    const metaDesc = overrideMaxPrice || overrideGender || overrideFeature
-        ? `Find verified ${dynamicTitle}. Explore budget-friendly stays, reviews, and commute times to tech parks on MakeMyStay.`
-        : profile.metaDescription;
+    const metaDesc = normalizedGender
+        ? normalizedGender === 'female'
+            ? `Find safe, verified girls PG and ladies hostels in ${profile.name}, Bangalore with CCTV, WiFi, meals, and zero brokerage.`
+            : `Find verified boys PG and men's coliving stays in ${profile.name}, Bangalore with WiFi, meals, and zero brokerage.`
+        : overrideMaxPrice || overrideFeature
+          ? `Find verified ${dynamicTitle}. Explore budget-friendly stays, reviews, and commute times to tech parks on MakeMyStay.`
+          : profile.metaDescription;
 
+    const genderPathSegment = overrideGender?.toLowerCase() === 'female' ? 'girls' : 'boys';
     const canonicalPath = overrideMaxPrice 
         ? `/pg-in-${profile.slug}-under-${overrideMaxPrice}`
         : overrideGender
-        ? `/pg-for-${overrideGender.toLowerCase()}-in-${profile.slug}`
+        ? `/pg-for-${genderPathSegment}-in-${profile.slug}`
         : overrideFeature
         ? `/pg-in-${profile.slug}-with-${overrideFeature.toLowerCase()}`
         : `/pg/${profile.slug}`;

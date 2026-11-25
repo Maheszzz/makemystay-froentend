@@ -125,9 +125,6 @@ export function generateAllSitemapUrls(): SitemapUrlEntry[] {
         { path: '/rent/bangalore', category: 'rent' as const },
         { path: '/rent/hyderabad', category: 'rent' as const },
         { path: '/rent/pune', category: 'rent' as const },
-        // PG gender pages — high volume
-        { path: '/pg-for-girls-in-bangalore', category: 'category' as const },
-        { path: '/pg-for-boys-in-bangalore', category: 'category' as const },
         { path: '/buy/in/bangalore', category: 'buy' as const },
         { path: '/plots/in/bangalore', category: 'static' as const },
         { path: '/blog', category: 'blog' as const }

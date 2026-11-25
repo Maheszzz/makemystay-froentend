@@ -8,6 +8,7 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { buildPageSEO, rentBangaloreHubSeo } from '@/lib/seo';
 import { buildPgLocationCombinedGraph } from '@/lib/schema';
 import Properties from '@/views/Properties';
+import { Link } from '@/lib/navigation';
 import { MapPin } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { formatInrRange } from '@/lib/listingInventoryStats';
@@ -82,7 +83,38 @@ export default function RentBangaloreHub() {
                     onRentHubInventoryRange={onRentHubInventoryRange}
                 />
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 md:mt-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-12">
+                    <section aria-labelledby="rent-bangalore-areas-heading">
+                        <h2 id="rent-bangalore-areas-heading" className="text-xl font-bold text-slate-900 mb-4">
+                            Browse Flats for Rent by Area in Bangalore
+                        </h2>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {[
+                                { label: 'Hebbal', slug: 'hebbal' },
+                                { label: 'JP Nagar', slug: 'jp-nagar' },
+                                { label: 'HSR Layout', slug: 'hsr-layout' },
+                                { label: 'Whitefield', slug: 'whitefield' },
+                                { label: 'Marathahalli', slug: 'marathahalli' },
+                                { label: 'Bellandur', slug: 'bellandur' },
+                                { label: 'Sarjapur Road', slug: 'sarjapur-road' },
+                                { label: 'Indiranagar', slug: 'indiranagar' },
+                                { label: 'BTM Layout', slug: 'btm' },
+                                { label: 'Koramangala', slug: 'koramangala' },
+                                { label: 'Electronic City', slug: 'electronic-city' },
+                                { label: 'Jayanagar', slug: 'jayanagar' },
+                            ].map((area) => (
+                                <Link
+                                    key={area.slug}
+                                    to={`/rent/${area.slug}`}
+                                    className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 hover:border-brand-red/40 hover:text-brand-red transition-colors"
+                                >
+                                    <MapPin className="w-3.5 h-3.5 text-brand-red shrink-0" aria-hidden />
+                                    Rent in {area.label}
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+
                     <FaqSection
                         title="Frequently asked — rent in Bangalore"
                         items={HUB_FAQS}

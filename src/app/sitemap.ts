@@ -12,6 +12,13 @@ export const revalidate = 3600; // Revalidate every hour
 
 const base = SITE_URL.replace(/\/+$/, '');
 
+const EXCLUDED_EXACT_PATHS = new Set([
+    '/pg-for-girls-in-bangalore',
+    '/pg-for-boys-in-bangalore',
+    '/blog/1bhk-for-rent-bangalore-guide-2026',
+    '/blog/cheapest-areas-rent-1bhk-bangalore-2026',
+]);
+
 const DISALLOWED_PREFIXES = [
     '/_next/',
     '/api/',
@@ -20,6 +27,14 @@ const DISALLOWED_PREFIXES = [
     '/quick-pay',
     '/wishlist',
     '/schedule-demo',
+    '/rent/1bhk/',
+    '/rent/2bhk/',
+    '/rent/3bhk/',
+    '/rent/flat/',
+    '/rent/apartment/',
+    '/rent/furnished/',
+    '/rent/1rk/',
+    '/rent/service-apartment/',
 ];
 
 function isValidSitemapPath(rawPath: string): boolean {
@@ -48,7 +63,8 @@ function isValidSitemapPath(rawPath: string): boolean {
         return false;
     }
 
-    // Exclude internal/private/non-canonical prefixes
+    // Exclude internal/private/non-canonical/removed paths
+    if (EXCLUDED_EXACT_PATHS.has(lower)) return false;
     if (DISALLOWED_PREFIXES.some((prefix) => lower.startsWith(prefix))) return false;
     if (lower.startsWith('/pg-in-')) return false;
 
@@ -95,7 +111,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     add('/rent', 'daily', 0.95);
     add('/properties', 'daily', 0.9);
     add('/buy', 'weekly', 0.8);
-    add('/plots', 'weekly', 0.8);
     add('/pg/bangalore', 'daily', 0.95);
     add('/pg/hyderabad', 'daily', 0.85);
     add('/pg/pune', 'daily', 0.85);
@@ -181,7 +196,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         for (const prop of allItems) {
             if (prop.is_available === false) continue;
             const detailPath = getPropertyDetailPath(prop);
-            if (detailPath.startsWith('/property/')) {
+            if (
+                detailPath.startsWith('/pg/') ||
+                detailPath.startsWith('/rent/') ||
+                detailPath.startsWith('/property/')
+            ) {
                 add(detailPath, 'daily', 0.85);
             }
         }
