@@ -10,7 +10,7 @@ import { SITE_URL } from '@/lib/siteConfig';
 import type { ProgrammaticBlogPost } from './blogTypes';
 
 export function generateBlogPostMetadata(post: ProgrammaticBlogPost): Metadata {
-    const ogImage = `${SITE_URL}/images/og-blog.jpg`;
+    const ogImage = `${SITE_URL}/og-image.jpg`;
 
     const keywordsList = [
         `PG in ${post.hero.category}`,

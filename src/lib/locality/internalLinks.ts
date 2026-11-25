@@ -7,6 +7,9 @@
 
 import type { HydratedLocality } from '@/data/localities';
 import { getAllLocalities } from '@/data/localities';
+import { OFFICES } from '@/data/offices';
+
+const OFFICE_SLUGS = new Set<string>(OFFICES.map((o) => o.slug));
 
 export interface InternalLinkItem {
     /** Anchor link text */
@@ -55,6 +58,7 @@ export function generateLocalityInternalLinks(locality: HydratedLocality): Local
     // 2. Nearby Tech Parks
     const nearbyTechParks: InternalLinkItem[] = [];
     for (const tp of locality.nearbyTechParks) {
+        if (!OFFICE_SLUGS.has(tp.slug)) continue; // only link to office pages that exist
         const url = `/office/${tp.slug}`;
         if (addUrl(url)) {
             nearbyTechParks.push({
@@ -90,7 +94,7 @@ export function generateLocalityInternalLinks(locality: HydratedLocality): Local
         { name: 'Managed Rentals in Bangalore', url: '/rent', description: 'Flats & independent rental homes' },
         { name: 'Bangalore PG Market Research', url: '/research', description: 'Rental trends & yield reports' },
         { name: 'How We Verify Properties', url: '/how-we-verify', description: '100% physical verification process' },
-        { name: 'Contact MakeMyStay', url: '/contact', description: 'Get assistance from our team' }
+        { name: 'Contact MakeMyStay', url: '/contact-us', description: 'Get assistance from our team' }
     ];
 
     const relatedLandingPages: InternalLinkItem[] = [];

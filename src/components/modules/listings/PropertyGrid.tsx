@@ -185,10 +185,7 @@ export function PropertyGrid({
                         >
                             {cardVariant === 'project' ? (
                                 <>
-                                    Handpicked for You{' '}
-                                    <span className="not-italic font-sans" aria-hidden>
-                                        ✨
-                                    </span>
+                                    Featured PGs &amp; Co-living in Bangalore
                                 </>
                             ) : (
                                 'Featured PGs near you'

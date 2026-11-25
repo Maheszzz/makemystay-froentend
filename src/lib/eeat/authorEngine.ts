@@ -101,7 +101,7 @@ export function generateEeatAuthorMetadata(
     const publisher = {
         name: LEGAL_ENTITY_NAME,
         url: SITE_URL,
-        logoUrl: `${SITE_URL}/logo.png`
+        logoUrl: `${SITE_URL}/icon-512.png`
     };
 
     const schemaJsonLd: Record<string, any> = {

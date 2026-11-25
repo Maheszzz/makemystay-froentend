@@ -39,6 +39,37 @@ export function absoluteUrl(path: string): string {
     return `${SITE_URL}${p}`;
 }
 
+const TITLE_MAX = 60;
+const DESCRIPTION_MAX = 155;
+
+/** "PGs in Bangalore — Bangalore" / "Bangalore, Bangalore" -> single mention. */
+function dedupeCity(text: string): string {
+    return text.replace(/\b(Bangalore|Bengaluru)(\s*[,—–-]\s*|\s+)\1\b/gi, '$1');
+}
+
+/** Keep titles under ~60 chars: drop the brand suffix first, then cut at a word boundary. */
+function fitTitle(stripped: string, hasBrandSuffix: boolean): string {
+    const withBrand = hasBrandSuffix ? stripped : `${stripped} | MakeMyStay`;
+    if (withBrand.length <= TITLE_MAX) return withBrand;
+    if (stripped.length <= TITLE_MAX) return stripped;
+    const cut = stripped.slice(0, TITLE_MAX);
+    const lastSpace = cut.lastIndexOf(' ');
+    const trimmed = (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).replace(/[\s|–—,:&-]+$/, '');
+    // Don't end on a dangling connector word ("... Coliving &", "... What")
+    return trimmed.replace(/(\s+(and|or|to|for|in|of|the|a|an|with|what|which|how|vs))+$/i, '').replace(/[\s|–—,:&-]+$/, '');
+}
+
+/** Cut descriptions at a sentence/word boundary instead of mid-word. */
+function fitDescription(text: string): string {
+    const t = text.replace(/\s+/g, ' ').trim();
+    if (t.length <= DESCRIPTION_MAX) return t;
+    const cut = t.slice(0, DESCRIPTION_MAX);
+    const lastSentence = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '));
+    if (lastSentence > 90) return cut.slice(0, lastSentence + 1);
+    const lastSpace = cut.lastIndexOf(' ');
+    return cut.slice(0, lastSpace > 90 ? lastSpace : DESCRIPTION_MAX).replace(/[\s,;:–—-]+$/, '') + '…';
+}
+
 /**
  * Values for react-helmet-async (title, meta, link).
  */
@@ -48,10 +79,11 @@ export function buildPageSEO(input: PageSEOInput): HelmetSEOProps {
         .replace(/(\s*[|–—-]\s*MakeMyStay(?:\.ai)?)+$/i, '')
         .trim();
     const hasBrandSuffix = /makemystay/i.test(stripped);
-    const title = hasBrandSuffix ? stripped : `${stripped} | MakeMyStay`;
+    const cleanTitle = dedupeCity(stripped);
+    const title = fitTitle(cleanTitle, hasBrandSuffix);
     return {
-        title: title.slice(0, 75), // Keep full title without truncating brand suffix
-        description: input.description.slice(0, 165), // Allow full 150-160 char SEO descriptions
+        title,
+        description: fitDescription(dedupeCity(input.description)),
         canonicalHref,
         ogImage: input.ogImage ?? DEFAULT_OG_IMAGE,
         noindex: input.noindex,
@@ -151,7 +183,7 @@ export function pgGenderLocalitySeo(
     const pathPrefix = isMale ? 'pg-for-boys-in' : 'pg-for-girls-in';
     const label = isMale ? 'Boys PG' : 'Girls PG';
     return {
-        title: `${label} in ${locationName} | Coliving`,
+        title: `${label} in ${locationName}, Bangalore`,
         description: `Find safe, verified ${label.toLowerCase()} in ${locationName}, Bangalore with WiFi, meals, and security. Zero brokerage on makemystay.ai.`,
         path: `/${pathPrefix}-${slug}`,
     };
@@ -318,9 +350,9 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Verified PGs & Flats in Bangalore',
+        title: 'PG in Bangalore: Verified PGs & Flats',
         description:
-            'Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in Bangalore with makemystay.ai.',
+            'Find verified PG in Bangalore, co-living, 1 BHK and 2 BHK flats with real photos, transparent pricing and zero brokerage. Book a visit on MakeMyStay.ai.',
         path: '/',
     };
 }

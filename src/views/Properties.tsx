@@ -960,16 +960,22 @@ function PropertiesInner({
                     description: resolvedSubtitle,
                     isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
                 },
-                {
-                    '@type': 'BreadcrumbList',
-                    itemListElement: [
-                        { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-                        { '@type': 'ListItem', position: 2, name: resolvedTitle, item: url },
-                    ],
-                },
+                // Embedded listings (hideChrome) sit inside pages that already emit their own
+                // BreadcrumbList, so only emit one here for the standalone listing hubs.
+                ...(hideChrome
+                    ? []
+                    : [
+                          {
+                              '@type': 'BreadcrumbList',
+                              itemListElement: [
+                                  { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+                                  { '@type': 'ListItem', position: 2, name: resolvedTitle, item: url },
+                              ],
+                          },
+                      ]),
             ],
         };
-    }, [location.pathname, resolvedTitle, resolvedSubtitle]);
+    }, [location.pathname, resolvedTitle, resolvedSubtitle, hideChrome]);
 
     const areaChipsWithHref = useMemo(() => {
         return areaCounts.slice(0, 14).map((area) => {
