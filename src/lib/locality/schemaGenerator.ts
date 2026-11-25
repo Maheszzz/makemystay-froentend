@@ -7,6 +7,7 @@
 
 import { BRAND_CONTACT, BRAND_SAME_AS } from '@/lib/brandEntity';
 import type { HydratedLocality } from '@/data/localities';
+import { OFFICES } from '@/data/offices';
 import {
     buildBreadcrumbSchema,
     buildFaqPageSchema,
@@ -116,7 +117,9 @@ export function generateLocalitySchemaBundle(
 
     // 5. ItemList (Nearby Tech Parks & Localities)
     const hubItems = [
-        ...locality.nearbyTechParks.map((tp) => ({
+        ...locality.nearbyTechParks
+            .filter((tp) => OFFICES.some((o) => o.slug === tp.slug))
+            .map((tp) => ({
             name: tp.name,
             url: `${SITE_URL}/office/${tp.slug}`
         })),
@@ -141,7 +144,7 @@ export function generateLocalitySchemaBundle(
         url: SITE_URL,
         logo: {
             '@type': 'ImageObject',
-            url: `${SITE_URL}/logo.png`
+            url: `${SITE_URL}/icon-512.png`
         },
         contactPoint: {
             '@type': 'ContactPoint',
