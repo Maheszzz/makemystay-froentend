@@ -54,7 +54,9 @@ function fitTitle(stripped: string, hasBrandSuffix: boolean): string {
     if (stripped.length <= TITLE_MAX) return stripped;
     const cut = stripped.slice(0, TITLE_MAX);
     const lastSpace = cut.lastIndexOf(' ');
-    return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).replace(/[\s|–—,:-]+$/, '');
+    const trimmed = (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).replace(/[\s|–—,:&-]+$/, '');
+    // Don't end on a dangling connector word ("... Coliving &", "... What")
+    return trimmed.replace(/(\s+(and|or|to|for|in|of|the|a|an|with|what|which|how|vs))+$/i, '').replace(/[\s|–—,:&-]+$/, '');
 }
 
 /** Cut descriptions at a sentence/word boundary instead of mid-word. */
