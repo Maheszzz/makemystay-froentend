@@ -29,7 +29,7 @@ export function generateBlogSchemaBundle(post: ProgrammaticBlogPost, faqs: FaqIt
         },
         image: {
             '@type': 'ImageObject',
-            url: `${SITE_URL}/images/og-blog.jpg`,
+            url: `${SITE_URL}/og-image.jpg`,
             width: 1200,
             height: 630
         },
@@ -43,7 +43,7 @@ export function generateBlogSchemaBundle(post: ProgrammaticBlogPost, faqs: FaqIt
             name: 'MakeMyStay.ai',
             logo: {
                 '@type': 'ImageObject',
-                url: `${SITE_URL}/logo.png`
+                url: `${SITE_URL}/icon-512.png`
             }
         },
         wordCount,
@@ -55,13 +55,6 @@ export function generateBlogSchemaBundle(post: ProgrammaticBlogPost, faqs: FaqIt
                 '[data-seo="blog-quick-summary"]',
                 '#faq-heading'
             ]
-        },
-        aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: '4.8',
-            reviewCount: '124',
-            bestRating: '5',
-            worstRating: '1'
         }
     };
 

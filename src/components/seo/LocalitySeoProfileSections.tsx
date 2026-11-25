@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import { OFFICES } from '@/data/offices';
 import type { LocalitySeoProfile } from '@/lib/locality';
 import { getAmenityIcon } from '@/lib/amenityIcons';
 import {
@@ -141,7 +142,7 @@ export function LocalitySeoProfileSections({ profile }: LocalitySeoProfileSectio
                         Nearby Tech Parks &amp; IT Campuses
                     </h2>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {nearbyTechParks.map((tp) => (
+                        {nearbyTechParks.filter((tp) => OFFICES.some((o) => o.slug === tp.slug)).map((tp) => (
                             <a
                                 key={tp.id}
                                 href={`/office/${tp.slug}`}

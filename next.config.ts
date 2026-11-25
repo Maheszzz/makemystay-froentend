@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     distDir: process.env.NEXT_DIST_DIR || '.next',
     output: 'standalone',
     reactStrictMode: true,
+    poweredByHeader: false,
     experimental: {
         scrollRestoration: true,
     },
@@ -35,12 +36,9 @@ const nextConfig: NextConfig = {
                 headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
             },
             {
-                source: '/sitemap(.*).xml',
-                headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
-            },
-            {
                 source: '/:path*',
                 headers: [
+                    { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
                     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
                     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
@@ -63,6 +61,7 @@ const nextConfig: NextConfig = {
             { source: '/hsr-layout-vs-bellandur', destination: '/compare/hsr-layout-vs-bellandur', permanent: true },
             { source: '/whitefield-vs-marathahalli', destination: '/compare/whitefield-vs-marathahalli', permanent: true },
             { source: '/koramangala-vs-indiranagar', destination: '/compare/koramangala-vs-indiranagar', permanent: true },
+            { source: '/contact', destination: '/contact-us', permanent: true },
             { source: '/1-bhk', destination: '/1bhk', permanent: true },
             { source: '/buy/bangalore', destination: '/buy/in/bangalore', permanent: true },
             { source: '/plot/bangalore', destination: '/plots/in/bangalore', permanent: true },
