@@ -18,31 +18,41 @@ import type { FaqItem } from '@/lib/schema';
 import Properties from '@/views/Properties';
 import { Suspense } from 'react';
 
+type GenderVariant = 'boys' | 'girls' | 'men' | 'women';
+
 function PgGenderLocalityPageBody({
     overrideSlug,
     overrideGender,
+    variant,
 }: {
     overrideSlug?: string;
     overrideGender?: 'male' | 'female';
+    variant?: GenderVariant;
 }) {
     const { pathname } = useLocation();
     const slug = (overrideSlug || '').toLowerCase();
     const loc = getPgLocationBySlug(slug);
 
     const isFemaleHub =
+        variant === 'girls' ||
+        variant === 'women' ||
         overrideGender === 'female' ||
         pathname.includes('girls') ||
         pathname.includes('women');
     const isMenOrWomenAlias =
-        pathname.includes('pg-for-men-in') || pathname.includes('pg-for-women-in');
-    const filterGender = isFemaleHub ? ('female' as const) : ('male' as const);
+        variant === 'men' ||
+        variant === 'women' ||
+        pathname.includes('pg-for-men-in') ||
+        pathname.includes('pg-for-women-in');
+    const filterGender: 'male' | 'female' = isFemaleHub ? 'female' : 'male';
     const audienceLabel = isFemaleHub ? 'Girls PG' : 'Boys PG';
     const canonicalPath = isFemaleHub ? `/pg-for-girls-in-${slug}` : `/pg-for-boys-in-${slug}`;
-    const seoVariant = pathname.includes('men') && !pathname.includes('women')
-        ? ('men' as const)
-        : pathname.includes('women')
-          ? ('women' as const)
-          : filterGender;
+    const seoVariant =
+        variant === 'men' || (pathname.includes('men') && !pathname.includes('women'))
+            ? ('men' as const)
+            : variant === 'women' || pathname.includes('women')
+              ? ('women' as const)
+              : filterGender;
 
     if (!loc) {
         return null;
@@ -102,8 +112,9 @@ function PgGenderLocalityPageBody({
                                     Verified {audienceLabel.toLowerCase()} in {name}
                                 </h1>
                                 <p className="mt-2 text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl">
-                                    Long-tail search hub for {name} — zero brokerage on many listings, real photos, and filters for
-                                    WiFi, meals, and AC on live inventory below.
+                                    {isFemaleHub
+                                        ? `Safe, verified PGs for women and girls in ${name} — look for CCTV, biometric entry, warden support and clear visitor policies. Real photos, and filters for WiFi, meals and AC on live inventory below.`
+                                        : `Verified PGs for men and boys in ${name} — compare commute to nearby tech parks, meals, WiFi and gate security. Real photos, and filters for WiFi, meals and AC on live inventory below.`}
                                 </p>
                                 <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-700 max-w-2xl">
                                     <p className="font-semibold text-slate-900">Quick facts</p>
@@ -166,6 +177,7 @@ function PgGenderLocalityPageBody({
 export default function PgGenderLocalityPage(props: {
     overrideSlug?: string;
     overrideGender?: 'male' | 'female';
+    variant?: GenderVariant;
 }) {
     return (
         <Suspense fallback={null}>

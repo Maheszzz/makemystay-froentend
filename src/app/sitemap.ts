@@ -201,7 +201,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 detailPath.startsWith('/rent/') ||
                 detailPath.startsWith('/property/')
             ) {
-                add(detailPath, 'daily', 0.85);
+                const updated = (prop as { updated_at?: string }).updated_at;
+                add(detailPath, 'daily', 0.85, updated ? new Date(updated).toISOString().split('T')[0] : undefined);
             }
         }
     } catch {
