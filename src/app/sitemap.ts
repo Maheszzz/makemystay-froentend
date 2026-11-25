@@ -55,6 +55,9 @@ function isValidSitemapPath(rawPath: string): boolean {
     return true;
 }
 
+/** Hyderabad / Pune localities in PG_LOCATIONS (their hub pages stay in the sitemap). */
+const NON_BANGALORE_LOCALITY_SLUGS = new Set(['hafeezpet', 'gachibowli', 'nanakramguda', 'kondapur', 'viman-nagar']);
+
 const TOP_BHK_LOCALITIES = [
     'whitefield',
     'marathahalli',
@@ -71,7 +74,6 @@ const TOP_BHK_LOCALITIES = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const today = new Date().toISOString().split('T')[0];
     const seen = new Set<string>();
     const entries: MetadataRoute.Sitemap = [];
 
@@ -79,14 +81,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         path: string,
         changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'],
         priority: number,
-        lastModified: string = today,
+        lastModified?: string,
     ) => {
         if (!isValidSitemapPath(path)) return;
         const normalized = path === '/' ? '/' : path.replace(/\/+$/, '');
         const url = normalized === '/' ? `${base}/` : `${base}${normalized}`;
         if (seen.has(url)) return;
         seen.add(url);
-        entries.push({ url, lastModified, changeFrequency, priority });
+        // Only emit lastmod when we have a real date; a build-date lastmod on every URL is ignored by Google
+        entries.push(lastModified ? { url, lastModified, changeFrequency, priority } : { url, changeFrequency, priority });
     };
 
     // 1. Core static & hub pages (all verified 200 canonical routes)
@@ -125,10 +128,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 3. Locality PG, Rent, and Gender hubs (from PG_LOCATIONS, excluding legacy redirects & 410 list)
     for (const loc of PG_LOCATIONS) {
         if (LEGACY_PG_SLUG_REDIRECTS[loc.slug]) continue;
+        // Boys/girls hubs for Hyderabad/Pune localities are thin duplicates of /pg/{slug}
+        const genderHubs = !NON_BANGALORE_LOCALITY_SLUGS.has(loc.slug);
         add(`/pg/${loc.slug}`, 'daily', 0.88);
         add(`/rent/${loc.slug}`, 'daily', 0.85);
-        add(`/pg-for-boys-in-${loc.slug}`, 'weekly', 0.8);
-        add(`/pg-for-girls-in-${loc.slug}`, 'weekly', 0.8);
+        if (genderHubs) {
+            add(`/pg-for-boys-in-${loc.slug}`, 'weekly', 0.8);
+            add(`/pg-for-girls-in-${loc.slug}`, 'weekly', 0.8);
+        }
     }
 
     // 4. BHK locality pages (/1bhk/[slug], /2bhk/[slug], /3bhk/[slug])
@@ -151,7 +158,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 6. Blog posts
     add('/blog', 'weekly', 0.8);
     for (const post of BLOG_POSTS) {
-        if (post.slug) add(`/blog/${post.slug}`, 'monthly', 0.8);
+        if (post.slug) add(`/blog/${post.slug}`, 'monthly', 0.8, post.updatedAt);
     }
 
     // 7. Static informational pages
@@ -182,7 +189,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             if (prop.is_available === false) continue;
             const detailPath = getPropertyDetailPath(prop);
             if (detailPath.startsWith('/property/')) {
-                add(detailPath, 'daily', 0.85);
+                const updated = (prop as { updated_at?: string }).updated_at;
+                add(detailPath, 'daily', 0.85, updated ? new Date(updated).toISOString().split('T')[0] : undefined);
             }
         }
     } catch {

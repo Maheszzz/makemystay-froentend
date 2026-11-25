@@ -356,7 +356,7 @@ export function buildPropertyDetailGraph(
         property.housekeeping ? 'Housekeeping' : '',
         property.power_backup ? 'Power backup' : '',
     ]
-        .filter(Boolean)
+        .filter((name): name is string => typeof name === 'string' && /^[^\n*]{2,60}$/.test(name.trim()))
         .slice(0, 20)
         .map((name) => ({
             '@type': 'LocationFeatureSpecification',
