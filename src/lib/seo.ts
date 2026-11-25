@@ -151,7 +151,7 @@ export function pgGenderLocalitySeo(
     const pathPrefix = isMale ? 'pg-for-boys-in' : 'pg-for-girls-in';
     const label = isMale ? 'Boys PG' : 'Girls PG';
     return {
-        title: `${label} in ${locationName} | Coliving`,
+        title: `${label} in ${locationName}, Bangalore`,
         description: `Find safe, verified ${label.toLowerCase()} in ${locationName}, Bangalore with WiFi, meals, and security. Zero brokerage on makemystay.ai.`,
         path: `/${pathPrefix}-${slug}`,
     };
