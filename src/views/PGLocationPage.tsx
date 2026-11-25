@@ -50,6 +50,11 @@ export interface PGLocationPageProps {
 
 export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPrice, overrideGender, overrideFeature }: PGLocationPageProps) {
   const actualSlug = overrideSlug || slug || '';
+  // Gender landing pages (/pg-for-boys-in-*, /pg-for-girls-in-*) get their own heading + filter
+  const genderLower = (overrideGender || '').toLowerCase();
+  const forcedGender: 'male' | 'female' | undefined =
+    genderLower === 'male' ? 'male' : genderLower === 'female' ? 'female' : undefined;
+  const genderLabel = forcedGender === 'female' ? 'Girls PG' : forcedGender === 'male' ? 'Boys PG' : '';
   // Legacy slug redirects (e.g., old URL formats)
   const legacyTarget = resolveLegacyPgSlug(actualSlug);
   if (legacyTarget) {
@@ -103,14 +108,15 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             hideChrome
             initialCategory="pg"
             initialCity={localitySeoProfile.locality.name}
-            pageTitle={localitySeoProfile.hero.heading}
+            pageTitle={genderLabel ? `${genderLabel} in ${localitySeoProfile.locality.name}, Bangalore` : localitySeoProfile.hero.heading}
             pageSubtitle={localitySeoProfile.hero.subHeading}
+            forcedGenderFilter={forcedGender}
             initialProperties={initialProperties}
             initialTotalCount={total}
             initialPropertyCounts={propertyCounts}
             hero={{
               breadcrumbs: localitySeoProfile.breadcrumb,
-              title: localitySeoProfile.hero.heading,
+              title: genderLabel ? `${genderLabel} in ${localitySeoProfile.locality.name}, Bangalore` : localitySeoProfile.hero.heading,
               subtitle: localitySeoProfile.hero.subHeading,
               extra: (
                 <Link
@@ -181,7 +187,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   // Only noindex empty pages if they are also programmatic (filtered) variants.
   const isEmptyLocality = isProgrammatic && initialProperties.length === 0;
 
-  const pageTitle = `PGs in ${name}`;
+  const pageTitle = genderLabel ? `${genderLabel} in ${name}, Bangalore` : `PGs in ${name}`;
   const pageSubtitle = `PGs and coliving stays in ${name} — filter by budget, meals, and gender.`;
 
   return (
@@ -202,6 +208,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           initialCity={name}
           pageTitle={pageTitle}
           pageSubtitle={pageSubtitle}
+          forcedGenderFilter={forcedGender}
           initialProperties={initialProperties}
           initialTotalCount={total}
           initialPropertyCounts={propertyCounts}
@@ -209,7 +216,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             breadcrumbs: [
               { name: 'Home', path: '/' },
               { name: 'PG', path: '/pg' },
-              { name: `PGs in ${name}` },
+              { name: genderLabel ? `${genderLabel} in ${name}` : `PGs in ${name}` },
             ],
             title: pageTitle,
             subtitle: pageSubtitle,
