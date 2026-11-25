@@ -318,9 +318,9 @@ export function pgVsFlatBangaloreSeo(): PageSEOInput {
 /** Homepage title/description for high-conversion SEO (SEO audit Appendix A). */
 export function buildHomeSEO(): PageSEOInput {
     return {
-        title: 'Verified PGs & Flats in Bangalore',
+        title: 'PG in Bangalore: Verified PGs & Flats',
         description:
-            'Find verified PGs, co-living spaces, rental homes, 1 BHK, 2 BHK and furnished apartments in Bangalore with makemystay.ai.',
+            'Find verified PG in Bangalore, co-living, 1 BHK and 2 BHK flats with real photos, transparent pricing and zero brokerage. Book a visit on MakeMyStay.ai.',
         path: '/',
     };
 }
