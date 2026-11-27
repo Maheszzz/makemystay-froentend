@@ -7,9 +7,23 @@ import RentHyderabadHub from '@/views/RentHyderabadHub';
 import RentPuneHub from '@/views/RentPuneHub';
 import RentLocationPage from '@/views/RentLocationPage';
 
-export default function RentSlugRoute() {
+import type { Property } from '@/types/api';
+
+interface RentSlugRouteProps {
+    overrideSlug?: string;
+    initialProperties?: Property[];
+    initialTotalCount?: number;
+    initialPropertyCounts?: Record<string, number>;
+}
+
+export default function RentSlugRoute({
+    overrideSlug,
+    initialProperties,
+    initialTotalCount,
+    initialPropertyCounts,
+}: RentSlugRouteProps = {}) {
     const { slug } = useParams<{ slug: string }>();
-    const param = (slug || '').toLowerCase();
+    const param = (overrideSlug || slug || '').toLowerCase();
 
     if (/^(\d+)(-|$)/.test(param)) {
         return <PropertyDetails />;
@@ -19,5 +33,12 @@ export default function RentSlugRoute() {
     if (param === 'hyderabad') return <RentHyderabadHub key="rent-hyderabad-hub" />;
     if (param === 'pune') return <RentPuneHub key="rent-pune-hub" />;
 
-    return <RentLocationPage />;
+    return (
+        <RentLocationPage
+            overrideSlug={param}
+            initialProperties={initialProperties}
+            initialTotalCount={initialTotalCount}
+            initialPropertyCounts={initialPropertyCounts}
+        />
+    );
 }

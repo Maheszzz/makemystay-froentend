@@ -240,13 +240,30 @@ for (const s of CITY_HUB_PATHS) {
     citiesBody += urlEntry(`${BASE}${s.path}`, s.priority, s.changefreq);
 }
 
+const REDIRECTING_LEGACY_SLUGS = new Set([
+    'btm-layout',
+    'sarjapur',
+    'hsr-sector-1',
+    'hsr-sector-2',
+    'hsr-sector-7',
+    'itpl',
+    'kundalahalli',
+    'aecs',
+    'magadi-road',
+    'kengeri',
+    'vijayanagar',
+    'malleswaram',
+]);
+
 let localitiesBody = '';
 for (const row of locJson) {
+    if (!row?.slug || REDIRECTING_LEGACY_SLUGS.has(row.slug.toLowerCase())) continue;
     localitiesBody += urlEntry(`${BASE}/pg/${row.slug}`, '0.85', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-boys-in-${row.slug}`, '0.84', 'weekly');
     localitiesBody += urlEntry(`${BASE}/pg-for-girls-in-${row.slug}`, '0.84', 'weekly');
 }
 for (const rentSlug of RENT_HUB_LOCATION_SLUGS) {
+    if (!rentSlug || REDIRECTING_LEGACY_SLUGS.has(rentSlug.toLowerCase())) continue;
     localitiesBody += urlEntry(`${BASE}/rent/${rentSlug}`, '0.86', 'weekly');
 }
 

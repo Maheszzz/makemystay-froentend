@@ -2,9 +2,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { STATIC_410_GONE_PATHS } from '@/lib/seoPropertyRedirects';
+import pgLocations from '@/data/pg-locations.json';
+
+const VALID_BHK_AREAS = new Set(pgLocations.map((loc) => loc.slug.toLowerCase()));
+const REMOVED_RENT_TYPE_RE = /^\/rent\/(flat|apartment|furnished|1rk|service-apartment)(?:\/.*)?$/;
+const LEGACY_RENT_BHK_RE = /^\/rent\/(1bhk|2bhk|3bhk)\/([^/]+)$/;
 
 /**
- * Middleware for 410 Gone enforcement, URL normalization, and query-param noindex headers.
+ * Middleware for 410 Gone enforcement, broken /rent/{type}/{area} redirects,
+ * URL normalization, and query-param noindex headers.
  */
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
@@ -35,6 +41,34 @@ export function middleware(request: NextRequest) {
     STATIC_410_GONE_PATHS.has(decodedClean) ||
     STATIC_410_GONE_PATHS.has(decodedLower)
   ) {
+    return new NextResponse('Gone', {
+      status: 410,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    });
+  }
+
+  // 0b. Removed /rent/{flat|apartment|furnished|1rk|service-apartment}/* -> 410 Gone
+  if (REMOVED_RENT_TYPE_RE.test(lowerPath)) {
+    return new NextResponse('Gone', {
+      status: 410,
+      headers: { 'X-Robots-Tag': 'noindex, nofollow' },
+    });
+  }
+
+  // 0c. Broken /rent/{1bhk|2bhk|3bhk}/{area} -> 301 to /{type}/{area} ONLY when destination exists (200), else 410
+  const bhkMatch = lowerPath.match(LEGACY_RENT_BHK_RE);
+  if (bhkMatch) {
+    const [, bhkType, area] = bhkMatch;
+    if (VALID_BHK_AREAS.has(area)) {
+      const targetUrl = request.nextUrl.clone();
+      const forwardedHost = request.headers.get('x-forwarded-host') || request.headers.get('host') || targetUrl.host;
+      if (!forwardedHost.startsWith('localhost') && !forwardedHost.startsWith('127.0.0.1')) {
+        targetUrl.host = forwardedHost.split(':')[0].replace(/^www\./, '');
+        targetUrl.port = '';
+      }
+      targetUrl.pathname = `/${bhkType}/${area}`;
+      return NextResponse.redirect(targetUrl, 301);
+    }
     return new NextResponse('Gone', {
       status: 410,
       headers: { 'X-Robots-Tag': 'noindex, nofollow' },

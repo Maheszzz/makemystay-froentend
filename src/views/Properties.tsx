@@ -1024,6 +1024,7 @@ function PropertiesInner({
     }, [inventoryCoverage, activeTabKey]);
 
     const budgetPresets = useMemo(() => getBudgetPresetsForCategory(activeTabKey), [activeTabKey]);
+    const ContentWrapper = hideChrome ? 'div' : 'main';
 
     return (
         <div className="bg-page min-h-screen text-ink font-sans flex flex-col overflow-x-clip">
@@ -1034,7 +1035,7 @@ function PropertiesInner({
             <JsonLd data={listingPageLd} id={`listing-page-${activeTabKey}-ld-json`} />
             {!hideChrome && <Navbar />}
 
-            <main id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
+            <ContentWrapper id={hideChrome ? undefined : 'main-content'} className={hideChrome ? 'pt-0 pb-16 flex-grow' : 'pt-[52px] md:pt-[56px] pb-20 flex-grow'}>
                 {/* 1. Hero (photo + deep-red gradient) */}
                 {(!hideChrome || hero) && (
                     <ListingHero
@@ -1308,7 +1309,7 @@ function PropertiesInner({
                         </div>
                     )}
                 </div>
-            </main>
+            </ContentWrapper>
 
             {!hideChrome && <Footer />}
 

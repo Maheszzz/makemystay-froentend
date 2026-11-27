@@ -5,11 +5,12 @@ import { FaqSection } from '@/components/seo/FaqSection';
 import { SEOHead } from '@/components/seo/SEOHead';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { PgLocationDeepContent } from '@/components/seo/PgLocationDeepContent';
+import { buildGenderLocalityFaqs, PgGenderLocalityContent } from '@/components/seo/PgGenderLocalityContent';
 import { QuickAnswer } from '@/components/seo/QuickAnswer';
 import { LOCALITY_CONTENT } from '@/data/localityContent';
 import { getPgLocationBySlug, resolveLegacyPgSlug } from '@/data/pgLocations';
 import { buildLocalityAeoGraph, buildLocalityFaqs, resolveLocalityProfile } from '@/lib/pgLocalityContent';
-import { buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
+import { absoluteUrl, buildPageSEO, pgLocationSeoWithQuery, stablePgListingCanonical } from '@/lib/seo';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthorityProfile } from '@/data/authority';
 import { getPropertyDetailPath } from '@/lib/propertyRouting';
@@ -50,11 +51,12 @@ export interface PGLocationPageProps {
 
 export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPrice, overrideGender, overrideFeature }: PGLocationPageProps) {
   const actualSlug = overrideSlug || slug || '';
-  // Gender landing pages (/pg-for-boys-in-*, /pg-for-girls-in-*) get their own heading + filter
-  const genderLower = (overrideGender || '').toLowerCase();
-  const forcedGender: 'male' | 'female' | undefined =
-    genderLower === 'male' ? 'male' : genderLower === 'female' ? 'female' : undefined;
-  const genderLabel = forcedGender === 'female' ? 'Girls PG' : forcedGender === 'male' ? 'Boys PG' : '';
+  const normalizedGender: 'male' | 'female' | undefined =
+    overrideGender?.toLowerCase() === 'female'
+      ? 'female'
+      : overrideGender?.toLowerCase() === 'male'
+        ? 'male'
+        : undefined;
   // Legacy slug redirects (e.g., old URL formats)
   const legacyTarget = resolveLegacyPgSlug(actualSlug);
   if (legacyTarget) {
@@ -70,6 +72,16 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           overrideFeature={overrideFeature}
       />;
   }
+
+  const selfCanonicalPathFor = (baseSlug: string): string => {
+    if (overrideGender) {
+      const genderWord = overrideGender.toLowerCase() === 'female' ? 'girls' : 'boys';
+      return `/pg-for-${genderWord}-in-${baseSlug}`;
+    }
+    if (overrideMaxPrice) return `/pg-in-${baseSlug}-under-${overrideMaxPrice}`;
+    if (overrideFeature) return `/pg-in-${baseSlug}-with-${overrideFeature.toLowerCase()}`;
+    return `/pg/${baseSlug}`;
+  };
 
   const baseLocalityProfile = getLocalitySeoProfile(actualSlug);
   if (baseLocalityProfile) {
@@ -89,17 +101,53 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
       ? getLocalitySeoProfile(actualSlug, liveStats) ?? baseLocalityProfile
       : baseLocalityProfile;
 
-    const helmet = generateLocalityHelmetSeo(localitySeoProfile.locality, liveStats);
+    const baseHelmet = generateLocalityHelmetSeo(localitySeoProfile.locality, liveStats);
+    const genderLabel = normalizedGender === 'female' ? 'Girls PG' : 'Boys PG';
+    const helmet = {
+      ...baseHelmet,
+      ...(normalizedGender
+        ? {
+            title: `${genderLabel} in ${localitySeoProfile.locality.name}, Bangalore | Verified Stays | MakeMyStay`,
+            description:
+              normalizedGender === 'female'
+                ? `Find safe, verified girls PG and ladies hostels in ${localitySeoProfile.locality.name}, Bangalore with CCTV, WiFi, meals, and zero brokerage.`
+                : `Find verified boys PG and men's coliving stays in ${localitySeoProfile.locality.name}, Bangalore with WiFi, meals, and zero brokerage.`,
+          }
+        : {}),
+      canonicalHref: absoluteUrl(selfCanonicalPathFor(actualSlug)),
+    };
     const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
-    const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
-    // Only noindex empty pages if they are also programmatic (filtered) variants.
-    // Clean canonical locality pages (/pg/[area]) are kept indexable even with 0 listings
-    // so Google can discover them and they can rank as the area gets listings added.
-    const isEmptyLocality = isProgrammatic && initialProperties.length === 0;
+    // Only noindex when a page has 0 listings AND lacks rich server-rendered guide content (< 300 words).
+    const hasRichGuideContent = Boolean(normalizedGender || localitySeoProfile);
+    const effectiveNoindex = helmet.noindex || (isProgrammatic && initialProperties.length === 0 && !hasRichGuideContent);
+
+    const heroTitle = normalizedGender
+      ? `${genderLabel} in ${localitySeoProfile.locality.name}`
+      : localitySeoProfile.hero.heading;
+    const heroSubtitle = normalizedGender
+      ? normalizedGender === 'female'
+        ? `Safe, verified girls PGs and women's coliving stays in ${localitySeoProfile.locality.name} — real photos, CCTV, WiFi, meals & zero brokerage.`
+        : `Verified boys PGs and men's coliving stays in ${localitySeoProfile.locality.name} — transparent rent, WiFi, meals & zero brokerage.`
+      : localitySeoProfile.hero.subHeading;
+
+    const livePrices = initialProperties.map((p) => Number(p.price)).filter((n) => Number.isFinite(n) && n > 0);
+    const liveMinPrice = livePrices.length > 0 ? Math.min(...livePrices) : null;
+    const liveMaxPrice = livePrices.length > 0 ? Math.max(...livePrices) : null;
+    const deepProfile = resolveLocalityProfile(actualSlug);
+    const locMeta = getPgLocationBySlug(actualSlug);
+    const genderFaqs = normalizedGender
+      ? buildGenderLocalityFaqs(
+          localitySeoProfile.locality.name,
+          normalizedGender,
+          locMeta?.rentRange,
+          deepProfile.nearbyOffices,
+          deepProfile.metro,
+        )
+      : localitySeoProfile.faqs;
 
     return (
       <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
-        <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
+        <SEOHead {...helmet} noindex={effectiveNoindex} />
         <JsonLd data={localitySeoProfile.jsonLdSchema} id="pg-locality-seo-ld" />
 
         <Navbar />
@@ -108,16 +156,22 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             hideChrome
             initialCategory="pg"
             initialCity={localitySeoProfile.locality.name}
-            pageTitle={genderLabel ? `${genderLabel} in ${localitySeoProfile.locality.name}, Bangalore` : localitySeoProfile.hero.heading}
-            pageSubtitle={localitySeoProfile.hero.subHeading}
-            forcedGenderFilter={forcedGender}
+            forcedGenderFilter={normalizedGender}
+            pageTitle={heroTitle}
+            pageSubtitle={heroSubtitle}
             initialProperties={initialProperties}
             initialTotalCount={total}
             initialPropertyCounts={propertyCounts}
             hero={{
-              breadcrumbs: localitySeoProfile.breadcrumb,
-              title: genderLabel ? `${genderLabel} in ${localitySeoProfile.locality.name}, Bangalore` : localitySeoProfile.hero.heading,
-              subtitle: localitySeoProfile.hero.subHeading,
+              breadcrumbs: normalizedGender
+                ? [
+                    { name: 'Home', path: '/' },
+                    { name: 'PG', path: '/pg' },
+                    { name: `${genderLabel} in ${localitySeoProfile.locality.name}` },
+                  ]
+                : localitySeoProfile.breadcrumb,
+              title: heroTitle,
+              subtitle: heroSubtitle,
               extra: (
                 <Link
                   to="/pg/bangalore"
@@ -133,15 +187,37 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
           {/* Comprehensive Locality SEO Engine sections */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
-            <QuickAnswer locationName={localitySeoProfile.locality.name}>
-              {localitySeoProfile.quickAnswer}
-            </QuickAnswer>
-            <LocalitySeoProfileSections profile={localitySeoProfile} />
+            {normalizedGender ? (
+              <PgGenderLocalityContent
+                name={localitySeoProfile.locality.name}
+                slug={actualSlug}
+                gender={normalizedGender}
+                rentRange={locMeta?.rentRange}
+                landmarks={locMeta?.landmarks}
+                profile={deepProfile}
+                content={LOCALITY_CONTENT[actualSlug]}
+                liveListingCount={total || initialProperties.length}
+                liveMinPrice={liveMinPrice}
+                liveMaxPrice={liveMaxPrice}
+                nearbySlugs={deepProfile.nearbySlugs}
+              />
+            ) : (
+              <>
+                <QuickAnswer locationName={localitySeoProfile.locality.name}>
+                  {localitySeoProfile.quickAnswer}
+                </QuickAnswer>
+                <LocalitySeoProfileSections profile={localitySeoProfile} />
+              </>
+            )}
 
             <FaqSection
               id="pg-locality-faq-heading"
-              title={`Frequently asked — PG in ${localitySeoProfile.locality.name}`}
-              items={localitySeoProfile.faqs}
+              title={
+                normalizedGender
+                  ? `Frequently asked — ${genderLabel} in ${localitySeoProfile.locality.name}`
+                  : `Frequently asked — PG in ${localitySeoProfile.locality.name}`
+              }
+              items={genderFaqs}
               collapsible
               titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
             />
@@ -162,10 +238,16 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   const { name, slug: locationSlug } = loc;
   const searchParams = new URLSearchParams(); // Empty – client‑side filters will update URL later
   const seoInput = pgLocationSeoWithQuery(name, locationSlug, searchParams);
-  const helmet = buildPageSEO(seoInput);
+  const selfPath = selfCanonicalPathFor(locationSlug);
+  const helmet = {
+    ...buildPageSEO(seoInput),
+    canonicalHref: absoluteUrl(selfPath),
+  };
   const profile = resolveLocalityProfile(locationSlug);
   const faqs = buildLocalityFaqs(name, locationSlug);
-  const canonicalListingPath = stablePgListingCanonical(locationSlug, searchParams);
+  const canonicalListingPath = overrideGender || overrideMaxPrice || overrideFeature
+    ? selfPath
+    : stablePgListingCanonical(locationSlug, searchParams);
   const content = LOCALITY_CONTENT[locationSlug] || {};
   const breadcrumbItems = [
     { name: 'Home', path: '/' },
@@ -183,18 +265,40 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
   });
 
   const isProgrammatic = !!(overrideMaxPrice || overrideGender || overrideFeature);
-  const isThinProgrammaticPage = isProgrammatic && initialProperties.length < 2;
-  // Only noindex empty pages if they are also programmatic (filtered) variants.
-  const isEmptyLocality = isProgrammatic && initialProperties.length === 0;
+  // Only noindex when a page has 0 listings AND lacks rich server-rendered guide content (< 300 words).
+  const hasRichGuideContent = Boolean(normalizedGender || loc);
+  const effectiveNoindex = helmet.noindex || (isProgrammatic && initialProperties.length === 0 && !hasRichGuideContent);
 
-  const pageTitle = genderLabel ? `${genderLabel} in ${name}, Bangalore` : `PGs in ${name}`;
-  const pageSubtitle = `PGs and coliving stays in ${name} — filter by budget, meals, and gender.`;
+  const genderLabel = normalizedGender === 'female' ? 'Girls PG' : 'Boys PG';
+  const pageTitle = normalizedGender ? `${genderLabel} in ${name}` : `PGs in ${name}`;
+  const pageSubtitle = normalizedGender
+    ? normalizedGender === 'female'
+      ? `Safe, verified girls PGs and women's coliving stays in ${name} — CCTV, WiFi, meals, and zero brokerage.`
+      : `Verified boys PGs and men's coliving stays in ${name} — WiFi, meals, transparent rent, and zero brokerage.`
+    : `PGs and coliving stays in ${name} — filter by budget, meals, and gender.`;
+
+  const effectiveFaqs = normalizedGender
+    ? buildGenderLocalityFaqs(name, normalizedGender, loc.rentRange, profile.nearbyOffices, profile.metro)
+    : faqs;
+  const effectiveBreadcrumbs = normalizedGender
+    ? [
+        { name: 'Home', path: '/' },
+        { name: 'PG', path: '/pg' },
+        { name: `${genderLabel} in ${name}`, path: selfPath },
+      ]
+    : breadcrumbItems;
+  const effectiveCombinedLd = normalizedGender
+    ? buildLocalityAeoGraph(profile, effectiveFaqs, effectiveBreadcrumbs, selfPath)
+    : combinedLd;
+  const livePrices = initialProperties.map((p) => Number(p.price)).filter((n) => Number.isFinite(n) && n > 0);
+  const liveMinPrice = livePrices.length > 0 ? Math.min(...livePrices) : null;
+  const liveMaxPrice = livePrices.length > 0 ? Math.max(...livePrices) : null;
 
   return (
     <div className="min-h-screen bg-page text-ink font-sans flex flex-col">
-      <SEOHead {...helmet} noindex={helmet.noindex || isThinProgrammaticPage || isEmptyLocality} />
-      <JsonLd data={combinedLd} id="pg-location-ld" />
-      <BreadcrumbSchema items={breadcrumbItems} />
+      <SEOHead {...helmet} noindex={effectiveNoindex} />
+      <JsonLd data={effectiveCombinedLd} id="pg-location-ld" />
+      <BreadcrumbSchema items={effectiveBreadcrumbs} />
 
       <PlaceSchema name={name} description={profile?.description} />
       <ItemListSchema items={initialProperties.map(p => ({ url: getPropertyDetailPath(p), name: p.title }))} />
@@ -206,9 +310,9 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           hideChrome
           initialCategory="pg"
           initialCity={name}
+          forcedGenderFilter={normalizedGender}
           pageTitle={pageTitle}
           pageSubtitle={pageSubtitle}
-          forcedGenderFilter={forcedGender}
           initialProperties={initialProperties}
           initialTotalCount={total}
           initialPropertyCounts={propertyCounts}
@@ -216,7 +320,7 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
             breadcrumbs: [
               { name: 'Home', path: '/' },
               { name: 'PG', path: '/pg' },
-              { name: genderLabel ? `${genderLabel} in ${name}` : `PGs in ${name}` },
+              { name: pageTitle },
             ],
             title: pageTitle,
             subtitle: pageSubtitle,
@@ -235,10 +339,28 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
 
         {/* Additional locality sections */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-14 space-y-10">
-          <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
-          <section className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
-            <PgLocationDeepContent name={name} profile={profile} />
-          </section>
+          {normalizedGender ? (
+            <PgGenderLocalityContent
+              name={name}
+              slug={locationSlug}
+              gender={normalizedGender}
+              rentRange={loc.rentRange}
+              landmarks={loc.landmarks}
+              profile={profile}
+              content={content}
+              liveListingCount={total || initialProperties.length}
+              liveMinPrice={liveMinPrice}
+              liveMaxPrice={liveMaxPrice}
+              nearbySlugs={profile.nearbySlugs}
+            />
+          ) : (
+            <>
+              <QuickAnswer locationName={name}>{profile.quickAnswer}</QuickAnswer>
+              <section className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm ring-1 ring-slate-900/5">
+                <PgLocationDeepContent name={name} profile={profile} />
+              </section>
+            </>
+          )}
 
           {/* Rent Range */}
           {loc.rentRange && (
@@ -333,8 +455,8 @@ export default async function PGLocationPage({ slug, overrideSlug, overrideMaxPr
           )}
           <FaqSection
             id="pg-locality-faq-heading"
-            title={`Frequently asked — PG in ${name}`}
-            items={faqs}
+            title={normalizedGender ? `Frequently asked — ${genderLabel} in ${name}` : `Frequently asked — PG in ${name}`}
+            items={effectiveFaqs}
             collapsible
             titleAdornment={<MapPin className="h-5 w-5 text-brand-red shrink-0" aria-hidden />}
           />

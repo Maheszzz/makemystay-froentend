@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Link, Navigate } from '@/lib/navigation';
+import { Link, useLocation } from '@/lib/navigation';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -22,25 +22,40 @@ type GenderVariant = 'boys' | 'girls' | 'men' | 'women';
 
 function PgGenderLocalityPageBody({
     overrideSlug,
-    variant = 'boys',
+    overrideGender,
+    variant,
 }: {
     overrideSlug?: string;
+    overrideGender?: 'male' | 'female';
     variant?: GenderVariant;
 }) {
-    const slugParam = undefined;
-    const slug = (overrideSlug || slugParam || '').toLowerCase();
+    const { pathname } = useLocation();
+    const slug = (overrideSlug || '').toLowerCase();
     const loc = getPgLocationBySlug(slug);
 
-    const isFemaleHub = variant === 'girls' || variant === 'women';
-    // /pg-for-men-in-* and /pg-for-women-in-* are aliases of the boys/girls pages
-    const isMenOrWomenAlias = variant === 'men' || variant === 'women';
+    const isFemaleHub =
+        variant === 'girls' ||
+        variant === 'women' ||
+        overrideGender === 'female' ||
+        pathname.includes('girls') ||
+        pathname.includes('women');
+    const isMenOrWomenAlias =
+        variant === 'men' ||
+        variant === 'women' ||
+        pathname.includes('pg-for-men-in') ||
+        pathname.includes('pg-for-women-in');
     const filterGender: 'male' | 'female' = isFemaleHub ? 'female' : 'male';
     const audienceLabel = isFemaleHub ? 'Girls PG' : 'Boys PG';
     const canonicalPath = isFemaleHub ? `/pg-for-girls-in-${slug}` : `/pg-for-boys-in-${slug}`;
-    const seoVariant = filterGender;
+    const seoVariant =
+        variant === 'men' || (pathname.includes('men') && !pathname.includes('women'))
+            ? ('men' as const)
+            : variant === 'women' || pathname.includes('women')
+              ? ('women' as const)
+              : filterGender;
 
     if (!loc) {
-        return <Navigate to={isFemaleHub ? '/pg-for-girls' : '/pg-for-boys'} replace />;
+        return null;
     }
 
     const { name, slug: locSlug } = loc;
@@ -159,7 +174,11 @@ function PgGenderLocalityPageBody({
     );
 }
 
-export default function PgGenderLocalityPage(props: { overrideSlug?: string; variant?: GenderVariant }) {
+export default function PgGenderLocalityPage(props: {
+    overrideSlug?: string;
+    overrideGender?: 'male' | 'female';
+    variant?: GenderVariant;
+}) {
     return (
         <Suspense fallback={null}>
             <PgGenderLocalityPageBody {...props} />
